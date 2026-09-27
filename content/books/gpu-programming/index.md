@@ -13,5 +13,9 @@ A GPU kernel is fast when it keeps the machine's *bottleneck resource* busy. The
 
 Every chapter ends with the kind of interview questions asked for kernel and performance roles, with answers.
 
-> [!NOTE]
-> Chapters are being edited for publication and will appear here one by one.
+> [!NOTE] Part I is published
+> Chapters 1 to 5 (Foundations) are available now: CPU parallelism, why GPUs exist, the hardware, the programming model and the toolchain. Later parts are being edited and will appear here as they are ready.
+
+## Running the code
+
+Chapter 1 runs on any laptop CPU. From Chapter 2 on you need an NVIDIA GPU; a free Google Colab T4 is enough. The code lives in [`code/gpu`](https://github.com/ishwar6/ishwar-books/tree/main/code/gpu) in this site's repository.

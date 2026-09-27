@@ -1,0 +1,11 @@
+[package]
+name = "ch01-tokio"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tokio = { version = "1", features = ["rt", "rt-multi-thread", "time", "macros"] }
+rayon = "1"
+
+[profile.release]
+opt-level = 3

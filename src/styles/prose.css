@@ -260,3 +260,7 @@
 .fig .t-note { font-size: 13px; fill: var(--muted); }
 .fig .arrow { fill: var(--border); }
 .fig .arrow-on { fill: var(--h2); }
+.fig .path.bad { stroke: #f06a6a; }
+.fig .arrow-bad { fill: #f06a6a; }
+.fig .node.stuck { fill: color-mix(in srgb, #f06a6a 30%, var(--surface-2)); stroke: #f06a6a; stroke-width: 2.5; }
+.fig .t-note.bad { fill: #f06a6a; font-weight: 700; }
