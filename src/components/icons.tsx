@@ -18,3 +18,4 @@ export const X = () => (
   <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.2 2.25h3.3l-7.2 8.26 8.5 11.24h-6.7l-5.2-6.8-6 6.8H1.7l7.7-8.84L1.25 2.25H8.1l4.7 6.23 5.4-6.23Zm-1.2 17.52h1.8L7.1 4.13H5.1l11.9 15.64Z" /></svg>
 )
 export const Dim = () => <svg viewBox="0 0 24 24" {...s}><circle cx="12" cy="12" r="9" /><path d="M12 3a9 9 0 0 1 0 18Z" fill="currentColor" /></svg>
+export const SearchIcon = () => <svg viewBox="0 0 24 24" {...s}><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>

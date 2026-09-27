@@ -9,11 +9,12 @@
     "dev": "npm run content && vite",
     "build": "npm run content && vite build && node scripts/postbuild.mjs",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "npm run content && tsc --noEmit"
   },
   "dependencies": {
     "katex": "^0.18.9",
     "mermaid": "^12.0.0",
+    "minisearch": "^7.2.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "react-router-dom": "^7.18.4"

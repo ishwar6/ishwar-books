@@ -223,8 +223,26 @@ function rehypeToc({ toc }) {
     })
 }
 
+/** Splits the page into sections at h2/h3 for the search index (code blocks are left out). */
+function rehypeSections({ sections }) {
+  return (tree) => {
+    let current = { id: '', heading: '', text: [] }
+    sections.push(current)
+    for (const node of tree.children) {
+      if (node.type !== 'element') continue
+      if ((node.tagName === 'h2' || node.tagName === 'h3') && node.properties.id) {
+        current = { id: String(node.properties.id), heading: toString(node).trim(), text: [] }
+        sections.push(current)
+      } else if (node.tagName !== 'pre' && !(node.properties?.className ?? []).includes('mermaid')) {
+        current.text.push(toString(node))
+      }
+    }
+  }
+}
+
 async function render(page) {
   const toc = []
+  const sections = []
   const file = await unified()
     .use(remarkParse)
     .use(remarkGfm)
@@ -236,6 +254,7 @@ async function render(page) {
     .use(rehypeMermaid)
     .use(rehypeSlug)
     .use(rehypeToc, { toc })
+    .use(rehypeSections, { sections })
     .use(rehypeAutolinkHeadings, { behavior: 'append', properties: { className: ['anchor'], ariaHidden: 'true', tabIndex: -1 }, content: { type: 'text', value: '#' } })
     .use(rehypeLinks, { page })
     .use(rehypeKatex)
@@ -250,7 +269,7 @@ async function render(page) {
     .use(rehypeChrome)
     .use(rehypeStringify)
     .process(page.body)
-  return { html: String(file), toc }
+  return { html: String(file), toc, sections }
 }
 
 // ---------- pass 2: render ----------
@@ -271,12 +290,18 @@ const metaOf = (p) => {
 }
 
 let rendered = 0
+const search = [] // one document per section: route, anchor, page title, heading, text, book
 for (const p of pages) {
   p.meta = metaOf(p)
-  const out = await render(p)
+  const { html, toc, sections } = await render(p)
   const dest = path.join(OUT_PUBLIC, `${p.route}.json`)
   fs.mkdirSync(path.dirname(dest), { recursive: true })
-  fs.writeFileSync(dest, JSON.stringify(out))
+  fs.writeFileSync(dest, JSON.stringify({ html, toc }))
+  for (const sec of sections) {
+    const text = sec.text.join(' ').replace(/\s+/g, ' ').trim()
+    if (!text && !sec.heading) continue
+    search.push({ id: search.length, r: p.route, a: sec.id, t: p.meta.title, h: sec.heading, x: text, b: p.book ?? null })
+  }
   rendered++
 }
 
@@ -296,5 +321,6 @@ const bookList = books.map((b) => ({
   chapters: b.chapters.map((c) => c.meta),
 })).sort((a, b) => a.order - b.order || natural(a.slug, b.slug))
 
+fs.writeFileSync(path.join(OUT_PUBLIC, 'search.json'), JSON.stringify(search))
 fs.writeFileSync(OUT_MANIFEST, JSON.stringify({ writings, books: bookList }, null, 2))
-console.log(`content: rendered ${rendered} pages (${writings.length} writings, ${bookList.length} books)`)
+console.log(`content: rendered ${rendered} pages, ${search.length} search sections (${writings.length} writings, ${bookList.length} books)`)

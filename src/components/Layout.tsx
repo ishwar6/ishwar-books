@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import { site } from '../data/site'
 import { books, writings } from '../lib/content'
 import { useFontSize, useTheme } from '../lib/hooks'
+import Search from './Search'
 import { Dim, GitHub, Mail, Moon, Sun, X, YouTube } from './icons'
 
 function ScrollToTop() {
@@ -48,6 +49,7 @@ export default function Layout() {
             <NavLink to="/about">About</NavLink>
           </nav>
           <div className="header-actions">
+            <Search />
             {reading && <FontSizeControl />}
             <button className="icon-btn" onClick={toggle} aria-label={`Theme: ${THEME_LABEL[theme]}. Switch theme`} title={`Theme: ${THEME_LABEL[theme]}`}>
               {theme === 'dark' ? <Moon /> : theme === 'dim' ? <Dim /> : <Sun />}
