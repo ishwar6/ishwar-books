@@ -44,7 +44,7 @@ export function PostList({ posts }: { posts: PageMeta[] }) {
 export function ProjectCard({ project, full = false }: { project: Project; full?: boolean }) {
   const body = (
     <>
-      <span className="project-status">{project.status}</span>
+      {project.status && <span className="project-status">{project.status}</span>}
       <h3>{project.name}{project.url && <Arrow />}</h3>
       <div className="project-tagline">{project.tagline}</div>
       <p>{project.description}</p>

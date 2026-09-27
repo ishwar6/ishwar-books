@@ -22,7 +22,8 @@ export type Project = {
   description: string
   highlights: string[]
   tech: string[]
-  status: string
+  /** Optional small label above the name. */
+  status?: string
   /** Optional public link; private projects have none. */
   url?: string
 }
@@ -42,6 +43,5 @@ export const projects: Project[] = [
       'A 3Blue1Brown look: Computer Modern math with a fixed colour per symbol, a mascot that reacts in comic bubbles, and sound effects placed from the script.',
     ],
     tech: ['Python', 'Manim', 'FastAPI', 'React', 'PostgreSQL', 'ffmpeg', 'Whisper', 'Claude Code'],
-    status: 'Private · in active development',
   },
 ]
