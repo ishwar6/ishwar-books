@@ -239,3 +239,24 @@
   border-radius: 5px;
   background: var(--surface);
 }
+
+/* inline SVG figures, themed through the same tokens as the text */
+.prose figure.fig { margin: 2.2em 0; }
+.prose .fig svg { display: block; width: 100%; height: auto; overflow: visible; }
+.prose .fig figcaption { margin-top: 0.8em; font-size: 0.8em; color: var(--muted); text-align: center; line-height: 1.55; }
+.fig .plane { fill: var(--surface); fill-opacity: 0.55; stroke: var(--border); }
+.fig .edge { stroke: var(--border); stroke-width: 2; fill: none; }
+.fig .long { stroke: var(--faint); stroke-width: 2; stroke-dasharray: 6 5; fill: none; }
+.fig .drop { stroke: var(--faint); stroke-width: 1.5; stroke-dasharray: 3 4; fill: none; }
+.fig .path { stroke: var(--h2); stroke-width: 3.5; fill: none; stroke-linecap: round; }
+.fig .node { fill: var(--surface-2); stroke: var(--muted); stroke-width: 1.5; }
+.fig .node.on { fill: color-mix(in srgb, var(--h2) 30%, var(--surface-2)); stroke: var(--h2); stroke-width: 2.5; }
+.fig .node.hit { fill: var(--h4); stroke: var(--h4); }
+.fig .entry { fill: var(--h3); stroke: var(--h3); }
+.fig .query { fill: var(--h3); }
+.fig text { font-family: var(--font-sans); fill: var(--text); }
+.fig .t-node { font-size: 14px; font-weight: 700; text-anchor: middle; dominant-baseline: central; fill: var(--text-strong); }
+.fig .t-label { font-size: 13px; font-weight: 700; fill: var(--muted); letter-spacing: 0.04em; }
+.fig .t-note { font-size: 13px; fill: var(--muted); }
+.fig .arrow { fill: var(--border); }
+.fig .arrow-on { fill: var(--h2); }

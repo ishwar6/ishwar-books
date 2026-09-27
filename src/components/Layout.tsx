@@ -89,7 +89,7 @@ export default function Layout() {
               <a href={site.links.youtube} target="_blank" rel="noreferrer">YouTube</a>
             </div>
           </div>
-          <div className="footer-bottom">© {new Date().getFullYear()} {site.name}. Written in Markdown, built with React.</div>
+          <div className="footer-bottom">© {new Date().getFullYear()} {site.name}</div>
         </div>
       </footer>
     </>

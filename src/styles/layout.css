@@ -44,8 +44,8 @@
 .site-footer { border-top: 1px solid var(--border-soft); margin-top: 96px; padding: 48px 0 40px; color: var(--muted); font-size: 15px; }
 .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 32px; }
 .footer-grid h4 { color: var(--text-strong); font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 12px; }
-.footer-grid a { display: block; padding: 3px 0; }
-.footer-grid a:hover { color: var(--text-strong); }
+.footer-grid a:not(.icon-btn) { display: block; padding: 3px 0; }
+.footer-grid a:not(.icon-btn):hover { color: var(--text-strong); }
 .footer-bottom { margin-top: 36px; font-size: 13.5px; color: var(--faint); }
 @media (max-width: 720px) { .footer-grid { grid-template-columns: 1fr 1fr; } .footer-grid > :first-child { grid-column: 1 / -1; } }
 
