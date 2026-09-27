@@ -27,7 +27,7 @@ const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..')
 const CONTENT = path.join(ROOT, 'content')
 const OUT_PUBLIC = path.join(ROOT, 'public', '_content')
 const OUT_MANIFEST = path.join(ROOT, 'src', 'generated', 'manifest.json')
-const BASE = (process.env.BASE_PATH ?? '/ishwar-books/').replace(/\/?$/, '/')
+const BASE = (process.env.BASE_PATH ?? '/').replace(/\/?$/, '/')
 
 const CALLOUTS = {
   note: 'Note', info: 'Info', tip: 'Tip', important: 'Important', warning: 'Warning',

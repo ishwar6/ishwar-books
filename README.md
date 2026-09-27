@@ -2,7 +2,7 @@
 
 Personal site of **Ishwar Jangid**: portfolio, writings and long-form books, written in Markdown and published to GitHub Pages.
 
-Live at **https://ishwar6.github.io/ishwar-books/**
+Live at **https://ishwarj.com**
 
 ## Writing
 
@@ -44,4 +44,4 @@ npm run content:watch  # (second terminal) rebuild content when a .md changes
 npm run build          # production build into dist/
 ```
 
-Pushing to `main` builds and deploys via `.github/workflows/deploy.yml`. For a custom domain, set `BASE_PATH=/` in the workflow and add a `public/CNAME`.
+Pushing to `main` builds and deploys via `.github/workflows/deploy.yml`. The site is served from the custom domain in `public/CNAME` (DNS: four A records to GitHub Pages and a `www` CNAME to `ishwar6.github.io`).

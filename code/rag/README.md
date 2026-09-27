@@ -1,6 +1,6 @@
 # RAG: From First Principles (code)
 
-The runnable code for the book at https://ishwar6.github.io/ishwar-books/books/rag-first-principles
+The runnable code for the book at https://ishwarj.com/books/rag-first-principles
 
 ```bash
 cd code/rag
