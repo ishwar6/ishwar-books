@@ -11,6 +11,9 @@ export type PageMeta = {
   tags: string[]
   minutes: number
   part?: string
+  cover?: string
+  motif?: 'graph' | 'code' | 'grid' | 'waves'
+  accent?: string
 }
 export type Book = {
   slug: string

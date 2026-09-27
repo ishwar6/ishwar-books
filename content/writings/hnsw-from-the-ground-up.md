@@ -3,6 +3,8 @@ title: "HNSW, From the Ground Up"
 description: "How Hierarchical Navigable Small World graphs find nearest neighbours in microseconds: the two ideas they combine, how the graph is built, what M, efConstruction and efSearch really cost, and measured numbers from a 200,000-vector index."
 date: 2026-09-27
 tags: [vector-search, hnsw, retrieval]
+motif: graph
+accent: "#7c9cff"
 ---
 
 **HNSW** (Hierarchical Navigable Small World graphs) is one of the most widely used indexes for finding similar vectors. Qdrant, Weaviate, pgvector and Elasticsearch all offer it, and several use it by default. It earns that place. On the index measured in this piece it returns 93% of the true top 10 in **0.085 ms**, where checking every vector takes **1.39 ms**, and the gap widens with every vector you add.

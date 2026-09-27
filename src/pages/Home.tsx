@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { projects, site } from '../data/site'
 import { books, writings } from '../lib/content'
 import { useTitle } from '../lib/hooks'
-import { BookCard, PostList, ProjectCard } from '../components/Cards'
+import { BookCard, ProjectCard, WritingCard } from '../components/Cards'
 import { GitHub, Mail, X, YouTube } from '../components/icons'
 
 export default function Home() {
@@ -63,7 +63,7 @@ export default function Home() {
           <h2>Recent writings</h2>
           <Link to="/writings" className="more-link">All writings →</Link>
         </div>
-        <PostList posts={writings.slice(0, 6)} />
+        <div className="writing-grid">{writings.slice(0, 3).map((w) => <WritingCard key={w.route} post={w} />)}</div>
       </section>
 
       <section className="section">

@@ -3,6 +3,8 @@ title: How this site renders Markdown
 description: "A tour of every element the reader supports (headings, code, callouts, tables, math and diagrams), so writing a new chapter is just dropping a .md file into content/."
 date: 2026-09-27
 tags: [meta, writing]
+motif: code
+accent: "#c4a1ff"
 ---
 
 Everything on this site starts life as a plain Markdown file. Drop a file into `content/writings/` and it becomes a page; drop a folder into `content/books/` and it becomes a book with a chapter sidebar. This page doubles as the style guide: if it looks right here, it looks right everywhere.

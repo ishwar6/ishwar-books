@@ -3,6 +3,7 @@ import type { CSSProperties } from 'react'
 import { formatDate, type Book, type PageMeta } from '../lib/content'
 import type { Project } from '../data/site'
 import { Arrow } from './icons'
+import Cover from './Cover'
 
 const STATUS: Record<Book['status'], string> = { 'in-progress': 'In progress', complete: 'Complete', planned: 'Planned' }
 
@@ -19,6 +20,33 @@ export function BookCard({ book }: { book: Book }) {
         <span>{published ? `${published} of ${book.plannedChapters} chapters published` : `${book.plannedChapters} chapters · coming soon`}</span>
       </div>
     </Link>
+  )
+}
+
+export function WritingCard({ post, featured = false, onTag }: { post: PageMeta; featured?: boolean; onTag?: (t: string) => void }) {
+  return (
+    <article className={`writing-card${featured ? ' featured' : ''}`}>
+      <Link to={`/${post.route}`} className="writing-cover-link" tabIndex={-1} aria-hidden="true">
+        <Cover meta={post} className="writing-cover" />
+      </Link>
+      <div className="writing-body">
+        <div className="writing-meta">
+          <time dateTime={post.date}>{formatDate(post.date)}</time>
+          <span className="dot">{post.minutes} min read</span>
+        </div>
+        <h3><Link to={`/${post.route}`}>{post.title}</Link></h3>
+        {post.description && <p>{post.description}</p>}
+        {post.tags.length > 0 && (
+          <div className="tags">
+            {post.tags.map((t) =>
+              onTag
+                ? <button key={t} className="tag tag-btn" onClick={() => onTag(t)}>#{t}</button>
+                : <span key={t} className="tag">#{t}</span>,
+            )}
+          </div>
+        )}
+      </div>
+    </article>
   )
 }
 

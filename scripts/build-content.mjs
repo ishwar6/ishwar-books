@@ -56,7 +56,10 @@ const firstParagraph = (body) =>
     .find((b) => b && !/^(#|>|\||```|<|-{3,}|\*\*Concepts|!\[)/.test(b))
     ?.replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').replace(/[*_`]/g, '').replace(/\s+/g, ' ')
 const clip = (s, n = 220) => (s && s.length > n ? s.slice(0, s.lastIndexOf(' ', n)).replace(/[,;:.\s]+$/, '') + '…' : s)
-const readingMinutes = (body) => Math.max(1, Math.round(body.replace(/```[\s\S]*?```/g, '').split(/\s+/).length / 220))
+// words of prose only: code blocks, figures/SVG and other HTML don't count toward reading time
+const readingMinutes = (body) =>
+  Math.max(1, Math.round(body.replace(/```[\s\S]*?```/g, '').replace(/<figure[\s\S]*?<\/figure>/g, '').replace(/<svg[\s\S]*?<\/svg>/g, '')
+    .replace(/<\/?[a-zA-Z][^>]*>/g, ' ').split(/\s+/).filter(Boolean).length / 220))
 const toDate = (d) => (d ? new Date(d).toISOString().slice(0, 10) : undefined)
 
 // ---------- pass 1: discover pages ----------
@@ -276,6 +279,28 @@ async function render(page) {
 fs.rmSync(OUT_PUBLIC, { recursive: true, force: true })
 fs.mkdirSync(path.dirname(OUT_MANIFEST), { recursive: true })
 
+/** Cover art: `cover: ./image.png` uses that image; otherwise the site draws one (`motif`, `accent` pick its style). */
+function coverOf(p) {
+  const out = {}
+  if (p.data.motif) out.motif = p.data.motif
+  if (p.data.accent) out.accent = p.data.accent
+  const c = p.data.cover
+  if (typeof c === 'string') {
+    if (/^(https?:)?\/\//.test(c)) out.cover = c
+    else {
+      const src = path.resolve(path.dirname(p.file), c)
+      if (fs.existsSync(src)) {
+        const rel = path.relative(CONTENT, src)
+        const dest = path.join(OUT_PUBLIC, 'files', rel)
+        fs.mkdirSync(path.dirname(dest), { recursive: true })
+        fs.copyFileSync(src, dest)
+        out.cover = BASE + '_content/files/' + rel.split(path.sep).map(encodeURIComponent).join('/')
+      }
+    }
+  }
+  return out
+}
+
 const metaOf = (p) => {
   const title = p.data.title ?? firstHeading(p.body) ?? pretty(p.slug)
   // The page header shows the title, so drop a leading H1 that duplicates it.
@@ -285,6 +310,7 @@ const metaOf = (p) => {
     description: p.data.description ?? clip(firstParagraph(p.body)) ?? '',
     date: toDate(p.data.date), updated: toDate(p.data.updated),
     tags: p.data.tags ?? [], minutes: readingMinutes(p.body),
+    ...coverOf(p),
     ...(p.part ? { part: p.part } : {}),
   }
 }
