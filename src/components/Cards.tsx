@@ -30,6 +30,7 @@ export function WritingCard({ post, featured = false, onTag }: { post: PageMeta;
         <Cover meta={post} className="writing-cover" />
       </Link>
       <div className="writing-body">
+        {post.series && <div className="series-badge" title={post.series}>{featured ? `${post.series} · Part ${post.seriesPart}` : `Series · Part ${post.seriesPart}`}</div>}
         <div className="writing-meta">
           <time dateTime={post.date}>{formatDate(post.date)}</time>
           <span className="dot">{post.minutes} min read</span>

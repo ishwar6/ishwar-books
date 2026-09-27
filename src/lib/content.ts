@@ -12,7 +12,9 @@ export type PageMeta = {
   minutes: number
   part?: string
   cover?: string
-  motif?: 'graph' | 'code' | 'grid' | 'waves'
+  motif?: 'graph' | 'code' | 'grid' | 'waves' | 'timeline' | 'kv' | 'blocks'
+  series?: string
+  seriesPart?: number
   accent?: string
 }
 export type Book = {
@@ -44,6 +46,10 @@ export function loadPage(route: string): Promise<Rendered> {
   }
   return cache.get(route)!
 }
+
+/** Every part of a series, in order. */
+export const seriesOf = (name?: string) =>
+  name ? writings.filter((w) => w.series === name).sort((a, b) => (a.seriesPart ?? 0) - (b.seriesPart ?? 0)) : []
 
 export const formatDate = (d?: string) =>
   d ? new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : ''

@@ -354,7 +354,7 @@ a.project-card:hover { transform: translateY(-2px); }
 .writing-meta .dot::before { content: '·'; margin-right: 14px; }
 .writing-card h3 { margin: 0; font-size: 21px; line-height: 1.25; letter-spacing: -0.02em; font-weight: 800; color: var(--text-strong); }
 .writing-card h3 a:hover { color: var(--h2); }
-.writing-card p { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.6; flex: 1;
+.writing-card p { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.6; flex: none; max-height: calc(1.6em * 3);
   display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .tag-btn { cursor: pointer; font: inherit; font-size: 12.5px; transition: color 0.15s, border-color 0.15s; }
 .tag-btn:hover { color: var(--h2); border-color: color-mix(in srgb, var(--h2) 45%, transparent); }
@@ -377,3 +377,21 @@ a.project-card:hover { transform: translateY(-2px); }
   .writing-card.featured .writing-body { padding: 22px; }
   .writing-card.featured h3 { font-size: 24px; }
 }
+
+/* ---------- series ---------- */
+.series-box { margin-top: 26px; padding: 18px 22px; border-radius: 14px; border: 1px solid var(--border-soft);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--h2) 9%, var(--bg-soft)), var(--bg-soft)); }
+.series-name { display: flex; align-items: baseline; gap: 10px; font-weight: 800; color: var(--text-strong); font-size: 16px; margin-bottom: 10px; }
+.series-name span { font-size: 11.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--h2); }
+.series-box ol { margin: 0; padding-left: 22px; display: grid; gap: 6px; font-size: 15px; }
+.series-box li::marker { color: var(--faint); font-variant-numeric: tabular-nums; }
+.series-box li a { color: var(--muted); }
+.series-box li a:hover { color: var(--h2); }
+.series-box li.current { color: var(--text-strong); font-weight: 700; }
+.series-box li.current::marker { color: var(--h2); }
+.series-badge { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--h2); }
+
+@media (max-width: 480px) { .site-header .brand-name { display: none; } .font-size button { padding: 0 9px; } }
+
+.writing-card .writing-body > .tags { margin-top: auto; padding-top: 4px; }
+.writing-card.featured p { max-height: none; }

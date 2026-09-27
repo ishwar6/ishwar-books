@@ -40,7 +40,7 @@ export default function Layout() {
         <div className={`container${reading ? ' wide' : ''}`}>
           <Link to="/" className="brand">
             <span className="brand-mark">IJ</span>
-            {site.name}
+            <span className="brand-name">{site.name}</span>
           </Link>
           <nav className="nav">
             <NavLink to="/writings">Writings</NavLink>

@@ -13,7 +13,7 @@ const TAG_MOTIF: Record<string, Motif> = {
   hnsw: 'graph', 'vector-search': 'graph', retrieval: 'graph', rag: 'graph', agents: 'graph',
   gpu: 'grid', cuda: 'grid', performance: 'grid', kernels: 'grid',
   meta: 'code', writing: 'code', python: 'code', tooling: 'code',
-  llm: 'waves', training: 'waves', ml: 'waves',
+  llm: 'waves', training: 'waves', ml: 'waves', inference: 'timeline', 'kv-cache': 'kv', vllm: 'blocks',
 }
 
 function hash(s: string) {
@@ -139,13 +139,70 @@ function Waves({ r, a }: { r: () => number; a: string }) {
   return <g>{waves}</g>
 }
 
+function Timeline({ r, a }: { r: () => number; a: string }) {
+  const rows = [0, 1, 2, 3]
+  return (
+    <g>
+      {rows.map((i) => {
+        const y = 92 + i * 52
+        const pre = 90 + r() * 130
+        const n = 9 + Math.floor(r() * 7)
+        const out = [<rect key={`p${i}`} x={90} y={y} width={pre} height={30} rx={7} fill={a} fillOpacity={i === 1 ? 1 : 0.55} />]
+        let x = 90 + pre + 6
+        for (let k = 0; k < n && x < 560; k++) {
+          out.push(<rect key={`d${i}-${k}`} x={x} y={y} width={18} height={30} rx={4} fill="#ff9ecf" fillOpacity={i === 1 ? 0.95 : 0.4} />)
+          x += 24
+        }
+        return <g key={i}>{out}</g>
+      })}
+      <line x1="90" y1="300" x2="560" y2="300" stroke="#ffffff" strokeOpacity="0.15" strokeWidth="2" />
+    </g>
+  )
+}
+
+function Kv({ r, a }: { r: () => number; a: string }) {
+  const cells = []
+  const n = 11
+  for (let row = 0; row < n; row++)
+    for (let col = 0; col <= row; col++) {
+      const fresh = col === row
+      cells.push(
+        <rect key={`${row}-${col}`} x={150 + col * 32} y={52 + row * 24} width={26} height={18} rx={4}
+          fill={fresh ? '#ff9ecf' : a} fillOpacity={fresh ? 0.95 : 0.25 + (col / n) * 0.55 * (0.7 + r() * 0.3)} />,
+      )
+    }
+  return <g>{cells}</g>
+}
+
+function Blocks({ r, a }: { r: () => number; a: string }) {
+  const hues = [a, '#ff9ecf', '#5fd4b0', '#f5b942']
+  const cells = []
+  for (let y = 0; y < 6; y++)
+    for (let x = 0; x < 12; x++) {
+      const v = r()
+      const owner = v < 0.2 ? -1 : Math.floor(r() * 4)
+      cells.push(
+        <rect key={`${x}-${y}`} x={100 + x * 38} y={70 + y * 38} width={32} height={32} rx={6}
+          fill={owner < 0 ? '#ffffff' : hues[owner]} fillOpacity={owner < 0 ? 0.05 : 0.35 + r() * 0.55} />,
+      )
+    }
+  return <g>{cells}</g>
+}
+
 export default function Cover({ meta, className = '' }: { meta: PageMeta; className?: string }) {
   const art = useMemo(() => {
     const seed = hash(meta.slug)
     const r = rng(seed)
     const a = meta.accent ?? ACCENTS[seed % ACCENTS.length]
     const motif = motifOf(meta)
-    const body = motif === 'graph' ? <Graph r={r} a={a} gid={`c${seed.toString(36)}-glow`} /> : motif === 'code' ? <Code r={r} a={a} /> : motif === 'grid' ? <Grid r={r} a={a} /> : <Waves r={r} a={a} />
+    const body =
+      motif === 'graph' ? <Graph r={r} a={a} gid={`c${seed.toString(36)}-glow`} />
+      : motif === 'code' ? <Code r={r} a={a} />
+      : motif === 'grid' ? <Grid r={r} a={a} />
+      : motif === 'timeline' ? <Timeline r={r} a={a} />
+      : motif === 'kv' ? <Kv r={r} a={a} />
+      : motif === 'blocks' ? <Blocks r={r} a={a} />
+      : <Waves r={r} a={a} />
     return { a, body, id: `c${seed.toString(36)}` }
   }, [meta])
 

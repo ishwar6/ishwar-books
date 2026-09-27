@@ -311,6 +311,7 @@ const metaOf = (p) => {
     date: toDate(p.data.date), updated: toDate(p.data.updated),
     tags: p.data.tags ?? [], minutes: readingMinutes(p.body),
     ...coverOf(p),
+    ...(p.data.series ? { series: p.data.series, seriesPart: p.data.series_part ?? 1 } : {}),
     ...(p.part ? { part: p.part } : {}),
   }
 }
@@ -332,7 +333,7 @@ for (const p of pages) {
 }
 
 const writings = pages.filter((p) => p.collection === 'writings').map((p) => p.meta)
-  .sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''))
+  .sort((a, b) => (b.date ?? '').localeCompare(a.date ?? '') || (a.seriesPart ?? 0) - (b.seriesPart ?? 0))
 
 const bookList = books.map((b) => ({
   slug: b.slug,

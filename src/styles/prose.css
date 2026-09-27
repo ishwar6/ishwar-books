@@ -264,3 +264,37 @@
 .fig .arrow-bad { fill: #f06a6a; }
 .fig .node.stuck { fill: color-mix(in srgb, #f06a6a 30%, var(--surface-2)); stroke: #f06a6a; stroke-width: 2.5; }
 .fig .t-note.bad { fill: #f06a6a; font-weight: 700; }
+
+/* ---------- charts inside figures (validated palette: dark + dim use the dark steps) ---------- */
+.prose { --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70; --chart-grid: rgba(255, 255, 255, 0.08); }
+:root[data-theme='light'] .prose { --series-1: #2a78d6; --series-2: #eb6834; --series-3: #1baf7a; --chart-grid: rgba(0, 0, 0, 0.08); }
+.fig .s1 { fill: var(--series-1); }
+.fig .s2 { fill: var(--series-2); }
+.fig .s3 { fill: var(--series-3); }
+.fig .l1 { stroke: var(--series-1); stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.fig .l2 { stroke: var(--series-2); stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.fig .l3 { stroke: var(--series-3); stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.fig .ring { stroke: var(--bg); stroke-width: 2; }
+.fig .grid { stroke: var(--chart-grid); stroke-width: 1; }
+.fig .axis { stroke: var(--border); stroke-width: 1; }
+.fig .t-val { font-size: 13px; font-weight: 700; fill: var(--text-strong); font-variant-numeric: tabular-nums; }
+.fig .t-tick { font-size: 12px; fill: var(--muted); font-variant-numeric: tabular-nums; }
+.fig .t-title { font-size: 14px; font-weight: 700; fill: var(--text-strong); }
+.fig .t-strong { fill: var(--text-strong); font-weight: 700; }
+.fig .box { fill: var(--surface); stroke: var(--border); stroke-width: 1.5; }
+.fig .box-1 { fill: color-mix(in srgb, var(--series-1) 22%, var(--surface)); stroke: var(--series-1); stroke-width: 1.5; }
+.fig .box-2 { fill: color-mix(in srgb, var(--series-2) 22%, var(--surface)); stroke: var(--series-2); stroke-width: 1.5; }
+.fig .box-3 { fill: color-mix(in srgb, var(--series-3) 22%, var(--surface)); stroke: var(--series-3); stroke-width: 1.5; }
+.fig .waste { fill: color-mix(in srgb, #f06a6a 18%, var(--surface)); stroke: #f06a6a; stroke-width: 1.2; stroke-dasharray: 4 3; }
+.fig .hit-area { fill: transparent; }
+.fig .hit-area:hover + .bar-mark, .fig g.mark:hover .bar-mark { filter: brightness(1.15); }
+.fig .code-bg { fill: var(--code-bg); stroke: var(--border-soft); }
+.fig .t-code { font-family: var(--font-mono); font-size: 13px; fill: var(--text); }
+.fig .t-code-key { font-family: var(--font-mono); font-size: 13px; fill: var(--h3); }
+.fig .t-code-num { font-family: var(--font-mono); font-size: 13px; fill: var(--h4); font-weight: 700; }
+
+/* on phones, keep figure text legible: figures keep a minimum width and scroll sideways */
+@media (max-width: 640px) {
+  .prose figure.fig { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .prose .fig svg { min-width: 600px; }
+}
