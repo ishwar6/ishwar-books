@@ -1,0 +1,388 @@
+# Golden evaluation set for the Lumora handbook corpus.
+#
+# Fields:
+#   id          short stable id
+#   question    what a user would actually type
+#   answer      the reference answer (short, factual)
+#   sources     doc_ids (file stems in data/handbook) that contain the answer
+#   answerable  false = the corpus does NOT contain the answer; the right output is "I don't know"
+#   keywords    strings that a correct answer should contain (cheap exact-match check)
+#   tags        what the question exercises (numeric, multi_hop, conflict, table, ...)
+
+- id: q01
+  question: How many days of PTO do full-time employees get per year?
+  answer: 24 days per calendar year, accrued at 2 days per month (the FAQ still says 20, but the 2026 policy supersedes it).
+  sources: [02-pto-and-leave-policy]
+  answerable: true
+  keywords: ["24"]
+  tags: [numeric, conflict]
+
+- id: q02
+  question: How many unused PTO days can I carry over, and by when must I use them?
+  answer: Up to 5 days can be carried over and must be used by 31 March.
+  sources: [02-pto-and-leave-policy]
+  answerable: true
+  keywords: ["5", "31 March"]
+  tags: [numeric]
+
+- id: q03
+  question: How long is parental leave for a primary caregiver?
+  answer: 26 weeks at full pay (8 weeks for a secondary caregiver).
+  sources: [02-pto-and-leave-policy]
+  answerable: true
+  keywords: ["26"]
+  tags: [numeric, table]
+
+- id: q04
+  question: How many sick days do I get and when do I need a medical certificate?
+  answer: 12 paid sick days per year; a certificate is needed for 3 or more consecutive days.
+  sources: [02-pto-and-leave-policy]
+  answerable: true
+  keywords: ["12", "3"]
+  tags: [numeric]
+
+- id: q05
+  question: Which teams have a PTO blackout period and when?
+  answer: Sales and Support, during the last week of each quarter. Engineering has none.
+  sources: [02-pto-and-leave-policy]
+  answerable: true
+  keywords: ["Sales", "Support", "quarter"]
+  tags: [factual]
+
+- id: q06
+  question: What is the hotel cap per night for travel in Europe?
+  answer: €180 per night before taxes.
+  sources: [03-travel-and-expense-policy]
+  answerable: true
+  keywords: ["180"]
+  tags: [numeric, table]
+
+- id: q07
+  question: When can I fly business class?
+  answer: On flights of 6 hours or longer (premium economy or business); under 6 hours is economy.
+  sources: [03-travel-and-expense-policy]
+  answerable: true
+  keywords: ["6"]
+  tags: [numeric]
+
+- id: q08
+  question: What is the per diem for international travel?
+  answer: $75 per day (₹2,000 per day within India), halved on travel days shorter than 8 hours.
+  sources: [03-travel-and-expense-policy]
+  answerable: true
+  keywords: ["75"]
+  tags: [numeric]
+
+- id: q09
+  question: Within how many days must expenses be submitted, and in which tool?
+  answer: Within 30 days of the spend, in Ledger.
+  sources: [03-travel-and-expense-policy, 14-faq]
+  answerable: true
+  keywords: ["30", "Ledger"]
+  tags: [numeric]
+
+- id: q10
+  question: What is the mileage reimbursement rate for using a personal car in India?
+  answer: ₹12 per km.
+  sources: [03-travel-and-expense-policy]
+  answerable: true
+  keywords: ["12"]
+  tags: [numeric]
+
+- id: q11
+  question: What is the maximum payload of the Atlas A2?
+  answer: 250 kg (the A2 Lite carries 120 kg).
+  sources: [04-atlas-a2-specification]
+  answerable: true
+  keywords: ["250"]
+  tags: [numeric, table]
+
+- id: q12
+  question: How long does a full charge of an Atlas A2 take, and how much runtime does a fast top-up give?
+  answer: A full charge takes 90 minutes; a 20-minute top-up gives about 2 hours of runtime.
+  sources: [04-atlas-a2-specification, 14-faq]
+  answerable: true
+  keywords: ["90", "20", "2 hours"]
+  tags: [numeric]
+
+- id: q13
+  question: What are the dimensions and weight of the Atlas A2?
+  answer: 1,120 × 720 × 380 mm and 145 kg.
+  sources: [04-atlas-a2-specification]
+  answerable: true
+  keywords: ["1,120", "145"]
+  tags: [numeric, table]
+
+- id: q14
+  question: What safety standard is the Atlas A2 compliant with, and what is its IP rating?
+  answer: ISO 3691-4, and IP54.
+  sources: [04-atlas-a2-specification]
+  answerable: true
+  keywords: ["3691", "IP54"]
+  tags: [factual]
+
+- id: q15
+  question: What does an Atlas robot do if it loses connectivity to Beacon?
+  answer: After more than 60 seconds without connectivity it parks itself safely and waits; robots never continue on stale plans.
+  sources: [04-atlas-a2-specification, 05-beacon-fleet-software]
+  answerable: true
+  keywords: ["60", "park"]
+  tags: [factual, multi_doc]
+
+- id: q16
+  question: What is the Beacon API rate limit?
+  answer: 600 requests per minute per API key; above that it returns HTTP 429 with a Retry-After header.
+  sources: [05-beacon-fleet-software, 14-faq]
+  answerable: true
+  keywords: ["600"]
+  tags: [numeric]
+
+- id: q17
+  question: Which database and message broker does Beacon use?
+  answer: PostgreSQL 16 and Apache Kafka.
+  sources: [05-beacon-fleet-software]
+  answerable: true
+  keywords: ["PostgreSQL", "Kafka"]
+  tags: [factual]
+
+- id: q18
+  question: What are Beacon's RTO and RPO?
+  answer: RTO 30 minutes, RPO 5 minutes.
+  sources: [05-beacon-fleet-software, 08-runbook-fleet-outage]
+  answerable: true
+  keywords: ["30", "5"]
+  tags: [numeric]
+
+- id: q19
+  question: How often does Beacon release, and on which weekday?
+  answer: Every two weeks, on a Tuesday.
+  sources: [05-beacon-fleet-software, 14-faq]
+  answerable: true
+  keywords: ["two weeks", "Tuesday"]
+  tags: [factual]
+
+- id: q20
+  question: How quickly must a suspected security incident be reported, and to whom?
+  answer: Within 1 hour, to security@lumora.example.
+  sources: [06-security-policy, 14-faq]
+  answerable: true
+  keywords: ["1 hour", "security@"]
+  tags: [factual]
+
+- id: q21
+  question: How often do privileged account passwords rotate?
+  answer: Every 90 days.
+  sources: [06-security-policy]
+  answerable: true
+  keywords: ["90"]
+  tags: [numeric]
+
+- id: q22
+  question: What are the four data classification levels?
+  answer: Public, Internal, Confidential and Restricted.
+  sources: [06-security-policy]
+  answerable: true
+  keywords: ["Public", "Internal", "Confidential", "Restricted"]
+  tags: [factual, table]
+
+- id: q23
+  question: Can I paste customer robot telemetry into a public AI assistant?
+  answer: No. Telemetry is Confidential and must never be pasted into external tools including public AI assistants; only tools that passed vendor security review under a company account.
+  sources: [06-security-policy, 14-faq]
+  answerable: true
+  keywords: ["No", "Confidential"]
+  tags: [reasoning]
+
+- id: q24
+  question: How long is Atlas Academy and who attends?
+  answer: A 3-day course attended by every new hire regardless of role.
+  sources: [07-onboarding-guide]
+  answerable: true
+  keywords: ["3"]
+  tags: [factual]
+
+- id: q25
+  question: What is the annual learning budget?
+  answer: ₹60,000 (about $700) per year, claimed through Ledger.
+  sources: [07-onboarding-guide, 14-faq]
+  answerable: true
+  keywords: ["60,000"]
+  tags: [numeric]
+
+- id: q26
+  question: How long is the probation period?
+  answer: 6 months.
+  sources: [07-onboarding-guide, 02-pto-and-leave-policy]
+  answerable: true
+  keywords: ["6"]
+  tags: [numeric]
+
+- id: q27
+  question: What condition makes a fleet outage a P1, and how fast must on-call acknowledge?
+  answer: More than 5% of a site's robots offline or a fully halted site is P1; on-call must acknowledge within 15 minutes.
+  sources: [08-runbook-fleet-outage]
+  answerable: true
+  keywords: ["5%", "15"]
+  tags: [numeric, table]
+
+- id: q28
+  question: What is the command to roll back a Beacon service?
+  answer: beaconctl rollout undo <service>
+  sources: [08-runbook-fleet-outage, 05-beacon-fleet-software]
+  answerable: true
+  keywords: ["rollout undo"]
+  tags: [code]
+
+- id: q29
+  question: What is the P1 response time for Platinum support, and what extra does Platinum include?
+  answer: 15 minutes, 24×7, with a dedicated Technical Account Manager and an on-site spares kit.
+  sources: [09-support-sla]
+  answerable: true
+  keywords: ["15", "Technical Account Manager"]
+  tags: [numeric, table]
+
+- id: q30
+  question: What service credit does a customer get if monthly uptime drops below 99.9%?
+  answer: 10% of that month's Beacon fee (25% below 99.0%).
+  sources: [09-support-sla]
+  answerable: true
+  keywords: ["10%"]
+  tags: [numeric]
+
+- id: q31
+  question: How much does an Atlas A2 robot cost, and how much is the extended warranty?
+  answer: $48,000 list price; extending the warranty from 24 to 48 months costs $4,200 per robot.
+  sources: [10-pricing-and-plans]
+  answerable: true
+  keywords: ["48,000", "4,200"]
+  tags: [numeric, table]
+
+- id: q32
+  question: What would 120 robots with Beacon and Compass cost per month, paying monthly?
+  answer: List is 120 × ($180 + $40) = $26,400; with the 15% discount for fleets over 100 robots it is $22,440 per month.
+  sources: [10-pricing-and-plans]
+  answerable: true
+  keywords: ["22,440"]
+  tags: [numeric, multi_hop]
+
+- id: q33
+  question: What software discounts exist and do they stack?
+  answer: 10% for annual prepayment and 15% for fleets over 100 robots; they stack to 25%.
+  sources: [10-pricing-and-plans]
+  answerable: true
+  keywords: ["10%", "15%", "stack"]
+  tags: [numeric]
+
+- id: q34
+  question: What minimum Atlas firmware does Beacon 4.2 require?
+  answer: Firmware 3.8 or newer (current firmware is 3.9).
+  sources: [11-release-notes-beacon-4.2, 04-atlas-a2-specification]
+  answerable: true
+  keywords: ["3.8"]
+  tags: [numeric, multi_doc]
+
+- id: q35
+  question: When will Beacon API v1 be removed?
+  answer: In Beacon 4.4; it is deprecated since 4.2 and still works in 4.2 and 4.3.
+  sources: [11-release-notes-beacon-4.2, 05-beacon-fleet-software]
+  answerable: true
+  keywords: ["4.4"]
+  tags: [factual]
+
+- id: q36
+  question: What caused the March 2026 Rotterdam fleet halt and how long did it last?
+  answer: An expired TLS certificate on the site's fleet gateway (the renewal job had failed silently since 28 February); 47 robots were halted for 2 hours 13 minutes.
+  sources: [12-postmortem-2026-03-rotterdam-halt]
+  answerable: true
+  keywords: ["certificate", "2 hours 13"]
+  tags: [factual, numeric]
+
+- id: q37
+  question: What was changed after the Rotterdam incident to prevent certificate expiry outages?
+  answer: Alerts fire 14 days before certificate expiry, the renewer job now pages on failure, the renewer's own credential is monitored, and quarterly game days expire a staging cert on purpose.
+  sources: [12-postmortem-2026-03-rotterdam-halt, 08-runbook-fleet-outage]
+  answerable: true
+  keywords: ["14 days"]
+  tags: [factual, multi_doc]
+
+- id: q38
+  question: How many days a week do hybrid employees work from the office, and which days by default?
+  answer: 3 days per week; Tuesday, Wednesday and Thursday by default.
+  sources: [13-remote-work-policy, 14-faq]
+  answerable: true
+  keywords: ["3", "Tuesday"]
+  tags: [factual]
+
+- id: q39
+  question: What is the home office stipend and the monthly internet allowance?
+  answer: A one-time ₹15,000 stipend and ₹1,500 per month for internet.
+  sources: [13-remote-work-policy]
+  answerable: true
+  keywords: ["15,000", "1,500"]
+  tags: [numeric]
+
+- id: q40
+  question: How many days per year can I work from another country?
+  answer: Up to 30 days per calendar year with manager approval and a People & Culture check.
+  sources: [13-remote-work-policy]
+  answerable: true
+  keywords: ["30"]
+  tags: [numeric]
+
+- id: q41
+  question: Where is Lumora headquartered and who founded it?
+  answer: Pune, India; founded in 2017 by Priya Raghavan (CEO) and Daniel Okafor (CTO).
+  sources: [01-company-overview]
+  answerable: true
+  keywords: ["Pune", "Raghavan", "Okafor"]
+  tags: [factual]
+
+- id: q42
+  question: If I am a new Sales hire, can I take two weeks off in the last week of the quarter during my first month?
+  answer: No. During probation at most 5 days of PTO can be taken, and the last week of the quarter is a blackout period for Sales.
+  sources: [02-pto-and-leave-policy]
+  answerable: true
+  keywords: ["No"]
+  tags: [reasoning, multi_hop]
+
+# ---- Unanswerable: the corpus does not contain these. Correct behaviour is to say so. ----
+
+- id: u01
+  question: What was Lumora's revenue in 2025?
+  answer: Not in the handbook. The overview says revenue is not disclosed there.
+  sources: []
+  answerable: false
+  keywords: []
+  tags: [unanswerable]
+
+- id: u02
+  question: Who is the head of marketing at Lumora?
+  answer: Not in the handbook.
+  sources: []
+  answerable: false
+  keywords: []
+  tags: [unanswerable]
+
+- id: u03
+  question: What is the maximum payload of the Atlas A3?
+  answer: Not in the handbook; there is no Atlas A3, only A2 and A2 Lite.
+  sources: []
+  answerable: false
+  keywords: []
+  tags: [unanswerable, trap]
+
+- id: u04
+  question: How do I configure the Kafka retention period in Beacon?
+  answer: Not in the handbook; it only says Beacon uses Kafka.
+  sources: []
+  answerable: false
+  keywords: []
+  tags: [unanswerable]
+
+- id: u05
+  question: What is the capital of France?
+  answer: Out of scope for the handbook assistant (general knowledge, not in the corpus).
+  sources: []
+  answerable: false
+  keywords: []
+  tags: [unanswerable, out_of_scope]

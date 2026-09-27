@@ -1,0 +1,14 @@
+.env
+.venv/
+.qdrant_data/
+__pycache__/
+*.pyc
+data/gutenberg/
+data/generated/
+.ipynb_checkpoints/
+*.egg-info/
+data/cache/
+data/pdfs/
+data/*.sqlite
+data/logs/
+data/reports/

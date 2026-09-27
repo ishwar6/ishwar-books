@@ -1,0 +1,213 @@
+q01:
+  question: How many days of PTO do full-time employees get per year?
+  doc_sources:
+  - 02-pto-and-leave-policy
+  n_candidate_chunks: 4
+  answer_chunks:
+  - 55490cd3-a701-5931-bd5e-c2f3dc66506d
+  supporting_chunks:
+  - 4a399501-6fe4-538d-abf9-5a60cf3b32fa
+  - 35d4ce6b-f54e-5c99-8f49-685885a6cd30
+  - 51f50ddc-2827-51c7-a13e-30d7decd44dc
+q02:
+  question: How many unused PTO days can I carry over, and by when must I use them?
+  doc_sources:
+  - 02-pto-and-leave-policy
+  n_candidate_chunks: 4
+  answer_chunks:
+  - 55490cd3-a701-5931-bd5e-c2f3dc66506d
+  supporting_chunks:
+  - 4a399501-6fe4-538d-abf9-5a60cf3b32fa
+  - 35d4ce6b-f54e-5c99-8f49-685885a6cd30
+  - 51f50ddc-2827-51c7-a13e-30d7decd44dc
+q03:
+  question: How long is parental leave for a primary caregiver?
+  doc_sources:
+  - 02-pto-and-leave-policy
+  n_candidate_chunks: 4
+  answer_chunks:
+  - 35d4ce6b-f54e-5c99-8f49-685885a6cd30
+  supporting_chunks: []
+q04:
+  question: How many sick days do I get and when do I need a medical certificate?
+  doc_sources:
+  - 02-pto-and-leave-policy
+  n_candidate_chunks: 4
+  answer_chunks:
+  - 4a399501-6fe4-538d-abf9-5a60cf3b32fa
+  supporting_chunks:
+  - 55490cd3-a701-5931-bd5e-c2f3dc66506d
+q05:
+  question: Which teams have a PTO blackout period and when?
+  doc_sources:
+  - 02-pto-and-leave-policy
+  n_candidate_chunks: 4
+  answer_chunks:
+  - 35d4ce6b-f54e-5c99-8f49-685885a6cd30
+  supporting_chunks:
+  - 55490cd3-a701-5931-bd5e-c2f3dc66506d
+  - 4a399501-6fe4-538d-abf9-5a60cf3b32fa
+  - 51f50ddc-2827-51c7-a13e-30d7decd44dc
+q06:
+  question: What is the hotel cap per night for travel in Europe?
+  doc_sources:
+  - 03-travel-and-expense-policy
+  n_candidate_chunks: 3
+  answer_chunks:
+  - b35e067e-7032-5d3d-8f44-efa52591804b
+  supporting_chunks:
+  - 0003101e-beb9-58be-ba51-b495c51ba2bb
+  - 02cd539e-861e-5d82-939d-467b74d42a3c
+q07:
+  question: When can I fly business class?
+  doc_sources:
+  - 03-travel-and-expense-policy
+  n_candidate_chunks: 3
+  answer_chunks:
+  - 0003101e-beb9-58be-ba51-b495c51ba2bb
+  supporting_chunks: []
+q08:
+  question: What is the per diem for international travel?
+  doc_sources:
+  - 03-travel-and-expense-policy
+  n_candidate_chunks: 3
+  answer_chunks:
+  - b35e067e-7032-5d3d-8f44-efa52591804b
+  supporting_chunks: []
+q09:
+  question: Within how many days must expenses be submitted, and in which tool?
+  doc_sources:
+  - 03-travel-and-expense-policy
+  - 14-faq
+  n_candidate_chunks: 6
+  answer_chunks:
+  - 02cd539e-861e-5d82-939d-467b74d42a3c
+  supporting_chunks:
+  - 3eef7eda-8178-5d20-8dd6-4f7d60147fbf
+  - 72acf160-6b5f-5552-bd0a-4246804f55d5
+q10:
+  question: What is the mileage reimbursement rate for using a personal car in India?
+  doc_sources:
+  - 03-travel-and-expense-policy
+  n_candidate_chunks: 3
+  answer_chunks:
+  - b35e067e-7032-5d3d-8f44-efa52591804b
+  supporting_chunks: []
+q11:
+  question: What is the maximum payload of the Atlas A2?
+  doc_sources:
+  - 04-atlas-a2-specification
+  n_candidate_chunks: 5
+  answer_chunks:
+  - 4141ddee-f7d1-5604-9a7c-3443a1b78b89
+  supporting_chunks:
+  - 33d39904-92bf-5f92-9c27-a9625ad89fd8
+  - f23ec8be-3c45-522c-a005-86c3b2c70115
+  - 3bb54478-efec-54f1-a02e-11ec16b23ed0
+  - 0819e15d-7b7c-547f-afa0-d613ecbf92f2
+q12:
+  question: How long does a full charge of an Atlas A2 take, and how much runtime
+    does a fast top-up give?
+  doc_sources:
+  - 04-atlas-a2-specification
+  - 14-faq
+  n_candidate_chunks: 8
+  answer_chunks:
+  - 4141ddee-f7d1-5604-9a7c-3443a1b78b89
+  - 72acf160-6b5f-5552-bd0a-4246804f55d5
+  supporting_chunks:
+  - 33d39904-92bf-5f92-9c27-a9625ad89fd8
+  - f23ec8be-3c45-522c-a005-86c3b2c70115
+q13:
+  question: What are the dimensions and weight of the Atlas A2?
+  doc_sources:
+  - 04-atlas-a2-specification
+  n_candidate_chunks: 5
+  answer_chunks:
+  - 4141ddee-f7d1-5604-9a7c-3443a1b78b89
+  supporting_chunks:
+  - 33d39904-92bf-5f92-9c27-a9625ad89fd8
+q14:
+  question: What safety standard is the Atlas A2 compliant with, and what is its IP
+    rating?
+  doc_sources:
+  - 04-atlas-a2-specification
+  n_candidate_chunks: 5
+  answer_chunks:
+  - 4141ddee-f7d1-5604-9a7c-3443a1b78b89
+  - 3bb54478-efec-54f1-a02e-11ec16b23ed0
+  supporting_chunks: []
+q15:
+  question: What does an Atlas robot do if it loses connectivity to Beacon?
+  doc_sources:
+  - 04-atlas-a2-specification
+  - 05-beacon-fleet-software
+  n_candidate_chunks: 10
+  answer_chunks:
+  - 3bb54478-efec-54f1-a02e-11ec16b23ed0
+  - 940e058d-44e8-53b2-b1f5-99fbb77a8f8e
+  supporting_chunks:
+  - f23ec8be-3c45-522c-a005-86c3b2c70115
+  - 6ae59416-c067-5cf7-a0aa-9fc84a1a9b41
+  - 5fe123f9-41ef-5bba-9813-8b04d316a479
+q16:
+  question: What is the Beacon API rate limit?
+  doc_sources:
+  - 05-beacon-fleet-software
+  - 14-faq
+  n_candidate_chunks: 8
+  answer_chunks:
+  - 940e058d-44e8-53b2-b1f5-99fbb77a8f8e
+  - 72acf160-6b5f-5552-bd0a-4246804f55d5
+  - cc86c15e-d805-57c6-bb77-27d35cc48cd6
+  supporting_chunks:
+  - 5fe123f9-41ef-5bba-9813-8b04d316a479
+  - b482a85b-e699-5cb1-be85-ad9c574a87c2
+q17:
+  question: Which database and message broker does Beacon use?
+  doc_sources:
+  - 05-beacon-fleet-software
+  n_candidate_chunks: 5
+  answer_chunks:
+  - 5fe123f9-41ef-5bba-9813-8b04d316a479
+  supporting_chunks: []
+q18:
+  question: What are Beacon's RTO and RPO?
+  doc_sources:
+  - 05-beacon-fleet-software
+  - 08-runbook-fleet-outage
+  n_candidate_chunks: 9
+  answer_chunks:
+  - 940e058d-44e8-53b2-b1f5-99fbb77a8f8e
+  - 3f33aba8-3b8a-5aa0-8cc3-8da7e31283bc
+  supporting_chunks:
+  - 6ae59416-c067-5cf7-a0aa-9fc84a1a9b41
+  - 4fc529e4-9248-55c3-8167-d815e9d12e0a
+  - 34ff1d50-0930-5e3e-a0da-8906cc97a420
+  - 2552e761-d601-5e2e-b059-6b0463a9065c
+q19:
+  question: How often does Beacon release, and on which weekday?
+  doc_sources:
+  - 05-beacon-fleet-software
+  - 14-faq
+  n_candidate_chunks: 8
+  answer_chunks:
+  - b482a85b-e699-5cb1-be85-ad9c574a87c2
+  - 72acf160-6b5f-5552-bd0a-4246804f55d5
+  supporting_chunks:
+  - 6ae59416-c067-5cf7-a0aa-9fc84a1a9b41
+  - 5fe123f9-41ef-5bba-9813-8b04d316a479
+  - 940e058d-44e8-53b2-b1f5-99fbb77a8f8e
+  - ee0e2e0b-0b65-54c0-88bd-43f06a870cd3
+  - 3eef7eda-8178-5d20-8dd6-4f7d60147fbf
+  - cc86c15e-d805-57c6-bb77-27d35cc48cd6
+q20:
+  question: How quickly must a suspected security incident be reported, and to whom?
+  doc_sources:
+  - 06-security-policy
+  - 14-faq
+  n_candidate_chunks: 8
+  answer_chunks:
+  - 013aefa0-1046-50be-9472-d75ea99d57f5
+  supporting_chunks:
+  - 72acf160-6b5f-5552-bd0a-4246804f55d5

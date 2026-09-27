@@ -1,0 +1,47 @@
+# ishwar-books
+
+Personal site of **Ishwar Jangid**: portfolio, writings and long-form books, written in Markdown and published to GitHub Pages.
+
+Live at **https://ishwar6.github.io/ishwar-books/**
+
+## Writing
+
+Everything is Markdown in `content/`:
+
+```
+content/
+  writings/<slug>.md                     → /writings/<slug>
+  books/<book>/index.md                  → /books/<book>          (book card + intro)
+  books/<book>/<part-folder>/<file>.md   → /books/<book>/<file>   (chapters, sidebar grouped by part folder)
+```
+
+Frontmatter is optional. The title falls back to the first `# heading`, the description to the first paragraph:
+
+```yaml
+---
+title: Why RAG exists
+description: One line for cards and link previews.
+date: 2026-09-27
+tags: [rag]
+order: 1        # chapters: explicit order (default: sorted by path, numerically)
+part: Foundations  # chapters: override the part name taken from the folder
+draft: true     # skipped in the production build
+---
+```
+
+Book `index.md` also takes `subtitle`, `status` (`planned` | `in-progress` | `complete`), `accent` (hex colour), `order`, `chapters` (planned count) and `topics`.
+
+Supported Markdown: GitHub-flavoured Markdown (tables, task lists, footnotes), syntax-highlighted code, callouts (`> [!NOTE]`, `[!TIP]`, `[!WARNING]`, `[!IMPORTANT]`, `[!CAUTION]`), math with `$$…$$`, ` ```mermaid ` diagrams, relative images, links between `.md` files and Obsidian `[[wikilinks]]`. See `content/writings/how-this-site-renders-markdown.md` for every element.
+
+Profile, links and projects live in `src/data/site.ts`.
+
+## Develop
+
+```bash
+npm install
+npm run dev            # content build + Vite dev server
+npm run content:watch  # (second terminal) rebuild content when a .md changes
+npm run build          # production build into dist/
+```
+
+Pushing to `main` builds and deploys via `.github/workflows/deploy.yml`. For a custom domain, set `BASE_PATH=/` in the workflow and add a `public/CNAME`.
