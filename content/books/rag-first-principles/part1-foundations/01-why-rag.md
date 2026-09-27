@@ -8,34 +8,92 @@
 
 ---
 
-## 1.1 Four things a language model cannot do on its own
+## 1.1 Four limitations that motivate RAG
 
-A large language model (LLM) is a function from text to text. Everything it "knows" was
-baked into its weights during training. That has four consequences, and RAG exists because
-of them.
+A large language model (LLM) answering a question draws on two different sources of
+information, and it helps to keep them apart from the first page:
 
-**1. It stops knowing at the cutoff date.** A model trained until spring 2026 has no idea
-what your company shipped last Tuesday. You cannot ask it about the Beacon 4.2 release
-notes because those did not exist when it was trained.
+```
+                 LLM answering a question
+                          │
+               ┌──────────┴──────────┐
+               │                     │
+     parametric knowledge     in-context information
+        (model weights)        (the current prompt)
+               │                     │
+        learned during        user text, retrieved docs,
+           training           tool results, conversation
+```
 
-**2. It has never seen your private data.** Your handbook, your tickets, your contracts,
-your database. None of it was on the public internet, so none of it is in the weights. Ask
-"how many PTO days do I get" and the model can only answer for *some* company, not yours.
+**Parametric knowledge** is what training wrote into the weights. **In-context
+information** is whatever you put in front of the model for this one call. A model can
+know something in its weights and not have it in the context, or know nothing about a
+topic from training and still answer correctly because you supplied the facts in the
+prompt. RAG works almost entirely through the second path. Relying on either path alone
+runs into four limitations.
 
-**3. It makes things up: fluently.** When the model does not know, it does not say "I
-don't know". It produces the most *plausible-sounding* continuation. This is called
-**hallucination**, and the dangerous part is that a hallucinated answer reads exactly like
-a correct one. Ask for a policy that does not exist and you will get one, with numbers.
+**1. Its parametric knowledge becomes stale.** An LLM learns facts during training, but its
+weights do not update when the world changes. If your company released Beacon 4.2
+yesterday, a model trained earlier cannot know those release notes from its parameters
+alone. It can still *use* them perfectly well if you put them in the prompt: the problem is
+not that the model cannot understand new facts, it is that new facts never get written
+into its weights. They have to be supplied at inference time, through the prompt, a tool,
+or retrieval.
 
-**4. Its input is finite and costs money.** The **context window** is the maximum number
-of tokens the model can read in one call. Even models with million-token windows charge per
-token, get slower as the input grows, and (this is measured, not folklore) get *worse*
-at using facts buried in the middle of a very long input ("lost in the middle"). Pasting
-your entire wiki into every request is neither free nor reliable.
+**2. You cannot rely on its weights to contain your private data.** Your handbook, tickets,
+contracts, databases and newly written documents are generally not available to a model as
+authoritative knowledge. Even if something related appeared in its training data, you
+cannot assume it was memorised accurately, that it is the current version, or that the
+model can recall it reliably. Ask "how many PTO days do I get" and a model with no context
+can only answer for *some* company, not yours.
 
-RAG attacks all four at once with one move: **look the facts up at question time and put
-them in the prompt.** The model no longer has to *remember* your handbook; it has to
-*read* the three paragraphs you hand it and answer from those.
+**3. It can generate unsupported information.** An LLM produces text by repeatedly choosing
+a likely next token given everything before it, $$P(x_t \mid x_1, \ldots, x_{t-1})$$. Nothing
+in that objective checks a claim against a source of truth. So when evidence is missing or
+ambiguous, a model may produce a fluent, plausible answer instead of reliably saying "I
+don't know". Models *can* abstain, and good prompting and training make them do it more
+often, but abstention is not guaranteed. This failure is called **hallucination**, and it
+is hard to spot because fluency and correctness are different properties: ask for a policy
+that does not exist and you may well get one, with numbers.
+
+**4. Its working context is finite and expensive.** The **context window** limits how much
+text the model can process in one call (the prompt plus the answer). Even with
+million-token windows, every input token costs money and time, and models do not always
+use information equally well across a very long input. Liu et al. measured this in
+["Lost in the Middle"](https://arxiv.org/abs/2307.03172) (2023): on multi-document question
+answering, accuracy was often highest when the relevant passage sat at the start or end of
+the context and dropped markedly when it sat in the middle. Newer models vary in how much
+they suffer from it, but pasting your entire wiki into every request is neither free nor
+reliable.
+
+RAG **helps** with all four through one architectural idea: **retrieve the relevant text at
+question time and put it in the model's context.** Instead of requiring the model to
+remember an entire handbook in its weights, or placing the entire handbook in every prompt,
+the system retrieves the few passages most likely to contain the answer. The model no
+longer has to *remember* your handbook; it has to *read* the three paragraphs you hand it
+and answer from those. Lewis et al., who coined the term, framed exactly this split as
+**parametric memory** (the weights) plus **non-parametric memory** (a retrievable index)
+([Lewis et al., 2020](https://arxiv.org/abs/2005.11401)).
+
+Retrieval does **not** guarantee a correct answer. Every step can fail:
+
+```
+the right document exists
+        ↓
+the retriever finds it
+        ↓
+the right chunk reaches the prompt
+        ↓
+the model reads it correctly
+        ↓
+the model makes only claims the chunk supports
+        ↓
+correct answer
+```
+
+What RAG gives you is a better foundation: current external knowledge, a small targeted
+context, provenance for every answer, and an answer you can check against its sources.
+Most of this book is about measuring and hardening each of those arrows.
 
 ## 1.2 The three ways to give a model new knowledge
 
@@ -254,8 +312,12 @@ first: that is why every script in this book prints them.
 
 ## Key takeaways
 
-- RAG exists because LLMs have a cutoff, have not seen your data, hallucinate, and have a
-  finite paid-for input. Retrieval fixes all four by putting the right text in the prompt.
+- An LLM answers from two sources: parametric knowledge in its weights and in-context
+  information in the prompt. RAG works through the second.
+- RAG is motivated by four limitations: stale weights, private data the weights cannot be
+  trusted to hold, unsupported (hallucinated) answers, and a finite, costly context.
+  Retrieval helps with all four by putting the right text in the prompt; it does not
+  guarantee a correct answer, because every step from document to answer can fail.
 - Fine-tuning changes behaviour; RAG changes knowledge. Long context is a complement, not
   a replacement: a million-token window is roughly two thousand pages, and you pay for all
   of them on every question.
