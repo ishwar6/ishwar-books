@@ -16,49 +16,32 @@ export const site = {
   },
 }
 
-export type Project = { name: string; description: string; url: string; language: string; tags: string[] }
+export type Project = {
+  name: string
+  tagline: string
+  description: string
+  highlights: string[]
+  tech: string[]
+  status: string
+  /** Optional public link; private projects have none. */
+  url?: string
+}
 
+// Add new projects to the top of this list.
 export const projects: Project[] = [
   {
-    name: 'Django REST Framework course',
-    description: 'The full DRF course from my YouTube series: serializers, viewsets, auth, permissions and testing, arranged lesson by lesson.',
-    url: 'https://github.com/ishwar6/Django-Rest-Framework',
-    language: 'Python',
-    tags: ['Django', 'REST', 'Teaching'],
-  },
-  {
-    name: 'Django CI/CD with Jenkins',
-    description: 'A complete continuous-integration and delivery pipeline for a Django project, built on Jenkins.',
-    url: 'https://github.com/ishwar6/django_ci_cd',
-    language: 'Python',
-    tags: ['CI/CD', 'Jenkins', 'DevOps'],
-  },
-  {
-    name: 'Django on ECS with Terraform',
-    description: 'Production-ready deployment package: Django, Postgres and Jenkins on AWS ECS, provisioned end to end with Terraform.',
-    url: 'https://github.com/ishwar6/django-terraform-ecs',
-    language: 'HCL',
-    tags: ['Terraform', 'AWS', 'Infrastructure'],
-  },
-  {
-    name: 'KST Learning Path',
-    description: 'An adaptive learning engine based on Knowledge Space Theory: assesses what a student knows and routes them to what they are ready to learn next.',
-    url: 'https://github.com/ishwar6/KST-Learning-Path',
-    language: 'Python',
-    tags: ['EdTech', 'Adaptive learning'],
-  },
-  {
-    name: 'RAG pipeline with agents',
-    description: 'A retrieval-augmented generation pipeline orchestrated by tool-using agents.',
-    url: 'https://github.com/ishwar6/rag-pipeline-with-agents',
-    language: 'Python',
-    tags: ['RAG', 'Agents', 'LLMs'],
-  },
-  {
-    name: 'Design patterns in Python',
-    description: 'The classic Gang-of-Four patterns, each with a small, idiomatic Python example.',
-    url: 'https://github.com/ishwar6/design_patterns',
-    language: 'Python',
-    tags: ['Software design'],
+    name: 'Manim Studio',
+    tagline: 'An explainer-video pipeline: animation, voice and code generation in one place',
+    description:
+      'A local platform for making 3Blue1Brown-style explainer videos. A video is written as a script of short beats; each beat is narrated in my own voice, animated in Manim, and synced so the motion lands on the spoken word. The first series explains vector databases in nine episodes, from "meaning as geometry" to HNSW, filtering, hybrid search and quantization.',
+    highlights: [
+      'Beat-by-beat script editor: narration, visual spec, camera moves, on-screen text and transitions for every beat, with full revision history.',
+      'Voice recorded per beat in the browser, then mastered automatically (rumble removal, denoising, compression, loudness normalisation) without changing its length.',
+      'Audio sync: sync marks in the narration become animation cues, timed from Whisper word timestamps on real recordings or exact character timings from text-to-speech.',
+      'AI-assisted Python generation: Claude Code writes the Manim scene code from each beat spec, renders it, checks the frames, and snapshots every build so any change can be undone.',
+      'A 3Blue1Brown look: Computer Modern math with a fixed colour per symbol, a mascot that reacts in comic bubbles, and sound effects placed from the script.',
+    ],
+    tech: ['Python', 'Manim', 'FastAPI', 'React', 'PostgreSQL', 'ffmpeg', 'Whisper', 'Claude Code'],
+    status: 'Private · in active development',
   },
 ]

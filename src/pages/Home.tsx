@@ -11,7 +11,7 @@ export default function Home() {
   const explore = [
     { to: '/writings', count: writings.length, label: 'Writings', desc: 'Long-form essays and deep dives, written from first principles.' },
     { to: '/books', count: books.length, label: 'Books', desc: `${chapters}+ chapters on GPUs, LLMs, RAG and agents.` },
-    { to: '/projects', count: projects.length, label: 'Projects', desc: 'Open-source code, courses and production templates.' },
+    { to: '/projects', count: projects.length, label: 'Projects', desc: 'Tools and pipelines I build, like an explainer-video studio.' },
     { href: site.links.youtube, count: <YouTube />, label: 'Videos', desc: 'Engineering tutorials on my YouTube channel.' },
   ]
 
@@ -71,7 +71,7 @@ export default function Home() {
           <h2>Projects</h2>
           <Link to="/projects" className="more-link">All projects →</Link>
         </div>
-        <div className="project-grid">{projects.slice(0, 3).map((p) => <ProjectCard key={p.url} project={p} />)}</div>
+        <div className="project-grid">{projects.slice(0, 3).map((p) => <ProjectCard key={p.name} project={p} />)}</div>
       </section>
     </div>
   )

@@ -5,7 +5,6 @@ import type { Project } from '../data/site'
 import { Arrow } from './icons'
 
 const STATUS: Record<Book['status'], string> = { 'in-progress': 'In progress', complete: 'Complete', planned: 'Planned' }
-const LANG_COLOR: Record<string, string> = { Python: '#3572a5', HCL: '#844fba', JavaScript: '#f1e05a', TypeScript: '#3178c6', CSS: '#663399' }
 
 export function BookCard({ book }: { book: Book }) {
   const published = book.chapters.length
@@ -42,15 +41,21 @@ export function PostList({ posts }: { posts: PageMeta[] }) {
   )
 }
 
-export function ProjectCard({ project }: { project: Project }) {
-  return (
-    <a href={project.url} target="_blank" rel="noreferrer" className="project-card">
-      <h3>{project.name}<Arrow /></h3>
+export function ProjectCard({ project, full = false }: { project: Project; full?: boolean }) {
+  const body = (
+    <>
+      <span className="project-status">{project.status}</span>
+      <h3>{project.name}{project.url && <Arrow />}</h3>
+      <div className="project-tagline">{project.tagline}</div>
       <p>{project.description}</p>
-      <div className="tags" style={{ alignItems: 'center' }}>
-        <span className="lang" style={{ '--lc': LANG_COLOR[project.language] } as CSSProperties}>{project.language}</span>
-        {project.tags.map((t) => <span key={t} className="tag">{t}</span>)}
-      </div>
-    </a>
+      {full && project.highlights.length > 0 && (
+        <ul className="project-highlights">{project.highlights.map((h) => <li key={h}>{h}</li>)}</ul>
+      )}
+      <div className="tags">{project.tech.map((t) => <span key={t} className="tag">{t}</span>)}</div>
+    </>
   )
+  const cls = `project-card${full ? ' full' : ''}`
+  return project.url
+    ? <a href={project.url} target="_blank" rel="noreferrer" className={cls}>{body}</a>
+    : <div className={cls}>{body}</div>
 }

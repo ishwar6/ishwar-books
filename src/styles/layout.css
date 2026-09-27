@@ -141,12 +141,20 @@
   display: flex; flex-direction: column; gap: 10px; padding: 22px; border-radius: var(--radius);
   border: 1px solid var(--border-soft); background: var(--bg-soft); transition: border-color 0.15s, transform 0.15s;
 }
-.project-card:hover { border-color: var(--border); transform: translateY(-2px); }
+.project-card:hover { border-color: var(--border); }
+a.project-card:hover { transform: translateY(-2px); }
+.project-status { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--h4); }
+.project-tagline { color: var(--h2); font-weight: 600; font-size: 15px; margin-top: -4px; line-height: 1.45; }
+.project-list { display: grid; gap: 16px; max-width: 900px; }
+.project-card.full { padding: 30px 30px 26px; gap: 12px; }
+.project-card.full h3 { font-size: 24px; letter-spacing: -0.02em; }
+.project-card.full p { font-size: 16.5px; line-height: 1.7; color: var(--text); }
+.project-highlights { margin: 4px 0 6px; padding-left: 1.2em; color: var(--muted); font-size: 15.5px; line-height: 1.65; }
+.project-highlights li { margin: 6px 0; }
+.project-highlights li::marker { color: var(--h4); }
 .project-card h3 { margin: 0; font-size: 18px; color: var(--text-strong); font-weight: 700; display: flex; justify-content: space-between; gap: 12px; }
 .project-card h3 svg { width: 16px; height: 16px; color: var(--faint); flex: none; margin-top: 3px; }
 .project-card p { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.6; flex: 1; }
-.lang { display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; color: var(--muted); }
-.lang::before { content: ''; width: 9px; height: 9px; border-radius: 50%; background: var(--lc, #3572a5); }
 
 /* ---------- page headers ---------- */
 .page-head { padding-top: 64px; margin-bottom: 40px; max-width: 820px; }
