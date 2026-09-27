@@ -1,12 +1,12 @@
 /* Long-form reading typography, modelled on educative.io: big Helvetica Neue body,
    heavy tight headings, generous leading, colour-coded sub-headings. */
 .prose {
-  font-size: 19px;
+  font-size: var(--prose-size);
   line-height: 1.8;
   color: var(--text);
   overflow-wrap: break-word;
 }
-@media (max-width: 640px) { .prose { font-size: 17.5px; line-height: 1.75; } }
+@media (max-width: 640px) { .prose { font-size: calc(var(--prose-size) - 1.5px); line-height: 1.75; } }
 
 .prose > :first-child { margin-top: 0; }
 .prose p { margin: 0 0 1.25em; }
@@ -122,7 +122,7 @@
   padding: 1.1em 1.25em;
   overflow-x: auto;
   font-family: var(--font-mono);
-  font-size: 14.5px;
+  font-size: calc(var(--prose-size) * 0.76);
   line-height: 1.7;
   tab-size: 4;
   background: transparent !important;

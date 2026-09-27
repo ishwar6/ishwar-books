@@ -23,6 +23,21 @@ export function useTheme(): [Theme, () => void] {
   return [theme, () => setTheme((t) => THEMES[(THEMES.indexOf(t) + 1) % THEMES.length])]
 }
 
+export const FONT_SIZES = ['small', 'normal', 'large'] as const
+export type FontSize = (typeof FONT_SIZES)[number]
+
+export function useFontSize(): [FontSize, (f: FontSize) => void] {
+  const [size, setSize] = useState<FontSize>(() => {
+    const f = document.documentElement.dataset.font as FontSize
+    return FONT_SIZES.includes(f) ? f : 'normal'
+  })
+  useEffect(() => {
+    document.documentElement.dataset.font = size
+    try { localStorage.setItem('font', size) } catch { /* storage unavailable */ }
+  }, [size])
+  return [size, setSize]
+}
+
 /** Id of the heading currently at the top of the viewport. */
 export function useActiveHeading(ids: string[]) {
   const [active, setActive] = useState<string>()

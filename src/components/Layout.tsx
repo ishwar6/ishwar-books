@@ -2,7 +2,7 @@ import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useEffect } from 'react'
 import { site } from '../data/site'
 import { books, writings } from '../lib/content'
-import { useTheme } from '../lib/hooks'
+import { useFontSize, useTheme } from '../lib/hooks'
 import { Dim, GitHub, Mail, Moon, Sun, X, YouTube } from './icons'
 
 function ScrollToTop() {
@@ -16,13 +16,27 @@ function ScrollToTop() {
 
 const THEME_LABEL = { dark: 'Dark', dim: 'Dim', light: 'Light' } as const
 
+function FontSizeControl() {
+  const [size, setSize] = useFontSize()
+  const opts = [['small', 'A-', 'sm', 'Smaller text'], ['normal', 'A', '', 'Normal text'], ['large', 'A+', 'lg', 'Larger text']] as const
+  return (
+    <div className="font-size" role="group" aria-label="Text size">
+      {opts.map(([value, label, cls, title]) => (
+        <button key={value} className={cls} aria-pressed={size === value} title={title} onClick={() => setSize(value)}>{label}</button>
+      ))}
+    </div>
+  )
+}
+
 export default function Layout() {
   const [theme, toggle] = useTheme()
+  const { pathname } = useLocation()
+  const reading = /^\/(writings|books)\/[^/]+/.test(pathname)
   return (
     <>
       <ScrollToTop />
       <header className="site-header">
-        <div className="container">
+        <div className={`container${reading ? ' wide' : ''}`}>
           <Link to="/" className="brand">
             <span className="brand-mark">IJ</span>
             {site.name}
@@ -34,6 +48,7 @@ export default function Layout() {
             <NavLink to="/about">About</NavLink>
           </nav>
           <div className="header-actions">
+            {reading && <FontSizeControl />}
             <button className="icon-btn" onClick={toggle} aria-label={`Theme: ${THEME_LABEL[theme]}. Switch theme`} title={`Theme: ${THEME_LABEL[theme]}`}>
               {theme === 'dark' ? <Moon /> : theme === 'dim' ? <Dim /> : <Sun />}
             </button>

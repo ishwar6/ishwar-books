@@ -154,12 +154,15 @@
 .page-head p { font-size: 19px; color: var(--muted); margin: 0; line-height: 1.65; }
 
 /* ---------- reader ---------- */
-.reader { display: grid; grid-template-columns: minmax(0, 1fr) 240px; gap: 64px; padding-top: 48px; }
-.reader.with-sidebar { grid-template-columns: 260px minmax(0, 1fr) 220px; gap: 48px; }
-.reader-main { min-width: 0; max-width: 780px; }
-.reader.with-sidebar .reader-main { justify-self: center; width: 100%; }
-@media (max-width: 1180px) {
-  .reader.with-sidebar { grid-template-columns: 250px minmax(0, 1fr); }
+/* Reading pages use the full window: chapters pinned left, "On this page" pinned right,
+   and a wide text column in between whose measure follows the chosen font size. */
+.container.wide { max-width: 1720px; }
+.reader { display: grid; grid-template-columns: minmax(0, 1fr) 250px; gap: 56px; padding-top: 44px; }
+.reader.with-sidebar { grid-template-columns: 280px minmax(0, 1fr) 250px; gap: 56px; }
+.reader-main { min-width: 0; width: 100%; max-width: var(--measure); justify-self: center; }
+@media (max-width: 1280px) {
+  .reader { grid-template-columns: minmax(0, 1fr) 220px; gap: 40px; }
+  .reader.with-sidebar { grid-template-columns: 260px minmax(0, 1fr); gap: 40px; }
   .reader.with-sidebar .toc { display: none; }
 }
 @media (max-width: 960px) {
@@ -168,6 +171,19 @@
   .reader .chapter-nav { display: none; }
   .reader .chapter-nav.open { display: block; }
 }
+
+/* A- / A / A+ reading size control */
+.font-size { display: inline-flex; border: 1px solid var(--border-soft); border-radius: 8px; overflow: hidden; height: 36px; }
+.font-size button {
+  border: 0; background: transparent; color: var(--muted); cursor: pointer; padding: 0 11px;
+  font-weight: 700; font-size: 14px; line-height: 1; transition: color 0.15s, background 0.15s;
+}
+.font-size button + button { border-left: 1px solid var(--border-soft); }
+.font-size button:hover { color: var(--text-strong); background: var(--surface); }
+.font-size button[aria-pressed='true'] { color: var(--text-strong); background: var(--surface-2); }
+.font-size .sm { font-size: 12.5px; }
+.font-size .lg { font-size: 16px; }
+.header-actions { display: flex; gap: 8px; align-items: center; }
 
 .breadcrumbs { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; font-size: 15px; color: var(--muted); margin-bottom: 24px; }
 .breadcrumbs a:hover { color: var(--text-strong); }

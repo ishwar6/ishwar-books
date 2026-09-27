@@ -31,8 +31,14 @@
   --radius: 12px;
   --maxw: 1180px;
   --gutter: 24px;
+  /* reading size: A- / A / A+ */
+  --prose-size: 20px;
+  --measure: 900px;
   color-scheme: dark;
 }
+
+:root[data-font='small'] { --prose-size: 17.5px; --measure: 820px; }
+:root[data-font='large'] { --prose-size: 23px; --measure: 1000px; }
 
 /* softer dark: the educative.io charcoal */
 :root[data-theme='dim'] {

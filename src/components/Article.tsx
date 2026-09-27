@@ -22,7 +22,7 @@ export default function Article({ route, header, sidebar, footer }: { route: str
   }, [page])
 
   return (
-    <div className={`container reader${sidebar ? ' with-sidebar' : ''}`}>
+    <div className={`container wide reader${sidebar ? ' with-sidebar' : ''}`}>
       <ReadingProgress />
       {sidebar}
       <article className="reader-main">
