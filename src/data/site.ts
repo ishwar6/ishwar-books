@@ -4,7 +4,7 @@ export const site = {
   firstName: 'Ishwar',
   tagline: 'systems, machine learning, and GPUs. learning in public.',
   location: 'Delhi, India',
-  email: 'iisudrj11@gmail.com',
+  email: 'ishwarjangid116@gmail.com',
   bio: [
     'I am a software engineer who builds production AI systems: agents, retrieval pipelines and the data platforms underneath them.',
     'I learn by writing things down properly. This site is where those notes become long-form, first-principles books on GPU programming, training LLMs from scratch, retrieval-augmented generation and ML systems, each with code you can run and numbers you can measure.',
@@ -12,7 +12,7 @@ export const site = {
   links: {
     github: 'https://github.com/ishwar6',
     youtube: 'https://www.youtube.com/c/IshwarJangid',
-    x: 'https://x.com/IshwarSJangid',
+    x: 'https://x.com/Ishwaraiml',
   },
 }
 

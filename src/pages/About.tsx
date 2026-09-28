@@ -26,7 +26,7 @@ export default function About() {
           <dt>Based in</dt><dd>{site.location}</dd>
           <dt>GitHub</dt><dd><a href={site.links.github} target="_blank" rel="noreferrer">github.com/ishwar6</a></dd>
           <dt>YouTube</dt><dd><a href={site.links.youtube} target="_blank" rel="noreferrer">Ishwar Jangid</a></dd>
-          <dt>X</dt><dd><a href={site.links.x} target="_blank" rel="noreferrer">@IshwarSJangid</a></dd>
+          <dt>X</dt><dd><a href={site.links.x} target="_blank" rel="noreferrer">@Ishwaraiml</a></dd>
         </dl>
       </div>
     </div>
