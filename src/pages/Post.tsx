@@ -8,7 +8,7 @@ import NotFound from './NotFound'
 export default function Post() {
   const { slug } = useParams()
   const meta = writings.find((w) => w.slug === slug)
-  useTitle(meta?.title)
+  useTitle(meta?.title, meta?.description)
   if (!meta) return <NotFound />
   const parts = seriesOf(meta.series)
   const idx = parts.findIndex((p) => p.slug === meta.slug)

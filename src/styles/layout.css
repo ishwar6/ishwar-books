@@ -395,3 +395,8 @@ a.project-card:hover { transform: translateY(-2px); }
 
 .writing-card .writing-body > .tags { margin-top: auto; padding-top: 4px; }
 .writing-card.featured p { max-height: none; }
+
+/* static HTML for crawlers and first paint; React replaces it on load */
+.prerender { padding-top: 40px; padding-bottom: 60px; max-width: 900px; }
+.prerender > nav { margin-bottom: 32px; color: var(--muted); font-size: 15px; }
+.prerender > nav a { color: var(--muted); }

@@ -36,7 +36,7 @@ Book `index.md` also takes `subtitle`, `status` (`planned` | `in-progress` | `co
 
 Supported Markdown: GitHub-flavoured Markdown (tables, task lists, footnotes), syntax-highlighted code, callouts (`> [!NOTE]`, `[!TIP]`, `[!WARNING]`, `[!IMPORTANT]`, `[!CAUTION]`), math with `$$…$$`, ` ```mermaid ` diagrams, relative images, links between `.md` files and Obsidian `[[wikilinks]]`. See `content/writings/how-this-site-renders-markdown.md` for every element.
 
-Profile, links and projects live in `src/data/site.ts`.
+Profile, links and projects live in `src/data/site.json`.
 
 ## Develop
 
@@ -48,3 +48,11 @@ npm run build          # production build into dist/
 ```
 
 Pushing to `main` builds and deploys via `.github/workflows/deploy.yml`. The site is served from the custom domain in `public/CNAME` (DNS: four A records to GitHub Pages and a `www` CNAME to `ishwar6.github.io`).
+
+## SEO
+
+Every page is built as real HTML for search engines (`scripts/postbuild.mjs`): its own title, description, canonical URL, Open Graph and X card tags, JSON-LD structured data (Person, WebSite, BlogPosting, Book, TechArticle, BreadcrumbList), and the full article text inside the page. The build also writes `sitemap.xml`, `robots.txt` and `rss.xml`.
+
+Social preview images live in `public/og/<slug>.png`. A new writing falls back to `public/og/site.png` until you generate its own card with `scripts/og.mjs` (instructions at the top of that file).
+
+Profile, links and projects are in `src/data/site.json`.

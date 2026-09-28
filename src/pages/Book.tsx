@@ -10,7 +10,7 @@ import NotFound from './NotFound'
 export default function Book() {
   const { book: slug } = useParams()
   const book = books.find((b) => b.slug === slug)
-  useTitle(book?.title)
+  useTitle(book?.title, book?.description)
   if (!book) return <NotFound />
   let n = 0
   return (

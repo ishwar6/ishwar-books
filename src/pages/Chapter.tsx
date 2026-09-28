@@ -13,7 +13,7 @@ export default function Chapter() {
   const book = books.find((b) => b.slug === bookSlug)
   const idx = book?.chapters.findIndex((c) => c.slug === chapter) ?? -1
   const meta = book?.chapters[idx]
-  useTitle(meta && book ? `${meta.title} · ${book.title}` : undefined)
+  useTitle(meta && book ? `${meta.title} · ${book.title}` : undefined, meta?.description || book?.description)
   useEffect(() => setNavOpen(false), [chapter])
   if (!book || !meta) return <NotFound />
   const prev = book.chapters[idx - 1]

@@ -1,10 +1,24 @@
 import { useEffect, useState } from 'react'
 import { site } from '../data/site'
 
-export function useTitle(title?: string) {
+function setMeta(selector: string, attr: string, value: string) {
+  const el = document.head.querySelector(selector)
+  if (el) el.setAttribute(attr, value)
+}
+
+/** Keeps the document title, description and canonical URL in sync with in-app navigation. */
+export function useTitle(title?: string, description?: string) {
   useEffect(() => {
-    document.title = title ? `${title} · ${site.name}` : `${site.name} · engineering, ML systems and GPUs`
-  }, [title])
+    const full = title ? `${title} · ${site.name}` : `${site.name}: LLM inference, RAG and GPU programming, from first principles`
+    document.title = full
+    const desc = description ?? site.description
+    setMeta('meta[name="description"]', 'content', desc)
+    setMeta('meta[property="og:title"]', 'content', full)
+    setMeta('meta[property="og:description"]', 'content', desc)
+    const canonical = site.url.replace(/\/$/, '') + location.pathname.replace(/\/?$/, '/')
+    setMeta('link[rel="canonical"]', 'href', canonical)
+    setMeta('meta[property="og:url"]', 'content', canonical)
+  }, [title, description])
 }
 
 export const THEMES = ['dark', 'dim', 'light'] as const
