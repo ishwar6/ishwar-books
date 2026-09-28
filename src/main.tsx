@@ -14,6 +14,8 @@ import Book from './pages/Book'
 import Chapter from './pages/Chapter'
 import Projects from './pages/Projects'
 import About from './pages/About'
+import Videos from './pages/Videos'
+import Video from './pages/Video'
 import NotFound from './pages/NotFound'
 
 createRoot(document.getElementById('root')!).render(
@@ -27,6 +29,8 @@ createRoot(document.getElementById('root')!).render(
           <Route path="books" element={<Books />} />
           <Route path="books/:book" element={<Book />} />
           <Route path="books/:book/:chapter" element={<Chapter />} />
+          <Route path="videos" element={<Videos />} />
+          <Route path="videos/:slug" element={<Video />} />
           <Route path="projects" element={<Projects />} />
           <Route path="about" element={<About />} />
           <Route path="*" element={<NotFound />} />

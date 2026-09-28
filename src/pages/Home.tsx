@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom'
 import { projects, site } from '../data/site'
-import { books, writings } from '../lib/content'
+import { books, videos, writings } from '../lib/content'
 import { useTitle } from '../lib/hooks'
-import { BookCard, ProjectCard, WritingCard } from '../components/Cards'
+import { BookCard, ProjectCard, VideoCard, WritingCard } from '../components/Cards'
 import { GitHub, Mail, X, YouTube } from '../components/icons'
 
 export default function Home() {
@@ -12,7 +12,7 @@ export default function Home() {
     { to: '/writings', count: writings.length, label: 'Writings', desc: 'Long-form essays and deep dives, written from first principles.' },
     { to: '/books', count: books.length, label: 'Books', desc: `${chapters}+ chapters on GPUs, LLMs, RAG and agents.` },
     { to: '/projects', count: projects.length, label: 'Projects', desc: 'Tools and pipelines I build, like an explainer-video studio.' },
-    { href: site.links.youtube, count: <YouTube />, label: 'Videos', desc: 'Engineering tutorials on my YouTube channel.' },
+    { to: '/videos', count: videos.length, label: 'Videos', desc: 'Animated explainers, each with a written companion.' },
   ]
 
   return (
@@ -43,12 +43,20 @@ export default function Home() {
                 <span className="desc">{e.desc}</span>
               </>
             )
-            return e.to
-              ? <Link key={e.label} to={e.to} className="explore-card">{body}</Link>
-              : <a key={e.label} href={e.href} target="_blank" rel="noreferrer" className="explore-card">{body}</a>
+            return <Link key={e.label} to={e.to} className="explore-card">{body}</Link>
           })}
         </div>
       </section>
+
+      {videos.length > 0 && (
+        <section className="section">
+          <div className="section-head">
+            <h2>Latest video</h2>
+            <Link to="/videos" className="more-link">All videos →</Link>
+          </div>
+          <VideoCard video={videos[0]} featured />
+        </section>
+      )}
 
       <section className="section">
         <div className="section-head">

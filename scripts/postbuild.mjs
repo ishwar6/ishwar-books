@@ -39,7 +39,7 @@ const crumbs = (items) => ({
 
 // ---------------------------------------------------------------- page definitions
 const pages = []
-const nav = `<nav><a href="${BASE}">Home</a> · <a href="${BASE}writings/">Writings</a> · <a href="${BASE}books/">Books</a> · <a href="${BASE}projects/">Projects</a> · <a href="${BASE}about/">About</a></nav>`
+const nav = `<nav><a href="${BASE}">Home</a> · <a href="${BASE}writings/">Writings</a> · <a href="${BASE}books/">Books</a> · <a href="${BASE}videos/">Videos</a> · <a href="${BASE}projects/">Projects</a> · <a href="${BASE}about/">About</a></nav>`
 const list = (items) => `<ul>${items.map(([href, title, desc]) => `<li><a href="${href}">${esc(title)}</a>${desc ? `<p>${esc(desc)}</p>` : ''}</li>`).join('')}</ul>`
 
 pages.push({
@@ -47,6 +47,7 @@ pages.push({
   image: ogImage('site'), type: 'website', ld: [website, person],
   body: `<h1>${esc(site.name)}</h1><p>${esc(site.tagline)}</p>${site.bio.map((p) => `<p>${esc(p)}</p>`).join('')}
     <h2>Writings</h2>${list(manifest.writings.map((w) => [`${BASE}${w.route}/`, w.title, w.description]))}
+    <h2>Videos</h2>${list((manifest.videos ?? []).map((v) => [`${BASE}${v.route}/`, v.title, v.description]))}
     <h2>Books</h2>${list(manifest.books.map((b) => [`${BASE}books/${b.slug}/`, b.title, b.description]))}
     <h2>Projects</h2>${list(projects.map((p) => [`${BASE}projects/`, p.name, p.tagline]))}`,
 })
@@ -93,6 +94,36 @@ for (const w of manifest.writings) {
       timeRequired: `PT${w.minutes}M`, inLanguage: 'en', author, publisher: author, ...series,
     }, crumbs([['Home', ''], ['Writings', 'writings'], [w.title, w.route]])],
     body: `<article><h1>${esc(w.title)}</h1><p>${esc(w.description)}</p>${content(w.route)}</article>`,
+  })
+}
+
+const videos = manifest.videos ?? []
+const isoDuration = (sec) => `PT${Math.floor(sec / 60)}M${sec % 60}S`
+pages.push({
+  route: 'videos', title: `Videos · ${site.name}`,
+  description: 'Animated explainers on vector databases, search and AI systems, each with a written companion, the key numbers and the full transcript.',
+  image: videos[0]?.cover ? ORIGIN + videos[0].cover : ogImage('site'), type: 'website',
+  ld: [{ '@type': 'CollectionPage', name: 'Videos', url: url('videos') }, crumbs([['Home', ''], ['Videos', 'videos']])],
+  body: `<h1>Videos</h1>${list(videos.map((v) => [`${BASE}${v.route}/`, v.title, v.description]))}`,
+})
+for (const v of videos) {
+  const thumb = v.cover ? ORIGIN + v.cover : ogImage('site')
+  const watch = `https://www.youtube.com/watch?v=${v.youtube}`
+  const clips = v.chapters.map((c, i) => ({
+    '@type': 'Clip', name: c.label, startOffset: c.t, endOffset: v.chapters[i + 1]?.t ?? v.durationSeconds, url: `${watch}&t=${c.t}s`,
+  }))
+  pages.push({
+    route: v.route, title: `${v.title} · ${site.name}`, description: v.description, image: thumb, type: 'video.other',
+    published: iso(v.date), tags: v.tags, video: { url: `https://www.youtube.com/embed/${v.youtube}`, watch },
+    ld: [{
+      '@type': 'VideoObject', name: v.title, description: v.description, thumbnailUrl: [thumb, `https://i.ytimg.com/vi/${v.youtube}/maxresdefault.jpg`],
+      uploadDate: iso(v.date), duration: v.durationSeconds ? isoDuration(v.durationSeconds) : undefined,
+      contentUrl: watch, embedUrl: `https://www.youtube.com/embed/${v.youtube}`, inLanguage: 'en', keywords: v.tags.join(', '),
+      author, publisher: author, hasPart: clips,
+      ...(v.series ? { isPartOf: { '@type': 'CreativeWorkSeries', name: v.series }, position: v.seriesPart } : {}),
+    }, crumbs([['Home', ''], ['Videos', 'videos'], [v.title, v.route]])],
+    body: `<article><h1>${esc(v.title)}</h1><p>${esc(v.description)}</p><p><a href="${watch}">Watch on YouTube (${esc(v.duration ?? '')})</a></p>
+      <h2>Chapters</h2><ol>${v.chapters.map((c) => `<li><a href="${watch}&amp;t=${c.t}s">${c.stamp} ${esc(c.label)}</a></li>`).join('')}</ol>${content(v.route)}</article>`,
   })
 }
 
@@ -146,6 +177,8 @@ function render(pg, { noindex = false } = {}) {
     pg.published ? `<meta property="article:published_time" content="${pg.published}" />` : '',
     pg.modified ? `<meta property="article:modified_time" content="${pg.modified}" />` : '',
     ...(pg.type === 'article' ? (pg.tags ?? []).map((t) => `<meta property="article:tag" content="${esc(t)}" />`) : []),
+    ...(pg.video ? [`<meta property="og:video" content="${pg.video.url}" />`, `<meta property="og:video:secure_url" content="${pg.video.url}" />`, '<meta property="og:video:type" content="text/html" />', '<meta property="og:video:width" content="1280" />', '<meta property="og:video:height" content="720" />'] : []),
+    ...(pg.type === 'video.other' ? (pg.tags ?? []).map((t) => `<meta property="video:tag" content="${esc(t)}" />`) : []),
     '<meta name="twitter:card" content="summary_large_image" />',
     `<meta name="twitter:creator" content="@${site.links.x.split('/').pop()}" />`,
     `<meta name="twitter:title" content="${esc(pg.title)}" />`,

@@ -44,7 +44,10 @@ export default function Prose({ html }: { html: string }) {
       const a = target.closest<HTMLAnchorElement>('a[href]')
       if (!a || a.target === '_blank' || e.metaKey || e.ctrlKey || e.shiftKey) return
       const href = a.getAttribute('href')!
-      if (href.startsWith('#')) {
+      if (href.startsWith('#t=')) {                    // timestamp link on a video page
+        e.preventDefault()
+        window.dispatchEvent(new CustomEvent('video-seek', { detail: Number(href.slice(3)) }))
+      } else if (href.startsWith('#')) {
         e.preventDefault()
         history.replaceState(null, '', href)
         document.getElementById(decodeURIComponent(href.slice(1)))?.scrollIntoView({ behavior: 'smooth' })

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import type { CSSProperties } from 'react'
-import { formatDate, type Book, type PageMeta } from '../lib/content'
+import { formatDate, type Book, type PageMeta, type VideoMeta } from '../lib/content'
 import type { Project } from '../data/site'
 import { Arrow } from './icons'
 import Cover from './Cover'
@@ -48,6 +48,24 @@ export function WritingCard({ post, featured = false, onTag }: { post: PageMeta;
         )}
       </div>
     </article>
+  )
+}
+
+export function VideoCard({ video, featured = false }: { video: VideoMeta; featured?: boolean }) {
+  return (
+    <Link to={`/${video.route}`} className={`video-card${featured ? ' featured' : ''}`}>
+      <div className="video-thumb">
+        {video.cover && <img src={video.cover} alt="" loading="lazy" />}
+        <span className="play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="currentColor" /></svg></span>
+        {video.duration && <span className="duration">{video.duration}</span>}
+      </div>
+      <div className="video-body">
+        {video.series && <div className="series-badge">{video.series} · Part {video.seriesPart}</div>}
+        <h3>{video.title}</h3>
+        <p>{video.description}</p>
+        <div className="writing-meta"><time dateTime={video.date}>{formatDate(video.date)}</time><span className="dot">{video.chapters.length} chapters</span></div>
+      </div>
+    </Link>
   )
 }
 

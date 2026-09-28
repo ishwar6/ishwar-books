@@ -72,6 +72,15 @@ for (const file of walk(path.join(CONTENT, 'writings')).filter((f) => f.endsWith
   pages.push({ file, collection: 'writings', slug, route: `writings/${slug}`, data, body: content })
 }
 
+const videosDir = path.join(CONTENT, 'videos')
+const videoFiles = fs.existsSync(videosDir) ? fs.readdirSync(videosDir).filter((f) => f.endsWith('.md')).map((f) => path.join(videosDir, f)) : []
+for (const file of videoFiles) {
+  const { data, content } = matter(fs.readFileSync(file, 'utf8'))
+  if (data.draft && process.env.NODE_ENV === 'production') continue
+  const slug = data.slug ?? slugOf(file)
+  pages.push({ file, collection: 'videos', slug, route: `videos/${slug}`, data, body: content })
+}
+
 const books = []
 const bookDirs = fs.existsSync(path.join(CONTENT, 'books'))
   ? fs.readdirSync(path.join(CONTENT, 'books'), { withFileTypes: true }).filter((d) => d.isDirectory() && !d.name.startsWith('.'))
@@ -284,7 +293,7 @@ function coverOf(p) {
   const out = {}
   if (p.data.motif) out.motif = p.data.motif
   if (p.data.accent) out.accent = p.data.accent
-  const c = p.data.cover
+  const c = p.data.cover ?? p.data.thumbnail
   if (typeof c === 'string') {
     if (/^(https?:)?\/\//.test(c)) out.cover = c
     else {
@@ -301,6 +310,16 @@ function coverOf(p) {
   return out
 }
 
+/** "12:46 Searching down the layers" -> { t: 766, stamp: '12:46', label: 'Searching down the layers' } */
+function videoMeta(d) {
+  const secs = (st) => st.split(':').map(Number).reduce((a, x) => a * 60 + x, 0)
+  const chapters = (d.chapters ?? []).map((line) => {
+    const m = String(line).match(/^(\d+(?::\d{2}){1,2})\s+(.+)$/)
+    return m ? { t: secs(m[1]), stamp: m[1], label: m[2].trim() } : null
+  }).filter(Boolean)
+  return { youtube: d.youtube, duration: d.duration, durationSeconds: d.duration ? secs(d.duration) : undefined, chapters }
+}
+
 const metaOf = (p) => {
   const title = p.data.title ?? firstHeading(p.body) ?? pretty(p.slug)
   // The page header shows the title, so drop a leading H1 that duplicates it.
@@ -312,6 +331,7 @@ const metaOf = (p) => {
     tags: p.data.tags ?? [], minutes: readingMinutes(p.body),
     ...coverOf(p),
     ...(p.data.series ? { series: p.data.series, seriesPart: p.data.series_part ?? 1 } : {}),
+    ...(p.collection === 'videos' ? videoMeta(p.data) : {}),
     ...(p.part ? { part: p.part } : {}),
   }
 }
@@ -349,5 +369,7 @@ const bookList = books.map((b) => ({
 })).sort((a, b) => a.order - b.order || natural(a.slug, b.slug))
 
 fs.writeFileSync(path.join(OUT_PUBLIC, 'search.json'), JSON.stringify(search))
-fs.writeFileSync(OUT_MANIFEST, JSON.stringify({ writings, books: bookList }, null, 2))
-console.log(`content: rendered ${rendered} pages, ${search.length} search sections (${writings.length} writings, ${bookList.length} books)`)
+const videos = pages.filter((p) => p.collection === 'videos').map((p) => p.meta)
+  .sort((a, b) => (b.date ?? '').localeCompare(a.date ?? '') || (a.seriesPart ?? 0) - (b.seriesPart ?? 0))
+fs.writeFileSync(OUT_MANIFEST, JSON.stringify({ writings, books: bookList, videos }, null, 2))
+console.log(`content: rendered ${rendered} pages, ${search.length} search sections (${writings.length} writings, ${bookList.length} books, ${videos.length} videos)`)

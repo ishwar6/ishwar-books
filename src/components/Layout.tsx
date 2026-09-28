@@ -1,7 +1,7 @@
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useEffect } from 'react'
 import { site } from '../data/site'
-import { books, writings } from '../lib/content'
+import { books, videos, writings } from '../lib/content'
 import { useFontSize, useTheme } from '../lib/hooks'
 import Search from './Search'
 import { Dim, GitHub, Mail, Moon, Sun, X, YouTube } from './icons'
@@ -32,7 +32,7 @@ function FontSizeControl() {
 export default function Layout() {
   const [theme, toggle] = useTheme()
   const { pathname } = useLocation()
-  const reading = /^\/(writings|books)\/[^/]+/.test(pathname)
+  const reading = /^\/(writings|books|videos)\/[^/]+/.test(pathname)
   return (
     <>
       <ScrollToTop />
@@ -45,6 +45,7 @@ export default function Layout() {
           <nav className="nav">
             <NavLink to="/writings">Writings</NavLink>
             <NavLink to="/books">Books</NavLink>
+            <NavLink to="/videos">Videos</NavLink>
             <NavLink to="/projects">Projects</NavLink>
             <NavLink to="/about">About</NavLink>
           </nav>
@@ -80,6 +81,7 @@ export default function Layout() {
               <h4>Read</h4>
               <Link to="/writings">Writings ({writings.length})</Link>
               <Link to="/books">Books ({books.length})</Link>
+              <Link to="/videos">Videos ({videos.length})</Link>
               <Link to="/projects">Projects</Link>
             </div>
             <div>

@@ -30,7 +30,11 @@ export type Book = {
 }
 export type Rendered = { html: string; toc: TocItem[] }
 
+export type Chapter = { t: number; stamp: string; label: string }
+export type VideoMeta = PageMeta & { youtube: string; duration?: string; durationSeconds?: number; chapters: Chapter[] }
+
 export const writings = manifest.writings as PageMeta[]
+export const videos = (manifest as { videos?: VideoMeta[] }).videos ?? []
 export const books = manifest.books as Book[]
 
 const cache = new Map<string, Promise<Rendered>>()
