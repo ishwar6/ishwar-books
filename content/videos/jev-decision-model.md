@@ -2,11 +2,10 @@
 title: "Jev: The AI Model That Doesn't Talk. It Decides."
 description: "What Jev, TypeSafe's decision model, actually is, where it fits next to plain code, a classifier and an LLM, and three real uses: an agent router that makes four decisions in one call, a cheap gate before a big model, and a guardrail around an LLM. Every number from real API runs."
 date: 2026-09-29
-youtube: TODO_YOUTUBE_ID
+youtube: bIfAv5qblvw
 duration: "12:04"
 thumbnail: ./jev-decision-model/thumbnail.png
 tags: [ai-agents, llm, jev, decision-models]
-draft: true
 chapters:
   - "0:00 Welcome"
   - "0:22 One ticket, 1.9 seconds, fenced JSON"
