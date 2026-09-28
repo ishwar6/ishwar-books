@@ -154,7 +154,7 @@ Engine arguments change between releases, so check them against the version you 
 
 **Disaggregated prefill and decode.** Chunked prefill makes the two phases share a GPU politely. The more radical option is to put them on **different GPUs**: some GPUs only prefill, others only decode, and the KV cache is sent from one to the other. DistServe (Zhong et al., OSDI 2024) showed this can serve up to 7.4x more requests, or meet 12.6x tighter latency targets, because each phase can be sized and tuned for its own bottleneck.
 
-**Speculative decoding.** Part 1 measured that processing 16 tokens costs about the same as processing one (10.8 ms against 10.0 ms). Speculative decoding (Leviathan et al. and Chen et al., 2023) exploits that directly. A cheap drafter proposes the next few tokens, and the big model checks them all in one pass, keeping every guess up to the first one it disagrees with and correcting that one. With the right acceptance rule, the output follows exactly the same distribution as if the big model had written every token itself, so it is faster without being approximate. The gain depends on how often the guesses are right, and it shrinks when the GPU is already busy with a large batch, because the spare compute it spends is no longer spare. vLLM supports several drafters, including n-gram lookup, EAGLE and Medusa.
+**Speculative decoding.** Part 1 measured that processing 16 tokens costs about the same as processing one (10.8 ms against 10.0 ms). Speculative decoding (Leviathan et al. and Chen et al., 2023) exploits that directly. A cheap drafter proposes the next few tokens, and the big model checks them all in one pass, keeping every guess up to the first one it disagrees with and correcting that one. With the right acceptance rule, the output follows exactly the same distribution as if the big model had written every token itself, so it is faster without being approximate. The gain depends on how often the guesses are right, and it shrinks when the GPU is already busy with a large batch, because the spare compute it spends is no longer spare. vLLM supports several drafters, including n-gram lookup, EAGLE and Medusa. Part 4 builds speculative decoding from scratch and measures it.
 
 ## The series, on one page
 
@@ -167,6 +167,7 @@ Engine arguments change between releases, so check them against the version you 
 | continuous batching | slots idle behind the slowest request | refill slots every step | 4.6x fewer steps |
 | chunked prefill | long prompts freeze streaming users | slice prompts into each step | worst pause 463 ms to 40 ms |
 | prefix caching | the same prompt prefilled again and again | reuse blocks by hash | first token 98 ms to 14 ms |
+| speculative decoding (Part 4) | one token per big-model pass | a cheap drafter guesses, the big model checks in one pass | 1.89x on code, 3.49x with prompt lookup |
 
 Every one of these ideas comes back to the two facts from Part 1: **decode is limited by memory, not math**, and **a GPU is only productive when it is decoding many sequences at once**. vLLM's whole design is a way of fitting as many sequences as possible into memory, and keeping every step full.
 

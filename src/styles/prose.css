@@ -266,8 +266,8 @@
 .fig .t-note.bad { fill: #f06a6a; font-weight: 700; }
 
 /* ---------- charts inside figures (validated palette: dark + dim use the dark steps) ---------- */
-.prose { --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70; --chart-grid: rgba(255, 255, 255, 0.08); }
-:root[data-theme='light'] .prose { --series-1: #2a78d6; --series-2: #eb6834; --series-3: #1baf7a; --chart-grid: rgba(0, 0, 0, 0.08); }
+.prose { --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70; --series-4: #c98500; --chart-grid: rgba(255, 255, 255, 0.08); }
+:root[data-theme='light'] .prose { --series-1: #2a78d6; --series-2: #eb6834; --series-3: #1baf7a; --series-4: #eda100; --chart-grid: rgba(0, 0, 0, 0.08); }
 .fig .s1 { fill: var(--series-1); }
 .fig .s2 { fill: var(--series-2); }
 .fig .s3 { fill: var(--series-3); }
@@ -298,3 +298,7 @@
   .prose figure.fig { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .prose .fig svg { min-width: 600px; }
 }
+
+.fig .s4 { fill: var(--series-4); }
+.fig .l4 { stroke: var(--series-4); stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.fig .base-line { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 4 4; }
