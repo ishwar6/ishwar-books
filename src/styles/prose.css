@@ -250,21 +250,22 @@
 .fig .drop { stroke: var(--faint); stroke-width: 1.5; stroke-dasharray: 3 4; fill: none; }
 .fig .path { stroke: var(--h2); stroke-width: 3.5; fill: none; stroke-linecap: round; }
 .fig .node { fill: var(--surface-2); stroke: var(--muted); stroke-width: 1.5; }
-.fig .node.on { fill: color-mix(in srgb, var(--h2) 30%, var(--surface-2)); stroke: var(--h2); stroke-width: 2.5; }
+.fig .node.on { fill: var(--h2); fill-opacity: 0.3; stroke: var(--h2); stroke-width: 2.5; }
 .fig .node.hit { fill: var(--h4); stroke: var(--h4); }
 .fig .entry { fill: var(--h3); stroke: var(--h3); }
 .fig .query { fill: var(--h3); }
 .fig text { font-family: var(--font-sans); fill: var(--text); }
 .fig .t-node { font-size: 14px; font-weight: 700; text-anchor: middle; dominant-baseline: central; fill: var(--text-strong); }
 .fig .t-label { font-size: 13px; font-weight: 700; fill: var(--muted); letter-spacing: 0.04em; }
-.fig .t-note { font-size: 13px; fill: var(--muted); }
+.fig .t-note { font-size: 13px; font-weight: 600; fill: var(--text-strong); }
 .fig .arrow { fill: var(--border); }
 .fig .arrow-on { fill: var(--h2); }
 .fig .path.bad { stroke: #f06a6a; }
 .fig .arrow-bad { fill: #f06a6a; }
-.fig .node.stuck { fill: color-mix(in srgb, #f06a6a 30%, var(--surface-2)); stroke: #f06a6a; stroke-width: 2.5; }
+.fig .node.stuck { fill: #f06a6a; fill-opacity: 0.3; stroke: #f06a6a; stroke-width: 2.5; }
 .fig .t-note.bad { fill: #f06a6a; font-weight: 700; }
 
+/* figure fills use plain colours + fill-opacity (not color-mix), so they follow theme switches in every browser */
 /* ---------- charts inside figures (validated palette: dark + dim use the dark steps) ---------- */
 .prose { --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70; --series-4: #c98500; --chart-grid: rgba(255, 255, 255, 0.08); }
 :root[data-theme='light'] .prose { --series-1: #2a78d6; --series-2: #eb6834; --series-3: #1baf7a; --series-4: #eda100; --chart-grid: rgba(0, 0, 0, 0.08); }
@@ -278,14 +279,14 @@
 .fig .grid { stroke: var(--chart-grid); stroke-width: 1; }
 .fig .axis { stroke: var(--border); stroke-width: 1; }
 .fig .t-val { font-size: 13px; font-weight: 700; fill: var(--text-strong); font-variant-numeric: tabular-nums; }
-.fig .t-tick { font-size: 12px; fill: var(--muted); font-variant-numeric: tabular-nums; }
+.fig .t-tick { font-size: 12px; fill: var(--text); font-variant-numeric: tabular-nums; }
 .fig .t-title { font-size: 14px; font-weight: 700; fill: var(--text-strong); }
 .fig .t-strong { fill: var(--text-strong); font-weight: 700; }
 .fig .box { fill: var(--surface); stroke: var(--border); stroke-width: 1.5; }
-.fig .box-1 { fill: color-mix(in srgb, var(--series-1) 22%, var(--surface)); stroke: var(--series-1); stroke-width: 1.5; }
-.fig .box-2 { fill: color-mix(in srgb, var(--series-2) 22%, var(--surface)); stroke: var(--series-2); stroke-width: 1.5; }
-.fig .box-3 { fill: color-mix(in srgb, var(--series-3) 22%, var(--surface)); stroke: var(--series-3); stroke-width: 1.5; }
-.fig .waste { fill: color-mix(in srgb, #f06a6a 18%, var(--surface)); stroke: #f06a6a; stroke-width: 1.2; stroke-dasharray: 4 3; }
+.fig .box-1 { fill: var(--series-1); fill-opacity: 0.22; stroke: var(--series-1); stroke-width: 1.5; }
+.fig .box-2 { fill: var(--series-2); fill-opacity: 0.22; stroke: var(--series-2); stroke-width: 1.5; }
+.fig .box-3 { fill: var(--series-3); fill-opacity: 0.22; stroke: var(--series-3); stroke-width: 1.5; }
+.fig .waste { fill: #f06a6a; fill-opacity: 0.18; stroke: #f06a6a; stroke-width: 1.2; stroke-dasharray: 4 3; }
 .fig .hit-area { fill: transparent; }
 .fig .hit-area:hover + .bar-mark, .fig g.mark:hover .bar-mark { filter: brightness(1.15); }
 .fig .code-bg { fill: var(--code-bg); stroke: var(--border-soft); }
