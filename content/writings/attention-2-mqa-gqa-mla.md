@@ -1,0 +1,352 @@
+---
+title: "Attention, Part 2: MQA, GQA and MLA"
+description: "Every token leaves its keys and values behind in memory (the KV cache), and plain multi-head attention leaves a lot. How multi-query, grouped-query and multi-head latent attention shrink it, explained from zero, built from scratch, checked against a real model's layer, and measured: DeepSeek-V3 stores 68.6 KiB per token where plain attention would need 4,880."
+date: 2026-10-04
+tags: [attention, kv-cache, llm]
+series: "Attention, From the Ground Up"
+series_part: 2
+motif: kv
+accent: "#5fd4b0"
+---
+
+[Part 1](attention-1-self-attention.md) built attention from scratch and ended on its cost: memory. This part is about three ideas that cut that memory, sometimes by more than 60 times, and which ones today's models use.
+
+As before, every technical word gets a yellow box the first time it appears.
+
+> [!TIP] Quick recap of Part 1
+> Every token makes a **query** (what am I looking for?), a **key** (what do I contain?) and a **value** (what do I hand over?). A token compares its query with the keys of all earlier tokens, turns the scores into weights with softmax, and takes a weighted mix of their values. A model runs several of these side by side, called **heads**.
+
+## The memory problem: the KV cache
+
+A chatbot writes its answer **one token at a time**. To write each new token, it runs attention: the new token's query is compared with the keys of every earlier token, and their values are mixed.
+
+Those earlier keys and values never change. So instead of recomputing them at every step, the model computes them once and keeps them in memory.
+
+> [!DEFINITION] KV cache
+> The stored **keys (K)** and **values (V)** of every token so far. Each new token adds its own key and value, so the cache grows by one token at every step. It lives in the GPU's memory for as long as the conversation runs.
+
+<figure class="fig"><svg viewBox="0 0 780 312" role="img" aria-label="How the KV cache works: every token leaves a key and a value in memory; the newest token adds its own and compares its query with all the stored keys."><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0,0L10,5L0,10z"/></marker><marker id="ah-on" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-on" d="M0,0L10,5L0,10z"/></marker><marker id="ah-2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-2" d="M0,0L10,5L0,10z"/></marker></defs><rect x="20" y="74" width="510" height="90" rx="12" fill="none" class="drop"/><text class="t-note" x="548.0" y="112.0" text-anchor="start">KV cache:</text><text class="t-tick" x="548.0" y="132.0" text-anchor="start">kept in memory,</text><text class="t-tick" x="548.0" y="150.0" text-anchor="start">one K and V per token</text><rect class="box" x="30.0" y="30.0" width="80.0" height="32.0" rx="8"/><text class="t-strong" x="70.0" y="51.0" text-anchor="middle">The</text><rect class="box-3" x="40.0" y="84.0" width="60.0" height="30.0" rx="6"/><text class="t-math" x="70.0" y="104.0" text-anchor="middle">V</text><rect class="box-3" x="40.0" y="124.0" width="60.0" height="30.0" rx="6"/><text class="t-math" x="70.0" y="144.0" text-anchor="middle">K</text><rect class="box" x="130.0" y="30.0" width="80.0" height="32.0" rx="8"/><text class="t-strong" x="170.0" y="51.0" text-anchor="middle">cat</text><rect class="box-3" x="140.0" y="84.0" width="60.0" height="30.0" rx="6"/><text class="t-math" x="170.0" y="104.0" text-anchor="middle">V</text><rect class="box-3" x="140.0" y="124.0" width="60.0" height="30.0" rx="6"/><text class="t-math" x="170.0" y="144.0" text-anchor="middle">K</text><rect class="box" x="230.0" y="30.0" width="80.0" height="32.0" rx="8"/><text class="t-strong" x="270.0" y="51.0" text-anchor="middle">sat</text><rect class="box-3" x="240.0" y="84.0" width="60.0" height="30.0" rx="6"/><text class="t-math" x="270.0" y="104.0" text-anchor="middle">V</text><rect class="box-3" x="240.0" y="124.0" width="60.0" height="30.0" rx="6"/><text class="t-math" x="270.0" y="144.0" text-anchor="middle">K</text><rect class="box" x="330.0" y="30.0" width="80.0" height="32.0" rx="8"/><text class="t-strong" x="370.0" y="51.0" text-anchor="middle">on</text><rect class="box-3" x="340.0" y="84.0" width="60.0" height="30.0" rx="6"/><text class="t-math" x="370.0" y="104.0" text-anchor="middle">V</text><rect class="box-3" x="340.0" y="124.0" width="60.0" height="30.0" rx="6"/><text class="t-math" x="370.0" y="144.0" text-anchor="middle">K</text><rect class="box-1" x="430.0" y="30.0" width="80.0" height="32.0" rx="8"/><text class="t-strong" x="470.0" y="51.0" text-anchor="middle">the</text><rect class="box-1" x="440.0" y="84.0" width="60.0" height="30.0" rx="6"/><text class="t-math" x="470.0" y="104.0" text-anchor="middle">V</text><rect class="box-1" x="440.0" y="124.0" width="60.0" height="30.0" rx="6"/><text class="t-math" x="470.0" y="144.0" text-anchor="middle">K</text><rect class="box-2" x="440.0" y="236.0" width="60.0" height="30.0" rx="6"/><text class="t-math" x="470.0" y="256.0" text-anchor="middle">Q</text><text class="t-tick" x="514.0" y="256.0" text-anchor="start">the new query</text><line class="edge" x1="470" y1="236" x2="70" y2="157" marker-end="url(#ah)"/><line class="edge" x1="470" y1="236" x2="170" y2="157" marker-end="url(#ah)"/><line class="edge" x1="470" y1="236" x2="270" y2="157" marker-end="url(#ah)"/><line class="edge" x1="470" y1="236" x2="370" y2="157" marker-end="url(#ah)"/><line class="edge" x1="470" y1="236" x2="470" y2="157" marker-end="url(#ah)"/><text class="t-title" x="20.0" y="22.0" text-anchor="start">Writing the next word after "The cat sat on the"</text><text class="t-tick" x="20.0" y="298.0" text-anchor="start">Blue: the newest token. Its K and V are added to the cache. Its query is compared with every stored key, then thrown away.</text></svg><figcaption>How the KV cache works. Every earlier token has left a key and a value in memory. The newest token adds its own, and its query is compared with every stored key.</figcaption></figure>
+
+Notice what is **not** in the cache: the query. A query belongs to the token being written right now. It is used once, for this one step, and thrown away. Only keys and values are kept.
+
+That is the opening for this whole part: **a model can keep many query heads while storing far fewer key and value heads**.
+
+### How big is it?
+
+With plain multi-head attention (MHA), every head in every layer stores one key and one value for every token:
+
+$$
+\text{KV cache per token} = 2 \times L \times H \times d_h \times b
+$$
+
+where:
+
+- the $$2$$ counts one key and one value;
+- $$L$$ is the number of layers;
+- $$H$$ is the number of key/value heads in each layer (in plain MHA, the same as the number of query heads);
+- $$d_h$$ is the length of each head's key and value vectors;
+- $$b$$ is the bytes per number (2 for the usual 16-bit numbers).
+
+For Llama 2 7B, $$2 \times 32 \times 32 \times 128 \times 2 = 524{,}288$$ bytes: **512 KiB for every single token**. A 4,096-token conversation needs 2 GiB, and a GPU serving 30 conversations at once needs 60 GiB just for caches.
+
+> [!DEFINITION] KiB, MiB and GiB
+> Units of memory. 1 KiB = 1,024 bytes, 1 MiB = 1,024 KiB, 1 GiB = 1,024 MiB. One 16-bit number takes 2 bytes.
+
+The cache, more than the arithmetic, limits how many people a GPU can serve and how long their conversations can be. (The [LLM inference series](llm-inference-2-kv-cache.md) goes deeper.) Look at the formula again: the only part we can shrink without changing the model's size much is $$H$$, the number of key/value heads, or what each head stores. That is exactly what the three ideas do.
+
+<figure class="fig"><svg viewBox="0 0 780 236" role="img" aria-label="MHA, GQA, MQA and MLA side by side: how many key/value heads each one stores per token."><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0,0L10,5L0,10z"/></marker><marker id="ah-on" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-on" d="M0,0L10,5L0,10z"/></marker><marker id="ah-2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-2" d="M0,0L10,5L0,10z"/></marker></defs><text class="t-title" x="100.0" y="24.0" text-anchor="middle">MHA</text><circle class="s2" cx="30" cy="56" r="7"/><circle class="s2" cx="51" cy="56" r="7"/><circle class="s2" cx="72" cy="56" r="7"/><circle class="s2" cx="93" cy="56" r="7"/><circle class="s2" cx="114" cy="56" r="7"/><circle class="s2" cx="135" cy="56" r="7"/><circle class="s2" cx="156" cy="56" r="7"/><circle class="s2" cx="177" cy="56" r="7"/><rect class="box-3" x="22.5" y="112.0" width="15.0" height="24.0" rx="5"/><line class="edge" x1="30" y1="63" x2="30.0" y2="110"/><rect class="box-3" x="43.5" y="112.0" width="15.0" height="24.0" rx="5"/><line class="edge" x1="51" y1="63" x2="51.0" y2="110"/><rect class="box-3" x="64.5" y="112.0" width="15.0" height="24.0" rx="5"/><line class="edge" x1="72" y1="63" x2="72.0" y2="110"/><rect class="box-3" x="85.5" y="112.0" width="15.0" height="24.0" rx="5"/><line class="edge" x1="93" y1="63" x2="93.0" y2="110"/><rect class="box-3" x="106.5" y="112.0" width="15.0" height="24.0" rx="5"/><line class="edge" x1="114" y1="63" x2="114.0" y2="110"/><rect class="box-3" x="127.5" y="112.0" width="15.0" height="24.0" rx="5"/><line class="edge" x1="135" y1="63" x2="135.0" y2="110"/><rect class="box-3" x="148.5" y="112.0" width="15.0" height="24.0" rx="5"/><line class="edge" x1="156" y1="63" x2="156.0" y2="110"/><rect class="box-3" x="169.5" y="112.0" width="15.0" height="24.0" rx="5"/><line class="edge" x1="177" y1="63" x2="177.0" y2="110"/><text class="t-tick" x="100.0" y="160.0" text-anchor="middle">own K, V per head</text><text class="t-note" x="100.0" y="178.0" text-anchor="middle">8 K/V heads cached</text><text class="t-title" x="292.0" y="24.0" text-anchor="middle">GQA</text><circle class="s2" cx="222" cy="56" r="7"/><circle class="s2" cx="243" cy="56" r="7"/><circle class="s2" cx="264" cy="56" r="7"/><circle class="s2" cx="285" cy="56" r="7"/><circle class="s2" cx="306" cy="56" r="7"/><circle class="s2" cx="327" cy="56" r="7"/><circle class="s2" cx="348" cy="56" r="7"/><circle class="s2" cx="369" cy="56" r="7"/><rect class="box-3" x="214.5" y="112.0" width="78.0" height="24.0" rx="5"/><text class="t-tick" x="253.5" y="129.0" text-anchor="middle">K V</text><line class="edge" x1="222" y1="63" x2="253.5" y2="110"/><line class="edge" x1="243" y1="63" x2="253.5" y2="110"/><line class="edge" x1="264" y1="63" x2="253.5" y2="110"/><line class="edge" x1="285" y1="63" x2="253.5" y2="110"/><rect class="box-3" x="298.5" y="112.0" width="78.0" height="24.0" rx="5"/><text class="t-tick" x="337.5" y="129.0" text-anchor="middle">K V</text><line class="edge" x1="306" y1="63" x2="337.5" y2="110"/><line class="edge" x1="327" y1="63" x2="337.5" y2="110"/><line class="edge" x1="348" y1="63" x2="337.5" y2="110"/><line class="edge" x1="369" y1="63" x2="337.5" y2="110"/><text class="t-tick" x="292.0" y="160.0" text-anchor="middle">groups share K, V</text><text class="t-note" x="292.0" y="178.0" text-anchor="middle">2 K/V heads cached</text><text class="t-title" x="484.0" y="24.0" text-anchor="middle">MQA</text><circle class="s2" cx="414" cy="56" r="7"/><circle class="s2" cx="435" cy="56" r="7"/><circle class="s2" cx="456" cy="56" r="7"/><circle class="s2" cx="477" cy="56" r="7"/><circle class="s2" cx="498" cy="56" r="7"/><circle class="s2" cx="519" cy="56" r="7"/><circle class="s2" cx="540" cy="56" r="7"/><circle class="s2" cx="561" cy="56" r="7"/><rect class="box-3" x="406.5" y="112.0" width="162.0" height="24.0" rx="5"/><text class="t-tick" x="487.5" y="129.0" text-anchor="middle">K V</text><line class="edge" x1="414" y1="63" x2="487.5" y2="110"/><line class="edge" x1="435" y1="63" x2="487.5" y2="110"/><line class="edge" x1="456" y1="63" x2="487.5" y2="110"/><line class="edge" x1="477" y1="63" x2="487.5" y2="110"/><line class="edge" x1="498" y1="63" x2="487.5" y2="110"/><line class="edge" x1="519" y1="63" x2="487.5" y2="110"/><line class="edge" x1="540" y1="63" x2="487.5" y2="110"/><line class="edge" x1="561" y1="63" x2="487.5" y2="110"/><text class="t-tick" x="484.0" y="160.0" text-anchor="middle">all share one K, V</text><text class="t-note" x="484.0" y="178.0" text-anchor="middle">1 K/V head cached</text><text class="t-title" x="676.0" y="24.0" text-anchor="middle">MLA</text><circle class="s2" cx="606" cy="56" r="7"/><line class="edge" x1="606" y1="63" x2="676" y2="110"/><circle class="s2" cx="627" cy="56" r="7"/><line class="edge" x1="627" y1="63" x2="676" y2="110"/><circle class="s2" cx="648" cy="56" r="7"/><line class="edge" x1="648" y1="63" x2="676" y2="110"/><circle class="s2" cx="669" cy="56" r="7"/><line class="edge" x1="669" y1="63" x2="676" y2="110"/><circle class="s2" cx="690" cy="56" r="7"/><line class="edge" x1="690" y1="63" x2="676" y2="110"/><circle class="s2" cx="711" cy="56" r="7"/><line class="edge" x1="711" y1="63" x2="676" y2="110"/><circle class="s2" cx="732" cy="56" r="7"/><line class="edge" x1="732" y1="63" x2="676" y2="110"/><circle class="s2" cx="753" cy="56" r="7"/><line class="edge" x1="753" y1="63" x2="676" y2="110"/><rect class="box-1" x="628.0" y="112.0" width="96.0" height="24.0" rx="5"/><text class="t-tick" x="676.0" y="129.0" text-anchor="middle">latent c</text><text class="t-tick" x="676.0" y="160.0" text-anchor="middle">K, V rebuilt from c</text><text class="t-note" x="676.0" y="178.0" text-anchor="middle">c + RoPE key cached</text><text class="t-tick" x="12.0" y="222.0" text-anchor="start">orange: query heads (computed fresh, never cached). Aqua and blue: what each token leaves in the KV cache.</text></svg><figcaption>Four ways to organise the heads. Orange dots are query heads: they are computed fresh and never stored. Aqua boxes are key/value heads: these are what each token leaves in the cache. MLA stores one compressed vector (blue) instead.</figcaption></figure>
+
+## Multi-query attention (MQA): one key/value head for everyone
+
+In 2019, Noam Shazeer proposed the most extreme answer: keep all the query heads, but give the whole layer **just one key head and one value head**, shared by every query head.
+
+In the formula, $$H$$ becomes $$1$$:
+
+$$
+\text{MQA cache per token} = 2 \times L \times 1 \times d_h \times b
+$$
+
+So the cache shrinks by a factor equal to the number of heads.
+
+Falcon-7B is a real example: 71 query heads sharing one key/value head. It stores **8 KiB per token**, against 512 KiB for Llama 2 7B.
+
+The price is quality. Every query head must find what it needs in the very same keys and values, and models trained this way tend to be measurably worse. The DeepSeek-V2 paper says it plainly: MQA and GQA "require a smaller magnitude of KV cache, but their performance does not match MHA."
+
+## Grouped-query attention (GQA): the compromise everyone adopted
+
+In 2023, Ainslie et al. proposed a middle ground: split the query heads into **groups**, and give each group its own key/value head.
+
+> [!DEFINITION] Group
+> A set of query heads that share one key head and one value head. With 32 query heads and 8 key/value heads, there are 8 groups of 4 query heads each.
+
+$$
+\text{GQA cache per token} = 2 \times L \times H_{kv} \times d_h \times b, \qquad \text{group size } g = \frac{H_q}{H_{kv}}
+$$
+
+where $$H_q$$ is the number of query heads and $$H_{kv}$$ the number of key/value heads.
+
+GQA is a **dial** between the two extremes:
+
+- With $$H_{kv} = H_q$$ (every query head has its own), GQA *is* plain multi-head attention.
+- With $$H_{kv} = 1$$ (one for everyone), GQA *is* multi-query attention.
+
+The paper showed that GQA gets "quality close to multi-head attention with comparable speed to MQA". It also showed that an existing MHA model can be converted to GQA: average the key and value heads inside each group, then train briefly (about 5% of the original training) to recover.
+
+It became the default. Llama 3 (8 key/value heads), Qwen2.5 (Qwen2.5-0.5B: 14 query heads, 2 key/value heads), Gemma 3 (27B: 32 query heads, 16 key/value heads) and Mistral all use it.
+
+### GQA from scratch
+
+One way to build GQA is to copy each key/value head once for every query head in its group, then run normal attention. That works, but making those copies wastes the memory we just saved. The better way is to **group the query heads** instead, so the small cache is read as it is:
+
+> [!DEFINITION] einsum
+> A compact way to write matrix multiplications in PyTorch. `torch.einsum("bhgqd,bhkd->bhgqk", a, b)` means: multiply `a` and `b` and add up over the letter that disappears (`d`, the vector length). It is just "dot product of every query with every key", with the head and group bookkeeping spelled out by letters.
+
+```python
+def gqa(q, k, v, causal=True):
+    """q: (B, Hq, T, d); k, v: (B, Hkv, T, d) with Hq a multiple of Hkv.
+    Each group of Hq/Hkv query heads shares one key/value head. No copy of K or V is made."""
+    B, Hq, T, d = q.shape
+    Hkv = k.shape[1]
+    g = Hq // Hkv
+    qg = q.view(B, Hkv, g, T, d)                                       # group the query heads
+    scores = torch.einsum('bhgqd,bhkd->bhgqk', qg, k) / math.sqrt(d)
+    if causal:
+        mask = torch.triu(torch.ones(T, T, dtype=torch.bool, device=q.device), 1)
+        scores = scores.masked_fill(mask, float('-inf'))
+    out = torch.einsum('bhgqk,bhkd->bhgqd', torch.softmax(scores, -1), v)
+    return out.reshape(B, Hq, T, d)
+```
+
+The shapes read like this: `B` is how many texts at once, `T` the number of tokens, `d` the head length, and `Hq` and `Hkv` the numbers of query and key/value heads.
+
+**Proof against PyTorch.** PyTorch's built-in attention function needs the copying approach, so I gave it copied keys and values and compared it with the function above, for all three cases:
+
+```text
+MHA (8 KV heads)   vs PyTorch with repeated K/V: max |diff| = 4.4e-16
+GQA (2 KV heads)   vs PyTorch with repeated K/V: max |diff| = 4.4e-16
+MQA (1 KV head)    vs PyTorch with repeated K/V: max |diff| = 6.7e-16
+```
+
+Differences around $$10^{-16}$$ are the smallest rounding errors a computer can make here: same answers.
+
+### Proof on a real model
+
+A toy test only proves the toy. So I opened **Qwen2.5-0.5B**, a real model that uses GQA with 14 query heads sharing 2 key/value heads. I captured the input to its first attention layer and recomputed that layer **by hand, from the model's own weights**:
+
+1. the query, key and value matrices (including their small added constants, called biases);
+2. the rotary position embedding, **RoPE** (explained below);
+3. the grouped attention function above;
+4. the output matrix.
+
+Then I compared my result with what the model itself produced:
+
+```text
+Qwen2.5-0.5B layer 0 (14 query heads share 2 KV heads): our GQA vs the model's own output,
+max |diff| = 6.6e-07 (outputs are up to 0.5)
+```
+
+$$6.6 \times 10^{-7}$$ is the rounding noise of 32-bit numbers. So the real layer computes exactly what those 13 lines compute.
+
+### Does a smaller cache make writing faster?
+
+At every step, the model reads the whole KV cache. Fewer key/value heads means less to read, so each step should be faster. I measured one attention step for 8 conversations at once, each with 4,096 tokens of history and 32 query heads, on an Apple M5 Pro GPU:
+
+<figure class="fig"><svg viewBox="0 0 780 300" role="img" aria-label="Time for one decode-step attention over a 4,096-token cache, with 32, 8 and 1 key/value heads."><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0,0L10,5L0,10z"/></marker><marker id="ah-on" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-on" d="M0,0L10,5L0,10z"/></marker><marker id="ah-2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-2" d="M0,0L10,5L0,10z"/></marker></defs><line class="grid" x1="64" y1="240.0" x2="750" y2="240.0"/><text class="t-tick" x="56.0" y="244.0" text-anchor="end">0 ms</text><line class="grid" x1="64" y1="180.0" x2="750" y2="180.0"/><text class="t-tick" x="56.0" y="184.0" text-anchor="end">1 ms</text><line class="grid" x1="64" y1="120.0" x2="750" y2="120.0"/><text class="t-tick" x="56.0" y="124.0" text-anchor="end">2 ms</text><line class="grid" x1="64" y1="60.0" x2="750" y2="60.0"/><text class="t-tick" x="56.0" y="64.0" text-anchor="end">3 ms</text><g class="mark"><title>32 KV heads (MHA): 3.08 ms, reads 537 MB of cache</title><path class="s1 bar-mark" d="M166.33333333333331,240.0V59.42376917786896Q166.33333333333331,55.42376917786896 170.33333333333331,55.42376917786896H186.33333333333331Q190.33333333333331,55.42376917786896 190.33333333333331,59.42376917786896V240.0Z"/></g><text class="t-val" x="178.3" y="47.4" text-anchor="middle">3.08 ms</text><text class="t-tick" x="178.3" y="260.0" text-anchor="middle">32 KV heads (MHA)</text><text class="t-tick" x="178.3" y="278.0" text-anchor="middle">reads 537 MB</text><g class="mark"><title>8 KV heads (GQA): 1.85 ms, reads 134 MB of cache</title><path class="s1 bar-mark" d="M394.99999999999994,240.0V133.0787793789059Q394.99999999999994,129.0787793789059 398.99999999999994,129.0787793789059H414.99999999999994Q418.99999999999994,129.0787793789059 418.99999999999994,133.0787793789059V240.0Z"/></g><text class="t-val" x="407.0" y="121.1" text-anchor="middle">1.85 ms</text><text class="t-tick" x="407.0" y="260.0" text-anchor="middle">8 KV heads (GQA)</text><text class="t-tick" x="407.0" y="278.0" text-anchor="middle">reads 134 MB</text><g class="mark"><title>1 KV head (MQA): 1.24 ms, reads 17 MB of cache</title><path class="s1 bar-mark" d="M623.6666666666666,240.0V169.82496954128146Q623.6666666666666,165.82496954128146 627.6666666666666,165.82496954128146H643.6666666666666Q647.6666666666666,165.82496954128146 647.6666666666666,169.82496954128146V240.0Z"/></g><text class="t-val" x="635.7" y="157.8" text-anchor="middle">1.24 ms</text><text class="t-tick" x="635.7" y="260.0" text-anchor="middle">1 KV head (MQA)</text><text class="t-tick" x="635.7" y="278.0" text-anchor="middle">reads 17 MB</text><line class="axis" x1="64" y1="240" x2="750" y2="240"/></svg><figcaption>Time for one attention step over a 4,096-token cache. Fewer key/value heads means less to read and a faster step, but not in proportion.</figcaption></figure>
+
+| Key/value heads | Cache read per step | Time per attention step |
+|---|---|---|
+| 32 (MHA) | 537 MB | 3.08 ms |
+| 8 (GQA) | 134 MB | 1.85 ms |
+| 1 (MQA) | 17 MB | 1.24 ms |
+
+Faster, clearly, but not 4 or 32 times faster. Each step has a fixed cost (starting the work on the GPU) that does not shrink, and once the cache is small that fixed cost dominates.
+
+The bigger win is **memory**: a cache 4 times smaller fits 4 times more conversations, or 4 times more history, on the same GPU.
+
+## Multi-head latent attention (MLA): compress instead of share
+
+GQA saves memory by **throwing information away**: query heads in the same group are forced to use identical keys and values. DeepSeek-V2 (2024) tried something different: what if each token stored a **compressed** version of its keys and values, from which every head's own keys and values can be rebuilt?
+
+> [!DEFINITION] Latent vector (compression)
+> A short vector that holds the important information of a longer one, like a zip file. "Latent" means hidden: the model learns what to keep. MLA squeezes all of a token's keys and values (thousands of numbers) into one latent of 512 numbers in DeepSeek-V3.
+
+<figure class="fig"><svg viewBox="0 0 780 290" role="img" aria-label="Multi-head latent attention: each token is compressed to a small latent vector plus a shared RoPE key, and only those are cached. Per-head keys and values are rebuilt from the latent, or never built at all at inference."><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0,0L10,5L0,10z"/></marker><marker id="ah-on" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-on" d="M0,0L10,5L0,10z"/></marker><marker id="ah-2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-2" d="M0,0L10,5L0,10z"/></marker></defs><rect class="box" x="20.0" y="120.0" width="70.0" height="44.0" rx="10"/><text class="t-math" x="55.0" y="147.0" text-anchor="middle">x</text><text class="t-tick" x="55.0" y="182.0" text-anchor="middle">token</text><line class="edge" x1="92.0" y1="132.0" x2="160.0" y2="74.0" marker-end="url(#ah)"/><rect class="box-1" x="160.0" y="52.0" width="120.0" height="44.0" rx="10"/><text class="t-note" x="220.0" y="72.0" text-anchor="middle">latent c</text><text class="t-tick" x="220.0" y="89.0" text-anchor="middle">via W_dkv</text><line class="edge" x1="92.0" y1="152.0" x2="160.0" y2="204.0" marker-end="url(#ah)"/><rect class="box-1" x="160.0" y="182.0" width="120.0" height="44.0" rx="10"/><text class="t-note" x="220.0" y="202.0" text-anchor="middle">RoPE key</text><text class="t-tick" x="220.0" y="219.0" text-anchor="middle">via W_kr + RoPE</text><rect x="150" y="36" width="140" height="206" rx="12" fill="none" class="drop"/><text class="t-note" x="220.0" y="266.0" text-anchor="middle">the whole KV cache</text><line class="edge" x1="282.0" y1="74.0" x2="360.0" y2="60.0" marker-end="url(#ah)"/><rect class="box-2" x="360.0" y="40.0" width="150.0" height="40.0" rx="8"/><text class="t-tick" x="435.0" y="65.0" text-anchor="middle">keys, head 1..h</text><line class="edge" x1="282.0" y1="74.0" x2="360.0" y2="124.0" marker-end="url(#ah)"/><rect class="box-3" x="360.0" y="104.0" width="150.0" height="40.0" rx="8"/><text class="t-tick" x="435.0" y="129.0" text-anchor="middle">values, head 1..h</text><text class="t-tick" x="436.0" y="158.0" text-anchor="middle">rebuilt by W_uk and W_uv</text><text class="t-tick" x="560.0" y="60.0" text-anchor="start">Training: rebuild every</text><text class="t-tick" x="560.0" y="78.0" text-anchor="start">head's K and V from c.</text><text class="t-note" x="560.0" y="120.0" text-anchor="start">Inference: never rebuild.</text><text class="t-tick" x="560.0" y="140.0" text-anchor="start">Fold W_uk into the query and</text><text class="t-tick" x="560.0" y="158.0" text-anchor="start">W_uv into the output, and</text><text class="t-tick" x="560.0" y="176.0" text-anchor="start">attend directly over c.</text><text class="t-tick" x="560.0" y="222.0" text-anchor="start">Same answer, measured:</text><text class="t-val" x="560.0" y="240.0" text-anchor="start">max |diff| = 3.9e-16</text></svg><figcaption>Multi-head latent attention. Each token is compressed into a small latent vector c, plus a small key that carries position (RoPE). Only those two are cached. Every head's keys and values can be rebuilt from c.</figcaption></figure>
+
+### The MLA equations
+
+For each token with vector $$x$$, MLA computes two small things and caches only them:
+
+$$
+c = x\,W_{dkv} \qquad\qquad k^{R} = \operatorname{RoPE}(x\,W_{kr})
+$$
+
+where:
+
+- $$c$$ is the **latent**: $$W_{dkv}$$ ("down-projection for keys and values") shrinks the token to $$d_c$$ numbers (512 in DeepSeek-V3);
+- $$k^R$$ is a small **position key** of $$d_r$$ numbers (64 in DeepSeek-V3), shared by all heads.
+
+> [!DEFINITION] Projection
+> Multiplying a vector by a learned matrix to get a new vector, usually of a different length. A **down-projection** makes it shorter (compresses); an **up-projection** makes it longer (expands).
+
+When a head $$h$$ needs its keys and values, it rebuilds them from the latent with two up-projections:
+
+$$
+k_h = c\,W_{uk}^{(h)} \qquad\qquad v_h = c\,W_{uv}^{(h)}
+$$
+
+So the cache per token is just:
+
+$$
+\text{MLA cache per token} = L \times (d_c + d_r) \times b
+$$
+
+For DeepSeek-V3: $$61 \times (512 + 64) \times 2 = 70{,}272$$ bytes, or **68.6 KiB**.
+
+(DeepSeek also compresses the *queries* through a small latent, to save memory during training. Queries are never cached, so that part does not change the KV cache, and my implementation leaves it out.)
+
+### The trick that makes it fast: never rebuild at all
+
+Rebuilding every head's keys and values at every step would cost a lot of extra work. MLA avoids it with a small piece of algebra called **absorption**.
+
+> [!DEFINITION] Absorption
+> Two matrix multiplications in a row can be merged into one. If the key is always built as $$c\,W_{uk}$$, we can move $$W_{uk}$$ over to the query side instead, multiply it in once, and then compare the query with the small latent $$c$$ directly.
+
+A head's attention score is its query dotted with a key. Put in the rebuilt key and rearrange:
+
+$$
+q_h \cdot k_h \;=\; q_h \cdot \big(c\,W_{uk}^{(h)}\big) \;=\; \big(q_h\,W_{uk}^{(h)\top}\big) \cdot c
+$$
+
+The left side needs every cached token's key to be rebuilt. The right side multiplies the **one** new query by $$W_{uk}^{(h)\top}$$ once, then compares it with the cached latents directly. Same number, much less work.
+
+The value side works the same way. The head's output is a weighted sum of values, with weights $$a_j$$ from softmax:
+
+$$
+\sum_j a_j\, v_{h,j} \;=\; \sum_j a_j\, c_j W_{uv}^{(h)} \;=\; \Big(\sum_j a_j\, c_j\Big)\, W_{uv}^{(h)}
+$$
+
+So the weighted sum is taken over the small latents, and $$W_{uv}^{(h)}$$ is applied just once at the end. **The full keys and values are never built.**
+
+Here is that inference path from my implementation:
+
+```python
+def absorbed(self, x):
+    """Inference path: cache only c (d_c) and the RoPE key (d_r) per token; never rebuild K or V."""
+    T = x.shape[0]; pos = torch.arange(T)
+    c, kr = self.W_dkv(x), rope(self.W_kr(x), pos)                     # <- the entire KV cache
+    W_uk = self.W_uk.weight.view(self.h, self.dn, self.dc)
+    W_uv = self.W_uv.weight.view(self.h, self.dv, self.dc)
+    q_nope = self.W_q(x).view(T, self.h, self.dn)
+    q_lat = torch.einsum('qhd,hdc->qhc', q_nope, W_uk)                  # absorb W_uk into the query
+    q_rope = torch.stack([rope(t, pos) for t in self.W_qr(x).view(T, self.h, self.dr).unbind(1)], 1)
+    scores = (torch.einsum('qhc,kc->hqk', q_lat, c) + torch.einsum('qhd,kd->hqk', q_rope, kr)) / math.sqrt(self.dn + self.dr)
+    mask = torch.triu(torch.ones(T, T, dtype=torch.bool), 1)
+    A = torch.softmax(scores.masked_fill(mask, float('-inf')), -1)
+    o_lat = torch.einsum('hqk,kc->qhc', A, c)                            # attend in latent space
+    o = torch.einsum('qhc,hvc->qhv', o_lat, W_uv)                        # then up-project once
+    return self.W_o(o.reshape(T, -1))
+```
+
+**Proof.** I compared it with the slow path that rebuilds every key and value, using the same weights:
+
+```text
+MLA: full path vs compressed-cache path, max |diff| = 3.9e-16
+numbers cached per token per layer: full K and V 640, latent + RoPE key 80 (8.0x smaller)
+```
+
+Identical answers, with an eighth of the cache in this small example.
+
+### Why position needs its own key
+
+You may wonder why MLA has that separate little position key. The reason is RoPE.
+
+> [!DEFINITION] RoPE (rotary position embedding)
+> Attention by itself does not know the order of words. RoPE adds order by **turning** each query and key vector by an angle that grows with the token's position. When two turned vectors are compared with a dot product, the result depends on **how far apart** the two tokens are. Most modern models use it.
+
+<figure class="fig"><svg viewBox="0 0 780 264" role="img" aria-label="RoPE turns a query or key vector by an angle that grows with its position in the text."><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0,0L10,5L0,10z"/></marker><marker id="ah-on" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-on" d="M0,0L10,5L0,10z"/></marker><marker id="ah-2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-2" d="M0,0L10,5L0,10z"/></marker></defs><circle class="grid" cx="100" cy="118" r="66" fill="none"/><line class="edge" x1="100" y1="118" x2="163.8" y2="100.9" stroke-dasharray="4 4"/><line class="path" x1="100" y1="118" x2="159.9" y2="102.0" marker-end="url(#ah-on)"/><circle class="node" cx="100" cy="118" r="4"/><text class="t-title" x="100.0" y="30.0" text-anchor="middle">position 0</text><text class="t-val" x="100.0" y="214.0" text-anchor="middle">turned by 0°</text><circle class="grid" cx="290" cy="118" r="66" fill="none"/><line class="edge" x1="290" y1="118" x2="353.8" y2="100.9" stroke-dasharray="4 4"/><line class="path" x1="290" y1="118" x2="333.8" y2="74.2" marker-end="url(#ah-on)"/><circle class="node" cx="290" cy="118" r="4"/><text class="t-title" x="290.0" y="30.0" text-anchor="middle">position 1</text><text class="t-val" x="290.0" y="214.0" text-anchor="middle">turned by 30°</text><circle class="grid" cx="480" cy="118" r="66" fill="none"/><line class="edge" x1="480" y1="118" x2="543.8" y2="100.9" stroke-dasharray="4 4"/><line class="path" x1="480" y1="118" x2="496.0" y2="58.1" marker-end="url(#ah-on)"/><circle class="node" cx="480" cy="118" r="4"/><text class="t-title" x="480.0" y="30.0" text-anchor="middle">position 2</text><text class="t-val" x="480.0" y="214.0" text-anchor="middle">turned by 60°</text><circle class="grid" cx="670" cy="118" r="66" fill="none"/><line class="edge" x1="670" y1="118" x2="733.8" y2="100.9" stroke-dasharray="4 4"/><line class="path" x1="670" y1="118" x2="654.0" y2="58.1" marker-end="url(#ah-on)"/><circle class="node" cx="670" cy="118" r="4"/><text class="t-title" x="670.0" y="30.0" text-anchor="middle">position 3</text><text class="t-val" x="670.0" y="214.0" text-anchor="middle">turned by 90°</text><text class="t-tick" x="20.0" y="250.0" text-anchor="start">Dashed: the vector before RoPE. Blue: after RoPE. Each position turns it a little more (here 30° per position).</text></svg><figcaption>RoPE in a picture. The same vector is turned a little more at each position. Comparing two turned vectors tells the model how far apart they are.</figcaption></figure>
+
+For one pair of numbers $$(x_1, x_2)$$ inside a vector at position $$m$$, RoPE does:
+
+$$
+\begin{pmatrix} x_1' \\ x_2' \end{pmatrix} = \begin{pmatrix} \cos m\theta & -\sin m\theta \\ \sin m\theta & \cos m\theta \end{pmatrix} \begin{pmatrix} x_1 \\ x_2 \end{pmatrix}
+$$
+
+where $$m\theta$$ is the angle: $$\theta$$ is a fixed small angle (different for each pair of numbers), and $$m$$ is the position.
+
+Here is the problem. If RoPE were applied to the rebuilt keys $$k_h = c\,W_{uk}^{(h)}$$, a rotation would sit **between** $$W_{uk}^{(h)}$$ and the query, and that rotation is different for every position. Then there is no single matrix to move over to the query side, and the absorption trick breaks.
+
+I tested exactly that mistake: apply RoPE to the rebuilt keys and the queries, then compare with the compressed path:
+
+```text
+with RoPE applied to the reconstructed keys, the compressed path is wrong by up to 0.03
+(outputs up to 0.53)
+```
+
+An error of about 6%, from one misplaced rotation.
+
+DeepSeek's fix is to **split the job**. The latent carries the **content** and is never rotated. A small separate key carries the **position**, and only it gets RoPE. The score simply adds the two parts:
+
+$$
+\text{score}_{h,j} = \frac{\big(q_h W_{uk}^{(h)\top}\big)\cdot c_j \;+\; q^R_h \cdot k^R_j}{\sqrt{d_n + d_r}}
+$$
+
+where $$q^R_h$$ is the head's small position query, $$k^R_j$$ is token $$j$$'s cached position key, and $$d_n$$ and $$d_r$$ are the lengths of the content and position parts. (This is exactly the `scores = ...` line in the code above.)
+
+## How big is the difference?
+
+Here are four real models, using each one's published settings and 2 bytes per number:
+
+<figure class="fig"><svg viewBox="0 0 780 232" role="img" aria-label="KV cache per token, in BF16, for four real models using MHA, GQA, MLA and MQA."><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0,0L10,5L0,10z"/></marker><marker id="ah-on" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-on" d="M0,0L10,5L0,10z"/></marker><marker id="ah-2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-2" d="M0,0L10,5L0,10z"/></marker></defs><g class="mark"><title>Llama 2 7B (MHA, 32 KV heads): 512.0 KiB per token</title><path class="s2 bar-mark" d="M220,28H626.0Q630.0,28 630.0,32V46Q630.0,50 626.0,50H220Z"/></g><text class="t-note" x="208.0" y="38.0" text-anchor="end">Llama 2 7B</text><text class="t-tick" x="208.0" y="54.0" text-anchor="end">MHA, 32 KV heads</text><text class="t-val" x="638.0" y="44.0" text-anchor="start">512.0 KiB</text><g class="mark"><title>Llama 3.1 8B (GQA, 8 KV heads): 128.0 KiB per token</title><path class="s1 bar-mark" d="M220,78H318.5Q322.5,78 322.5,82V96Q322.5,100 318.5,100H220Z"/></g><text class="t-note" x="208.0" y="88.0" text-anchor="end">Llama 3.1 8B</text><text class="t-tick" x="208.0" y="104.0" text-anchor="end">GQA, 8 KV heads</text><text class="t-val" x="330.5" y="94.0" text-anchor="start">128.0 KiB</text><g class="mark"><title>DeepSeek-V3 (671B) (MLA, latent 512 + RoPE 64): 68.6 KiB per token</title><path class="s3 bar-mark" d="M220,128H270.95361328125Q274.95361328125,128 274.95361328125,132V146Q274.95361328125,150 270.95361328125,150H220Z"/></g><text class="t-note" x="208.0" y="138.0" text-anchor="end">DeepSeek-V3 (671B)</text><text class="t-tick" x="208.0" y="154.0" text-anchor="end">MLA, latent 512 + RoPE 64</text><text class="t-val" x="283.0" y="144.0" text-anchor="start">68.6 KiB</text><g class="mark"><title>Falcon 7B (MQA, 1 KV head): 8.0 KiB per token</title><path class="s4 bar-mark" d="M220,178H222.40625Q226.40625,178 226.40625,182V196Q226.40625,200 222.40625,200H220Z"/></g><text class="t-note" x="208.0" y="188.0" text-anchor="end">Falcon 7B</text><text class="t-tick" x="208.0" y="204.0" text-anchor="end">MQA, 1 KV head</text><text class="t-val" x="234.4" y="194.0" text-anchor="start">8.0 KiB</text><line class="axis" x1="220" y1="16" x2="220" y2="222"/></svg><figcaption>KV cache per token for four real models. Llama 2 7B uses plain multi-head attention; Llama 3.1 8B uses GQA; DeepSeek-V3 uses MLA; Falcon 7B uses MQA.</figcaption></figure>
+
+| Model | Attention | Formula | Cached per token |
+|---|---|---|---|
+| Llama 2 7B | MHA | 2 × 32 layers × 32 heads × 128 × 2 B | 512 KiB |
+| Llama 3.1 8B | GQA | 2 × 32 layers × 8 heads × 128 × 2 B | 128 KiB |
+| DeepSeek-V3 (671B) | MLA | 61 layers × (512 + 64) × 2 B | 68.6 KiB |
+| Falcon 7B | MQA | 2 × 32 layers × 1 head × 64 × 2 B | 8 KiB |
+
+The DeepSeek-V3 row is the striking one. It is a 671-billion-parameter model with 128 attention heads, yet it stores less per token than an 8-billion-parameter Llama. With plain multi-head attention and the same heads, it would need **4,880 KiB per token**, about **71 times** more.
+
+The DeepSeek-V2 paper says MLA's cache is as small as GQA with only **2.25 groups**, and reports that MLA, unlike GQA and MQA, "achieves better performance than MHA". That claim comes from their own tests at large scale. MLA is also harder to build and serve, which is part of why GQA is still the most common choice.
+
+## Which one to use?
+
+| | Cache per token | Quality | How hard | Used by |
+|---|---|---|---|---|
+| **MHA** | largest | the baseline | simplest | older models (Llama 2 7B, GPT-2) |
+| **MQA** | smallest | noticeably worse | simple | Falcon, PaLM |
+| **GQA** | in between, a dial | close to MHA | simple | Llama 3, Qwen2.5, Gemma 3, Mistral |
+| **MLA** | small | as good as MHA or better, per DeepSeek | harder: latent, absorption, separate RoPE key | DeepSeek-V2/V3/R1, Kimi K2 |
+
+All four keep one thing the same: **every token still looks at every earlier token**. They shrink what each token stores, not how many tokens are looked at. Cutting *that* is the subject of Part 3.
+
+## Summary
+
+- When a model writes, it keeps every earlier token's **keys and values** in the **KV cache**. Queries are used once and never stored.
+- Plain MHA stores $$2 \times L \times H \times d_h \times b$$ bytes per token: 512 KiB for Llama 2 7B.
+- **MQA** shares one key/value head across all query heads (Falcon 7B: 8 KiB per token) but loses quality. **GQA** shares in groups, a dial between MHA and MQA.
+- Our GQA matched PyTorch to $$10^{-16}$$ and reproduced **Qwen2.5-0.5B's real first layer** to $$6.6 \times 10^{-7}$$.
+- Fewer key/value heads made each step faster (3.08, 1.85, 1.24 ms) and, more importantly, the cache smaller.
+- **MLA** stores a small compressed latent plus a small RoPE key, and **absorbs** the up-projections into the query and output so keys and values are never rebuilt. The fast path matched the slow path to $$3.9 \times 10^{-16}$$.
+- RoPE must stay out of the latent: putting it on the rebuilt keys broke the shortcut by about 6%.
+- DeepSeek-V3 stores **68.6 KiB per token**; plain MHA would need **4,880 KiB**.
+
+<details>
+<summary>Run it yourself</summary>
+
+Everything above comes from [`code/attention/part2_kv_variants.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/attention/part2_kv_variants.py), which also contains the full `MLA` class with both the slow (rebuild) path and the fast (absorbed) path.
+
+```bash
+pip install torch transformers
+python part2_kv_variants.py     # writes results/part2.json
+```
+
+</details>
+
+## References
+
+1. N. Shazeer. [*Fast Transformer Decoding: One Write-Head is All You Need*](https://arxiv.org/abs/1911.02150). 2019.
+2. J. Ainslie et al. [*GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints*](https://arxiv.org/abs/2305.13245). EMNLP 2023.
+3. DeepSeek-AI. [*DeepSeek-V2: A Strong, Economical, and Efficient Mixture-of-Experts Language Model*](https://arxiv.org/abs/2405.04434). 2024.
+4. J. Su et al. [*RoFormer: Enhanced Transformer with Rotary Position Embedding*](https://arxiv.org/abs/2104.09864). 2021.
+5. Model configurations: [Llama 2 7B](https://huggingface.co/meta-llama/Llama-2-7b-hf), [Llama 3.1 8B](https://huggingface.co/meta-llama/Llama-3.1-8B), [DeepSeek-V3](https://huggingface.co/deepseek-ai/DeepSeek-V3), [Falcon 7B](https://huggingface.co/tiiuae/falcon-7b), [Qwen2.5-0.5B](https://huggingface.co/Qwen/Qwen2.5-0.5B).

@@ -1,0 +1,50 @@
+{
+ "gqa_checks": {
+  "MHA (8 KV heads)": 4.440892098500626e-16,
+  "GQA (2 KV heads)": 4.440892098500626e-16,
+  "MQA (1 KV head)": 6.661338147750939e-16
+ },
+ "qwen_layer0": {
+  "query_heads": 14,
+  "kv_heads": 2,
+  "head_dim": 64,
+  "tokens": 15,
+  "max_abs_diff": 6.556510925292969e-07,
+  "output_scale": 0.45922932028770447
+ },
+ "decode_speed": {
+  "device": "mps",
+  "batch": 8,
+  "context": 4096,
+  "query_heads": 32,
+  "head_dim": 128,
+  "results": {
+   "32": {
+    "ms": 3.076270513702184,
+    "kv_mb": 536.870912
+   },
+   "8": {
+    "ms": 1.8486870103515685,
+    "kv_mb": 134.217728
+   },
+   "1": {
+    "ms": 1.236250507645309,
+    "kv_mb": 16.777216
+   }
+  }
+ },
+ "mla": {
+  "naive_vs_absorbed": 3.885780586188048e-16,
+  "rope_on_latent_vs_absorbed": 0.031822200478723084,
+  "output_scale": 0.5301830626678229,
+  "full_cache_per_token": 640,
+  "latent_cache_per_token": 80
+ },
+ "kv_per_token_bytes": {
+  "Llama 2 7B (MHA)": 524288,
+  "Llama 3.1 8B (GQA, 8 KV heads)": 131072,
+  "Falcon 7B (MQA)": 8192,
+  "DeepSeek-V3 if it used MHA": 4997120,
+  "DeepSeek-V3 (MLA)": 70272
+ }
+}
