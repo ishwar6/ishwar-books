@@ -1,0 +1,50 @@
+[
+ {
+  "text": "The dog chased the ball because it was bored.",
+  "pronoun": "it",
+  "expected": "dog",
+  "top": "dog",
+  "weight_on_expected": 0.9049416184425354,
+  "correct": true
+ },
+ {
+  "text": "The trophy did not fit in the suitcase because it was too big.",
+  "pronoun": "it",
+  "expected": "trophy",
+  "top": "trophy",
+  "weight_on_expected": 0.6211403608322144,
+  "correct": true
+ },
+ {
+  "text": "My sister bought a new car and she loves driving it.",
+  "pronoun": "she",
+  "expected": "sister",
+  "top": "sister",
+  "weight_on_expected": 0.8570504784584045,
+  "correct": true
+ },
+ {
+  "text": "The engineers fixed the server after it crashed twice.",
+  "pronoun": "it",
+  "expected": "server",
+  "top": "server",
+  "weight_on_expected": 0.401127427816391,
+  "correct": true
+ },
+ {
+  "text": "The scientist published the paper because she was proud of it.",
+  "pronoun": "she",
+  "expected": "scientist",
+  "top": "scientist",
+  "weight_on_expected": 0.7788352370262146,
+  "correct": true
+ },
+ {
+  "text": "The children ate the cake because they were hungry.",
+  "pronoun": "they",
+  "expected": "children",
+  "top": "children",
+  "weight_on_expected": 0.719069242477417,
+  "correct": true
+ }
+]

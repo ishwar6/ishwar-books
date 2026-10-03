@@ -302,3 +302,8 @@
 .fig .s4 { fill: var(--series-4); }
 .fig .l4 { stroke: var(--series-4); stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
 .fig .base-line { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 4 4; }
+.fig .cell { fill: var(--series-1); }
+.fig .cell-masked { fill: none; stroke: var(--border-soft); stroke-dasharray: 2 3; }
+.fig .t-cell { font-size: 11.5px; font-weight: 700; fill: var(--text-strong); font-variant-numeric: tabular-nums; }
+.fig .t-cell.on { fill: #ffffff; }
+.fig .t-math { font-family: 'KaTeX_Main', 'Times New Roman', serif; font-size: 17px; fill: var(--text-strong); font-style: italic; }
