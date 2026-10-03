@@ -6,6 +6,6 @@ F = json.load(open(f'results/figs_part{part}.json'))
 s = open(f'part{part}.md').read()
 s = re.sub(r'\{\{FIG:(\w+)\|([^}]*)\}\}', lambda m: f'<figure class="fig">{F[m.group(1)]}<figcaption>{m.group(2)}</figcaption></figure>', s)
 assert '{{' not in s, 'unreplaced figure'
-assert '—' not in s, 'em dash found'
+assert '\u2014' not in s, 'em dash found'   # U+2014, written as an escape
 open(f'../../content/writings/{slug}.md', 'w').write(s)
 print('wrote', slug, len(s.split()), 'words')
