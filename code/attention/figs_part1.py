@@ -40,8 +40,9 @@ def pipeline():
     b += [box(20, 120, 70, 44, 'box'), text(55, 147, 'X', 't-math', 'middle'), text(55, 182, 'tokens', 't-tick', 'middle')]
     for i, (n, cls) in enumerate((('Q', 'box-2'), ('K', 'box-1'), ('V', 'box-3'))):
         y = 40 + i * 80
+        lx, ly = [(118, 70), (128, 134), (98, 210)][i]
         b += [arrow(92, 142, 150, y + 22), box(150, y, 64, 44, cls), text(182, y + 28, n, 't-math', 'middle'),
-              text(120, y + 14 if i == 0 else y + 50, f'× W{n.lower()}', 't-tick', 'middle')]
+              text(lx, ly, f'× W{n.lower()}', 't-tick', 'middle')]
     b += [arrow(216, 62, 270, 108), arrow(216, 142, 270, 120), box(270, 92, 120, 44, 'box'), text(330, 119, 'Q Kᵀ / √d', 't-math', 'middle'),
           text(330, 82, 'how well each pair matches', 't-tick', 'middle'),
           arrow(392, 114, 420, 114), box(420, 92, 86, 44, 'box'), text(463, 119, 'mask', 't-note', 'middle'), text(463, 82, 'hide the future', 't-tick', 'middle'),
@@ -89,6 +90,65 @@ for k, (key, title) in enumerate((('sink', 'attention sink'), ('previous', 'prev
     h = r[key]
     b += heatmap(10 + k * 252, 44, h['matrix'], words, words, 15.5, title=f"{title} (L{h['layer']} H{h['head']})", mask_upper=True, label_w=62)
 F['p1_real'] = svg(770, 300, 'Three real attention heads from Qwen2.5-0.5B on the sentence "The cat sat on the mat because it was tired": one dumps attention on the first token, one looks at the previous token, one links "it" to "cat".', b)
+
+import math
+
+def vectors():
+    words = [('cat', [0.8, -1.2, 0.3, 2.1]), ('dog', [0.7, -1.0, 0.5, 1.9]), ('mat', [-1.4, 0.6, 1.1, -0.2])]
+    b = [text(20, 26, 'Each token becomes a list of numbers (a vector). Real models use hundreds or thousands of numbers per token.', 't-tick')]
+    for i, (w, v) in enumerate(words):
+        y = 50 + i * 62
+        b += [box(20, y, 90, 40, 'box', 8), text(65, y + 25, w, 't-strong', 'middle'), arrow(112, y + 20, 160, y + 20)]
+        for j, n in enumerate(v):
+            b += [box(164 + j * 70, y + 2, 62, 36, 'box-1' if i < 2 else 'box-2', 6), text(195 + j * 70, y + 25, f'{n:+.1f}', 't-val', 'middle')]
+        b.append(text(470, y + 25, '…', 't-strong'))
+    b += [text(520, 81, '"cat" and "dog" get similar numbers:', 't-tick'), text(520, 99, 'they mean similar things.', 't-tick'),
+          text(520, 205, '"mat" gets different numbers.', 't-tick')]
+    return svg(780, 250, 'Every token is turned into a vector: a list of numbers. Similar words get similar numbers.', b)
+F['p1_vectors'] = vectors()
+
+
+def dot_product():
+    b = []
+    cases = [('same direction', 18, 'big and positive'), ('at a right angle', 90, 'zero'), ('opposite', 162, 'negative')]
+    for i, (lab, ang, word) in enumerate(cases):
+        cx, cy = 130 + i * 250, 130
+        a = math.radians(ang)
+        val = math.cos(a)                              # dot product of two unit-length vectors
+        b += [f'<line class="path" x1="{cx}" y1="{cy}" x2="{cx + 80}" y2="{cy}" marker-end="url(#ah-on)"/>',
+              f'<line class="key-line" x1="{cx}" y1="{cy}" x2="{cx + 78 * math.cos(a):.1f}" y2="{cy - 78 * math.sin(a):.1f}" marker-end="url(#ah-2)"/>',
+              f'<circle class="node" cx="{cx}" cy="{cy}" r="4"/>',
+              text(cx + 10, 40, lab, 't-title', 'middle'), text(cx + 10, 205, f'dot product: {val:+.2f}', 't-val', 'middle'),
+              text(cx + 10, 225, f'({word})', 't-tick', 'middle')]
+    b.append(text(20, 262, 'Blue: a query. Orange: a key. Both have length 1, so the dot product is the cosine of the angle between them.', 't-tick'))
+    return svg(780, 276, 'The dot product is large when two vectors point the same way, zero when they are at a right angle, and negative when they point in opposite directions.', b)
+F['p1_dot'] = dot_product()
+
+
+def softmax_fig():
+    scores = [2.0, 1.0, 0.1, -1.0]
+    ex = [math.exp(v) for v in scores]
+    w = [e / sum(ex) for e in ex]
+    names = ['cat', 'sat', 'on', 'the']
+    b = [text(150, 26, 'scores (any size, can be negative)', 't-title', 'middle'), text(560, 26, 'weights after softmax (add up to 1)', 't-title', 'middle')]
+    base = 200
+    for i, (n, v, wt) in enumerate(zip(names, scores, w)):
+        x = 50 + i * 60
+        h = v * 40
+        y = base - max(h, 0)
+        b.append(f'<rect class="s2" x="{x}" y="{y:.1f}" width="34" height="{abs(h):.1f}" rx="3"/>')
+        b.append(text(x + 17, (base - h - 8) if h > 0 else (base - h + 16), f'{v:+.1f}', 't-val', 'middle'))
+        b.append(text(x + 17, 274, n, 't-tick', 'middle'))
+        x2 = 460 + i * 60
+        h2 = wt * 160
+        b.append(f'<rect class="s1" x="{x2}" y="{base - h2:.1f}" width="34" height="{h2:.1f}" rx="3"/>')
+        b.append(text(x2 + 17, base - h2 - 8, f'{wt:.2f}', 't-val', 'middle'))
+        b.append(text(x2 + 17, 274, n, 't-tick', 'middle'))
+    b += [f'<line class="axis" x1="40" y1="{base}" x2="290" y2="{base}"/>', f'<line class="axis" x1="450" y1="{base}" x2="700" y2="{base}"/>',
+          arrow(310, 140, 430, 140, on=True), text(370, 128, 'softmax', 't-note', 'middle'),
+          text(370, 302, 'Bigger score → bigger weight. All weights are positive and sum to 1.', 't-tick', 'middle')]
+    return svg(760, 316, 'Softmax turns any list of scores into positive weights that add up to 1, keeping the order: the biggest score gets the biggest weight.', b)
+F['p1_softmax'] = softmax_fig()
 
 json.dump(F, open('results/figs_part1.json', 'w'))
 print(len(F), 'figures:', list(F))

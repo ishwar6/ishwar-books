@@ -5,7 +5,9 @@ import math
 DEFS = ('<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">'
         '<path class="arrow" d="M0,0L10,5L0,10z"/></marker>'
         '<marker id="ah-on" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">'
-        '<path class="arrow-on" d="M0,0L10,5L0,10z"/></marker></defs>')
+        '<path class="arrow-on" d="M0,0L10,5L0,10z"/></marker>'
+        '<marker id="ah-2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">'
+        '<path class="arrow-2" d="M0,0L10,5L0,10z"/></marker></defs>')
 
 
 def svg(w, h, label, body):

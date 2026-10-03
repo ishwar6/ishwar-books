@@ -33,6 +33,7 @@ const CALLOUTS = {
   note: 'Note', info: 'Info', tip: 'Tip', important: 'Important', warning: 'Warning',
   caution: 'Caution', danger: 'Danger', example: 'Example', question: 'Question',
   quote: 'Quote', summary: 'Summary', success: 'Success', bug: 'Bug', abstract: 'Summary',
+  definition: 'Definition', define: 'Definition', term: 'Definition',
 }
 
 // ---------- helpers ----------
@@ -132,7 +133,9 @@ function remarkCallouts() {
       text.value = text.value.slice(m[0].length)
       if (!text.value && para.children.length === 1) node.children.shift()
       node.data = { hName: 'aside', hProperties: { className: ['callout', `callout-${CALLOUTS[kind] ? kind : 'note'}`] } }
+      const isDef = ['definition', 'define', 'term'].includes(kind)
       node.children.unshift({ type: 'paragraph', data: { hProperties: { className: ['callout-title'] } }, children: [{ type: 'text', value: title }] })
+      if (isDef) node.data.hProperties.className = ['callout', 'callout-definition']
     })
 }
 
