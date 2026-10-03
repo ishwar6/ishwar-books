@@ -1,0 +1,36 @@
+
+custom full mask vs default: max |diff| = 0.0e+00
+full attention: perplexity 17.39
+budget   64 tokens: window only   132.70   4 sinks + window 60:  22.45
+budget  256 tokens: window only    67.90   4 sinks + window 252:  18.83
+budget 1024 tokens: window only   508.88   4 sinks + window 1020:  17.80
+collecting dense attention targets ...
+layer  0: warm-up loss 7.966 -> 4.902
+layer  1: warm-up loss 7.426 -> 4.750
+layer  2: warm-up loss 7.325 -> 4.052
+layer  3: warm-up loss 7.175 -> 3.307
+layer  4: warm-up loss 7.358 -> 4.037
+layer  5: warm-up loss 7.062 -> 3.967
+layer  6: warm-up loss 7.158 -> 4.039
+layer  7: warm-up loss 8.187 -> 2.198
+layer  8: warm-up loss 7.058 -> 2.949
+layer  9: warm-up loss 7.366 -> 2.523
+layer 10: warm-up loss 7.197 -> 3.739
+layer 11: warm-up loss 7.371 -> 2.854
+layer 12: warm-up loss 7.414 -> 3.970
+layer 13: warm-up loss 7.376 -> 3.521
+layer 14: warm-up loss 7.630 -> 3.817
+layer 15: warm-up loss 7.556 -> 3.749
+layer 16: warm-up loss 7.775 -> 2.196
+layer 17: warm-up loss 7.343 -> 4.128
+layer 18: warm-up loss 7.415 -> 2.662
+layer 19: warm-up loss 7.144 -> 3.021
+layer 20: warm-up loss 7.775 -> 3.816
+layer 21: warm-up loss 7.554 -> 3.563
+layer 22: warm-up loss 7.251 -> 5.799
+layer 23: warm-up loss 7.521 -> 5.472
+budget 64: attention captured  window 0.423  sinks+window 0.721  indexer 0.776  (untrained, layer 0: 0.042)
+budget 256: attention captured  window 0.520  sinks+window 0.820  indexer 0.887  (untrained, layer 0: 0.177)
+budget   64 tokens: indexer top-k perplexity 18.93
+budget  256 tokens: indexer top-k perplexity 17.62
+done in 106 s

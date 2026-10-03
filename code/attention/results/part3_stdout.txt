@@ -1,0 +1,31 @@
+1. SWA vs PyTorch SDPA with the same mask:  max |diff| = 4.4e-16
+   window wider than the text vs causal:   max |diff| = 0.0e+00
+   change all 18 tokens outside the window of the last token:
+      last output with sliding window moves by 0.0e+00
+      last output with full attention moves by 0.65
+2. Receptive field of the last token, window W = 4
+   1 layer(s): depends on  4 tokens (formula L*(W-1)+1 =  4), reaches  3 tokens back
+   2 layer(s): depends on  7 tokens (formula L*(W-1)+1 =  7), reaches  6 tokens back
+   3 layer(s): depends on 10 tokens (formula L*(W-1)+1 = 10), reaches  9 tokens back
+   4 layer(s): depends on 13 tokens (formula L*(W-1)+1 = 13), reaches 12 tokens back
+   5 layer(s): depends on 16 tokens (formula L*(W-1)+1 = 16), reaches 15 tokens back
+   6 layer(s): depends on 19 tokens (formula L*(W-1)+1 = 19), reaches 18 tokens back
+3. Rolling buffer cache (W = 8 slots) vs computing all 50 tokens at once: max |diff| = 1.1e-15
+4. KV cache for one sequence, 16-bit numbers
+   Gemma 3 27B (52 local + 10 global layers):
+         1024 tokens: all global   0.48 GiB   5 local : 1 global  0.48 GiB   (1.0x smaller)
+         2048 tokens: all global   0.97 GiB   5 local : 1 global  0.56 GiB   (1.7x smaller)
+         4096 tokens: all global   1.94 GiB   5 local : 1 global  0.72 GiB   (2.7x smaller)
+         8192 tokens: all global   3.88 GiB   5 local : 1 global  1.03 GiB   (3.8x smaller)
+        16384 tokens: all global   7.75 GiB   5 local : 1 global  1.66 GiB   (4.7x smaller)
+        32768 tokens: all global  15.50 GiB   5 local : 1 global  2.91 GiB   (5.3x smaller)
+        65536 tokens: all global  31.00 GiB   5 local : 1 global  5.41 GiB   (5.7x smaller)
+       131072 tokens: all global  62.00 GiB   5 local : 1 global 10.41 GiB   (6.0x smaller)
+   Mistral 7B at 32K: full 4.00 GiB, window 4096 0.50 GiB (8x smaller)
+   gpt-oss-20b at 128K: full 6.00 GiB, alternating window 128 3.00 GiB
+5. One decode step of attention (16 heads, d = 128, mps, bf16)
+     1024 tokens so far: full 0.057 ms, window 1024: 0.041 ms
+     4096 tokens so far: full 0.137 ms, window 1024: 0.033 ms
+    16384 tokens so far: full 0.521 ms, window 1024: 0.030 ms
+    65536 tokens so far: full 2.019 ms, window 1024: 0.034 ms
+   131072 tokens so far: full 3.893 ms, window 1024: 0.031 ms
