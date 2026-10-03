@@ -325,3 +325,6 @@
 .fig .arrow { fill: var(--faint); }
 .fig .arrow-2 { fill: var(--series-2); }
 .fig .key-line { stroke: var(--series-2); stroke-width: 3; fill: none; }
+
+/* screenshots of papers: keep them as white "paper" cards with a frame in every theme */
+.prose .fig.paper img { background: #fff; padding: 14px 18px; border: 1px solid var(--border); border-radius: var(--radius); max-width: 100%; height: auto; box-sizing: border-box; margin: 0.6em auto; }

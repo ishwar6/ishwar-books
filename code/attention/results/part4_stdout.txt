@@ -1,0 +1,31 @@
+1. Linear attention, parallel form vs recurrent form (T = 200): max |diff| = 4.4e-16
+   the recurrent form keeps only 272 numbers, however long the text
+2. Write "x = 1", "y = 7", then "x = 5". Read x and y back:
+   linear attention: x = 6.00, y = 7.00
+   delta rule:       x = 5.00, y = 7.00
+3. Store n random facts in a 64 x 64 memory, then read all of them back (relative error, 0 = perfect):
+   n =   4: linear attention 0.21   delta rule 0.10
+   n =   8: linear attention 0.32   delta rule 0.20
+   n =  16: linear attention 0.49   delta rule 0.33
+   n =  32: linear attention 0.70   delta rule 0.50
+   n =  48: linear attention 0.86   delta rule 0.63
+   n =  64: linear attention 1.00   delta rule 0.73
+   n =  96: linear attention 1.22   delta rule 0.89
+   n = 128: linear attention 1.41   delta rule 0.99
+   n = 192: linear attention 1.74   delta rule 1.12
+   n = 256: linear attention 2.01   delta rule 1.20
+4. Strength of a fact after t more tokens, with forget gate alpha (alpha^t):
+   alpha = 0.9  : t=0: 1.000  t=10: 0.349  t=50: 0.005  t=100: 0.000  t=500: 0.000
+   alpha = 0.99 : t=0: 1.000  t=10: 0.904  t=50: 0.605  t=100: 0.366  t=500: 0.007
+   alpha = 0.999: t=0: 1.000  t=10: 0.990  t=50: 0.951  t=100: 0.905  t=500: 0.606
+5. Our gated delta rule vs the Qwen3-Next reference code in transformers (float32 inside):
+   vs step-by-step version: max |diff| = 3.0e-08
+   vs chunked version:      max |diff| = 2.3e-07   (outputs up to 0.17)
+6. Memory, 2 bytes per number
+   Qwen3-Next-80B at 262144 tokens: 12 attention layers 6.00 GiB (all 48 as attention: 24.00 GiB), plus a fixed 36 MiB of Gated DeltaNet state
+   Kimi Linear 48B: 8064 B per token with 7 MLA layers vs 31104 B if all 27 were MLA (74% less), plus a fixed 20 MiB of KDA state
+7. One decode step on mps (Qwen3-Next layer shapes):
+     4096 tokens so far: gated attention 0.097 ms   Gated DeltaNet 0.180 ms
+    16384 tokens so far: gated attention 0.284 ms   Gated DeltaNet 0.181 ms
+    65536 tokens so far: gated attention 1.238 ms   Gated DeltaNet 0.180 ms
+   262144 tokens so far: gated attention 5.831 ms   Gated DeltaNet 0.180 ms
