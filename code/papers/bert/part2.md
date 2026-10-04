@@ -24,6 +24,8 @@ Everything that can be checked, we check on the real released model, `bert-base-
 
 The three groups are: **feature-based** approaches (§2.1), **fine-tuning** approaches (§2.2), and **transfer from labelled data** (§2.3). We take them one at a time.
 
+{{FIG:p2_related_map|The related work on one timeline. Feature-based methods (word2vec, GloVe, skip-thought, ELMo) produce frozen vectors for another model. Fine-tuning methods (Collobert and Weston, Dai and Le, ULMFiT, OpenAI GPT) keep training the whole pre-trained network. Labelled transfer (ImageNet, InferSent, CoVe) pre-trains on a big labelled task. BERT takes the fine-tuning recipe and the ImageNet habit, with unlabeled text.}}
+
 ### Word embeddings {§2.1}
 
 > [!PAPER] Devlin et al. (2018), BERT · Section 2.1 · page 2
@@ -43,6 +45,47 @@ The three groups are: **feature-based** approaches (§2.1), **fine-tuning** appr
 
 A word embedding is a **lookup table**: one row per word. The word "bank" always gets the same row, whether it is a river bank or a money bank. Keep this weakness in mind; the next two paragraphs are about fixing it.
 
+{{FIG:p2_word_reprs|Three generations of word representations. Non-neural: Brown clusters (1992) give each word a code from a tree of word groups built from counts. Neural, static: word2vec and GloVe learn one vector per word. Contextual: ELMo and BERT compute a new vector for every sentence.}}
+
+The paragraph says word vectors were trained with left-to-right language models and with objectives that "discriminate correct from incorrect words in left and right context". The second phrase is word2vec. Here is its picture and its training objective, from its own papers:
+
+> [!PAPER] Mikolov et al. (2013a), Efficient Estimation of Word Representations in Vector Space · Section 3.2, Figure 1
+> [![Figure 1 of the skip-gram paper: the input word w(t) is projected to a vector, which is used to predict the surrounding words w(t-2), w(t-1), w(t+1), w(t+2); the training objective is to learn word vectors that are good at predicting the nearby words](/img/papers/bert/p2-ext-skipgram-fig1.png)](/img/papers/bert/p2-ext-skipgram-fig1.png)
+>
+> **Context:** the skip-gram model, one of the two word2vec models.
+>
+> **What it says:** one word goes in, becomes a vector, and that vector is used to predict the words around it, two on each side here. The training objective is "to learn word vector representations that are good at predicting the nearby words".
+>
+> **Why it matters:** this is "left and right context" in 2013: a small window on both sides of the word. The window is the context; there are no layers that mix it.
+
+> [!PAPER] Mikolov et al. (2013b), Distributed Representations of Words and Phrases · Section 2.2, Equation (4)
+> [![Equation 4 of the word2vec negative sampling paper: the objective log sigma of v prime w O dot v w I plus the sum over k samples from a noise distribution of log sigma of minus v prime w i dot v w I, called negative sampling](/img/papers/bert/p2-ext-skipgram-neg.png)](/img/papers/bert/p2-ext-skipgram-neg.png)
+>
+> **Context:** the trick that made skip-gram fast, from the paper BERT cites as Mikolov et al. (2013).
+>
+> **What it says:** instead of a softmax over the whole vocabulary, the model learns to tell the real neighbour $$w_O$$ apart from $$k$$ random "noise" words. They "define Negative sampling (NEG)" by this objective.
+>
+> **Why it matters:** this is exactly "discriminate correct from incorrect words in left and right context", the phrase in BERT's related work.
+
+The objective, symbol by symbol:
+
+$$
+\log \sigma\!\left(v'^{\top}_{w_O} v_{w_I}\right) + \sum_{i=1}^{k} \mathbb{E}_{w_i \sim P_n(w)}\!\left[\log \sigma\!\left(-v'^{\top}_{w_i} v_{w_I}\right)\right]
+$$
+
+where:
+
+- $$w_I$$ is the input (centre) word and $$w_O$$ a real word from its window; $$v_{w_I}$$ and $$v'_{w_O}$$ are their vectors (word2vec keeps two vectors per word, one for each role);
+- $$\sigma(x) = 1 / (1 + e^{-x})$$ is the sigmoid, which squeezes any number into a probability between 0 and 1;
+- the first term is large when the real pair's dot product is large ("these two go together");
+- $$w_1, \dots, w_k$$ are $$k$$ random words drawn from a noise distribution $$P_n(w)$$ (common words drawn more often); the second term is large when their dot products with the centre word are very negative ("these do not go together");
+- $$\mathbb{E}$$ means "on average over the random draws". Training makes the whole expression as large as possible.
+
+{{FIG:p2_window|The skip-gram setup on "the cat sat on the mat". The centre word "sat" has a window of two words on each side. Training pairs it with its real neighbours (target 1) and with random words such as "banana" (target 0), and learns vectors so that sigmoid of the dot product tells them apart.}}
+
+> [!DEFINITION] Sigmoid
+> The function $$\sigma(x) = 1/(1 + e^{-x})$$. It turns any number into a value between 0 and 1: large positive numbers give almost 1, large negative ones almost 0, and 0 gives 0.5. Used whenever a model must output a single "yes" probability.
+
 ### Sentence and paragraph embeddings {§2.1}
 
 > [!PAPER] Devlin et al. (2018), BERT · Section 2.1 · page 2
@@ -56,6 +99,45 @@ A word embedding is a **lookup table**: one row per word. The word "bank" always
 
 > [!DEFINITION] Denoising auto-encoder
 > A model that is given a damaged input (some words deleted or swapped) and is trained to rebuild the clean original. BERT's masked language model is similar, but it only has to rebuild the hidden words, not the whole input.
+
+The paragraph packs three earlier sentence objectives into one sentence. Each one is a small idea worth seeing, because BERT borrows from two of them.
+
+**1. Generate the neighbouring sentences (skip-thought).** Kiros et al. (2015) encode a sentence into one vector, then train two decoders to write the sentence before it and the sentence after it.
+
+> [!PAPER] Kiros et al. (2015), Skip-Thought Vectors · Section 2, Figure 1
+> [![Figure 1 of the skip-thought paper: given a triplet of contiguous sentences, the middle sentence I could see the cat on the steps is encoded and the model tries to reconstruct the previous sentence I got back home and the next sentence This was strange](/img/papers/bert/p2-ext-skipthought-fig1.png)](/img/papers/bert/p2-ext-skipthought-fig1.png)
+>
+> **Context:** the model BERT's related work describes as "left-to-right generation of next sentence words given a representation of the previous sentence".
+>
+> **What it says:** given three sentences in a row, "the sentence $$s_i$$ is encoded and tries to reconstruct the previous sentence $$s_{i-1}$$ and next sentence $$s_{i+1}$$".
+>
+> **Why it matters:** the idea that a sentence's meaning shows in what comes around it. BERT keeps this idea but turns it into a much cheaper yes/no question (next sentence prediction, Part 3).
+
+**2. Rank candidate next sentences.** Jernite et al. (2017) and Logeswaran and Lee (2018) skip the writing. They give the model a sentence and a few candidates, and train it to pick the one that really came next.
+
+> [!PAPER] Logeswaran and Lee (2018), An efficient framework for learning sentence representations · Section 3, Figure 1
+> [![Figure 1 of the quick-thought paper: the conventional approach encodes Spring had come and decodes the next sentence; the proposed approach encodes the sentence and several candidates and a classifier chooses the target sentence from the set of candidate sentences](/img/papers/bert/p2-ext-quickthought-fig1.png)](/img/papers/bert/p2-ext-quickthought-fig1.png)
+>
+> **Context:** the "quick-thought" model, one of the two papers BERT cites for ranking next sentences.
+>
+> **What it says:** (a) the conventional approach decodes the next sentence word by word. (b) The proposed approach "replaces the decoder with a classifier which chooses the target sentence from a set of candidate sentences".
+>
+> **Why it matters:** choosing beats generating: it is faster and trains the same skill. BERT's next sentence prediction is the simplest version: two candidates (the real next sentence or a random one), one yes/no answer.
+
+**3. Repair a damaged sentence (denoising auto-encoders).** Hill et al. (2016) corrupt a sentence and train an encoder-decoder to rebuild the original.
+
+> [!PAPER] Hill, Cho, Korhonen (2016), Learning Distributed Representations of Sentences from Unlabelled Data · Section 2
+> [![The sequential denoising autoencoder paragraph of Hill et al.: each word is deleted with probability p0 and each non-overlapping bigram is swapped with probability px, and an LSTM encoder-decoder is trained to predict the original sentence from the corrupted version](/img/papers/bert/p2-ext-hill-sdae.png)](/img/papers/bert/p2-ext-hill-sdae.png)
+>
+> **Context:** the "sequential denoising autoencoder" (SDAE), the model behind the phrase "denoising auto-encoder derived objectives".
+>
+> **What it says:** each word is deleted "with (independent) probability $$p_o$$", neighbouring pairs are swapped with probability $$p_x$$, and an LSTM encoder-decoder learns to "predict (as target) the original source sentence" from the damaged one.
+>
+> **Why it matters:** this is the closest ancestor of the masked language model. BERT damages the input too, but only asks for the damaged words back, not the whole sentence (Section 3.1 says so explicitly).
+
+{{FIG:p2_sentence_objectives|Learning sentence vectors from neighbouring sentences. Skip-thought writes the previous and next sentence from one sentence vector. Ranking methods score candidate sentences and pick the true next one (scores here are an illustration).}}
+
+{{FIG:p2_denoise|Denoising, step by step. A clean sentence is damaged (a word deleted, two words swapped). An SDAE rebuilds every word of the original. BERT's masked LM hides one word and predicts only that word.}}
 
 ### ELMo: a word's vector depends on its sentence {§2.1}
 
@@ -71,6 +153,8 @@ A word embedding is a **lookup table**: one row per word. The word "bank" always
 > [!DEFINITION] Contextual embedding
 > A word vector that is computed fresh for each sentence, from the words around it. The same word in two sentences gets two different vectors. ELMo and BERT both produce contextual embeddings.
 
+{{FIG:p2_elmo_concat|ELMo's vector for "bank", drawn. A left-to-right LSTM and a right-to-left LSTM each read the sentence on their own. The vector for "bank" is the forward state glued to the backward state. Inside each reader, information flows one way only.}}
+
 > [!DEFINITION] Sentiment analysis
 > Deciding whether a piece of text is positive or negative, for example a movie review.
 
@@ -78,6 +162,14 @@ We can see the difference between a static and a contextual vector in the real B
 
 > [!DEFINITION] Cosine similarity
 > A number from -1 to 1 that says how much two vectors point the same way. 1 means the same direction; values near 0 mean unrelated. It ignores the length of the vectors and only looks at their direction.
+
+As a formula, for two vectors $$a$$ and $$b$$ of the same length:
+
+$$
+\cos(a, b) = \frac{a \cdot b}{\lVert a \rVert \, \lVert b \rVert}, \qquad a \cdot b = \sum_i a_i b_i, \qquad \lVert a \rVert = \sqrt{\textstyle\sum_i a_i^2}
+$$
+
+where $$a \cdot b$$ is the dot product and $$\lVert a \rVert$$ the length. A tiny example: $$a = (1, 2, 2)$$ and $$b = (2, 1, 2)$$ give $$a \cdot b = 2 + 2 + 4 = 8$$, $$\lVert a \rVert = \lVert b \rVert = 3$$, so $$\cos = 8 / 9 = 0.889$$. BERT's vectors have 768 numbers instead of 3, but the formula is the same.
 
 ```python
 import torch, torch.nn.functional as F
@@ -152,6 +244,8 @@ The key phrase is "**few parameters need to be learned from scratch**". With the
 > [!DEFINITION] Machine translation (MT)
 > Translating text from one language to another automatically.
 
+{{FIG:p2_transfer|The transfer-learning recipe in vision and in language. Step 1, done once: pre-train a big network on a huge dataset (ImageNet's 1.2 million labelled photos; BERT's 3.3 billion words of unlabeled text). Step 2, done for every new task: start from a copy of those weights and fine-tune.}}
+
 ## BERT in two steps, with one architecture {§3}
 
 Now Section 3, the description of BERT itself. It opens with the two steps and with the paper's main picture, Figure 1.
@@ -184,6 +278,8 @@ How to read Figure 1, from bottom to top:
 - **Blue box:** BERT itself, the stack of layers. Every position is connected to every other (the faint lines).
 - **Green (top):** the outputs. **C** is the output for `[CLS]`. **T₁, …, T_N** and **T₁′, …, T_M′** are the outputs for the other tokens.
 - **Red arrows (top):** the output layers. In pre-training, C feeds **NSP** (next sentence prediction) and the T vectors feed **Mask LM**. In fine-tuning, the output layer depends on the task: for **SQuAD** (question answering), the T vectors of the paragraph predict where the answer starts and ends.
+
+{{FIG:p2_figure1|Figure 1 redrawn with real words. Left, pre-training: "[CLS] my [MASK] [SEP] he [MASK] [SEP]"; C feeds the IsNext question, the T vectors at the masked positions predict "dog" and "likes". Right, fine-tuning on SQuAD: a question and a paragraph go through the same encoder, starting from the same weights, and the paragraph's T vectors predict where the answer "Ada" starts and ends. C is unused there.}}
 
 > [!DEFINITION] MNLI, NER, SQuAD
 > Three of the downstream tasks in Figure 1. **MNLI** (MultiNLI): natural language inference on sentence pairs. **NER**: named entity recognition, a label for every token. **SQuAD**: question answering, find the answer span in a paragraph. Part 4 covers all of them.
@@ -239,6 +335,151 @@ where:
 
 > [!DEFINITION] LayerNorm (layer normalisation)
 > A step that rescales each token's vector so its numbers have average 0 and spread 1, then multiplies and shifts them by two learned vectors. It keeps the numbers in a stable range from layer to layer.
+
+The paper hands the details to Vaswani et al. and to "The Annotated Transformer" in two footnotes:
+
+> [!PAPER] Devlin et al. (2018), BERT · Section 3, footnotes 1 and 2 · page 3
+> [![Footnotes 1 and 2 of the BERT paper: the tensor2tensor library on GitHub, and The Annotated Transformer at nlp.seas.harvard.edu](/img/papers/bert/p2-footnotes12.png)](/img/papers/bert/p2-footnotes12.png)
+>
+> **Context:** the two links behind "the tensor2tensor library" and "excellent guides such as The Annotated Transformer".
+>
+> **What it says:** footnote 1 is Google's [tensor2tensor](https://github.com/tensorflow/tensor2tensor) code; footnote 2 is [The Annotated Transformer](http://nlp.seas.harvard.edu/2018/04/03/attention.html), a line-by-line code walk-through of Vaswani et al. by Harvard NLP.
+>
+> **Why it matters:** BERT's code started from that Transformer code, so the layer we describe next is exactly the 2017 one.
+
+### Inside one layer: attention, with real numbers
+
+The heart of each layer is the attention equation of Vaswani et al.:
+
+> [!PAPER] Vaswani et al. (2017), Attention Is All You Need · Section 3.2.1, Equation (1)
+> [![Section 3.2.1 of Attention Is All You Need: queries are packed together into a matrix Q, keys and values into matrices K and V, and the matrix of outputs is Attention of Q, K, V equals softmax of Q K transpose over square root of d k, times V](/img/papers/bert/p2-ext-vaswani-eq1.png)](/img/papers/bert/p2-ext-vaswani-eq1.png)
+>
+> **Context:** scaled dot-product attention, computed for all tokens at once.
+>
+> **What it says:** "we compute the attention function on a set of queries simultaneously, packed together into a matrix $$Q$$", and likewise $$K$$ and $$V$$, then $$\text{softmax}(QK^T / \sqrt{d_k})V$$.
+>
+> **Why it matters:** this one line is most of what BERT computes. BERT uses it with no mask (Part 1).
+
+Where do $$Q$$, $$K$$ and $$V$$ come from? Each is the layer input $$X$$ (one row of $$H = 768$$ numbers per token) multiplied by a learned matrix:
+
+$$
+Q = X W^Q, \qquad K = X W^K, \qquad V = X W^V, \qquad \text{head} = \operatorname{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right) V
+$$
+
+where, for one head of BERT-base and a text of $$n$$ tokens:
+
+- $$X$$ is $$n \times 768$$;
+- $$W^Q$$, $$W^K$$, $$W^V$$ are each $$768 \times 64$$, so $$Q$$, $$K$$, $$V$$ are $$n \times 64$$ (here $$d_k = 64$$);
+- $$QK^\top$$ is $$n \times n$$: one score for every pair of tokens;
+- softmax works row by row, so each row of weights adds up to 1;
+- multiplying by $$V$$ gives the head's output, $$n \times 64$$: for each token, a weighted mix of all tokens' value rows.
+
+{{FIG:p2_attn_shapes|One attention head of BERT-base, shape by shape, for a text of n tokens. X (n × 768) times W_Q (768 × 64) gives Q (n × 64); the same for K and V. Q times Kᵀ gives an n × n table of scores; divided by 8 and passed through softmax, it becomes weights; the weights times V give the head's output Z (n × 64).}}
+
+**A worked example small enough to check by hand.** Three tokens, $$d_k = 4$$, with simple numbers chosen for the example ([`bert_part2_math.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/bert/bert_part2_math.py)):
+
+```text
+Q K^T:
+  the      1.000  0.000  2.000
+  kid      0.000  3.000  2.000
+  smiles   1.000  2.000  3.000
+/ sqrt(d_k):
+  the      0.500  0.000  1.000
+  kid      0.000  1.500  1.000
+  smiles   0.500  1.000  1.500
+softmax:
+  the      0.307  0.186  0.506
+  kid      0.122  0.547  0.331
+  smiles   0.186  0.307  0.506
+output = weights V:
+  the      0.814  0.693
+  kid      0.453  0.878
+  smiles   0.693  0.814
+row sums of the weights: [1.0, 1.0, 1.0]
+```
+
+Check the row for "kid": the scaled scores are 0, 1.5 and 1.0, and
+
+$$
+\frac{e^{0}}{e^{0} + e^{1.5} + e^{1.0}} = \frac{1}{1 + 4.482 + 2.718} = \frac{1}{8.200} = 0.122
+$$
+
+and likewise $$4.482 / 8.200 = 0.547$$ and $$2.718 / 8.200 = 0.331$$. "kid" looks mostly at itself, then at "smiles", and all three weights add up to 1.
+
+{{FIG:p2_attn_tiny|The tiny example as a picture. Left: the scaled scores. Middle: softmax turns each row into weights that add up to 1. Right: each token's output is the weighted mix of the value rows.}}
+
+**Why divide by $$\sqrt{d_k}$$?** If the numbers in $$q$$ and $$k$$ are random with spread 1, their dot product (a sum of $$d_k$$ products) has spread about $$\sqrt{d_k}$$. With $$d_k = 64$$ that is 8, and softmax over numbers that large picks one key and ignores the rest. Measured:
+
+```text
+10,000 random pairs, each number drawn with mean 0 and spread 1
+spread (standard deviation) of q.k:          8.002   (about sqrt(64) = 8)
+spread of q.k / sqrt(64):                     1.000
+softmax WITHOUT the division (scores x 8):    [ 0.530,  0.023,  0.004,  0.385,  0.000,  0.001,  0.000,  0.057]   max 0.530
+softmax WITH the division:                    [ 0.208,  0.140,  0.114,  0.199,  0.068,  0.091,  0.023,  0.157]   max 0.208
+```
+
+{{FIG:p2_scale|The same eight scores through softmax, without and with the division by 8. Without it, one key takes 0.53 and three get almost nothing, so learning stalls. With it, the weights stay spread out and every key still gets some signal.}}
+
+**Many heads.** One head learns one way of looking. BERT-base runs $$A = 12$$ heads side by side, each with its own $$W^Q, W^K, W^V$$ of $$768 \times 64$$, and joins their outputs:
+
+> [!PAPER] Vaswani et al. (2017), Attention Is All You Need · Section 3.2.2
+> [![Section 3.2.2 of Attention Is All You Need: multi-head attention allows the model to jointly attend to information from different representation subspaces at different positions; MultiHead of Q, K, V equals Concat of head 1 to head h times W O, where head i is Attention of Q W i Q, K W i K, V W i V](/img/papers/bert/p2-ext-vaswani-mha.png)](/img/papers/bert/p2-ext-vaswani-mha.png)
+>
+> **Context:** multi-head attention, the version every Transformer uses.
+>
+> **What it says:** multiple heads let the model "jointly attend to information from different representation subspaces at different positions". The outputs are concatenated and multiplied by $$W^O$$.
+>
+> **Why it matters:** with $$A$$ heads of $$H/A$$ numbers each, the joined output is again $$H$$ wide: $$12 \times 64 = 768$$. That is why BERT's $$H$$ is always a multiple of $$A$$.
+
+$$
+\text{MultiHead}(X) = \text{Concat}(\text{head}_1, \dots, \text{head}_A)\, W^O
+$$
+
+where each $$\text{head}_i$$ is $$n \times 64$$, the concatenation is $$n \times 768$$, and $$W^O$$ is $$768 \times 768$$.
+
+{{FIG:p2_multihead|Multi-head attention in BERT-base. Twelve heads, each producing 64 numbers per token, are joined side by side into 768 numbers and mixed by W_O (768 × 768).}}
+
+Here is a real head of the real model on "the kid smiles":
+
+```text
+tokens: ['[CLS]', 'the', 'kid', 'smiles', '[SEP]']  (n = 5)
+X (input embeddings) (5, 768);  W_Q (768, 768) holds 12 heads of 64 columns
+per head: Q (5, 64), K (5, 64), V (5, 64); Q K^T (5, 5); output (5, 64)
+12 heads joined: (5, 768); after W_O (768, 768): (5, 768)
+head 1 of layer 1, attention weights:
+             [CLS]     the     kid  smiles   [SEP]
+  [CLS]      0.108   0.246   0.063   0.076   0.506
+  the        0.198   0.212   0.175   0.217   0.198
+  kid        0.152   0.088   0.139   0.281   0.340
+  smiles     0.144   0.160   0.185   0.235   0.276
+  [SEP]      0.189   0.200   0.091   0.171   0.348
+```
+
+{{FIG:p2_attn_real|Head 1 of layer 1 of the real bert-base-uncased. Every square is allowed (no mask) and every row adds up to 1. "kid" looks most at [SEP] (0.340) and at "smiles" (0.281), the word on its right.}}
+
+### Inside one layer: the feed-forward network
+
+> [!PAPER] Vaswani et al. (2017), Attention Is All You Need · Section 3.3, Equation (2)
+> [![Section 3.3 of Attention Is All You Need: each layer contains a fully connected feed-forward network applied to each position separately and identically, two linear transformations with a ReLU activation in between, FFN of x equals max of 0 and x W1 plus b1, times W2, plus b2](/img/papers/bert/p2-ext-vaswani-ffn.png)](/img/papers/bert/p2-ext-vaswani-ffn.png)
+>
+> **Context:** the second part of every Transformer layer.
+>
+> **What it says:** a feed-forward network "applied to each position separately and identically": "two linear transformations with a ReLU activation in between".
+>
+> **Why it matters:** BERT uses the same shape, with two changes: the inner size is $$4H$$ (footnote 3, below) and GELU replaces ReLU (Part 3).
+
+{{FIG:p2_ffn|The feed-forward network for one token. "kid" (768 numbers after attention) is widened to 3,072 by W₁, passed through GELU, and narrowed back to 768 by W₂. The same weights are used for every position in the layer. In this real example only 5.2% of the 3,072 numbers were positive before GELU.}}
+
+Real numbers, for "kid" in layer 1:
+
+```text
+in (768,) -> x W1 + b1 (3072,) -> GELU -> x W2 + b2 (768,)
+first 6 of the 3072 numbers before GELU: [-1.334, -0.569, -4.067, -1.991, -1.904, -0.816]
+the same 6 after GELU:                   [-0.122, -0.162, -0.000, -0.046, -0.054, -0.169]
+share of the 3072 that are positive before GELU: 0.052
+```
+
+Negative inputs come out of GELU small but not exactly zero (-1.334 becomes -0.122), unlike ReLU, which would make them all 0. Very negative inputs (-4.067) do become almost exactly 0.
 
 {{FIG:p2_stack|The BERT-base encoder. Tokens become input embeddings, go up through 12 identical layers (each with 12-head self-attention and a feed-forward network), and come out as one 768-number vector per token: C for [CLS] and T for every other token.}}
 
@@ -360,6 +601,8 @@ bert-large-uncased: L=24 H=1024 A=16 feed-forward=4096
 
 {{FIG:p2_params|Where BERT-base's 109,482,240 parameters live. The feed-forward networks hold about half (56.67 million), attention about a quarter (28.35 million), the embedding tables about a fifth (23.84 million).}}
 
+{{FIG:p2_params_terms|The same count as bars, for BERT-base and BERT-large, with OpenAI GPT for comparison. In both BERTs the feed-forward networks are the biggest part. GPT has the same L, H and A as BERT-base, but 116.5 million parameters, mostly because its vocabulary is larger (40,478 tokens against 30,522).}}
+
 So the formula and the real models agree exactly: **109,482,240** for BERT-base and **335,141,888** for BERT-large. The paper's "110M" and "340M" are both what you get by rounding these to the nearest 10 million (109.5 → 110, 335.1 → 340). The paper does not say how it rounded, so treat this as arithmetic, not as the authors' stated method.
 
 Two things stand out in the picture:
@@ -443,6 +686,37 @@ Some real splits:
 ```
 
 Two honest notes. First, the pieces are chosen by frequency, not by meaning: "bidirectional" becomes `bid ##ire ##ction ##al`, which a person would never choose. Second, Figure 2 of the paper (below) shows "playing" split into `play ##ing`, but in the released uncased vocabulary "playing" is a single token. The figure illustrates the idea; it is not the output of the real tokenizer. (Even the example in the tokenizer's own code comment, "unaffable" → `un ##aff ##able`, differs from what the released vocabulary gives: `una ##ffa ##ble`.)
+
+The paper cites Wu et al. (2016) for WordPiece. Their own example shows the idea:
+
+> [!PAPER] Wu et al. (2016), Google's Neural Machine Translation System · Section 4
+> [![The WordPiece example from the Google neural machine translation paper: Jet makers feud over seat width with big orders at stake becomes _J et _makers _fe ud _over _seat _width _with _big _orders _at _stake, where the underscore is a special character added to mark the beginning of a word](/img/papers/bert/p2-ext-wu-wordpiece.png)](/img/papers/bert/p2-ext-wu-wordpiece.png)
+>
+> **Context:** the WordPiece model, built for Google's translation system.
+>
+> **What it says:** "Jet" becomes two pieces, `_J` and `et`, and "feud" becomes `_fe` and `ud`; the other words stay whole. "_" "is a special character added to mark the beginning of a word".
+>
+> **Why it matters:** BERT uses the same idea with the opposite marker: it marks the pieces that *continue* a word (`##`) instead of the ones that start one.
+
+Here is the greedy rule above, run on "embeddings", with every lookup it makes:
+
+```text
+18 lookups, 4 pieces: em ##bed ##ding ##s
+  embeddings     not in the vocabulary
+  embedding      not in the vocabulary
+  ...            (6 more misses)
+  em             in the vocabulary -> keep
+  ##beddings     not in the vocabulary
+  ...            (4 more misses)
+  ##bed          in the vocabulary -> keep
+  ##dings        not in the vocabulary
+  ##ding         in the vocabulary -> keep
+  ##s            in the vocabulary -> keep
+```
+
+{{FIG:p2_wordpiece_frames|Greedy longest-match-first on "embeddings", in four rounds. Each round tries the longest remaining piece first and shortens it one letter at a time until a piece is in the vocabulary: em, then ##bed, then ##ding, then ##s.}}
+
+Interesting detail: "embedding" (singular) is not in the vocabulary either, so the plural is not simply `embedding ##s`. The rule is greedy: it never goes back to try a different split, even if a nicer one exists.
 
 ### The vocabulary: "30,000" is 30,522 {§3}
 
@@ -530,6 +804,37 @@ where:
 
 {{FIG:p2_embed_sum|The real input for the Figure 2 pair. Each token looks up three vectors (its token id, its segment, its position), the three are added, then normalised. Note that the real tokenizer keeps "playing" as one token, so there are 10 tokens, not the 11 drawn in the paper.}}
 
+Let us follow one token through this step with real numbers: "dog" in the Figure 2 pair (token id 3899, segment A, position 2). Its input vector is
+
+$$
+E_{\text{dog}} = \text{LayerNorm}\big(\text{Tok}[3899] + \text{Seg}[A] + \text{Pos}[2]\big)
+$$
+
+where $$\text{Tok}$$ is the $$30{,}522 \times 768$$ token table, $$\text{Seg}$$ the $$2 \times 768$$ segment table (row 0 for A, row 1 for B), $$\text{Pos}$$ the $$512 \times 768$$ position table, and all three are learned during pre-training. The first 6 of the 768 numbers:
+
+```text
+Tok[3899]           [-0.015,  0.012,  0.009, -0.014, -0.024, -0.009]  ...
+Seg[A]              [ 0.000,  0.011,  0.004,  0.002,  0.001, -0.011]  ...
+Pos[2]              [-0.011, -0.002, -0.012, -0.022, -0.010,  0.012]  ...
+sum                 [-0.026,  0.021,  0.001, -0.035, -0.034, -0.008]  ...
+mean of all 768 numbers of the sum: -0.0185; spread (standard deviation): 0.0517
+(sum - mean)/spread [-0.141,  0.773,  0.382, -0.309, -0.292,  0.200]  ...
+x gamma + beta      [-0.156,  0.665,  0.352, -0.178, -0.324,  0.166]  ...   (LayerNorm output)
+model.embeddings    [-0.156,  0.665,  0.352, -0.178, -0.324,  0.166]  ...   max |difference| 0.0e+00
+```
+
+LayerNorm, written out for one vector $$x$$ of $$H$$ numbers:
+
+$$
+\mu = \frac{1}{H}\sum_{i=1}^{H} x_i, \qquad \sigma = \sqrt{\frac{1}{H}\sum_{i=1}^{H} (x_i - \mu)^2}, \qquad \text{LayerNorm}(x)_i = \gamma_i \, \frac{x_i - \mu}{\sigma} + \beta_i
+$$
+
+where $$\mu$$ is the mean, $$\sigma$$ the spread, and $$\gamma$$, $$\beta$$ are two learned vectors of $$H$$ numbers (a scale and a shift). Check the second number by hand: $$(0.021 - (-0.0185)) / 0.0517 = 0.764$$, close to the printed 0.773 (the printed inputs are rounded to three decimals). Our hand computation matches the model's own embedding layer exactly (difference 0.0).
+
+{{FIG:p2_embed_numbers|The three lookups for "dog", number by number (first 6 of 768). Blue is positive, orange negative, darker is larger. They are added, then LayerNorm rescales the sum to mean 0 and spread 1 and applies the learned scale and shift.}}
+
+Notice the sizes: the three vectors are small (lengths 1.069, 0.897 and 0.494), and the sum has length 1.522. After LayerNorm the vector has length 16.659: LayerNorm does not keep vectors short, it puts every token on the same footing, whatever the size of its raw lookups.
+
 The paper says "summing". The released model also applies **LayerNorm** after the sum (and **dropout** during training), which the paper does not mention in this paragraph. To check exactly what happens, I rebuilt the input embeddings from the model's own three tables and compared them with the model's embedding layer:
 
 ```python
@@ -611,12 +916,36 @@ python bert_part2.py      # prints everything below, writes results/part2.json
 
 ## References
 
-1. J. Devlin, M.-W. Chang, K. Lee, K. Toutanova. [*BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding*](https://arxiv.org/abs/1810.04805). NAACL 2019.
-2. T. Mikolov et al. *Distributed representations of words and phrases and their compositionality* (word2vec). NeurIPS 2013.
-3. J. Pennington, R. Socher, C. Manning. *GloVe: Global vectors for word representation*. EMNLP 2014.
-4. M. Peters et al. [*Deep contextualized word representations*](https://arxiv.org/abs/1802.05365) (ELMo). NAACL 2018.
-5. J. Howard, S. Ruder. *Universal language model fine-tuning for text classification* (ULMFiT). ACL 2018.
-6. A. Radford et al. *Improving Language Understanding by Generative Pre-Training* (OpenAI GPT). OpenAI, 2018.
-7. A. Vaswani et al. [*Attention Is All You Need*](https://arxiv.org/abs/1706.03762). NeurIPS 2017.
-8. Y. Wu et al. *Google's neural machine translation system: Bridging the gap between human and machine translation* (WordPiece). arXiv:1609.08144, 2016.
-9. Google Research. [BERT code and pre-trained models](https://github.com/google-research/bert): `modeling.py` (the pooler), `tokenization.py` (WordPiece), `README.md`.
+**The BERT paper**
+
+1. J. Devlin, M.-W. Chang, K. Lee, K. Toutanova. [*BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding*](https://arxiv.org/abs/1810.04805). NAACL 2019 ([ACL Anthology](https://aclanthology.org/N19-1423/)).
+2. Google Research. [BERT code and pre-trained models](https://github.com/google-research/bert): `modeling.py` (the pooler), `tokenization.py` (WordPiece), `README.md`.
+
+**Papers the BERT paper cites in this part**
+
+3. P. F. Brown, P. V. deSouza, R. L. Mercer, V. J. Della Pietra, J. C. Lai. [*Class-Based n-gram Models of Natural Language*](https://aclanthology.org/J92-4003/) (Brown clusters). Computational Linguistics 18(4), 1992.
+4. T. Mikolov, I. Sutskever, K. Chen, G. Corrado, J. Dean. [*Distributed Representations of Words and Phrases and their Compositionality*](https://arxiv.org/abs/1310.4546) (word2vec, negative sampling). NeurIPS 2013.
+5. J. Pennington, R. Socher, C. D. Manning. [*GloVe: Global Vectors for Word Representation*](https://aclanthology.org/D14-1162/). EMNLP 2014.
+6. R. Kiros, Y. Zhu, R. Salakhutdinov, R. Zemel, A. Torralba, R. Urtasun, S. Fidler. [*Skip-Thought Vectors*](https://arxiv.org/abs/1506.06726). NeurIPS 2015.
+7. Y. Jernite, S. R. Bowman, D. Sontag. [*Discourse-Based Objectives for Fast Unsupervised Sentence Representation Learning*](https://arxiv.org/abs/1705.00557). arXiv 2017.
+8. L. Logeswaran, H. Lee. [*An efficient framework for learning sentence representations*](https://arxiv.org/abs/1803.02893) (quick-thought). ICLR 2018.
+9. F. Hill, K. Cho, A. Korhonen. [*Learning Distributed Representations of Sentences from Unlabelled Data*](https://arxiv.org/abs/1602.03483) (SDAE). NAACL 2016.
+10. M. E. Peters et al. [*Deep contextualized word representations*](https://arxiv.org/abs/1802.05365) (ELMo). NAACL 2018.
+11. O. Melamud, J. Goldberger, I. Dagan. [*context2vec: Learning Generic Context Embedding with Bidirectional LSTM*](https://aclanthology.org/K16-1006/). CoNLL 2016.
+12. W. Fedus, I. Goodfellow, A. M. Dai. [*MaskGAN: Better Text Generation via Filling in the ______*](https://arxiv.org/abs/1801.07736). ICLR 2018.
+13. R. Collobert, J. Weston. [*A unified architecture for natural language processing: deep neural networks with multitask learning*](https://doi.org/10.1145/1390156.1390177). ICML 2008.
+14. A. M. Dai, Q. V. Le. [*Semi-supervised Sequence Learning*](https://arxiv.org/abs/1511.01432). NeurIPS 2015.
+15. J. Howard, S. Ruder. [*Universal Language Model Fine-tuning for Text Classification*](https://arxiv.org/abs/1801.06146) (ULMFiT). ACL 2018.
+16. A. Radford, K. Narasimhan, T. Salimans, I. Sutskever. [*Improving Language Understanding by Generative Pre-Training*](https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf) (OpenAI GPT). OpenAI, 2018.
+17. A. Conneau, D. Kiela, H. Schwenk, L. Barrault, A. Bordes. [*Supervised Learning of Universal Sentence Representations from Natural Language Inference Data*](https://arxiv.org/abs/1705.02364) (InferSent). EMNLP 2017.
+18. B. McCann, J. Bradbury, C. Xiong, R. Socher. [*Learned in Translation: Contextualized Word Vectors*](https://arxiv.org/abs/1708.00107) (CoVe). NeurIPS 2017.
+19. J. Deng, W. Dong, R. Socher, L.-J. Li, K. Li, L. Fei-Fei. [*ImageNet: A Large-Scale Hierarchical Image Database*](https://doi.org/10.1109/CVPR.2009.5206848). CVPR 2009.
+20. J. Yosinski, J. Clune, Y. Bengio, H. Lipson. [*How transferable are features in deep neural networks?*](https://arxiv.org/abs/1411.1792). NeurIPS 2014.
+21. A. Vaswani et al. [*Attention Is All You Need*](https://arxiv.org/abs/1706.03762). NeurIPS 2017.
+22. Harvard NLP (A. Rush). [*The Annotated Transformer*](http://nlp.seas.harvard.edu/2018/04/03/attention.html). 2018. Footnote 2 of the paper.
+23. Y. Wu et al. [*Google's Neural Machine Translation System: Bridging the Gap between Human and Machine Translation*](https://arxiv.org/abs/1609.08144) (WordPiece). arXiv 2016.
+
+**Other sources used in this part**
+
+24. T. Mikolov, K. Chen, G. Corrado, J. Dean. [*Efficient Estimation of Word Representations in Vector Space*](https://arxiv.org/abs/1301.3781) (the skip-gram figure). ICLR workshop 2013.
+25. Code for this part: [`bert_part2.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/bert/bert_part2.py) and [`bert_part2_math.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/bert/bert_part2_math.py).

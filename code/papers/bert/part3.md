@@ -120,6 +120,65 @@ where:
 
 How is $$P$$ computed from the final vector $$T_i$$? The paper only says "an output softmax over the vocabulary, as in a standard LM". In the released model it is a small head: one more dense layer with GELU and LayerNorm, then a multiplication by the token embedding matrix (the same matrix used at the input, shared to save weights) plus a bias, then softmax.
 
+Here is that head as equations, for one masked position $$i$$:
+
+$$
+h_i = \text{LayerNorm}\big(\text{GELU}(T_i W_t + b_t)\big), \qquad z = h_i\, E^\top + b_o, \qquad P(v \mid \tilde{x}) = \frac{e^{z_v}}{\sum_{u=1}^{V} e^{z_u}}
+$$
+
+where:
+
+- $$T_i$$ is BERT's final 768-number vector at position $$i$$;
+- $$W_t$$ ($$768 \times 768$$) and $$b_t$$ are the head's own small "transform" layer;
+- $$E$$ is the **token embedding table** from the input, $$V \times 768$$ with $$V = 30{,}522$$, reused here; $$h_i E^\top$$ is the dot product of $$h_i$$ with every token's input vector;
+- $$b_o$$ holds one extra learned number per vocabulary token;
+- $$z$$ is the list of $$V$$ scores (often called **logits**), and $$P(v \mid \tilde{x})$$ is the softmax probability of token $$v$$.
+
+> [!DEFINITION] Logits
+> The raw scores a model outputs before softmax. They can be any number, positive or negative. Softmax turns them into probabilities; a logit 1 higher means $$e \approx 2.7$$ times more likely.
+
+> [!DEFINITION] Tied (shared) weights
+> Using the same matrix in two places. BERT's output layer reuses the input token table $$E$$, so a token's input vector also serves as its "answer detector" at the output. This saves 23 million parameters and is standard practice.
+
+{{FIG:p3_mlm_head|From Tᵢ to a probability for every token of the vocabulary. Tᵢ (768 numbers) goes through a dense layer, GELU and LayerNorm to give h. h is multiplied by the transposed token table Eᵀ (768 × 30,522) and a bias is added, giving 30,522 scores z. Softmax turns them into probabilities; the loss is minus the log of the right token's probability.}}
+
+**The whole computation on one real example** ([`bert_part3_math.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/bert/bert_part3_math.py)). The paper's own Appendix A.1 sentence "the man went to the store to buy a gallon of milk", with "store" masked:
+
+```text
+the masked-LM head of bert-base-uncased
+  transform: dense (768, 768) + GELU + LayerNorm(768)
+  decoder weight (30522, 768), bias (30522,)
+  decoder weight is the input token-embedding matrix (same memory): True
+
+sentence: [CLS] the man went to the [MASK] to buy a gallon of milk . [SEP]   (masked position i = 6, original word "store")
+T_i: (768,), first 4 numbers: +0.388, +0.178, -0.210, +0.139
+scores z = h E^T + b: (30522,); largest score 12.814; smallest -12.503
+top 5 scores and their probabilities:
+  store        z =  12.814   exp(z - max) = 1.0000   p = 0.4743
+  refrigerator z =  10.991   exp(z - max) = 0.1615   p = 0.0766
+  fridge       z =  10.915   exp(z - max) = 0.1496   p = 0.0710
+  kitchen      z =  10.707   exp(z - max) = 0.1215   p = 0.0576
+  counter      z =  10.278   exp(z - max) = 0.0792   p = 0.0375
+log of the softmax denominator, log sum_v exp(z_v) = 13.5602
+p("store") = exp(12.814 - 13.560) = 0.4743
+cross-entropy = -log p("store") = 0.7459   (library: 0.7459)
+for scale: a uniform guess over 30,522 tokens gives -log(1/30522) = 10.3262
+```
+
+Follow it by hand. The softmax needs $$\sum_v e^{z_v}$$ over all 30,522 scores, and its log is 13.5602. So
+
+$$
+P(\text{store}) = e^{12.814 - 13.560} = e^{-0.746} = 0.474, \qquad \mathcal{L} = -\log 0.474 = 0.746
+$$
+
+Two useful reference points: a model that guessed uniformly would get $$-\log(1/30{,}522) = 10.33$$, and a perfect model 0. Notice that refrigerator, fridge and kitchen also score high: places where milk lives. The model knows the scene, not just the word.
+
+{{FIG:p3_ce_curve|Cross-entropy as a function of the probability the model gave the right word: loss = −log p. A uniform guess (p = 3.3 × 10⁻⁵) costs 10.33; the real examples in this part sit along the curve, from "##s" in "penguins" (p = 0.003, loss 5.76) to "of" (p = 0.9986, loss 0.0014).}}
+
+The paper's contrast with denoising auto-encoders (Vincent et al., 2008) is about *where the loss is computed*:
+
+{{FIG:p3_dae_vs_mlm|Where the loss is. A denoising auto-encoder (Vincent et al., 2008) rebuilds the whole input, so every position has a loss. BERT's masked LM puts a loss only on the hidden position; the other positions produce no loss.}}
+
 > [!DEFINITION] Denoising auto-encoder
 > A model that gets a damaged input and must rebuild the **whole** clean input. BERT differs: it only predicts the damaged positions. The other 85% of positions produce no loss at all.
 
@@ -160,6 +219,18 @@ Appendix A.1 walks through the rule on one sentence, and explains the reasons.
 > **Why it matters:** this is the real reason for the rule: the model can never relax about any token, because any token might be a test.
 
 {{FIG:p3_8010|The 80/10/10 rule. Each chosen token becomes [MASK] 80% of the time, a random word 10% of the time, and stays itself 10% of the time. The target is always the original word.}}
+
+**What share of all tokens ends up in each state?** Combine the two random choices. A token is first chosen with probability 0.15, and a chosen token is then masked with probability 0.8, replaced with 0.1, or kept with 0.1:
+
+$$
+P(\text{[MASK]}) = 0.15 \times 0.8 = 0.12, \qquad P(\text{random}) = 0.15 \times 0.1 = 0.015, \qquad P(\text{same, predicted}) = 0.15 \times 0.1 = 0.015
+$$
+
+and the other $$1 - 0.15 = 0.85$$ are untouched and not predicted. So in a typical batch, 12% of tokens are `[MASK]`, 1.5% are wrong words, 1.5% are unchanged but still predicted, and 85% are plain context. The model sees $$85\% + 1.5\% = 86.5\%$$ of tokens exactly as they were written. For one 512-token sequence that is about 76.8 predictions: 61.4 masks, 7.7 random and 7.7 unchanged.
+
+{{FIG:p3_budget|Every 200 tokens of training text, on average. 170 untouched (no loss), 24 [MASK], 3 random words and 3 unchanged-but-predicted. A loss on 12 + 1.5 + 1.5 = 15%; 85 + 1.5 = 86.5% look like the original text.}}
+
+{{FIG:p3_pipeline|The procedure on two real sentences, step by step. Choose 15% of positions (here "store", "milk" and "bag"). Of the chosen ones, one becomes [MASK], one becomes a random word ("piano"), and one stays the same. The model must predict all three originals; the other 17 tokens carry no loss.}}
 
 In plain words, the three cases do three jobs:
 
@@ -276,6 +347,17 @@ With a whole paragraph of context, BERT finds the hidden word 58.3% of the time,
 
 {{FIG:p3_nsp|How one next-sentence example is made. Sentence A comes from a document. Half of the time B is the real next sentence (IsNext); half of the time it is a sentence from a random document (NotNext). The vector C of the [CLS] token makes the two-way decision.}}
 
+Here is where NSP lives in the paper's Figure 1: the left-most output, $$C$$, feeds the box marked NSP.
+
+> [!PAPER] Devlin et al. (2018), BERT · Section 3, Figure 1 · page 3
+> [![Figure 1 of the BERT paper: in pre-training, the output C of the [CLS] token feeds the NSP head and the output vectors at masked positions feed the Mask LM heads; the caption says the same architectures are used in both pre-training and fine-tuning](/img/papers/bert/p3-figure1.png)](/img/papers/bert/p3-figure1.png)
+>
+> **Context:** the paper's main figure, seen again from the point of view of the two pre-training heads.
+>
+> **What it says:** on the left (pre-training), two kinds of red arrow leave BERT: "NSP" from $$C$$, and "Mask LM" from the output vectors of the masked positions. "The same architectures are used in both pre-training and fine-tuning."
+>
+> **Why it matters:** both tasks share one encoder and one forward pass. Only the tiny heads on top differ, and both heads are thrown away at fine-tuning time.
+
 The NSP loss is cross-entropy over two classes:
 
 $$
@@ -326,6 +408,32 @@ All six are right, and very confident. The paper reports how good the final mode
 >
 > **Why it matters:** footnote 5 says the task is easy for the model. Footnote 6 is a warning that many people later ignored: do not use raw $$C$$ as a sentence embedding.
 
+**The NSP head, worked by hand.** In the released model, $$C$$ first passes through the **pooler** (Part 2), then a two-way linear classifier:
+
+$$
+c = \tanh(C\, W_p + b_p), \qquad s = c\, W^\top + b, \qquad P(\text{IsNext}) = \frac{e^{s_0}}{e^{s_0} + e^{s_1}}
+$$
+
+where $$W_p$$ is $$768 \times 768$$, $$W$$ is $$2 \times 768$$ (one row per class: row 0 IsNext, row 1 NotNext), $$s = (s_0, s_1)$$ are the two scores, and $$\tanh$$ squeezes every number into the range -1 to 1. The loss is $$-\log$$ of the right class's probability. On the paper's two Appendix A.1 examples:
+
+```text
+A: the man went to [MASK] store | B: he bought a gallon [MASK] milk | label IsNext
+  scores W C + b = [5.111, -4.188]   (library: [5.111, -4.188])
+  softmax: P(IsNext) = 0.999908, P(NotNext) = 0.000092; loss -log P(IsNext) = 0.000092
+A: the man [MASK] to the store | B: penguin [MASK] are flightless birds | label NotNext
+  scores W C + b = [-2.080, 4.691]   (library: [-2.080, 4.691])
+  softmax: P(IsNext) = 0.001145, P(NotNext) = 0.998855; loss -log P(NotNext) = 0.001146
+```
+
+For the first pair, the gap between the two scores is $$5.111 - (-4.188) = 9.299$$, so
+
+$$
+P(\text{IsNext}) = \frac{1}{1 + e^{-9.299}} = \frac{1}{1 + 0.000092} = 0.999908
+$$
+
+(A two-way softmax only depends on the difference of the two scores, which is why it can be written with a single exponential.)
+
+{{FIG:p3_nsp_head|Next sentence prediction reads one vector, C, and makes two scores. C goes through the pooler, then W (2 × 768) and a bias. Softmax over the two scores gives IsNext 0.99991 for the first A.1 example and NotNext 0.99885 for the second, exactly as the library computes them.}}
 **Checking footnote 5.** I built 1,000 pairs from real Wikipedia text: for 500, B is the true next sentence; for 500, B is a random sentence from a different article. One sentence on each side, no masks.
 
 ```text
@@ -366,6 +474,26 @@ Every pair scores above 0.76, and the two sentences with **opposite** meanings s
 >
 > **Why it matters:** this is the fine-tuning idea from Part 1 again. The whole network is reused, not just one vector per sentence.
 
+The two cited papers, in their own words:
+
+> [!PAPER] Jernite, Bowman, Sontag (2017), Discourse-Based Objectives · Section 3
+> [![The NEXT task of Jernite et al.: two adjacent sentences will generally be more coherent than two more distant ones, so given the first three sentences of a paragraph and five candidates from later in the paragraph, the model must decide which candidate immediately follows the initial three](/img/papers/bert/p3-jernite.png)](/img/papers/bert/p3-jernite.png)
+>
+> **Context:** one of three "discourse" training tasks in that paper.
+>
+> **What it says:** "two adjacent sentences will generally be more coherent than two more distant ones", so the model must "decide which candidate immediately follows the initial three" sentences, out of five.
+>
+> **Why it matters:** the same intuition as NSP, with harder negatives: the wrong candidates come from the same paragraph, not from a random document.
+
+> [!PAPER] Logeswaran and Lee (2018), An efficient framework for learning sentence representations · Abstract
+> [![The quick-thought abstract: reformulate the problem of predicting the context in which a sentence appears as a classification problem; given a sentence and its context, a classifier distinguishes context sentences from other contrastive sentences based on their vector representations](/img/papers/bert/p3-logeswaran.png)](/img/papers/bert/p3-logeswaran.png)
+>
+> **Context:** the quick-thought paper we met in Part 2.
+>
+> **What it says:** they "reformulate the problem of predicting the context in which a sentence appears as a classification problem": a classifier "distinguishes context sentences from other contrastive sentences".
+>
+> **Why it matters:** NSP is this classification in its simplest form. The difference, as the BERT paragraph says, is what gets reused afterwards: one sentence vector there, the whole network here.
+
 ## The pre-training data {§3.1}
 
 > [!PAPER] Devlin et al. (2018), BERT · Section 3.1 · page 5
@@ -383,6 +511,31 @@ Every pair scores above 0.76, and the two sentences with **opposite** meanings s
 > [!DEFINITION] BooksCorpus
 > A collection of books put together for research by Zhu et al. (2015). OpenAI GPT was trained on it too (Appendix A.4).
 
+What is in the BooksCorpus? Its paper (Zhu et al., 2015) describes it:
+
+> [!PAPER] Zhu et al. (2015), Aligning Books and Movies · Section 3 and Table 2
+> [![The BookCorpus paragraph: the learning signal of the model depends on having contiguous text, where sentences follow one another in sequence, so a natural corpus is a large collection of books](/img/papers/bert/p3-bookcorpus.png)](/img/papers/bert/p3-bookcorpus.png)
+> [![Table 2 of the BookCorpus paper: 11,038 books, 74,004,228 sentences, 984,846,357 words, 1,316,420 unique words, mean 13 and median 11 words per sentence](/img/papers/bert/p3-bookcorpus-table.png)](/img/papers/bert/p3-bookcorpus-table.png)
+>
+> **Context:** the dataset section of the paper that built the BooksCorpus, originally to train skip-thought vectors.
+>
+> **What it says:** their model "depends on having contiguous text, where sentences follow one another in sequence", so "a natural corpus is thus a large collection of books". Table 2: 11,038 books, 74 million sentences, about 985 million words.
+>
+> **Why it matters:** the same reason BERT needs it: books are long, ordered text. The table counts about 985 million words; the BERT paper reports 800 million for the version it used (the counts depend on how text is split into words), so the two numbers are not a contradiction.
+
+And the Billion Word Benchmark, which the paper rules out, says this about itself:
+
+> [!PAPER] Chelba et al. (2013), One Billion Word Benchmark · Sections 2 and 4
+> [![From the One Billion Word Benchmark data description: sentence order was randomized, and the data was split into 100 disjoint partitions](/img/papers/bert/p3-billion-steps.png)](/img/papers/bert/p3-billion-steps.png)
+> [![From the One Billion Word Benchmark: because the original data had already randomized sentence order, the benchmark is not useful for experiments with models that capture long context dependencies across sentence boundaries](/img/papers/bert/p3-billion.png)](/img/papers/bert/p3-billion.png)
+>
+> **Context:** the benchmark BERT names as the wrong kind of corpus.
+>
+> **What it says:** "Sentence order was randomized", so the benchmark is "not useful for experiments with models that capture long context dependencies across sentence boundaries".
+>
+> **Why it matters:** the benchmark's own authors give the reason BERT avoids it. With shuffled sentences there is no true next sentence to learn from, and no 512-token span stays on one topic.
+
+{{FIG:p3_doc_vs_shuffled|Document-level text versus shuffled sentences. In a document-level corpus, the sentence after sentence 1 really is sentence 2, so IsNext pairs and long coherent spans exist. In a shuffled corpus, the "next" sentence comes from another document.}}
 Why must the text be **document-level**? The Billion Word Benchmark is a big set of single sentences in **shuffled** order. In it, the sentence after "She opened the fridge." is some unrelated sentence from somewhere else. That makes next sentence prediction impossible to learn, and it stops the model from ever seeing long stretches of connected text. BERT needs sequences of up to 512 tokens that really belong together, so it needs whole documents.
 
 ## The pre-training procedure {§A.2}
@@ -477,6 +630,32 @@ where:
 
 So GELU keeps $$x$$ in proportion to how large $$x$$ is. Big positive inputs pass almost unchanged, big negative inputs become almost 0, and small inputs are scaled down smoothly.
 
+> [!PAPER] Hendrycks and Gimpel (2016), Gaussian Error Linear Units (GELUs) · Abstract
+> [![The GELU abstract: the GELU activation function is x times Phi of x, where Phi of x is the standard Gaussian cumulative distribution function; the GELU nonlinearity weights inputs by their value, rather than gates inputs by their sign as in ReLUs](/img/papers/bert/p3-gelu-paper.png)](/img/papers/bert/p3-gelu-paper.png)
+>
+> **Context:** the paper the BERT appendix cites for "gelu".
+>
+> **What it says:** "The GELU activation function is $$x\Phi(x)$$, where $$\Phi(x)$$ the standard Gaussian cumulative distribution function." It "weights inputs by their value, rather than gates inputs by their sign as in ReLUs".
+>
+> **Why it matters:** "weights by value, not by sign" is the one-line difference from ReLU, and it is easy to see in the numbers below.
+
+$$\Phi$$ has no simple closed form, so the released code uses a fast approximation based on tanh:
+
+$$
+\Phi(x) = \frac{1}{2}\left(1 + \operatorname{erf}\frac{x}{\sqrt{2}}\right), \qquad \text{GELU}(x) \approx \frac{x}{2}\left(1 + \tanh\!\left(\sqrt{2/\pi}\,\big(x + 0.044715\,x^3\big)\right)\right)
+$$
+
+where $$\operatorname{erf}$$ is the "error function" of statistics. Worked values:
+
+```text
+x = -1.0: Phi(x) = 0.1587, GELU = -1.0 x 0.1587 = -0.1587; tanh formula -0.1588; ReLU +0.0
+x = -0.5: Phi(x) = 0.3085, GELU = -0.5 x 0.3085 = -0.1543; tanh formula -0.1543; ReLU +0.0
+x = +0.5: Phi(x) = 0.6915, GELU = +0.5 x 0.6915 = +0.3457; tanh formula +0.3457; ReLU +0.5
+x = +1.0: Phi(x) = 0.8413, GELU = +1.0 x 0.8413 = +0.8413; tanh formula +0.8412; ReLU +1.0
+```
+
+Read the $$x = +0.5$$ row: a standard bell-curve number is below 0.5 with probability 0.6915, so GELU lets 69% of the input through: $$0.5 \times 0.6915 = 0.346$$. ReLU would pass all of it.
+
 {{FIG:p3_gelu|ReLU and GELU. For large positive inputs they agree. GELU bends smoothly through zero and lets small negative inputs out as small negative numbers.}}
 
 ```text
@@ -514,6 +693,26 @@ I checked this on a real batch: 8 sentence pairs from Wikipedia (half IsNext, ha
 
 The two parts add up exactly to the loss the library computes. Notice how lopsided they are: next sentence prediction is nearly solved (0.0001), while filling in blanks is still hard (2.1302). After pre-training, almost all of the remaining learning signal comes from the masked LM.
 
+The same check on the paper's own two Appendix A.1 examples, where every number can be followed:
+
+```text
+pair 1, position  5, target "the": p = 0.8087, loss 0.2123
+pair 1, position 12, target "of": p = 0.9986, loss 0.0014
+pair 2, position  3, target "went": p = 0.0755, loss 2.5830
+pair 2, position  9, target "##s": p = 0.0032, loss 5.7557
+mean MLM loss over 4 masked positions: 2.1381
+NSP loss per pair: 0.000092, 0.001146; mean 0.000619
+total = 2.1381 + 0.000619 = 2.1387   (BertForPreTraining: 2.1387)
+```
+
+$$
+\mathcal{L}_{\text{MLM}} = \frac{0.2123 + 0.0014 + 2.5830 + 5.7557}{4} = 2.1381, \qquad \mathcal{L}_{\text{NSP}} = \frac{0.000092 + 0.001146}{2} = 0.000619
+$$
+
+(The paper does not print the hidden words in A.1; the script restores the obvious ones. "##s" is the last piece of "penguins": its probability is low because, seeing "penguin [MASK]", the model mostly expects other continuations.)
+
+{{FIG:p3_loss_sum|The pre-training loss for the two A.1 examples as one batch. Four masked-LM losses, averaged to 2.1381; two NSP losses, averaged to 0.000619; their sum, 2.1387, is exactly what BertForPreTraining reports.}}
+
 ### Hardware and the two sequence lengths
 
 > [!PAPER] Devlin et al. (2018), BERT · Appendix A.2 · page 13
@@ -537,6 +736,28 @@ per token: 4x more attention work at length 512
 ```
 
 The other parts of the model (the feed-forward layers) cost the same per token at any length, so attention is the part that blows up. Training mostly at length 128 saves a lot. But the position embeddings for positions 128 to 511 (Part 2) are only trained in the final 10% of steps, which is the reason for that last phase.
+
+How big is the effect for BERT-base, exactly? Count multiply-adds per layer for a sequence of $$n$$ tokens with $$H = 768$$:
+
+$$
+\underbrace{12\, n H^2}_{\text{Q, K, V, O and the feed-forward}} \;+\; \underbrace{2\, n^2 H}_{\text{scores } QK^\top \text{ and mixing } AV}
+$$
+
+where the first term grows like $$n$$ (each token does the same matrix work) and the second like $$n^2$$ (every pair of tokens).
+
+```text
+n = 128: projections + feed-forward 905,969,664; attention scores and mixing 25,165,824
+         attention share of a layer's work: 2.7%; work per token 7,274,496
+n = 512: projections + feed-forward 3,623,878,656; attention scores and mixing 402,653,184
+         attention share of a layer's work: 10.0%; work per token 7,864,320
+512 vs 128: score matrix 16x, whole-sequence work 4.32x (4x the tokens), work per token 1.08x
+```
+
+{{FIG:p3_attn_cost|Attention cost at the two lengths. One head's score table grows from 128 × 128 = 16,384 to 512 × 512 = 262,144 entries (16 times). But for BERT-base the n² part is only 2.7% of a layer's work at length 128 and 10.0% at 512, so the work per token grows by just 1.08 times.}}
+
+So the paper's statement is true (the $$n^2$$ part does grow 16-fold), but at $$n \le 512$$ it is a modest share of the total. The bigger practical costs of long sequences on 2018 hardware were memory (every layer stores $$n \times n$$ attention weights per head for the backward pass) and the 4 times larger batch in tokens. The short-then-long schedule saves time either way:
+
+{{FIG:p3_schedule|The pre-training schedule of Appendix A.2. Steps 0 to 900,000 use sequences of 128 tokens; the last 100,000 steps use 512. Position embeddings 0 to 127 are trained the whole time; positions 128 to 511 only get a training signal in the last 10%.}}
 
 > [!TAKEAWAYS] Key takeaways
 > - A normal language model cannot simply look both ways: with two or more layers, **each word can see itself through a neighbour**. In a real experiment, a two-layer "both sides" model reached a loss of 0.90 on unseen text by cheating, against 4.37 for the honest one-layer version.
@@ -574,12 +795,23 @@ python bert_part3_schedule.py    # batch arithmetic, learning rate, GELU, attent
 
 ## References
 
-1. J. Devlin, M.-W. Chang, K. Lee, K. Toutanova. [*BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding*](https://arxiv.org/abs/1810.04805). NAACL 2019.
-2. Google Research. [BERT code and models](https://github.com/google-research/bert), including `create_pretraining_data.py`, `optimization.py` and the Whole Word Masking models.
-3. W. L. Taylor. *Cloze procedure: A new tool for measuring readability*. Journalism Bulletin, 1953.
-4. P. Vincent, H. Larochelle, Y. Bengio, P.-A. Manzagol. *Extracting and composing robust features with denoising autoencoders*. ICML 2008.
-5. Y. Jernite, S. R. Bowman, D. Sontag. [*Discourse-based objectives for fast unsupervised sentence representation learning*](https://arxiv.org/abs/1705.00557). 2017.
+**The BERT paper**
+
+1. J. Devlin, M.-W. Chang, K. Lee, K. Toutanova. [*BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding*](https://arxiv.org/abs/1810.04805). NAACL 2019 ([ACL Anthology](https://aclanthology.org/N19-1423/)).
+2. Google Research. [BERT code and models](https://github.com/google-research/bert), including `create_pretraining_data.py`, `run_pretraining.py`, `optimization.py` and the Whole Word Masking models.
+
+**Papers the BERT paper cites in this part**
+
+3. W. L. Taylor. [*"Cloze Procedure": A New Tool for Measuring Readability*](https://doi.org/10.1177/107769905303000401). Journalism Quarterly 30(4), 1953.
+4. P. Vincent, H. Larochelle, Y. Bengio, P.-A. Manzagol. [*Extracting and composing robust features with denoising autoencoders*](https://doi.org/10.1145/1390156.1390294). ICML 2008.
+5. Y. Jernite, S. R. Bowman, D. Sontag. [*Discourse-Based Objectives for Fast Unsupervised Sentence Representation Learning*](https://arxiv.org/abs/1705.00557). arXiv 2017.
 6. L. Logeswaran, H. Lee. [*An efficient framework for learning sentence representations*](https://arxiv.org/abs/1803.02893). ICLR 2018.
-7. Y. Zhu et al. *Aligning books and movies: Towards story-like visual explanations by watching movies and reading books* (BooksCorpus). ICCV 2015.
-8. D. Hendrycks, K. Gimpel. [*Gaussian Error Linear Units (GELUs)*](https://arxiv.org/abs/1606.08415). 2016.
-9. S. Merity, C. Xiong, J. Bradbury, R. Socher. [*Pointer Sentinel Mixture Models*](https://arxiv.org/abs/1609.07843) (the WikiText data). 2016.
+7. Y. Zhu, R. Kiros, R. Zemel, R. Salakhutdinov, R. Urtasun, A. Torralba, S. Fidler. [*Aligning Books and Movies: Towards Story-like Visual Explanations by Watching Movies and Reading Books*](https://arxiv.org/abs/1506.06724) (BooksCorpus). ICCV 2015.
+8. C. Chelba, T. Mikolov, M. Schuster, Q. Ge, T. Brants, P. Koehn, T. Robinson. [*One Billion Word Benchmark for Measuring Progress in Statistical Language Modeling*](https://arxiv.org/abs/1312.3005). arXiv 2013.
+9. D. Hendrycks, K. Gimpel. [*Gaussian Error Linear Units (GELUs)*](https://arxiv.org/abs/1606.08415). arXiv 2016.
+10. A. Radford, K. Narasimhan, T. Salimans, I. Sutskever. [*Improving Language Understanding by Generative Pre-Training*](https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf) (OpenAI GPT, which also used GELU and the BooksCorpus). OpenAI, 2018.
+
+**Other sources used in this part**
+
+11. S. Merity, C. Xiong, J. Bradbury, R. Socher. [*Pointer Sentinel Mixture Models*](https://arxiv.org/abs/1609.07843) (the WikiText data used in our measurements). ICLR 2017.
+12. Code for this part: [`bert_part3_seeitself.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/bert/bert_part3_seeitself.py), [`bert_part3_mlm.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/bert/bert_part3_mlm.py), [`bert_part3_nsp.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/bert/bert_part3_nsp.py), [`bert_part3_schedule.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/bert/bert_part3_schedule.py), [`bert_part3_math.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/bert/bert_part3_math.py).

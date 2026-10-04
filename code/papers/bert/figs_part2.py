@@ -292,9 +292,9 @@ def elmo_concat():
     b += [line(cx[-1], yF, cx[-1], yB + 32, 'edge-dim'), text(140, yF + 20, 'left to right', 't-s1', 'end'), text(140, yB + 20, 'right to left', 't-s2', 'end')]
     x = cx[-1] + 50
     b += [text(x, 60, 'vector for "bank"', 't-note')] + vec(x, 76, [0.5, 0.8, 0.3, 0.9], 's2', 14, 2) + vec(x + 66, 76, [0.7, 0.2, 0.6, 0.4], 's1', 14, 2)
-    b += [text(x, 112, '← half  +  → half', 't-muted'), text(x, 200, 'Concatenated, not mixed:', 't-muted'), text(x, 216, 'inside each reader', 't-muted'), text(x, 232, 'information flows one way.', 't-muted')]
+    b += [text(x, 112, '← half  +  → half', 't-muted'), text(20, 272, 'Concatenated, not mixed: inside each reader, information flows only one way.', 't-muted')]
     b += [line(cx[-1] + 30, yB + 15, x - 4, 84, 'edge-2'), line(cx[-1] + 30, yF + 15, x + 96, 92, 'edge-1')]
-    return svg(760, 264, 'ELMo runs a left-to-right LSTM and a right-to-left LSTM over the sentence. The vector for bank is the forward state glued to the backward state. Inside each reader, information flows only one way; the two directions meet only in this final concatenation.', b)
+    return svg(800, 286, 'ELMo runs a left-to-right LSTM and a right-to-left LSTM over the sentence. The vector for bank is the forward state glued to the backward state. Inside each reader, information flows only one way; the two directions meet only in this final concatenation.', b)
 
 
 F['p2_elmo_concat'] = elmo_concat()
@@ -429,16 +429,16 @@ def scale_fig():
     b = [text(20, 26, 'Why divide by √64 = 8: the same 8 scores, softmax with and without the division', 't-title')]
     for k, (name, p, cls) in enumerate([('without ÷ 8 (spread 8)', s_['p_raw'], 's2'), ('with ÷ 8 (spread 1)', s_['p_scaled'], 's1')]):
         x0 = 30 + k * 370
-        b.append(text(x0, 56, name, 't-note'))
-        base = 200
+        b.append(text(x0, 52, name, 't-note'))
+        base = 214
         for i, v in enumerate(p):
-            h = v * 260
+            h = v * 250
             b += [f'<g class="mark"><title>key {i + 1}: {v:.3f}</title><rect class="{cls}" x="{x0 + i * 40:.1f}" y="{base - h:.1f}" width="30" height="{max(1, h):.1f}" rx="3"/></g>',
                   text(x0 + i * 40 + 15, base - h - 6, f'{v:.2f}', 't-tick', 'middle'), text(x0 + i * 40 + 15, base + 16, str(i + 1), 't-muted', 'middle')]
         b.append(line(x0 - 4, base, x0 + 8 * 40 - 6, base, 'axis'))
-    b += [text(30, 238, 'Unscaled, one key takes 0.53 and three get almost 0: softmax is close to "pick one", and its gradients are tiny.', 't-muted'),
-          text(30, 256, 'Scaled, the weights stay spread out (largest 0.21), so the model can still learn which keys matter.', 't-muted')]
-    return svg(760, 268, 'Softmax of the same eight scores. Without dividing by 8, the spread of dot products of 64-number vectors is about 8, and softmax puts 0.53 on one key and almost nothing on several. With the division the largest weight is 0.21.', b)
+    b += [text(30, 250, 'Unscaled, one key takes 0.53 and three get almost 0: softmax is close to "pick one", and its gradients are tiny.', 't-muted'),
+          text(30, 268, 'Scaled, the weights stay spread out (largest 0.21), so the model can still learn which keys matter.', 't-muted')]
+    return svg(760, 280, 'Softmax of the same eight scores. Without dividing by 8, the spread of dot products of 64-number vectors is about 8, and softmax puts 0.53 on one key and almost nothing on several. With the division the largest weight is 0.21.', b)
 
 
 F['p2_scale'] = scale_fig()
@@ -590,9 +590,9 @@ def params_terms():
         b.append(text(x + 8, y + 20, f'{total / 1e6:.1f} M', 't-val'))
     y = 60 + 2 * 70
     b += [text(20, y + 20, 'OpenAI GPT', 't-note'), f'<rect class="s4" x="140" y="{y}" width="{g["params"] * scale:.1f}" height="30" rx="2" style="fill-opacity:0.5"/>',
-          text(140 + g['params'] * scale + 8, y + 20, f'{g["params"] / 1e6:.1f} M', 't-val'), text(150, y + 20, f'L={g["L"]}, H={g["H"]}, {g["A"]} heads, vocabulary {g["vocab"]:,}', 't-tick')]
-    b += [text(20, y + 60, 'BERT-base copies GPT\'s L, H and A. The totals differ by 7 million mainly because GPT\'s vocabulary is larger (40,478 vs 30,522 tokens).', 't-muted')]
-    return svg(760, y + 74, 'Parameter counts split by part. BERT-base 109.5 million: embeddings 23.8, attention 28.3, feed-forward 56.7. BERT-large 335.1 million: embeddings 31.8, attention 100.8, feed-forward 201.4. OpenAI GPT, which has the same number of layers, hidden size and heads as BERT-base, has 116.5 million, mostly because of its larger vocabulary.', b)
+          text(140 + g['params'] * scale + 8, y + 20, f'{g["params"] / 1e6:.1f} M', 't-val'), text(140, y + 48, f'L={g["L"]}, H={g["H"]}, {g["A"]} heads, vocabulary {g["vocab"]:,}', 't-tick')]
+    b += [text(20, y + 76, 'BERT-base copies GPT\'s L, H and A. The totals differ by 7 million mainly because GPT\'s vocabulary is larger (40,478 vs 30,522 tokens).', 't-muted')]
+    return svg(760, y + 90, 'Parameter counts split by part. BERT-base 109.5 million: embeddings 23.8, attention 28.3, feed-forward 56.7. BERT-large 335.1 million: embeddings 31.8, attention 100.8, feed-forward 201.4. OpenAI GPT, which has the same number of layers, hidden size and heads as BERT-base, has 116.5 million, mostly because of its larger vocabulary.', b)
 
 
 F['p2_params_terms'] = params_terms()

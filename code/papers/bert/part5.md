@@ -51,6 +51,13 @@ One detail in the screenshot deserves attention: for **LTR & No NSP**, "the left
 
 {{FIG:p5_ladder|The four models of Table 5. Each row changes exactly one thing from the row before, so each difference in scores can be blamed on that one change.}}
 
+What differs between the four models is easiest to see in their attention masks and pre-training heads:
+
+{{FIG:p5_four_models|The four models of Table 5, side by side. BERT-base: no mask, MLM and NSP heads. No NSP: no mask, MLM head only. LTR & No NSP: a left-to-right mask (the upper triangle blocked, like GPT), next-word head, and the mask is kept during fine-tuning too. + BiLSTM: the LTR model with a new, randomly initialised BiLSTM added for fine-tuning.}}
+
+> [!DEFINITION] BiLSTM
+> A bidirectional LSTM: two LSTMs over the same sequence, one left to right and one right to left, with their outputs joined at each position. The same idea as ELMo, but here trained from zero during fine-tuning.
+
 ### Table 5, row by row
 
 > [!PAPER] Devlin et al. (2018), BERT · Section 5.1, Table 5 · page 8
@@ -117,6 +124,8 @@ Looking at the computed differences, the NSP claim is weaker than the word "sign
 
 Why does SQuAD suffer most? SQuAD needs a start and an end position for the answer (Part 4). Whether a word is the *end* of an answer depends heavily on the words after it. In an LTR model, the vector for each token was built without ever seeing those words. The BiLSTM adds right-side context, which is why SQuAD jumps by **7.1** points (77.8 to 84.9). But it is one small layer trained only on the task data, while BERT mixes both sides in all 12 layers during pre-training. The result is still **3.6** points below BERT-base (84.9 versus 88.5).
 
+{{FIG:p5_ltr_squad|What the vector of the answer's first word can see. Question "who painted it?", passage "the mona lisa was painted by leonardo da vinci". In a left-to-right model, "leonardo" sees only what came before it; "da vinci" is hidden, so its vector cannot say where the answer ends. In BERT it sees both sides, in every layer.}}
+
 On the GLUE tasks the BiLSTM does not help at all (MNLI unchanged, the others down by 0.2 to 1.8 points). A plausible reason, not tested in the paper: a randomly initialized layer has to be learned from small task datasets, and MRPC has only a few thousand training pairs (3,600, according to Section 5.2).
 
 ### Why not just do what ELMo does?
@@ -135,6 +144,37 @@ Each argument in plain words:
 - **(a) Cost.** Two full models to pre-train and to run, instead of one.
 - **(b) Question answering.** In BERT's input the question comes first and the paragraph second (Part 4). A right-to-left model reading the paragraph has not reached the question yet (the question is to its left), so its vectors for the paragraph words know nothing about what is being asked.
 - **(c) Depth.** In ELMo the two directions meet only at the very end. In BERT, every layer mixes both sides, so later layers can build on information that already combines left and right. A small grammar slip in the paper can confuse readers here: in "this it is strictly less powerful ... since **it** can use both left and right context at every layer", the second "it" means the deep bidirectional model, not the concatenation.
+
+{{FIG:p5_rtl_qa|Argument (b), as attention tables. Rows are passage tokens, columns question tokens. A left-to-right model lets passage tokens see the question (it comes first). A right-to-left model blocks all of it: the passage never sees the question. BERT allows everything.}}
+
+Argument (a) is easy to measure. I built an LTR stack and an RTL stack of BERT-base size and timed them against one bidirectional model ([`bert_part5_math.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/bert/bert_part5_math.py)):
+
+```text
+parameters: one bidirectional model 109,482,240; LTR + RTL = 218,964,480
+vector per token: bidirectional (512, 768) ; LTR (512, 768) + RTL (512, 768) -> concat (512, 1536)
+time for a batch of 8 x 512 tokens on mps (median of 5): one model 133 ms, LTR + RTL 261 ms -> 1.96x
+in a sequence of 6 tokens, which positions can token 3 use (1-based)?
+  bidirectional, any layer: [1, 2, 3, 4, 5, 6]
+  LTR stack, any layer:     [1, 2, 3]    RTL stack, any layer: [3, 4, 5, 6]
+  concatenation: both lists, but only side by side at the very top; no layer ever mixes them
+```
+
+Twice the parameters and 1.96 times the time, as the paper says. And the last lines are argument (c) in miniature: in the glued model, no single layer ever combines token 1 with token 6 when building token 3.
+
+{{FIG:p5_elmo_concat|ELMo-style versus BERT, with the measured cost. Left: an LTR stack and an RTL stack, each one-directional, glued at the top into 1,536 numbers per token. Right: one stack where every layer mixes both sides, 768 numbers per token. Glued: 219.0M parameters and 261 ms per batch; bidirectional: 109.5M and 133 ms.}}
+
+How ELMo actually combines its layers, in its own paper:
+
+> [!PAPER] Peters et al. (2018a), ELMo · Section 3.2, Equation (1)
+> [![Equation 1 of the ELMo paper: the ELMo vector for token k is gamma task times the sum over layers j of s j task times h k j, a task specific weighting of all biLM layers with softmax-normalized weights s and a scalar gamma](/img/papers/bert/p5-elmo-eq1.png)](/img/papers/bert/p5-elmo-eq1.png)
+>
+> **Context:** how ELMo turns its two LSTM stacks into one vector per token for a downstream task.
+>
+> **What it says:** "we compute a task specific weighting of all biLM layers": $$\text{ELMo}_k = \gamma \sum_{j=0}^{L} s_j\, h_{k,j}$$, where the $$s_j$$ are "softmax-normalized weights" and $$\gamma$$ scales the whole vector.
+>
+> **Why it matters:** this is the "weighted sum" idea that Section 5.3 tests on BERT's layers (Table 7, below).
+
+where $$h_{k,j}$$ is the (forward and backward, concatenated) vector of token $$k$$ at layer $$j$$, and the task model learns the $$L + 1$$ weights $$s_j$$ and the single number $$\gamma$$; the LSTMs themselves stay frozen.
 
 > [!NOTE] An argument, not a measurement
 > Point (c) says "strictly less powerful". That is a statement about what the model can represent in principle. The paper gives no experiment comparing BERT with an LTR+RTL concatenation of the same size.
@@ -158,6 +198,17 @@ Table 5's LTR & No NSP row matters for one more reason, which the paper explains
 | [SEP], [CLS], segment A/B | added only at fine-tuning | learned during pre-training |
 | Batch size | 32,000 words, 1M steps | 128,000 words, 1M steps |
 | Fine-tuning learning rate | always 5e-5 | best of several, chosen per task on Dev |
+
+> [!PAPER] Devlin et al. (2018), BERT · Appendix A.4 · page 13
+> [![The opening of Appendix A.4: BERT and OpenAI GPT are fine-tuning approaches, while ELMo is a feature-based approach; many design decisions in BERT were intentionally made to make it as close to GPT as possible; the bi-directionality and the two pre-training tasks account for the majority of the empirical improvements](/img/papers/bert/p5-a4-open.png)](/img/papers/bert/p5-a4-open.png)
+>
+> **Context:** the start of Appendix A.4, just before the list of differences in the table above.
+>
+> **What it says:** design decisions were "intentionally made to make it as close to GPT as possible", and "the bi-directionality and the two pre-training tasks presented in Section 3.1 account for the majority of the empirical improvements".
+>
+> **Why it matters:** this is the paper's thesis stated in one sentence, and Section 5.1 is the evidence for it.
+
+{{FIG:p5_gpt_vs_bert|The four non-architecture differences between OpenAI GPT and BERT, as bars and boxes: training text (800M against 3,300M words), batch size (32,000 against 128,000 words per step), when [CLS], [SEP] and A/B are learned, and the fine-tuning learning rate. The "LTR & No NSP" row of Table 5 is GPT's objective with all four BERT advantages.}}
 
 > [!PAPER] Devlin et al. (2018), BERT · Appendix A.4 · page 14
 > [![To isolate the effect of these differences, we perform ablation experiments in Section 5.1 which demonstrate that the majority of the improvements are in fact coming from the two pre-training tasks and the bidirectionality they enable](/img/papers/bert/p5-a4-end.png)](/img/papers/bert/p5-a4-end.png)
@@ -221,6 +272,19 @@ So BERT-base's 3.99 means: on its held-out training text, when it predicts a mas
 
 ### How many parameters is each row?
 
+Where the per-layer term $$12H^2 + 13H$$ comes from, piece by piece (all for one layer with hidden size $$H$$ and feed-forward size $$4H$$):
+
+| Part | Matrices | Biases and LayerNorms | Count |
+|---|---|---|---|
+| Q, K, V, O projections | $$4 \times H \times H$$ | $$4H$$ | $$4H^2 + 4H$$ |
+| Feed-forward | $$H \times 4H + 4H \times H$$ | $$4H + H$$ | $$8H^2 + 5H$$ |
+| Two LayerNorms | | $$2 \times 2H$$ | $$4H$$ |
+| **One layer** | | | $$12H^2 + 13H$$ |
+
+For $$H = 768$$: $$12 \times 768^2 + 13 \times 768 = 7{,}077{,}888 + 9{,}984 = 7{,}087{,}872$$ parameters per layer.
+
+{{FIG:p5_params_terms|Where the parameters of each Table 6 model live. Blue: embeddings (23.8M or 31.8M, fixed by H, not by L). Orange: attention. Green: feed-forward. The embedding tables do not grow with L, so in the 3-layer model they are half of everything.}}
+
 The paper gives parameter counts only for BERT-base and BERT-large. I built every model of Table 6 with the Hugging Face `BertConfig` (30,522-token vocabulary, 512 positions, feed-forward size 4H, as in Part 2) on PyTorch's `meta` device, which creates the shapes without allocating any memory, and counted:
 
 ```python
@@ -255,6 +319,36 @@ The "formula" column is the count from the equation of Part 2 (embeddings, plus 
 
 ### Was this big for 2018?
 
+The two comparison models, in their own papers:
+
+> [!PAPER] Vaswani et al. (2017), Attention Is All You Need · Table 3, last row
+> [![Table 3 of Attention Is All You Need: variations on the Transformer, with the big model row highlighted: N 6, d model 1024, d ff 4096, h 16, and 213 million parameters](/img/papers/bert/p5-vaswani-table3.png)](/img/papers/bert/p5-vaswani-table3.png)
+>
+> **Context:** the Transformer paper's table of model variants, for translation.
+>
+> **What it says:** the "big" Transformer has $$N = 6$$ layers, $$d_{\text{model}} = 1024$$, $$d_{ff} = 4096$$, $$h = 16$$ heads, and **213 million** parameters in total (encoder and decoder together).
+>
+> **Why it matters:** this is the "L=6, H=1024, A=16" of the BERT sentence. The paper's "100M parameters for the encoder" is roughly its share of the 213M.
+
+> [!PAPER] Al-Rfou et al. (2018), Character-Level Language Modeling with Deeper Self-Attention · Abstract and Table 1
+> [![From the Al-Rfou et al. abstract: a deep 64-layer transformer model with fixed context outperforms RNN variants by a large margin](/img/papers/bert/p5-alrfou-abstract.png)](/img/papers/bert/p5-alrfou-abstract.png)
+> [![Table 1 of Al-Rfou et al.: parameters in millions, with the T64 model at 235 million for training and 219 million for inference, bits per character 1.13 on text8](/img/papers/bert/p5-alrfou-table1.png)](/img/papers/bert/p5-alrfou-table1.png)
+>
+> **Context:** the "largest Transformer we have found in the literature", a character-level language model.
+>
+> **What it says:** "a deep (64-layer) transformer model" reaches 1.13 bits per character on text8. Table 1: T64 has **235M** parameters for training (219M at inference; the difference is extra training-only outputs).
+>
+> **Why it matters:** BERT-large (335M) was larger than both, and the Table 6 gains came on top of sizes that were already at the edge of 2018 practice.
+
+Can we check these two numbers with our formula? Only roughly, because both models differ from BERT in their embeddings and outputs:
+
+```text
+Vaswani et al. 2017, big encoder: L=6, H=1024: the layers alone, if shaped like BERT's (12H^2 + 13H each) = 75,577,344   (paper says 100M for the encoder)
+Al-Rfou et al. 2018: L=64, H=512: the layers alone, if shaped like BERT's (12H^2 + 13H each) = 201,752,576   (paper says 235M)
+```
+
+The layers alone give 75.6M and 201.8M. The rest of the published totals is embeddings and other parts (the big Transformer's shared vocabulary table of about 37,000 tokens × 1,024 adds roughly 38M). So the orders of magnitude agree; the exact numbers depend on details these papers do not spell out in the same way.
+
 > [!PAPER] Devlin et al. (2018), BERT · Section 5.2 · page 8
 > [![For example, the largest Transformer explored in Vaswani et al. (2017) is (L=6, H=1024, A=16) with 100M parameters for the encoder, and the largest Transformer we have found in the literature is (L=64, H=512, A=2) with 235M parameters (Al-Rfou et al., 2018). By contrast, BERT-base contains 110M parameters and BERT-large contains 340M parameters](/img/papers/bert/p5-size-prior.png)](/img/papers/bert/p5-size-prior.png)
 >
@@ -277,6 +371,30 @@ The "formula" column is the count from the equation of Part 2 (embeddings, plus 
 Note the careful word "hypothesize": the paper offers an explanation for why fine-tuning scales where feature-based approaches did not, but does not test it directly. The measured fact is Table 6 itself.
 
 ### A real perplexity, for scale
+
+First, the definition with a toy you can follow. For $$N$$ predicted words with probabilities $$p_1, \dots, p_N$$ given to the true words:
+
+$$
+\text{NLL} = -\frac{1}{N}\sum_{n=1}^{N} \log p_n, \qquad \text{perplexity} = e^{\text{NLL}}
+$$
+
+where NLL is the mean negative log-likelihood in **nats** (natural-log units). Sanity check: a model that is uniform over 4 words gives every word $$p = 1/4$$, so NLL $$= \log 4 = 1.386$$ and perplexity $$= 4$$: "as unsure as a 4-way guess".
+
+A real sentence, three masked words, `bert-base-uncased`:
+
+```text
+input: she opened the [MASK] with her [MASK] and walked into the [MASK] .
+door     p = 0.9586   -log p = 0.0423   (top 3 guesses: door, gate, box)
+key      p = 0.1324   -log p = 2.0222   (top 3 guesses: key, hand, keys)
+kitchen  p = 0.1823   -log p = 1.7022   (top 3 guesses: room, kitchen, house)
+mean NLL = (0.0423 + 2.0222 + 1.7022) / 3 = 1.2554 nats -> perplexity = exp(1.2554) = 3.51
+GPT-2 mean NLL = 3.7125 -> perplexity 40.96  (same three words, left context only)
+```
+
+{{FIG:p5_ppl|Perplexity in three steps on one sentence. 1: the probability of each true word. 2: the surprise, minus the log of each. 3: average the surprise and raise e to it: 3.51, "about as unsure as a pick among 3.5 equal words".}}
+
+BERT's 3.51 here is close to Table 6's numbers (3.23 to 5.84), but it is one sentence. (GPT-2's 40.96 is not a fair comparison: it predicts each word from the left side only, a harder task.)
+
 
 What does a masked-LM perplexity of about 4 look like on real text? I measured the released `bert-base-uncased` on the test split of WikiText-2, a public set of Wikipedia articles, using the paper's masking recipe (15% of tokens chosen; of those 80% `[MASK]`, 10% random, 10% unchanged), sequences of 512 tokens, and a fixed random seed:
 
@@ -341,6 +459,32 @@ Part 1 introduced two ways to reuse a pre-trained model: feature-based (freeze i
 > [!DEFINITION] CRF (conditional random field)
 > An output layer often put on top of taggers. It scores whole sequences of tags, so it can learn rules like "I-PER cannot follow B-ORG". BERT leaves it out and predicts every tag on its own.
 
+The tags come from the CoNLL-2003 data format, described in its own paper:
+
+> [!PAPER] Tjong Kim Sang and De Meulder (2003), Introduction to the CoNLL-2003 Shared Task · Section 2.3
+> [![The CoNLL-2003 data format: one word per line with its part-of-speech tag, chunk tag and named entity tag; the I-XXX tag is used for words inside a named entity of type XXX, B-XXX marks the first word of a second entity right after another of the same type, following the IOB scheme of Ramshaw and Marcus 1995](/img/papers/bert/p5-conll-format.png)](/img/papers/bert/p5-conll-format.png)
+>
+> **Context:** how every word of the dataset is labelled.
+>
+> **What it says:** each line holds a word, its part of speech, its chunk tag and its **named entity tag**. "The I-XXX tag is used for words inside a named entity of type XXX"; when two entities of the same type are next to each other, the first word of the second one gets B-XXX. Four types: persons (PER), organisations (ORG), locations (LOC) and miscellaneous (MISC).
+>
+> **Why it matters:** the tags are a small grammar: an I-tag continues a name. That is the kind of rule a CRF can enforce and BERT's per-token classifier cannot.
+
+{{FIG:p5_bio|A real CoNLL-2003 dev sentence (#99), "Lithuania - Danius Gleveckas ( 13rd )": one tag per word (B-LOC, O, B-PER, I-PER, O, O, O). WordPiece splits "Danius" into Dani ##us and "Gleveckas" into G ##lev ##eck ##as; the tagger reads only the first piece of each word.}}
+
+Why would a CRF help? A per-token classifier picks each tag on its own, and can produce impossible sequences. A toy with hand-made scores for three words (rows) and three tags (columns):
+
+```text
+scores (rows = words ['met', 'Ada', 'Lovelace'], columns = ['O', 'B-PER', 'I-PER']): 3.0, 0.5, 0.2; 1.2, 1.0, 0.4; 0.3, 0.6, 2.5
+per-token argmax: ['O', 'O', 'I-PER']  (sum 6.7; O followed by I-PER is invalid)
+best valid sequence: ['O', 'B-PER', 'I-PER']  (sum 6.5)
+```
+
+{{FIG:p5_crf|Left: which tag may follow which (an I-PER cannot follow O). Right: picking the best tag per word gives O O I-PER (score 6.7), which breaks the rule; the best valid sequence is O B-PER I-PER (score 6.5). A CRF finds the best valid sequence; BERT's tagger in Section 5.3 does not use one.}}
+
+> [!DEFINITION] Viterbi decoding
+> The algorithm a CRF uses to find the highest-scoring valid tag sequence, by keeping the best partial sequence ending in each tag at each word. It is exact and fast: work proportional to (words) × (tags)².
+
 > [!DEFINITION] First sub-token
 > WordPiece can split one word into several pieces (Part 2): "Lovelace" might become `Love` `##lace`. A tagger needs one label per word, so BERT uses only the vector of the first piece and ignores the rest.
 
@@ -380,6 +524,23 @@ Reading Table 7 carefully:
 > [!DEFINITION] Weighted sum of layers
 > Multiply each layer's vector by a learned number (its weight) and add them up. The result has the same size as one layer (768 numbers). ELMo combined its layers this way. In code: `(softmax(w)[:, None] * layers).sum(0)`.
 
+The frozen-feature tagger of Section 5.3, shape by shape, on "Ada Lovelace met Charles Babbage in London .":
+
+```text
+WordPiece tokens               [13]
+all hidden states              [13, 13, 768]
+first sub-token of each word   [8, 13, 768]
+concat last four layers        [8, 3072]
+BiLSTM output                  [8, 768]
+tag scores                     [8, 9]
+BiLSTM layer 1 (input 3072): 2 directions x 4 x (384*3072 + 384*384 + 2*384) = 10,622,976
+BiLSTM layer 2 (input 768):  2 directions x 4 x (384*768 + 384*384 + 2*384)  = 3,545,088
+classifier 9 x 768 + 9 = 6,921;  tagger total 14,174,985 trainable, BERT-base-cased frozen (108,310,272 parameters never change)
+```
+
+The LSTM count: each direction has 4 gates, each gate a matrix from the input (3,072 numbers) and one from its own previous state (384 numbers), plus two bias vectors in the PyTorch layout: $$4 \times (384 \times 3072 + 384 \times 384 + 2 \times 384)$$ per direction.
+
+{{FIG:p5_tagger|The Section 5.3 tagger, shape by shape. BERT's 13 hidden states (n × 13 × 768, frozen) → concatenate the last four (n × 3,072) → a 2-layer BiLSTM with 768 outputs (14.17M weights, trained) → a linear layer to 9 tags (6,921 weights) → softmax per word.}}
 ### A smaller re-run of the feature-based experiment
 
 Can we see the same pattern ourselves? I ran a smaller version of the experiment in `bert_part5_ner.py`:
@@ -479,6 +640,17 @@ How to read it:
 
 The trade-off is worth it. The MLM sees fewer training signals per batch, but each one uses context from both sides.
 
+How many predictions does each objective get from one batch?
+
+```text
+one batch = 256 x 512 = 131,072 tokens; masked LM predicts 15% = 19,661; left-to-right LM predicts every next token, about 131,072
+over 1,000,000 steps: 19,661,000,000 masked-LM predictions versus about 131,072,000,000 for LTR (6.67x more)
+```
+
+{{FIG:p5_signal|Training signal per batch. The masked LM predicts 15% of tokens (19,661 per batch); a left-to-right LM predicts almost every token (about 131,072). The masked LM gets 6.67 times fewer training signals, yet Figure 5 shows it overtakes the left-to-right model almost at once.}}
+
+That is the "converges slightly slower" of Question 2, made concrete: per step the masked LM learns from 6.67 times fewer predictions. Figure 5 shows it is still the better choice.
+
 ## Masking strategies {§C.2}
 
 Part 3 explained the 80/10/10 masking recipe and *why* the paper uses it. Appendix C.2 tests whether it was a good choice.
@@ -566,9 +738,25 @@ python bert_part5_ner.py    # writes results/part5_ner.json
 
 ## References
 
-1. J. Devlin, M.-W. Chang, K. Lee, K. Toutanova. [*BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding*](https://arxiv.org/abs/1810.04805). NAACL 2019. Section 5, Appendix A.4, Appendix C.
-2. E. F. Tjong Kim Sang, F. De Meulder. [*Introduction to the CoNLL-2003 Shared Task: Language-Independent Named Entity Recognition*](https://aclanthology.org/W03-0419/). CoNLL 2003.
-3. M. Peters et al. [*Deep contextualized word representations*](https://arxiv.org/abs/1802.05365) (ELMo). NAACL 2018.
-4. R. Al-Rfou, D. Choe, N. Constant, M. Guo, L. Jones. [*Character-Level Language Modeling with Deeper Self-Attention*](https://arxiv.org/abs/1808.04444). 2018.
-5. S. Merity, C. Xiong, J. Bradbury, R. Socher. [*Pointer Sentinel Mixture Models*](https://arxiv.org/abs/1609.07843) (the WikiText datasets). 2016.
-6. [CoNLL-2003 on the Hugging Face hub](https://huggingface.co/datasets/eriktks/conll2003) and [WikiText on the Hugging Face hub](https://huggingface.co/datasets/Salesforce/wikitext).
+**The BERT paper**
+
+1. J. Devlin, M.-W. Chang, K. Lee, K. Toutanova. [*BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding*](https://arxiv.org/abs/1810.04805). NAACL 2019 ([ACL Anthology](https://aclanthology.org/N19-1423/)).
+2. Google Research. [BERT code and models](https://github.com/google-research/bert), including `extract_features.py` and the cased models.
+
+**Papers the BERT paper cites in this part**
+
+3. A. Radford, K. Narasimhan, T. Salimans, I. Sutskever. [*Improving Language Understanding by Generative Pre-Training*](https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf) (OpenAI GPT). OpenAI, 2018.
+4. M. E. Peters et al. [*Deep contextualized word representations*](https://arxiv.org/abs/1802.05365) (ELMo, "2018a"). NAACL 2018.
+5. M. E. Peters, M. Neumann, L. Zettlemoyer, W. Yih. [*Dissecting Contextual Word Embeddings: Architecture and Representation*](https://arxiv.org/abs/1808.08949) ("2018b", the mixed results on bi-LM size). EMNLP 2018.
+6. O. Melamud, J. Goldberger, I. Dagan. [*context2vec: Learning Generic Context Embedding with Bidirectional LSTM*](https://aclanthology.org/K16-1006/). CoNLL 2016.
+7. A. Vaswani et al. [*Attention Is All You Need*](https://arxiv.org/abs/1706.03762). NeurIPS 2017.
+8. R. Al-Rfou, D. Choe, N. Constant, M. Guo, L. Jones. [*Character-Level Language Modeling with Deeper Self-Attention*](https://arxiv.org/abs/1808.04444). AAAI 2019.
+9. E. F. Tjong Kim Sang, F. De Meulder. [*Introduction to the CoNLL-2003 Shared Task: Language-Independent Named Entity Recognition*](https://aclanthology.org/W03-0419/). CoNLL 2003.
+10. K. Clark, M.-T. Luong, C. D. Manning, Q. V. Le. [*Semi-Supervised Sequence Modeling with Cross-View Training*](https://arxiv.org/abs/1809.08370) (CVT, Table 7). EMNLP 2018.
+11. A. Akbik, D. Blythe, R. Vollgraf. [*Contextual String Embeddings for Sequence Labeling*](https://aclanthology.org/C18-1139/) (CSE, Table 7). COLING 2018.
+
+**Other sources used in this part**
+
+12. L. A. Ramshaw, M. P. Marcus. [*Text Chunking using Transformation-Based Learning*](https://aclanthology.org/W95-0107/) (the IOB tagging scheme). Workshop on Very Large Corpora, 1995.
+13. S. Merity, C. Xiong, J. Bradbury, R. Socher. [*Pointer Sentinel Mixture Models*](https://arxiv.org/abs/1609.07843) (WikiText-2). ICLR 2017.
+14. Code for this part: [`bert_part5.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/bert/bert_part5.py), [`bert_part5_ner.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/bert/bert_part5_ner.py), [`bert_part5_math.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/bert/bert_part5_math.py).

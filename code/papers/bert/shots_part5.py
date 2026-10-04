@@ -82,10 +82,10 @@ JOBS = [
                     'using only the MASK strategy was problematic when applying the feature-based approach to NER',
                     'using only the RND strategy performs much worse than our strategy as well'], end='than our strategy as well.', above=4),
     # ---- added in the second pass: the A.4 opening, and the other papers Section 5 talks to
-    dict(name='p5-a4-open', page=13, anchor='Comparison of BERT, ELMo',
+    dict(name='p5-a4-open', page=13, anchor='Here we studies the differences',
          highlight=['BERT and OpenAI GPT are fine-tuning approaches, while ELMo is a feature-based approach',
                     'intentionally made to make it as close to GPT as possible', 'account for the majority of the empirical improvements'],
-         end='between how BERT and GPT were trained:', above=6),
+         end='between how BERT and GPT were trained:', above=30),
     dict(name='p5-vaswani-table3', arxiv_id='1706.03762', page=8, anchor='Table 3: Variations on the Transformer architecture',
          highlight=['big 6 1024 4096 16', '213'], column='full', end='big 6 1024 4096 16', above=4),
     dict(name='p5-alrfou-table1', arxiv_id='1808.04444', page=3, anchor='Table 1: Comparison of various models on text8',

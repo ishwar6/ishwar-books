@@ -240,10 +240,10 @@ def ltr_squad():
         if not see_right:
             b += brace(X[focus + 1], X[-1] + Ws[-1], y + 56, 'hidden from "leonardo"', 'edge')
         else:
-            b.append(text(X[focus + 1], y + 96, 'teal arrows: right-side words, only BERT can use them', 't-muted'))
-    b.append(text(14, 268, 'Without "da vinci", the vector of "leonardo" cannot tell whether a longer name follows, or where the answer should end.', 't-muted'))
-    b.append(text(14, 290, 'The highlighted box is the token whose vector must say "the answer starts here". Green: the true answer span.', 't-muted'))
-    return svg(760, 302, 'What the vector of the answer word leonardo can see. In a left-to-right model it sees only the tokens up to itself, so it cannot know that da vinci follows. In BERT it sees the whole question and passage, in every layer.', b)
+            b.append(text(14, y + 100, 'Teal arrows: right-side words. Only BERT can use them.', 't-muted'))
+    b.append(text(14, 306, 'Without "da vinci", the vector of "leonardo" cannot tell whether a longer name follows, or where the answer should end.', 't-muted'))
+    b.append(text(14, 326, 'The highlighted box is the token whose vector must say "the answer starts here". Green: the true answer span.', 't-muted'))
+    return svg(760, 338, 'What the vector of the answer word leonardo can see. In a left-to-right model it sees only the tokens up to itself, so it cannot know that da vinci follows. In BERT it sees the whole question and passage, in every layer.', b)
 
 
 F['p5_ltr_squad'] = ltr_squad()

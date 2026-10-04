@@ -68,12 +68,101 @@ The name has four parts. You already know **bidirectional** and **transformers**
 > [!DEFINITION] Encoder
 > The part of a Transformer that **reads** text and turns every word into a representation. (The other part, a **decoder**, writes text one word at a time.) BERT is only an encoder: it understands, it does not write.
 
+### Encoder and decoder: the two halves of the Transformer
+
+"Encoder" is a precise word here. It points at one half of the Transformer from *Attention Is All You Need* (Vaswani et al., 2017), the paper BERT is built on.
+
+> [!PAPER] Vaswani et al. (2017), Attention Is All You Need · Section 3 · page 3, Figure 1
+> [![Figure 1 of Attention Is All You Need: the Transformer, an encoder stack on the left with multi-head attention and feed-forward blocks, and a decoder stack on the right with masked multi-head attention, cross-attention and feed-forward blocks, ending in a linear layer and softmax](/img/papers/bert/p1-transformer-fig1.png)](/img/papers/bert/p1-transformer-fig1.png)
+> [![Section 3.1 of Attention Is All You Need: the encoder and decoder are the left and right halves of Figure 1; the decoder's self-attention is modified to prevent positions from attending to subsequent positions, so predictions for position i depend only on outputs at positions before i](/img/papers/bert/p1-transformer-halves.png)](/img/papers/bert/p1-transformer-halves.png)
+>
+> **Context:** the Transformer was built for translation. The left half (the **encoder**) reads the source sentence. The right half (the **decoder**) writes the translation, one word at a time.
+>
+> **What it says:** both halves are stacks of $$N$$ identical layers. The decoder's self-attention is "modified to prevent positions from attending to subsequent positions", so "the predictions for position $$i$$ can depend only on the known outputs at positions less than $$i$$". The encoder has no such rule.
+>
+> **Why it matters:** BERT is the left half. OpenAI GPT is (almost) the right half, without the cross-attention block. The single difference between them is that rule about "subsequent positions".
+
+{{FIG:p1_enc_dec|The two halves of the original Transformer. BERT keeps only the encoder (every word sees every word). GPT keeps a decoder-style stack without the cross-attention, so a word sees only itself and the words before it.}}
+
+That rule is implemented by a **mask** inside attention. Here is attention with the mask written in. (The [attention series](/writings/attention-1-self-attention/) derives this equation step by step.)
+
+$$
+\text{Attention}(Q, K, V) = \operatorname{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}} + M\right) V
+$$
+
+where, for a text of $$n$$ tokens:
+
+- $$Q$$, $$K$$, $$V$$ are the **queries**, **keys** and **values**: three $$n \times d_k$$ tables made from the token vectors. Row $$i$$ of $$Q$$ asks "what is token $$i$$ looking for?"; row $$j$$ of $$K$$ says "what does token $$j$$ offer?";
+- $$QK^\top$$ is an $$n \times n$$ table of scores: entry $$(i, j)$$ says how well token $$i$$'s question matches token $$j$$;
+- $$\sqrt{d_k}$$ (here $$\sqrt{64} = 8$$) keeps the scores from growing too large;
+- $$M$$ is the **mask**, also $$n \times n$$: 0 where looking is allowed, $$-\infty$$ where it is blocked;
+- softmax turns each row into weights that add up to 1, and $$e^{-\infty} = 0$$, so a blocked position gets weight exactly 0.
+
+The two models differ only in $$M$$:
+
+$$
+M^{\text{GPT}}_{ij} = \begin{cases} 0 & j \le i \\ -\infty & j > i \end{cases}
+\qquad\qquad
+M^{\text{BERT}}_{ij} = 0 \ \text{ for every } i, j
+$$
+
+In words: GPT blocks every key to the right of the query (the upper triangle of the table). BERT blocks nothing. (BERT's real code also masks padding, the empty slots that fill short texts up to a common length, but never real words.)
+
+{{FIG:p1_kid_masks|The mask for "the kid smiles". Rows are queries (the word that looks), columns are keys (the word looked at). GPT blocks the upper triangle: "kid" may read "the" and itself, but not "smiles". BERT allows every square.}}
+
+**A worked example with real numbers.** I took the first attention head of GPT-2's first layer, fed it "the kid smiles", and recomputed the attention by hand ([`bert_part1_math.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/bert/bert_part1_math.py)):
+
+```python
+q, k, v = blk.attn.c_attn(blk.ln_1(x)).split(768, dim=2)      # GPT-2 layer 1: queries, keys, values
+qh, kh = q[0, :, 0:64], k[0, :, 0:64]                          # head 1 uses 64 of the 768 numbers
+S = (qh @ kh.T) / math.sqrt(64)                                # 3 x 3 table of scores
+M = torch.triu(torch.full((3, 3), float('-inf')), diagonal=1)  # -inf above the diagonal: the future
+A = torch.softmax(S + M, -1)                                   # each row adds up to 1
+```
+
+```text
+scores s = q.k / sqrt(64):
+  the     -0.618   -1.104   -0.860
+  kid      0.770   -0.374   -0.562
+  smiles   0.345   -0.316   -0.987
+mask M (0 = allowed, -inf = blocked: a key to the right of the query):
+  the      0.000     -inf     -inf
+  kid      0.000    0.000     -inf
+  smiles   0.000    0.000    0.000
+weights a = softmax(s + M), row by row:
+  the      1.000    0.000    0.000   (row sum 1.000)
+  kid      0.758    0.242    0.000   (row sum 1.000)
+  smiles   0.562    0.290    0.148   (row sum 1.000)
+max difference from the library's own attention weights: 0.0e+00
+```
+
+Follow the row for "kid" by hand. Its score for "smiles" (-0.562) is replaced by $$-\infty$$, so only two scores are left:
+
+$$
+a_{\text{kid},\text{the}} = \frac{e^{0.770}}{e^{0.770} + e^{-0.374}} = \frac{2.160}{2.160 + 0.688} = 0.758,
+\qquad
+a_{\text{kid},\text{kid}} = \frac{0.688}{2.848} = 0.242
+$$
+
+The first row is even simpler: "the" can see only itself, so its weight on itself is 1.000 whatever its score is. Our hand computation matches the library exactly (difference 0.0).
+
+{{FIG:p1_kid_weights|Real attention weights on the same words. Left: GPT-2, layer 1, head 1, with the blocked squares forced to 0. Right: BERT, layer 1, averaged over its 12 heads, on "[CLS] the kid smiles [SEP]" (BERT adds those two special tokens, explained in Part 2). Every square is filled, and every row still adds up to 1.}}
+
+So when the paper says BERT is "bidirectional", this is the concrete meaning: an all-zero mask. The hard part, which the rest of the paper solves, is how to *train* such a model, since the usual training game (predict the next word) breaks when the model can see the next word.
+
 The abstract makes three claims. Let us translate each one.
 
 **1. "Pre-train deep bidirectional representations from unlabeled text."** BERT learns from text that nobody has labelled: Wikipedia and a collection of books. Nobody had to mark which sentences are happy or sad. Labelled data is expensive. Plain text is almost free, and there is a lot of it.
 
 > [!DEFINITION] Labeled and unlabeled data
 > **Labeled** data has the right answer attached by a person, like a movie review marked "positive". **Unlabeled** data is just text, with no answers attached.
+
+How can a model learn anything from text that has no answers attached? The trick is to make the answers out of the text itself. Hide a piece of the text, and the hidden piece *is* the answer.
+
+{{FIG:p1_selfsup|Where the "labels" come from when nobody labels anything. A language model like GPT uses each next word as the answer for the words before it. BERT's masked language model hides a word in the middle and uses it as the answer, with both sides as input. Either way, every sentence ever written becomes training data.}}
+
+> [!DEFINITION] Self-supervised learning
+> Learning from data whose labels are made automatically from the data itself, for example by hiding a word and asking for it back. The BERT paper calls this "unsupervised" (no person supervises it). Today it is usually called **self-supervised**.
 
 **2. "Jointly conditioning on both left and right context in all layers."** When BERT builds the representation of a word, it uses the words before it *and* the words after it, and it does this at every layer, not just at the end. "Conditioning on" simply means "using as input".
 
@@ -85,6 +174,30 @@ The abstract makes three claims. Let us translate each one.
 {{FIG:p1_two_steps|The whole BERT recipe. Pre-train once on unlabeled text (the expensive step). Then, for every task, start from a copy of the pre-trained model, add one small output layer, and fine-tune.}}
 
 **Use case.** A company that wants to sort support emails into "billing", "bug report" and "feature request" does not need to teach a model English. It starts from pre-trained BERT and fine-tunes it on a few thousand labelled emails.
+
+### Why an "understanding" model, when GPT-style models can write?
+
+A fair question today: chat models write fluent text, so why read a paper about a model that does not write? Because writing is only one job. Many everyday language jobs are about **reading and deciding**: is this review positive, which department should get this email, where are the names in this contract, which passage answers this question. Images have the same split: generating a new picture is one job, recognising what is in a photo is another, and most practical vision systems do the second.
+
+{{FIG:p1_understand_gen|Two families of jobs. Understanding: read the whole input, then output a label, a span or a tag per word (BERT's home ground). Generation: write new text one word at a time (GPT's home ground). The same split exists for images.}}
+
+For understanding jobs, a model that sees the whole input at once is a natural fit, and it can be small and fast. That is why BERT-style models still run inside many search, classification and retrieval systems (Part 6 shows where).
+
+### What exactly gets trained when you fine-tune?
+
+This is a common point of confusion, so it is worth stating carefully. The paper is explicit (we will see it in Section 3): "all of the parameters are fine-tuned". During fine-tuning, **every one of BERT's roughly 110 million weights keeps learning**, together with the small new output layer, which is the only part that starts from random numbers.
+
+{{FIG:p1_what_updates|Three ways to reuse a pre-trained model. Left, feature-based (ELMo-style): the pre-trained layers are frozen and a separate task model is trained from zero. Middle, a common misreading of BERT: freeze everything and train only a new top layer. Right, what BERT actually does: all layers keep training, a little, together with the new layer.}}
+
+> [!WARNING] A common misreading
+> "Fine-tuning BERT means freezing it and training only the last layer" is **not** what the paper does. Freezing BERT and training something on top is the *feature-based* approach, which the paper tests separately in Section 5.3 (Part 5). In fine-tuning, all weights move, but only a little, because training is short and the learning rate is small.
+
+The idea itself came from computer vision, which the paper mentions in its related work (Section 2.3, Part 2): train a big network once on ImageNet, a large labelled photo collection, then reuse it for many smaller tasks. BERT brings that recipe to language, with one difference: its first stage needs no labels at all.
+
+{{FIG:p1_transfer|Transfer learning in two fields. Vision: pre-train on ImageNet's labelled photos, then fine-tune for a narrow task such as reading chest X-rays. Language: pre-train BERT on unlabeled Wikipedia and books, then fine-tune for a narrow task such as routing support emails.}}
+
+> [!DEFINITION] Transfer learning
+> Reusing what a model learned on one task (usually a big, general one) to do better on another task (usually a small, specific one). Pre-training followed by fine-tuning is transfer learning.
 
 ## The results in the abstract {§Abstract}
 
@@ -149,6 +262,13 @@ The paper names four example tasks:
 
 {{FIG:p1_tasks|Two kinds of tasks. A sentence-level task (here, natural language inference) gives one answer for the whole input. A token-level task (here, named entity recognition) gives an answer for every token.}}
 
+The two token-level examples in that paragraph deserve a closer look, because both come back in Part 4.
+
+{{FIG:p1_token_tasks|The two token-level tasks the paragraph names. Named entity recognition gives every word a tag: B-PER starts a person's name, I-PER continues it, B-LOC starts a place, O means "not a name". Question answering points at two positions in the passage: where the answer starts and where it ends.}}
+
+> [!DEFINITION] Named entity recognition (NER)
+> Finding the names of people, places, organisations and similar things in a text, and labelling each word. The usual tags are **B-** (beginning of a name), **I-** (inside a name) and **O** (outside any name), so "Barack Obama" becomes B-PER I-PER.
+
 ## Two ways to reuse a pre-trained model {§1}
 
 > [!PAPER] Devlin et al. (2018), BERT · Section 1 · page 1
@@ -189,6 +309,42 @@ where:
 - $$\prod$$ means "multiply all of these together", for $$i$$ from 1 to $$n$$.
 
 Look at what is on the right of the bar: only earlier words. That is what **unidirectional** means. The training signal is free (the next word is always in the text), which is why language models are such a good way to pre-train. But each word only ever learns from its left.
+
+**The chain rule with real numbers.** Here is the equation applied to "The kid smiles at the dog." by GPT-2 ([`bert_part1_math.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/bert/bert_part1_math.py)). Each row is one factor of the product: the probability GPT-2 gave the real next word, seeing only the words on its left.
+
+```text
+ i  word     given (left side only)     P(word | left)    log P
+ 1  The      (start)                          0.037700   -3.278
+ 2  kid      The                              0.000040  -10.114
+ 3  smiles   The kid                          0.000257   -8.268
+ 4  at       The kid smiles                   0.087426   -2.437
+ 5  the      The kid smiles at                0.150418   -1.894
+ 6  dog      The kid smiles at the            0.002395   -6.034
+ 7  .        The kid smiles at the dog        0.177917   -1.726
+sum of log P = -33.752
+P(sentence) = exp(-33.752) = 2.196e-15
+average negative log-likelihood = 4.822  (perplexity exp of that = 124.2)
+```
+
+{{FIG:p1_chain|The chain rule, one factor per word. Each bar is the probability GPT-2 gave the real next word from its left side only. Multiplying all seven gives the probability of the whole sentence, 2.2 × 10⁻¹⁵.}}
+
+Three things to notice:
+
+- **Multiplying tiny numbers underflows**, so in practice everyone adds logarithms instead: $$\log \prod_i p_i = \sum_i \log p_i$$. Here the seven logs add up to $$-33.752$$, and $$e^{-33.752} = 2.2 \times 10^{-15}$$, the same probability.
+- **Training a language model** means making this sum as large as possible over billions of sentences. Written as a loss to make small, it is the **negative log-likelihood**:
+
+$$
+\mathcal{L}_{\text{LM}} = -\sum_{i=1}^{n} \log P(w_i \mid w_1, \dots, w_{i-1})
+$$
+
+  where $$\mathcal{L}$$ is the loss (lower is better) and the other symbols are as above. For our sentence, $$\mathcal{L} = 33.752$$, or $$4.822$$ per word.
+- **"kid" got only 0.00004.** After "The", thousands of words are possible, so no single one gets much probability. Every word is predicted from its left only; the model never got to use "smiles at the dog" to help with "kid".
+
+> [!DEFINITION] Logarithm and log-likelihood
+> The natural logarithm $$\log x$$ answers "$$e$$ to what power gives $$x$$?", with $$e \approx 2.718$$. It turns multiplication into addition, and small probabilities into manageable negative numbers ($$\log 0.00004 = -10.1$$). The **log-likelihood** of a text is the sum of the logs of the probabilities a model gave its words.
+
+> [!DEFINITION] Perplexity
+> $$e$$ raised to the average negative log-likelihood per word. It reads as "on average, the model was as unsure as if it were choosing among this many equally likely words". Here 124.2. Lower is better. Part 5 uses perplexity to compare BERT sizes.
 
 > [!DEFINITION] Objective function (training objective)
 > The score a model is trained to improve. For a language model, it is "give high probability to the real next word". Training means nudging the weights, millions of times, so this score gets better.
@@ -263,6 +419,17 @@ sentence: she picked up her ____ and started to play a song.   (hidden word: gui
 
 {{FIG:p1_fill|The first sentence as a picture. GPT-2 cannot see "to deposit my paycheck" and spreads its guesses over places you might go. BERT sees both sides and puts 0.901 on "bank".}}
 
+Both sides do not make every word easy, though. Take "smiles" from our chain-rule sentence:
+
+```text
+GPT-2  P(smiles | "The kid")                    = 0.0003   top 5: who 0.1939, is 0.0687, in 0.0596, was 0.0550, 's 0.0507
+BERT   P(smiles | "the kid [MASK] at the dog.") = 0.0008   top 5: looked 0.3233, stared 0.1029, glanced 0.0795, pointed 0.0620, glared 0.0595
+```
+
+{{FIG:p1_smiles|One hidden word, predicted with one side and with both. GPT-2, seeing "The kid", guesses words that can follow any noun (who, is, in). BERT, seeing "the kid ___ at the dog.", guesses only verbs that take "at": looked, stared, glanced. Neither gets "smiles" right, because many verbs fit.}}
+
+BERT's probability for "smiles" is still small, because "looked at the dog" fits just as well. But look at the *kind* of guesses. With only the left side, GPT-2's guesses are almost generic. With both sides, every one of BERT's top five is a verb that can be followed by "at". The right side did not reveal the answer; it narrowed the space of sensible answers. That narrowing is what makes BERT's vectors useful for understanding tasks.
+
 > [!DEFINITION] Probability
 > A number from 0 to 1 that says how likely something is. 0.901 means "about 90% sure". The probabilities over all possible words add up to 1.
 
@@ -319,6 +486,27 @@ Let us unpack each contribution.
 > [!DEFINITION] Concatenation
 > Joining two lists of numbers end to end. A list of 512 numbers concatenated with another list of 512 numbers gives one list of 1,024 numbers. Nothing is mixed; the two halves just sit side by side.
 
+To see what "shallow" means exactly, look at how ELMo is trained, in its own paper:
+
+> [!PAPER] Peters et al. (2018a), Deep contextualized word representations (ELMo) · Section 3.1 · page 2
+> [![Section 3.1 of the ELMo paper: a forward language model predicts each token from the tokens before it, a backward language model predicts each token from the tokens after it, and the biLM maximizes the sum of both log likelihoods, with separate parameters for the LSTMs in each direction](/img/papers/bert/p1-elmo-bilm.png)](/img/papers/bert/p1-elmo-bilm.png)
+>
+> **Context:** ELMo's training objective, the paper BERT calls "Peters et al. (2018a)".
+>
+> **What it says:** a **forward** language model predicts each token from the tokens before it; a **backward** one predicts "the previous token given the future context". ELMo "jointly maximizes the log likelihood of the forward and backward directions", sharing only the input layer and the final softmax, while keeping "separate parameters for the LSTMs in each direction".
+>
+> **Why it matters:** "separate parameters for the LSTMs in each direction" is the shallow part. Each reader is still one-directional. They meet only when their outputs are glued together at the end.
+
+ELMo's objective, in the notation we used for GPT:
+
+$$
+\mathcal{L}_{\text{ELMo}} = -\sum_{k=1}^{N} \Big( \log p(t_k \mid t_1, \dots, t_{k-1}) + \log p(t_k \mid t_{k+1}, \dots, t_N) \Big)
+$$
+
+where $$t_1, \dots, t_N$$ are the tokens, the first term is the forward model (left side only) and the second the backward model (right side only). Each term on its own is an ordinary one-directional language model. No single term ever conditions on both sides at once, which is the thing BERT's masked language model does (Part 3).
+
+{{FIG:p1_layers|"In all layers", drawn. Highlighted lines show what feeds the word "kid" at the top. BERT: both neighbours, at every layer, so after two layers "kid" has mixed in everything. GPT: only "the" and itself. ELMo: the left tower sees "the", the right tower sees "smiles", and the two halves meet only in the final concatenation.}}
+
 > [!DEFINITION] Architecture
 > The design of a model: which layers it has, in what order, and how they connect. A "task-specific architecture" is a design built by hand for one task.
 
@@ -328,6 +516,25 @@ Let us unpack each contribution.
 
 > [!DEFINITION] NLP
 > Natural language processing: the field of making computers work with human language (text and speech).
+
+## Who's who: the papers BERT is talking to
+
+The introduction names a handful of earlier works again and again. Here they are in one place, so the rest of the series can refer back to them. Each entry is listed in full in the references at the end of this part.
+
+| Short name | Paper | Year | What it is, in one line | Role in the BERT paper |
+|---|---|---|---|---|
+| Transformer | Vaswani et al., [*Attention Is All You Need*](https://arxiv.org/abs/1706.03762) | 2017 | the attention-only network for translation | BERT is its encoder half |
+| ELMo | Peters et al. (2018a), [*Deep contextualized word representations*](https://arxiv.org/abs/1802.05365) | 2018 | two one-way LSTM language models, concatenated | the feature-based rival; "shallow" bidirectional |
+| OpenAI GPT | Radford et al., [*Improving Language Understanding by Generative Pre-Training*](https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf) | 2018 | a left-to-right Transformer, fine-tuned per task | the fine-tuning rival; BERT-base copies its size |
+| ULMFiT | Howard and Ruder, [*Universal Language Model Fine-tuning for Text Classification*](https://arxiv.org/abs/1801.06146) | 2018 | an LSTM language model fine-tuned per task | an earlier fine-tuning approach |
+| Semi-supervised sequence learning | Dai and Le, [*Semi-supervised Sequence Learning*](https://arxiv.org/abs/1511.01432) | 2015 | pre-train an LSTM, then fine-tune it | one of the first pre-train-then-fine-tune papers |
+| word2vec | Mikolov et al., [*Distributed Representations of Words and Phrases and their Compositionality*](https://arxiv.org/abs/1310.4546) | 2013 | one fixed vector per word, learned from its neighbours | the classic pre-trained word embeddings |
+| GloVe | Pennington et al., [*GloVe: Global Vectors for Word Representation*](https://aclanthology.org/D14-1162/) | 2014 | word vectors from word co-occurrence counts | the other classic word embeddings |
+| Skip-thought | Kiros et al., [*Skip-Thought Vectors*](https://arxiv.org/abs/1506.06726) | 2015 | a sentence vector trained to predict nearby sentences | sentence-level pre-training (Part 2) |
+| CoVe | McCann et al., [*Learned in Translation: Contextualized Word Vectors*](https://arxiv.org/abs/1708.00107) | 2017 | word vectors from a translation encoder | transfer from a supervised task (Part 2) |
+| Cloze | Taylor, [*"Cloze Procedure": A New Tool for Measuring Readability*](https://doi.org/10.1177/107769905303000401) | 1953 | the fill-in-the-blank reading test | the inspiration for the masked LM |
+
+GPT-2 (Radford et al., 2019, [*Language Models are Unsupervised Multitask Learners*](https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf)), which we ran above, came out a few months after BERT and is not cited in the paper. We use it only because it is a freely available left-to-right model of similar size.
 
 ## Figure 3: the three designs side by side {§A.4}
 
@@ -361,6 +568,8 @@ Notice also that BERT and GPT have the **same** shape: a stack of Transformer bl
 > - The problem: standard **language models are unidirectional**, so each word learns only from its left. For tasks like question answering, the clue is often on the right.
 > - We checked it on real models: with the right side hidden, GPT-2's best guess for "I went to the ____" had probability 0.033; BERT, seeing "to deposit my paycheck", put **0.901** on "bank".
 > - BERT's fix is the **masked language model**: hide some tokens and predict them from both sides (a Cloze task), plus **next sentence prediction** for sentence pairs.
+> - Concretely, BERT and GPT differ only in the **attention mask** $$M$$: GPT blocks every key to the right of the query ($$-\infty$$ in the upper triangle); BERT blocks nothing. We recomputed a real GPT-2 head by hand and matched the library exactly.
+> - In **fine-tuning, all of BERT's weights keep training**, not just the new top layer. Freezing BERT is the separate feature-based approach (Part 5).
 > - The results: new state of the art on **eleven tasks**, including GLUE **80.5** (+7.7) and SQuAD v1.1 Test F1 **93.2**.
 
 **Next, in Part 2:** the related work the paper builds on, and the model itself: its layers, its size (and where "110 million parameters" comes from), and how text becomes the numbers BERT reads.
@@ -381,10 +590,27 @@ python bert_part1.py      # prints the table above, writes results/part1.json
 
 ## References
 
-1. J. Devlin, M.-W. Chang, K. Lee, K. Toutanova. [*BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding*](https://arxiv.org/abs/1810.04805). NAACL 2019. arXiv:1810.04805.
-2. M. Peters et al. [*Deep contextualized word representations*](https://arxiv.org/abs/1802.05365) (ELMo). NAACL 2018.
-3. A. Radford, K. Narasimhan, T. Salimans, I. Sutskever. *Improving Language Understanding by Generative Pre-Training* (OpenAI GPT). OpenAI, 2018.
-4. P. Nayak. [*Understanding searches better than ever before*](https://blog.google/products/search/search-language-understanding-bert/). Google blog, 25 October 2019.
-5. A. Vaswani et al. [*Attention Is All You Need*](https://arxiv.org/abs/1706.03762). NeurIPS 2017.
-6. W. L. Taylor. *Cloze procedure: A new tool for measuring readability*. Journalism Bulletin, 1953.
-7. Google Research. [BERT code and pre-trained models](https://github.com/google-research/bert).
+**The BERT paper**
+
+1. J. Devlin, M.-W. Chang, K. Lee, K. Toutanova. [*BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding*](https://arxiv.org/abs/1810.04805). NAACL 2019 ([ACL Anthology](https://aclanthology.org/N19-1423/)). arXiv:1810.04805, version 2 (May 2019), which is the version shown in the screenshots.
+2. Google Research. [BERT code and pre-trained models](https://github.com/google-research/bert). GitHub, 2018.
+
+**Papers the BERT paper cites in this part**
+
+3. A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez, Ł. Kaiser, I. Polosukhin. [*Attention Is All You Need*](https://arxiv.org/abs/1706.03762). NeurIPS 2017.
+4. M. E. Peters, M. Neumann, M. Iyyer, M. Gardner, C. Clark, K. Lee, L. Zettlemoyer. [*Deep contextualized word representations*](https://arxiv.org/abs/1802.05365) (ELMo; "Peters et al., 2018a" in the paper). NAACL 2018.
+5. A. Radford, K. Narasimhan, T. Salimans, I. Sutskever. [*Improving Language Understanding by Generative Pre-Training*](https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf) (OpenAI GPT). OpenAI technical report, 2018. The BERT paper's reference list gives it the title "Improving language understanding with unsupervised learning".
+6. J. Howard, S. Ruder. [*Universal Language Model Fine-tuning for Text Classification*](https://arxiv.org/abs/1801.06146) (ULMFiT). ACL 2018.
+7. A. M. Dai, Q. V. Le. [*Semi-supervised Sequence Learning*](https://arxiv.org/abs/1511.01432). NeurIPS 2015.
+8. W. L. Taylor. [*"Cloze Procedure": A New Tool for Measuring Readability*](https://doi.org/10.1177/107769905303000401). Journalism Quarterly 30(4), 1953 (cited as "Journalism Bulletin" in the BERT paper).
+9. T. Mikolov, I. Sutskever, K. Chen, G. Corrado, J. Dean. [*Distributed Representations of Words and Phrases and their Compositionality*](https://arxiv.org/abs/1310.4546) (word2vec). NeurIPS 2013.
+10. J. Pennington, R. Socher, C. D. Manning. [*GloVe: Global Vectors for Word Representation*](https://aclanthology.org/D14-1162/). EMNLP 2014.
+11. R. Kiros, Y. Zhu, R. Salakhutdinov, R. Zemel, A. Torralba, R. Urtasun, S. Fidler. [*Skip-Thought Vectors*](https://arxiv.org/abs/1506.06726). NeurIPS 2015.
+12. B. McCann, J. Bradbury, C. Xiong, R. Socher. [*Learned in Translation: Contextualized Word Vectors*](https://arxiv.org/abs/1708.00107) (CoVe). NeurIPS 2017.
+13. J. Deng, W. Dong, R. Socher, L.-J. Li, K. Li, L. Fei-Fei. [*ImageNet: A Large-Scale Hierarchical Image Database*](https://doi.org/10.1109/CVPR.2009.5206848). CVPR 2009.
+
+**Other sources used in this part**
+
+14. A. Radford, J. Wu, R. Child, D. Luan, D. Amodei, I. Sutskever. [*Language Models are Unsupervised Multitask Learners*](https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf) (GPT-2). OpenAI, 2019. The `openai-community/gpt2` model used in the code.
+15. P. Nayak. [*Understanding searches better than ever before*](https://blog.google/products/search/search-language-understanding-bert/). Google blog, 25 October 2019.
+16. Code for this part: [`bert_part1.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/bert/bert_part1.py) and [`bert_part1_math.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/bert/bert_part1_math.py).

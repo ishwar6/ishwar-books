@@ -198,5 +198,116 @@ for key, fn in [('p4_span', span_strip), ('p4_null', null_bars), ('p4_tau', tau_
     except (FileNotFoundError, KeyError, ValueError) as e:
         print('skipped', key, '(missing results:', e, ')')
 
+
+# ---------------------------------------------------------------- second pass: illustrated maths figures
+from alammar import vec, matrix, attn_grid, frame, brace
+M4 = json.load(open('results/part4_math.json'))
+
+
+def glue_shapes():
+    t = M4['glue_toy']
+    b = [text(20, 24, 'The classification head, shape by shape (toy numbers: H = 4, K = 3)', 't-title')]
+    b += [text(40, 64, 'C', 't-math')] + vec(60, 52, t['C'], 's1', 18, 3) + [text(60, 92, '1 × H', 't-tick')]
+    b += [text(170, 70, '×', 't-note', 'middle')]
+    m, W, H = matrix(195, 52, 4, 3, 's3', 18, 3, [list(r) for r in zip(*t['W'])], 'Wᵀ', 'H × K')
+    b += m + [text(195 + W + 25, 70, '=', 't-note', 'middle')]
+    x = 195 + W + 50
+    b += vec(x, 52, t['logits'], 's2', 18, 3) + [text(x, 40, 'logits', 't-math'), text(x, 92, '1 × K', 't-tick')]
+    x2 = x + 90
+    b += [arrow(x2, 62, x2 + 60, 62, on=True), text(x2 + 30, 50, 'softmax', 't-tick', 'middle')]
+    x3 = x2 + 75
+    for k, (lg, p) in enumerate(zip(t['logits'], t['p'])):
+        y = 46 + k * 22
+        b += [f'<rect class="s1" x="{x3}" y="{y}" width="{p * 140:.1f}" height="16" rx="3"/>', text(x3 + p * 140 + 6, y + 13, f'class {k}: {p:.3f}', 't-val')]
+    b += [text(20, 168, f'logits = C Wᵀ = [{t["logits"][0]:.2f}, {t["logits"][1]:.2f}, {t["logits"][2]:.2f}]   →   softmax = [{t["p"][0]:.3f}, {t["p"][1]:.3f}, {t["p"][2]:.3f}]', 't-tick'),
+          text(20, 188, f'if the right class is 0: loss = −log {t["p"][0]:.3f} = {t["loss"]:.3f}.   In BERT-base: C has H = 768 numbers, W is K × 768, so K × 768 + K new weights.', 't-tick')]
+    return svg(760, 204, 'The GLUE classification head with toy numbers: the 4-number vector C times the transpose of the 3 by 4 matrix W gives three logits, and softmax turns them into probabilities 0.867, 0.032 and 0.101.', b)
+F['p4_glue_shapes'] = glue_shapes()
+
+
+def pack_vs_cross():
+    q = ['who', 'sat', '?']
+    p_ = ['a', 'cat', 'sat', '.']
+    b = [text(20, 24, 'Two ways to let a question and a passage look at each other', 't-title')]
+    toks = ['[CLS]'] + q + ['[SEP]'] + p_ + ['[SEP]']
+    nq = 1 + len(q) + 1
+    seg = lambda i: 'A' if i < nq else 'B'
+    cls_fn = lambda i, j: 'cell' if seg(i) == seg(j) else 's2'
+    b += attn_grid(20, 100, toks, toks, lambda i, j: True, cell=36, title='BERT: one square self-attention over the packed pair', cls_fn=cls_fn, label_w=58)[0]
+    b += attn_grid(470, 100, q, p_, lambda i, j: True, cell=34, title='Older models: a separate cross-attention', label_w=46)[0]
+    b += [text(470, 250, 'rows: question words; columns: passage words.', 't-tick'), text(470, 268, 'A separate block, built on top of', 't-tick'),
+          text(470, 286, 'two independently encoded texts.', 't-tick'),
+          f'<rect class="cell" x="20" y="490" width="12" height="12" rx="2"/>', text(38, 500, 'within one text', 't-tick'),
+          f'<rect class="s2" x="160" y="490" width="12" height="12" rx="2"/>', text(178, 500, 'across the two texts (question ↔ passage): cross attention, for free', 't-tick')]
+    return svg(760, 514, 'Left: BERT packs the question and passage into one sequence, so its square self-attention already contains question-to-passage and passage-to-question attention. Right: older models encoded the two texts separately and added a rectangular cross-attention between them.', b)
+F['p4_pack_vs_cross'] = pack_vs_cross()
+
+
+def span_grid():
+    t = M4['span_toy']
+    n = 4
+    b = [text(20, 24, 'Span scores score(i, j) = S·Tᵢ + E·Tⱼ, toy passage of 4 tokens', 't-title')]
+    cell = 46
+    gx, gy = 150, 80
+    b += [text(gx + cell * n / 2, gy - 30, 'end j', 't-muted', 'middle'), text(gx - 70, gy + cell * n / 2, 'start i', 't-muted', 'middle')]
+    for j in range(n):
+        b.append(text(gx + j * cell + cell / 2, gy - 10, f'j={j}  E·T={t["end"][j]}', 't-tick', 'middle') if False else text(gx + j * cell + cell / 2, gy - 10, f'{j}', 't-tick', 'middle'))
+    best = tuple(t['best']); free = tuple(t['free'])
+    for i in range(n):
+        b.append(text(gx - 10, gy + i * cell + cell / 2 + 4, f'{i}', 't-tick', 'end'))
+        for j in range(n):
+            v = t['M'][i][j]; x, y = gx + j * cell, gy + i * cell
+            ok = j >= i
+            cls = 'cell' if ok else 'cell-masked'
+            op = 0.15 + 0.8 * (v / 6) if ok else 1
+            b.append(f'<rect class="{cls}" x="{x + 2}" y="{y + 2}" width="{cell - 4}" height="{cell - 4}" rx="4" style="fill-opacity:{op:.2f}"/>')
+            if (i, j) == best:
+                b.append(f'<rect class="box-on" x="{x}" y="{y}" width="{cell}" height="{cell}" rx="5" style="fill:none"/>')
+            b.append(text(x + cell / 2, y + cell / 2 + 5, f'{v:.1f}', 't-cell' + (' on' if ok and v > 3 else ''), 'middle'))
+    x0 = gx + n * cell + 40
+    b += [text(x0, 90, f'S·T = {t["start"]}', 't-tick'), text(x0, 110, f'E·T = {t["end"]}', 't-tick'),
+          text(x0, 140, f'highest of all: i={free[0]}, j={free[1]}, score 5.8', 't-tick'), text(x0, 158, 'but it ends before it starts: crossed out', 't-tick'),
+          text(x0, 188, f'best with j ≥ i: i={best[0]}, j={best[1]}, score 4.5', 't-val'),
+          text(x0, 218, f'training loss if (2, 3) is right:', 't-tick'), text(x0, 236, f'−log {t["p_start"][2]:.3f} − log {t["p_end"][3]:.3f} = {t["loss"]:.3f}', 't-tick')]
+    return svg(760, 280, 'A 4 by 4 table of span scores. The highest score sits below the diagonal, where the end comes before the start, so it is not allowed. The best allowed span starts at 2 and ends at 3 with score 4.5.', b)
+F['p4_span_grid'] = span_grid()
+
+
+def f1_fig():
+    rows = M4['emf1'][1:3]
+    b = [text(20, 24, 'Exact match and F1: word overlap after normalising (lowercase, no punctuation, no a/an/the)', 't-title')]
+    y = 60
+    for r in rows:
+        pw, gw = r['pn'].split(), r['gn'].split()
+        b.append(text(20, y, 'prediction', 't-muted'))
+        x = 110
+        for w in pw:
+            W = 9 * len(w) + 18; b += [box(x, y - 16, W, 24, 'box-1' if w in gw else 'box', 5), text(x + W / 2, y, w, 't-tick', 'middle')]; x += W + 6
+        b.append(text(20, y + 32, 'gold', 't-muted'))
+        x = 110
+        for w in gw:
+            W = 9 * len(w) + 18; b += [box(x, y + 16, W, 24, 'box-1' if w in pw else 'box', 5), text(x + W / 2, y + 32, w, 't-tick', 'middle')]; x += W + 6
+        b.append(text(110, y + 64, f'shared {r["same"]}:  precision {r["same"]}/{len(pw)} = {r["P"]:.3f},  recall {r["same"]}/{len(gw)} = {r["R"]:.3f},  F1 = {r["F1"]:.3f},  EM = {int(r["EM"])}', 't-val'))
+        y += 104
+    return svg(760, y - 16, 'Two predictions scored against the gold answer. Shared words are highlighted. A prediction missing two of five gold words gets precision 1, recall 0.6, F1 0.75 and exact match 0.', b)
+try:
+    F['p4_f1'] = f1_fig()
+except KeyError as e:
+    print('p4_f1 skipped', e)
+
+
+def new_weights():
+    P = M4['params']
+    items = [(k, v) for k, v in P['heads'].items()]
+    b = [text(20, 24, 'New weights added for each task, next to the 109.5 million that are fine-tuned', 't-title')]
+    y = 54
+    for k, v in items:
+        b += [text(20, y + 14, k, 't-tick'), f'<rect class="s2" x="250" y="{y}" width="{max(3, v / 2307 * 60):.1f}" height="20" rx="3"/>', text(320, y + 14, f'{v:,}', 't-val')]
+        y += 30
+    b += [text(20, y + 14, 'BERT-base itself (all trained)', 't-tick'), f'<rect class="s1" x="250" y="{y}" width="480" height="20" rx="3"/>', text(260, y + 14, f'{P["trained"] - P["new"]:,}', 't-cell on')]
+    b.append(text(20, y + 50, 'The new head is about 0.001% to 0.002% of the model. Fine-tuning still updates every one of the 109.5 million weights.', 't-muted'))
+    return svg(760, y + 62, 'Number of new weights per task head (769 to 2,307) compared with the 109.5 million weights of BERT-base, which are all updated during fine-tuning.', b)
+F['p4_new_weights'] = new_weights()
+
 json.dump(F, open('results/figs_part4.json', 'w'))
 print('figures:', ', '.join(F))

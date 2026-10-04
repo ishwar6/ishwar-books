@@ -55,6 +55,45 @@ The output side has only two cases:
 - **Sentence-level tasks** (one answer per input, like "positive" or "entailment") read the final vector of `[CLS]`, called $$C$$, and add one small classification layer.
 - **Token-level tasks** (one answer per token, like named-entity tags or the start and end of an answer) read the final vector of every token, $$T_1, T_2, \dots$$, and add one small layer that is applied to each token.
 
+### Why packing two texts into one sequence is enough
+
+Section 3.2 also makes a claim that is easy to read past: "encoding a concatenated text pair with self-attention effectively includes bidirectional cross attention between two sentences". Before BERT, models for text pairs encoded each text on its own, then added a special layer to compare them. The paper names two such systems:
+
+> [!PAPER] Parikh et al. (2016), A Decomposable Attention Model for Natural Language Inference · Figure 1
+> [![Figure 1 of the decomposable attention paper: an attention grid between the words of two sentences, followed by Attend, Compare and Aggregate steps](/img/papers/bert/p4-x-decomp-fig1.png)](/img/papers/bert/p4-x-decomp-fig1.png)
+>
+> **Context:** one of the two pair models BERT cites as "independently encode text pairs before applying bidirectional cross attention".
+>
+> **What it says:** an **Attend** step builds a grid of attention between every word of sentence 1 and every word of sentence 2, then **Compare** and **Aggregate** steps turn it into a decision.
+>
+> **Why it matters:** that grid is exactly a block of BERT's self-attention table, as the figure below shows. BERT gets it for free.
+
+> [!PAPER] Seo et al. (2017), Bidirectional Attention Flow for Machine Comprehension · Figure 1
+> [![Figure 1 of the BiDAF paper: separate character, word and contextual embedding layers for the context and the query, an attention flow layer with Query2Context and Context2Query attention, a modeling layer of LSTMs and an output layer for the start and end](/img/papers/bert/p4-x-bidaf-fig1.png)](/img/papers/bert/p4-x-bidaf-fig1.png)
+>
+> **Context:** BiDAF, a leading SQuAD model of 2017 and the other system BERT cites here.
+>
+> **What it says:** the passage ("context") and the question ("query") each get their own embedding and LSTM layers; an "attention flow layer" then computes attention in both directions (Query2Context and Context2Query), followed by more LSTMs and a start/end output layer.
+>
+> **Why it matters:** this is the "heavily-engineered task-specific architecture" of Part 1's contribution 2. BERT replaces all of it with one encoder and two vectors.
+
+> [!DEFINITION] Cross-attention
+> Attention where the queries come from one text and the keys and values from another, for example question words looking at passage words. Its table of weights is a rectangle: rows for one text, columns for the other.
+
+{{FIG:p4_pack_vs_cross|Left: BERT's packed input "[CLS] who sat ? [SEP] a cat sat . [SEP]" has one square attention table. The blue blocks are attention within each text; the orange blocks are attention between them, in both directions. Right: an older pair model's separate cross-attention, which is just one of BERT's orange blocks.}}
+
+It is not just a picture. In a public BERT-base fine-tuned for SQuAD, given "Where was Ada born?" and "Ada Lovelace was born in London in 1815.", question words really do look at the passage, in every layer ([`bert_part4_math.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/bert/bert_part4_math.py)):
+
+```text
+layer  1: question -> passage 0.190   passage -> question 0.107   question -> [CLS]/[SEP] 0.306
+layer  6: question -> passage 0.170   passage -> question 0.072   question -> [CLS]/[SEP] 0.503
+layer 10: question -> passage 0.191   passage -> question 0.196   question -> [CLS]/[SEP] 0.414
+layer 12: question -> passage 0.087   passage -> question 0.045   question -> [CLS]/[SEP] 0.740
+averaged over all 12 layers and heads, "born" (question) gives 0.162 of its attention to the passage
+```
+
+(Each number is the average share of attention, over all heads, that flows from one block to the other. Much of the rest goes to `[CLS]` and `[SEP]`, which many heads use as a resting place.)
+
 ### Figure 4: the four shapes of a task {§A.5}
 
 The paper draws these cases in Appendix A.5.
@@ -144,6 +183,23 @@ The size of the grid is 2 batch sizes × 3 learning rates × 3 epoch counts = 18
 
 ## The nine GLUE tasks {§B.1}
 
+First, the benchmark's own summary table:
+
+> [!PAPER] Wang et al. (2018), GLUE · Section 3, Table 1
+> [![Table 1 of the GLUE paper: the nine tasks grouped as single-sentence, similarity and paraphrase, and inference tasks, with training and test sizes, task type, metric and domain; CoLA uses Matthews correlation and MNLI matched and mismatched accuracy](/img/papers/bert/p4-x-glue-table1.png)](/img/papers/bert/p4-x-glue-table1.png)
+>
+> **Context:** the GLUE paper (Wang et al., 2018), which defined the benchmark BERT reports first.
+>
+> **What it says:** nine tasks in three groups: single-sentence (CoLA, SST-2), similarity and paraphrase (MRPC, STS-B, QQP), and inference (MNLI, QNLI, RTE, WNLI). The **Metrics** column says how each is scored: CoLA by **Matthews correlation**, STS-B by Pearson/Spearman correlation, MNLI by accuracy on a **matched** and a **mismatched** test set.
+>
+> **Why it matters:** this explains two things in BERT's Table 1 below: why MNLI has two numbers ("m/mm"), and why the CoLA column is not really an accuracy.
+
+> [!DEFINITION] Matthews correlation
+> A score for yes/no classification between -1 and +1 that stays fair when one answer is much more common than the other. 0 means "no better than guessing", 1 means perfect. GLUE uses it for CoLA, where most sentences are grammatical.
+
+> [!DEFINITION] Matched and mismatched
+> MNLI's two test sets. **Matched** examples come from the same kinds of text (genres) as the training data; **mismatched** examples come from genres the model never trained on. A model that scores well on both generalises.
+
 Before the results, let us meet the tasks. Appendix B.1 describes each one.
 
 > [!PAPER] Devlin et al. (2018), BERT · Appendix B.1 · page 14
@@ -214,6 +270,34 @@ where:
 
 The paper's "$$\log(\text{softmax}(CW^T))$$" is the log-probability of the right label; training maximises it, which is the same as minimising the loss above. (Real implementations also add a bias of $$K$$ numbers to the logits; the paper leaves it out of the formula.)
 
+**A toy example you can check by hand**, with $$H = 4$$ and $$K = 3$$:
+
+$$
+C = (0.5,\ -1,\ 2,\ 0.1), \qquad W = \begin{pmatrix} 1 & 0 & 0.5 & 0 \\ 0 & 1 & -0.5 & 2 \\ -0.5 & 0.5 & 0 & 1 \end{pmatrix}
+$$
+
+Each logit is the dot product of $$C$$ with one row of $$W$$:
+
+$$
+\text{logit}_0 = (0.5)(1) + (-1)(0) + (2)(0.5) + (0.1)(0) = 1.50, \quad \text{logit}_1 = -1.80, \quad \text{logit}_2 = -0.65
+$$
+
+Softmax: $$e^{1.50} = 4.482$$, $$e^{-1.80} = 0.165$$, $$e^{-0.65} = 0.522$$, which add up to $$5.169$$. So $$P = (0.867,\ 0.032,\ 0.101)$$, and if the right label is 0 the loss is $$-\log 0.867 = 0.143$$.
+
+{{FIG:p4_glue_shapes|The classification head, shape by shape, with the toy numbers: C (1 × H) times Wᵀ (H × K) gives K logits; softmax gives K probabilities. In BERT-base, H = 768.}}
+
+The same arithmetic on a real fine-tuned model, a public BERT-base fine-tuned on SST-2 (`textattack/bert-base-uncased-SST-2`), where label 1 means positive:
+
+```text
+"a gorgeous, witty, seductive movie."  gold label 1
+  C W^T = [-4.316, 4.135]  (library: [-4.316, 4.135])
+  softmax = [0.0002, 0.9998];  loss = -log P(gold) = 0.0002
+"the plot is dull and the acting is worse."  gold label 0
+  C W^T = [3.883, -3.500]  (library: [3.883, -3.499])
+  softmax = [0.9994, 0.0006];  loss = -log P(gold) = 0.0006
+```
+
+After fine-tuning, the gap between the two logits is large (8.45 and 7.38), so the model is very sure, and right, on both.
 {{FIG:p4_cls_head|The sentence-level head. All tokens go through BERT; only the final [CLS] vector C is read. One new matrix W turns it into K scores, and softmax turns the scores into probabilities. The probabilities drawn are an illustration.}}
 
 ### Checking the formula in code
@@ -252,6 +336,8 @@ new parameters for this task: 2,307 out of 109,484,547 (0.0021%)
 
 The hand-written loss and the library's loss agree to all six printed decimals. The probabilities are meaningless here, because $$W$$ is still random: fine-tuning has not started.
 
+{{FIG:p4_new_weights|How many new weights each task adds: 1,538 for a two-label GLUE task, 2,307 for MNLI's three labels, 1,538 for SQuAD's S and E, and 769 for SWAG's single vector. All 109.5 million weights of BERT-base are updated during fine-tuning as well.}}
+
 > [!WARNING] One honest detail: the pooler
 > The paper says the classifier reads $$C$$, the final `[CLS]` vector. The code Google released (and Hugging Face, which copies it) first passes $$C$$ through a **pooler**: one more dense layer with a tanh, which was trained during pre-training together with next sentence prediction. The classifier reads that pooled vector. The output above shows that the raw $$C$$ would give different logits. The idea is unchanged (one vector per sequence, one new matrix $$W$$), but if you implement the formula literally you will not match the released models.
 
@@ -259,6 +345,16 @@ The hand-written loss and the library's loss agree to all six printed decimals. 
 > A smooth function that squashes any number into the range from -1 to 1. "Dense layer + tanh" means: multiply by a matrix, add a bias, then squash every number.
 
 ## Table 1: the GLUE results {§4.1}
+
+> [!PAPER] Devlin et al. (2018), BERT · Section 4.1, footnote 9 and the paragraph after Table 1 · page 6
+> [![Footnote 9 of the BERT paper: the GLUE data set distribution does not include the Test labels, and we only made a single GLUE evaluation server submission for each of BERT-base and BERT-large](/img/papers/bert/p4-footnote9.png)](/img/papers/bert/p4-footnote9.png)
+> [![From Section 4.1: BERT-base and OpenAI GPT are nearly identical in terms of model architecture apart from the attention masking; for MNLI, BERT obtains a 4.6% absolute accuracy improvement](/img/papers/bert/p4-gpt-arch.png)](/img/papers/bert/p4-gpt-arch.png)
+>
+> **Context:** a footnote and a sentence that tell you how to read Table 1.
+>
+> **What it says:** the test labels are secret, and the authors "only made a single GLUE evaluation server submission" for each model. And "BERT-base and OpenAI GPT are nearly identical in terms of model architecture apart from the attention masking".
+>
+> **Why it matters:** one submission means the test numbers were not tuned by trying many times against the hidden labels. And the second sentence is what makes the GPT row a fair comparison: same size, different mask (Part 1).
 
 > [!PAPER] Devlin et al. (2018), BERT · Section 4.1, Table 1 · page 6
 > [![Table 1: GLUE test results. Columns MNLI matched and mismatched, QQP, QNLI, SST-2, CoLA, STS-B, MRPC, RTE and Average, with training set sizes below each name. Rows: Pre-OpenAI SOTA 74.0 average, BiLSTM+ELMo+Attn 71.0, OpenAI GPT 75.1, BERT-base 79.6, BERT-large 82.1](/img/papers/bert/p4-table1.png)](/img/papers/bert/p4-table1.png)
@@ -387,6 +483,17 @@ The best learning rate here is **5e-5**, with **87.0%** dev accuracy (355/408) a
 
 ## SQuAD v1.1: finding the answer in a paragraph {§4.2}
 
+What a SQuAD example looks like, from the dataset's own paper:
+
+> [!PAPER] Rajpurkar et al. (2016), SQuAD · Section 1, Figure 1
+> [![Figure 1 of the SQuAD paper: a Wikipedia paragraph about precipitation and three questions whose answers, gravity, graupel and within a cloud, are each a segment of text from the passage](/img/papers/bert/p4-x-squad-fig1.png)](/img/papers/bert/p4-x-squad-fig1.png)
+>
+> **Context:** the SQuAD paper's first figure.
+>
+> **What it says:** a Wikipedia paragraph about precipitation, with three crowd-written questions. "Each of the answers is a segment of text from the passage": "gravity", "graupel", "within a cloud".
+>
+> **Why it matters:** because every answer is a span, the model never has to *write* anything. It only has to point at a start and an end, which is why two vectors are enough.
+
 > [!PAPER] Devlin et al. (2018), BERT · Section 4.2 · page 6
 > [![Section 4.2: the Stanford Question Answering Dataset, SQuAD v1.1, is a collection of 100k crowd-sourced question and answer pairs. Given a question and a passage from](/img/papers/bert/p4-squad-intro.png)](/img/papers/bert/p4-squad-intro.png)
 > [![Section 4.2 continued: predict the answer text span in the passage. The question uses the A embedding and the passage the B embedding. Only a start vector S and an end vector E are introduced. The probability of word i being the start is a softmax of S dot T i over the paragraph. The score of a span from i to j is S dot T i plus E dot T j, and the maximum scoring span with j at least i is the prediction. The training objective is the sum of the log-likelihoods of the correct start and end positions. 3 epochs, learning rate 5e-5, batch size 32](/img/papers/bert/p4-squad-se.png)](/img/papers/bert/p4-squad-se.png)
@@ -422,6 +529,16 @@ $$
 $$
 
 where $$i$$ is the start token and $$j$$ the end token. The condition $$j \ge i$$ just says an answer cannot end before it starts. Adding the two dot products is the same as multiplying the two probabilities (the softmax bottoms are the same for every span), so this picks the most likely start-and-end pair.
+
+**A toy example.** A passage of four tokens, with these dot products:
+
+$$
+S \cdot T = (0.5,\ 1.0,\ 3.0,\ 0.2), \qquad E \cdot T = (2.8,\ 0.1,\ 1.0,\ 1.5)
+$$
+
+Every cell of the table below is $$S \cdot T_i + E \cdot T_j$$. The largest number in the whole table is 5.8, at $$i = 2, j = 0$$: but that span ends before it starts. Among the cells with $$j \ge i$$ (on or above the diagonal), the best is 4.5, at $$i = 2, j = 3$$. The softmaxes give $$P^{\text{start}}_2 = 0.782$$ and $$P^{\text{end}}_3 = 0.181$$, so if (2, 3) is the true span, the training loss is $$-\log 0.782 - \log 0.181 = 0.245 + 1.709 = 1.954$$.
+
+{{FIG:p4_span_grid|The toy span table. Rows are start positions i, columns end positions j, each cell is S·Tᵢ + E·Tⱼ. Cells below the diagonal (end before start) are not allowed; the highest of those, 5.8, is ignored. The best allowed span is (2, 3) with 4.5.}}
 
 The training loss for one example whose true answer starts at token $$s$$ and ends at token $$e$$:
 
@@ -493,6 +610,25 @@ One passage proves nothing about quality. So I ran the same checkpoint, with my 
 > [!DEFINITION] Exact match (EM) and F1 for SQuAD
 > **EM** is 1 if the predicted answer is exactly one of the human answers (after normalisation), else 0. **F1** gives partial credit: it counts the words the prediction shares with a human answer, and combines precision and recall. Both are averaged over all questions and shown out of 100.
 
+Written out, for one prediction and one gold answer, after normalising both (lowercase, remove punctuation and the words "a", "an", "the"):
+
+$$
+\text{precision} = \frac{\#\text{shared words}}{\#\text{predicted words}}, \qquad \text{recall} = \frac{\#\text{shared words}}{\#\text{gold words}}, \qquad F_1 = \frac{2 \cdot \text{precision} \cdot \text{recall}}{\text{precision} + \text{recall}}
+$$
+
+When a question has several human answers, the score against the best-matching one counts. Worked examples:
+
+```text
+pred "Bidirectional Encoder Representations" | gold "Bidirectional Encoder Representations from Transformers"
+   shared words 3, precision 1.000, recall 0.600, F1 0.750, EM 0
+pred "the Broncos defeated the Panthers" -> "broncos defeated panthers" | gold "Denver Broncos" -> "denver broncos"
+   shared words 1, precision 0.333, recall 0.500, F1 0.400, EM 0
+```
+
+For the first: $$F_1 = 2 \times 1 \times 0.6 / (1 + 0.6) = 0.75$$.
+
+{{FIG:p4_f1|Two predictions scored against the gold answer, word by word. Shared words are highlighted. Missing two of five gold words gives F1 0.75; one shared word out of three predicted and two gold gives F1 0.4. Exact match is 0 for both.}}
+
 Long passages do not fit in 384 tokens, so each one is cut into overlapping windows with a stride of 128 tokens (the settings of the released code), and the best span over all windows wins.
 
 ```text
@@ -507,6 +643,18 @@ On all **10,570** dev questions, this checkpoint with my decoding scores **EM 80
 The misses are instructive. "What was the theme of Super Bowl 50?" appears twice because the dev set really contains two copies of that question (two separate entries with slightly different gold answers); both times the model picked a long span about the purpose of the game instead of "golden anniversary". And for "How many times have the Panthers been in the Super Bowl?" it answered "eight" where the answer is "2": a number from the right paragraph, attached to the wrong fact.
 
 ### Table 2 {§4.2}
+
+Two footnotes qualify Table 2:
+
+> [!PAPER] Devlin et al. (2018), BERT · Section 4.2, footnotes 11 and 12 · page 7
+> [![Footnote 11 of the BERT paper: QANet is described in Yu et al. 2018, but the system has improved substantially after publication](/img/papers/bert/p4-footnote11.png)](/img/papers/bert/p4-footnote11.png)
+> [![Footnote 12 of the BERT paper: the TriviaQA data used consists of paragraphs from TriviaQA-Wiki formed of the first 400 tokens in documents that contain at least one of the provided possible answers](/img/papers/bert/p4-footnote12.png)](/img/papers/bert/p4-footnote12.png)
+>
+> **Context:** notes on the leaderboard systems and on the extra data.
+>
+> **What it says:** QANet on the leaderboard had "improved substantially after publication", so its published paper is not the system in the table. And the TriviaQA data BERT added uses "the first 400 tokens in documents, that contain at least one of the provided possible answers".
+>
+> **Why it matters:** both are honesty notes. Leaderboard entries were moving targets, and the "+TriviaQA" rows used extra training data, so they are not directly comparable with systems that did not.
 
 > [!PAPER] Devlin et al. (2018), BERT · Section 4.2, Table 2 · page 7
 > [![Table 2: SQuAD 1.1 results. Top leaderboard systems on Dec 10th 2018: Human test EM 82.3 F1 91.2, #1 ensemble nlnet 86.0 and 91.7. Published: BiDAF+ELMo, R.M. Reader. Ours: BERT-base single dev EM 80.8 F1 88.5; BERT-large single 84.1 and 90.9; BERT-large ensemble 85.8 and 91.8; BERT-large single plus TriviaQA dev 84.2 and 91.1, test 85.1 and 91.8; BERT-large ensemble plus TriviaQA dev 86.2 and 92.2, test 87.4 and 93.2. The ensemble is 7 systems with different pre-training checkpoints and fine-tuning seeds](/img/papers/bert/p4-table2.png)](/img/papers/bert/p4-table2.png)
@@ -533,6 +681,15 @@ The misses are instructive. "What was the theme of Super Bowl 50?" appears twice
 The arithmetic: the ensemble's 93.2 test F1 minus the top leaderboard ensemble's 91.7 is the "+1.5". And the single model with TriviaQA (91.8 test F1) beats that top *ensemble* (91.7), which is the sentence "our single BERT model outperforms the top ensemble system in terms of F1 score".
 
 ## SQuAD v2.0: when there is no answer {§4.3}
+
+> [!PAPER] Rajpurkar, Jia, Liang (2018), Know What You Don't Know (SQuAD 2.0) · Figure 1
+> [![Figure 1 of the SQuAD 2.0 paper: a paragraph about the Endangered Species Act with two unanswerable questions written by crowdworkers, each with a plausible but incorrect answer](/img/papers/bert/p4-x-squad2-fig1.png)](/img/papers/bert/p4-x-squad2-fig1.png)
+>
+> **Context:** the paper that built SQuAD 2.0.
+>
+> **What it says:** "Two unanswerable questions written by crowdworkers, along with plausible (but incorrect) answers." The questions use words from the paragraph ("1937 treaty"), but the paragraph does not answer them.
+>
+> **Why it matters:** these traps are why SQuAD 2.0 is hard: a model that just matches words will answer confidently and be wrong.
 
 > [!PAPER] Devlin et al. (2018), BERT · Section 4.3 · page 7
 > [![Section 4.3: SQuAD 2.0 allows that no short answer exists in the paragraph. Questions without an answer are treated as having an answer span that starts and ends at the CLS token. For prediction, compare the score of the no-answer span s null equal to S dot C plus E dot C to the score of the best non-null span](/img/papers/bert/p4-squad2.png)](/img/papers/bert/p4-squad2.png)
@@ -578,6 +735,25 @@ SQuAD 2.0 Q: How many layers does BERT have?
    s_null = S.C + E.C = 13.19;  best span "all" scores 16.16;  difference +2.97
 ```
 
+The rule with real numbers, from a public BERT-base fine-tuned on SQuAD 2.0 (`deepset/bert-base-uncased-squad2`), on our BERT-abstract passage, with $$\tau = 4.00$$ chosen on the dev set (next section):
+
+```text
+Q: What does BERT stand for?
+   s_null = S.C + E.C = 5.08 + 5.10 = 10.18
+   best span "Bidirectional Encoder Representations from Transformers": S.T_i + E.T_j = 11.69 + 11.56 = 23.25
+   tau = +4.00: 23.25 > 14.18 ?  yes -> answer
+Q: Who won the football world cup in 2018?
+   s_null = S.C + E.C = 10.51 + 10.63 = 21.13
+   best span "BERT": S.T_i + E.T_j = 0.33 + 0.89 = 1.22
+   tau = +4.00: 1.22 > 25.13 ?  no -> no answer
+Q: How many layers does BERT have?
+   s_null = S.C + E.C = 6.61 + 6.58 = 13.19
+   best span "all": S.T_i + E.T_j = 8.45 + 7.71 = 16.16
+   tau = 0:     16.16 > 13.19 ?  yes -> answer
+   tau = +4.00: 16.16 > 17.19 ?  no -> no answer
+```
+
+The last question shows what $$\tau$$ is for. The abstract does not say how many layers BERT has, and the best span ("all") is nonsense. With $$\tau = 0$$ the model would answer it; with $$\tau = 4$$ it correctly declines.
 {{FIG:p4_null|Best span score minus the no-answer score for four questions. Positive bars: a span wins and the model answers. Negative bars: the [CLS] option wins and the model says there is no answer. This uses a threshold of 0.}}
 
 Read the differences:
@@ -615,6 +791,18 @@ One caution, which applies to the paper too: choosing $$\tau$$ on the dev set an
 
 ## SWAG: choosing the best ending {§4.4}
 
+> [!PAPER] Zellers et al. (2018), SWAG · Table 1
+> [![Table 1 of the SWAG paper: three examples, a woman at a piano, a girl at monkey bars and a woman blow drying a dog, each with four possible endings and the correct one in bold; adversarial filtering ensures that stylistic models find all options equally appealing](/img/papers/bert/p4-x-swag-table1.png)](/img/papers/bert/p4-x-swag-table1.png)
+>
+> **Context:** examples from the SWAG paper.
+>
+> **What it says:** each example is a sentence and four endings; "the correct answer is bolded". The wrong endings were chosen by **adversarial filtering** so that "stylistic models find all options equally appealing".
+>
+> **Why it matters:** the wrong endings are fluent and on topic, so surface cues do not help. Choosing well needs commonsense: you sit at a piano and set your fingers on the keys; you do not "smile with someone as the music plays" by default.
+
+> [!DEFINITION] Adversarial filtering
+> Building a test by keeping only the wrong answers that fool existing models. The test is then hard on purpose for the models of its time.
+
 > [!PAPER] Devlin et al. (2018), BERT · Section 4.4 · page 7
 > [![Section 4.4: SWAG contains 113k sentence-pair completion examples for grounded commonsense inference; choose the most plausible continuation among four choices. Construct four input sequences, each the given sentence plus one possible continuation. The only new parameter is a vector whose dot product with C gives a score for each choice, normalized with softmax. 3 epochs, learning rate 2e-5, batch size 16. BERT-large outperforms ESIM+ELMo by +27.1% and OpenAI GPT by 8.3%](/img/papers/bert/p4-swag.png)](/img/papers/bert/p4-swag.png)
 >
@@ -635,6 +823,13 @@ $$
 
 where $$C_k$$ is the `[CLS]` vector when BERT reads "sentence + ending $$k$$", $$w$$ is the one new vector (768 numbers), and the softmax runs across the four choices. Unlike GLUE, the softmax is not over labels of one input, but over four separate inputs.
 
+A toy example with $$H = 4$$: four `[CLS]` vectors and one learned vector $$w = (2, -1, 0.5, 1)$$:
+
+$$
+s_1 = (2)(0.9) + (-1)(0.2) + (0.5)(-0.1) + (1)(0.4) = 1.95, \quad s_2 = -1.75, \quad s_3 = 1.35, \quad s_4 = -0.30
+$$
+
+Softmax over the four scores gives $$(0.596,\ 0.015,\ 0.327,\ 0.063)$$. If ending 1 is right, the loss is $$-\log 0.596 = 0.518$$.
 {{FIG:p4_swag|SWAG. Each ending is paired with the sentence and read by BERT on its own. One learned vector w turns each [CLS] vector into a score, and a softmax across the four scores picks the ending.}}
 
 The head in code, checked against `BertForMultipleChoice` (untrained, so the probabilities mean nothing yet; the point is the shapes and the arithmetic):
@@ -704,10 +899,31 @@ python bert_part4_squad.py            # span search, SQuAD v1.1 and v2.0 dev set
 
 ## References
 
-1. J. Devlin, M.-W. Chang, K. Lee, K. Toutanova. [*BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding*](https://arxiv.org/abs/1810.04805). NAACL 2019.
-2. A. Wang, A. Singh, J. Michael, F. Hill, O. Levy, S. Bowman. [*GLUE: A Multi-Task Benchmark and Analysis Platform for Natural Language Understanding*](https://arxiv.org/abs/1804.07461). ICLR 2019.
-3. P. Rajpurkar, J. Zhang, K. Lopyrev, P. Liang. [*SQuAD: 100,000+ Questions for Machine Comprehension of Text*](https://arxiv.org/abs/1606.05250). EMNLP 2016.
-4. P. Rajpurkar, R. Jia, P. Liang. [*Know What You Don't Know: Unanswerable Questions for SQuAD*](https://arxiv.org/abs/1806.03822) (SQuAD 2.0). ACL 2018.
-5. R. Zellers, Y. Bisk, R. Schwartz, Y. Choi. [*SWAG: A Large-Scale Adversarial Dataset for Grounded Commonsense Inference*](https://arxiv.org/abs/1808.05326). EMNLP 2018.
-6. Google Research. [BERT code](https://github.com/google-research/bert) (`run_classifier.py`, `run_squad.py`).
-7. Public checkpoints used here: [csarron/bert-base-uncased-squad-v1](https://huggingface.co/csarron/bert-base-uncased-squad-v1) and [deepset/bert-base-uncased-squad2](https://huggingface.co/deepset/bert-base-uncased-squad2).
+**The BERT paper**
+
+1. J. Devlin, M.-W. Chang, K. Lee, K. Toutanova. [*BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding*](https://arxiv.org/abs/1810.04805). NAACL 2019 ([ACL Anthology](https://aclanthology.org/N19-1423/)).
+2. Google Research. [BERT code](https://github.com/google-research/bert) (`run_classifier.py`, `run_squad.py`, `modeling.py`).
+
+**Papers the BERT paper cites in this part**
+
+3. A. Wang, A. Singh, J. Michael, F. Hill, O. Levy, S. R. Bowman. [*GLUE: A Multi-Task Benchmark and Analysis Platform for Natural Language Understanding*](https://arxiv.org/abs/1804.07461). BlackboxNLP workshop at EMNLP 2018.
+4. A. Williams, N. Nangia, S. R. Bowman. [*A Broad-Coverage Challenge Corpus for Sentence Understanding through Inference*](https://arxiv.org/abs/1704.05426) (MultiNLI). NAACL 2018.
+5. R. Socher et al. [*Recursive Deep Models for Semantic Compositionality Over a Sentiment Treebank*](https://aclanthology.org/D13-1170/) (SST-2). EMNLP 2013.
+6. A. Warstadt, A. Singh, S. R. Bowman. [*Neural Network Acceptability Judgments*](https://arxiv.org/abs/1805.12471) (CoLA). TACL 2019.
+7. D. Cer, M. Diab, E. Agirre, I. Lopez-Gazpio, L. Specia. [*SemEval-2017 Task 1: Semantic Textual Similarity Multilingual and Crosslingual Focused Evaluation*](https://arxiv.org/abs/1708.00055) (STS-B). SemEval 2017.
+8. W. B. Dolan, C. Brockett. [*Automatically Constructing a Corpus of Sentential Paraphrases*](https://aclanthology.org/I05-5002/) (MRPC). IWP 2005.
+9. L. Bentivogli, B. Magnini, I. Dagan, H. T. Dang, D. Giampiccolo. *The Fifth PASCAL Recognizing Textual Entailment Challenge* (RTE). TAC 2009.
+10. H. J. Levesque, E. Davis, L. Morgenstern. *The Winograd Schema Challenge* (WNLI). KR 2012 (cited as an AAAI spring symposium paper, 2011).
+11. P. Rajpurkar, J. Zhang, K. Lopyrev, P. Liang. [*SQuAD: 100,000+ Questions for Machine Comprehension of Text*](https://arxiv.org/abs/1606.05250). EMNLP 2016.
+12. P. Rajpurkar, R. Jia, P. Liang. [*Know What You Don't Know: Unanswerable Questions for SQuAD*](https://arxiv.org/abs/1806.03822) (SQuAD 2.0). ACL 2018.
+13. M. Joshi, E. Choi, D. S. Weld, L. Zettlemoyer. [*TriviaQA: A Large Scale Distantly Supervised Challenge Dataset for Reading Comprehension*](https://arxiv.org/abs/1705.03551). ACL 2017.
+14. R. Zellers, Y. Bisk, R. Schwartz, Y. Choi. [*SWAG: A Large-Scale Adversarial Dataset for Grounded Commonsense Inference*](https://arxiv.org/abs/1808.05326). EMNLP 2018.
+15. A. P. Parikh, O. Täckström, D. Das, J. Uszkoreit. [*A Decomposable Attention Model for Natural Language Inference*](https://arxiv.org/abs/1606.01933). EMNLP 2016.
+16. M. Seo, A. Kembhavi, A. Farhadi, H. Hajishirzi. [*Bidirectional Attention Flow for Machine Comprehension*](https://arxiv.org/abs/1611.01603) (BiDAF). ICLR 2017.
+17. A. W. Yu et al. [*QANet: Combining Local Convolution with Global Self-Attention for Reading Comprehension*](https://arxiv.org/abs/1804.09541). ICLR 2018.
+18. A. Radford, K. Narasimhan, T. Salimans, I. Sutskever. [*Improving Language Understanding by Generative Pre-Training*](https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf) (OpenAI GPT). OpenAI, 2018.
+
+**Other sources used in this part**
+
+19. Public checkpoints: [csarron/bert-base-uncased-squad-v1](https://huggingface.co/csarron/bert-base-uncased-squad-v1), [deepset/bert-base-uncased-squad2](https://huggingface.co/deepset/bert-base-uncased-squad2) and [textattack/bert-base-uncased-SST-2](https://huggingface.co/textattack/bert-base-uncased-SST-2).
+20. Code for this part: [`bert_part4_heads.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/bert/bert_part4_heads.py), [`bert_part4_finetune.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/bert/bert_part4_finetune.py), [`bert_part4_squad.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/bert/bert_part4_squad.py), [`bert_part4_math.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/bert/bert_part4_math.py).
