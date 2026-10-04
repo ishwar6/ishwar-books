@@ -11,6 +11,7 @@ Code and results for the series at https://ishwarj.com/writings/attention-1-self
 | `part3_qwen.py` | Part 3: Qwen2.5-0.5B with windows and attention sinks; a DeepSeek-style lightning indexer per layer, trained with the dense warm-up KL loss and tested with top-k sparse attention |
 | `part4_linear.py` | Part 4: linear attention (parallel vs recurrent), overwrite and capacity tests for the delta rule, forget-gate fading, our gated delta rule vs the Qwen3-Next reference code, hybrid memory, decode timing |
 | `part4_train.py` | Part 4: five small models (softmax, gated, linear, Gated DeltaNet, hybrid) trained on books and on an associative-recall task |
+| `paper_shots.py` | cuts highlighted excerpts (text, equations, figures, tables) out of the research papers' PDFs for the "From the paper" boxes: `python paper_shots.py 1 2 3 4` |
 | `figlib.py`, `figs_part*.py` | draws the figures from the results |
 | `results/` | the JSON every number in the articles comes from |
 

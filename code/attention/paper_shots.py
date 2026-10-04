@@ -57,7 +57,7 @@ def find(pg, phrase, nth=0):
 
 
 def shot(name, arxiv_id, highlight=(), anchor=None, page=None, above=40, below=40, dpi=190, snap=True, band=None,
-         figure=False, column=None, nth=0, hl_nth=None, fig_top=None):
+         figure=False, column=None, nth=0, hl_nth=None, fig_top=None, x0_min=None):
     """Render one highlighted excerpt.
     anchor: phrase that positions the crop (defaults to the first highlight); nth picks a later match on the page.
     above/below: points of context kept around the anchor (text mode).
@@ -90,6 +90,8 @@ def shot(name, arxiv_id, highlight=(), anchor=None, page=None, above=40, below=4
         ws = [w for w in pg.get_text('words') if (w[3] - w[1]) < 3 * (w[2] - w[0])]   # skip arXiv's rotated side stamp
         x0, x1 = max(20, min(w[0] for w in ws) - 10), min(W - 20, max(w[2] for w in ws) + 10)
 
+    if x0_min is not None:
+        x0 = max(x0, x0_min)
     found = []
     for phrase in highlight:
         n = (hl_nth or {}).get(phrase, 0)
@@ -110,7 +112,7 @@ def shot(name, arxiv_id, highlight=(), anchor=None, page=None, above=40, below=4
     if figure:
         cap = blk
         art = [fitz.Rect(d['rect']) for d in pg.get_drawings()] + [fitz.Rect(i['bbox']) for i in pg.get_image_info()]
-        art = sorted((r for r in art if r.y1 <= cap.y0 + 3 and r.y0 > 60 and r.width > 2 and r.x1 > x0 and r.x0 < x1),
+        art = sorted((r for r in art if r.y1 <= cap.y0 + 3 and r.y0 > 75 and r.width > 2 and r.x1 > x0 and r.x0 < x1),
                      key=lambda r: -r.y1)
         top = cap.y0
         for r in (art if fig_top is None else []):
@@ -118,7 +120,7 @@ def shot(name, arxiv_id, highlight=(), anchor=None, page=None, above=40, below=4
                 top = min(top, r.y0)
         # figure labels are text: include text blocks that sit inside the figure area
         for b in (blocks if fig_top is None else []):
-            if b.y0 >= top - 2 and b.y1 <= cap.y0 + 1 and b.x1 > x0 and b.x0 < x1:
+            if b.y0 >= top - 2 and b.y0 > 75 and b.y1 <= cap.y0 + 1 and b.x1 > x0 and b.x0 < x1:
                 top = min(top, b.y0)
         if fig_top is not None:
             top = cap.y0 - fig_top
@@ -126,7 +128,7 @@ def shot(name, arxiv_id, highlight=(), anchor=None, page=None, above=40, below=4
         while changed:                                # short text lines just above the art are figure titles
             changed = False
             for b in blocks:
-                if b.y0 < top and b.y1 >= top - 14 and b.height < 30 and b.y1 <= cap.y0:
+                if b.y0 < top and b.y0 > 75 and b.y1 >= top - 14 and b.height < 30 and b.y1 <= cap.y0:
                     top, changed = b.y0, True
         clip = fitz.Rect(x0, max(0, top - 6), x1, min(Hh, cap.y1 + 4 + below))
     else:
@@ -244,6 +246,47 @@ JOBS = {
              highlight=['still has a complexity of'], above=50, below=40),
         dict(name='dsv32-figure3', arxiv_id='2512.02556', anchor='Inference costs of DeepSeek-V3.1-Terminus and DeepSeek-V3.2 on H800 clusters',
              highlight=['Inference costs of DeepSeek-V3.1-Terminus and DeepSeek-V3.2'], figure=True, below=0),
+    ],
+    '4': [
+        dict(name='kath-linearized', arxiv_id='2006.16236', anchor='once and reuse them for every query',
+             highlight=['once and reuse them for every query'], above=235, below=8),
+        dict(name='kath-masked', arxiv_id='2006.16236', anchor='we linearize the masked attention as described below',
+             highlight=['we linearize the masked attention as described below'], above=90, below=40),
+        dict(name='kath-rnn', arxiv_id='2006.16236', anchor='The resulting RNN has two hidden states',
+             highlight=['The resulting RNN has two hidden states, namely the attention memory s and the normalizer memory z'], above=40, below=136, snap=False),
+        dict(name='kath-figure1', arxiv_id='2006.16236', anchor='Comparison of the computational requirements for a forward/backward pass',
+             highlight=['Comparison of the computational requirements for a forward/backward pass'], figure=True, column='full', below=0),
+        dict(name='kath-table1', arxiv_id='2006.16236', anchor='Table 1: Comparison of autoregressive', highlight=['Linear (ours)'],
+             figure=True, below=20, fig_top=80),
+        dict(name='gdn-intro', arxiv_id='2412.06464', anchor='it can promptly clear memory by setting',
+             highlight=['we propose the gated delta rule, a simple and intuitive mechanism that combines both approaches', 'it can promptly clear memory by setting'],
+             above=20, below=40),
+        dict(name='gdn-rule', arxiv_id='2412.06464', anchor='The proposed gated delta rule is simple yet effective',
+             highlight=['The proposed gated delta rule is simple yet effective', 'controls state decay'], above=10, below=60),
+        dict(name='gdn-table1', arxiv_id='2412.06464', anchor='Comparison of different linear RNN models and their corresponding online learning objectives',
+             highlight=['Comparison of different linear RNN models and their corresponding online learning objectives'], above=6, below=112),
+        dict(name='gdn-figure1', arxiv_id='2412.06464', anchor='Visualization of the (hybrid) architecture and block design of Gated DeltaNet models',
+             highlight=['Visualization of the (hybrid) architecture and block design of Gated DeltaNet models'], figure=True, below=0),
+        dict(name='ga-figure1', arxiv_id='2505.06708', anchor='Investigated positions for applying gating operations',
+             highlight=['Investigated positions for applying gating operations'], figure=True, below=0, fig_top=180),
+        dict(name='ga-figure2', arxiv_id='2505.06708', anchor='Proportion of attention allocated to the initial token per layer',
+             highlight=['an average of 46.7% of attention scores across layers directed towards the first token', 'reducing the proportion to 4.8%'],
+             figure=True, below=0, fig_top=250),
+        dict(name='kimi-figure1', arxiv_id='2510.26692', page=0, anchor='(a) Performance vs. acceleration',
+             highlight=['(a) Performance vs. acceleration'], figure=True, below=0, x0_min=60),
+        dict(name='kimi-figure3', arxiv_id='2510.26692', anchor='Illustration of our Kimi Linear model architecture',
+             highlight=['Illustration of our Kimi Linear model architecture'], figure=True, below=0),
+        dict(name='kimi-nope', arxiv_id='2510.26692', anchor='we apply NoPE to all full attention (MLA) layers',
+             highlight=['a uniform 3:1 ratio, i.e., repeating 3 KDA layers to 1 full MLA layer', 'we apply NoPE to all full attention (MLA) layers'],
+             above=70, below=40),
+        dict(name='kimi-6x', arxiv_id='2510.26692', anchor='For decoding at 1M context length, Kimi Linear is',
+             highlight=['For decoding at 1M context length, Kimi Linear is'], above=60, below=12),
+        dict(name='nemo-figure2', arxiv_id='2504.03624', anchor='Nemotron-H-8B/56B model architectures',
+             highlight=['Roughly 8% of the total layers in the model are self-attention layers'], figure=True, below=0),
+        dict(name='nemo-figure1', arxiv_id='2504.03624', anchor='versus per-GPU inference throughput for Nemotron-H-56B/47B-Base',
+             highlight=['versus per-GPU inference throughput for Nemotron-H-56B/47B-Base'], figure=True, below=0, fig_top=152),
+        dict(name='zoology-figure1', arxiv_id='2312.04927', anchor='The associative recall gap',
+             highlight=['The associative recall gap'], figure=True, below=0),
     ],
 }
 
