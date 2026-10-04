@@ -1,6 +1,6 @@
 import manifest from '../generated/manifest.json'
 
-export type TocItem = { depth: number; id: string; text: string }
+export type TocItem = { depth: number; id: string; text: string; sec?: string }
 export type PageMeta = {
   slug: string
   route: string
@@ -16,6 +16,8 @@ export type PageMeta = {
   series?: string
   seriesPart?: number
   accent?: string
+  partNumber?: number
+  covers?: string
 }
 export type Book = {
   slug: string
@@ -33,7 +35,29 @@ export type Rendered = { html: string; toc: TocItem[] }
 export type Chapter = { t: number; stamp: string; label: string }
 export type VideoMeta = PageMeta & { youtube: string; duration?: string; durationSeconds?: number; chapters: Chapter[] }
 
+export type Paper = {
+  slug: string
+  route: string
+  title: string
+  short: string
+  description: string
+  authors: string[]
+  org: string
+  year?: number
+  venue: string
+  arxiv?: string
+  code?: string
+  accent: string
+  learn: string[]
+  tags: string[]
+  date?: string
+  plannedParts: number
+  minutes: number
+  parts: PageMeta[]
+}
+
 export const writings = manifest.writings as PageMeta[]
+export const papers = ((manifest as { papers?: unknown }).papers ?? []) as Paper[]
 export const videos = (manifest as { videos?: VideoMeta[] }).videos ?? []
 export const books = manifest.books as Book[]
 

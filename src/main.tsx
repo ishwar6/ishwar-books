@@ -5,6 +5,7 @@ import 'katex/dist/katex.min.css'
 import './styles/base.css'
 import './styles/prose.css'
 import './styles/layout.css'
+import './styles/paper.css'
 import Layout from './components/Layout'
 import Home from './pages/Home'
 import Writings from './pages/Writings'
@@ -16,6 +17,9 @@ import Projects from './pages/Projects'
 import About from './pages/About'
 import Videos from './pages/Videos'
 import Video from './pages/Video'
+import Papers from './pages/Papers'
+import Paper from './pages/Paper'
+import PaperPart from './pages/PaperPart'
 import NotFound from './pages/NotFound'
 
 createRoot(document.getElementById('root')!).render(
@@ -29,6 +33,9 @@ createRoot(document.getElementById('root')!).render(
           <Route path="books" element={<Books />} />
           <Route path="books/:book" element={<Book />} />
           <Route path="books/:book/:chapter" element={<Chapter />} />
+          <Route path="papers" element={<Papers />} />
+          <Route path="papers/:paper" element={<Paper />} />
+          <Route path="papers/:paper/:part" element={<PaperPart />} />
           <Route path="videos" element={<Videos />} />
           <Route path="videos/:slug" element={<Video />} />
           <Route path="projects" element={<Projects />} />

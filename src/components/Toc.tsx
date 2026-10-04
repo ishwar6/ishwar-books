@@ -21,7 +21,7 @@ export default function Toc({ items }: { items: TocItem[] }) {
                 document.getElementById(i.id)?.scrollIntoView({ behavior: 'smooth' })
               }}
             >
-              {i.text}
+              {i.sec && <span className="toc-sec">{i.sec}</span>}{i.text}
             </a>
           </li>
         ))}

@@ -5,7 +5,7 @@ import Toc from './Toc'
 import ReadingProgress from './ReadingProgress'
 
 /** Fetches a pre-rendered page and lays it out with a header, body and table of contents. */
-export default function Article({ route, header, sidebar, footer }: { route: string; header: ReactNode; sidebar?: ReactNode; footer?: ReactNode }) {
+export default function Article({ route, header, sidebar, footer, className = '' }: { route: string; header: ReactNode; sidebar?: ReactNode; footer?: ReactNode; className?: string }) {
   const [page, setPage] = useState<Rendered | null>(null)
   const [error, setError] = useState(false)
 
@@ -22,7 +22,7 @@ export default function Article({ route, header, sidebar, footer }: { route: str
   }, [page])
 
   return (
-    <div className={`container wide reader${sidebar ? ' with-sidebar' : ''}`}>
+    <div className={`container wide reader${sidebar ? ' with-sidebar' : ''}${className ? ` ${className}` : ''}`}>
       <ReadingProgress />
       {sidebar}
       <article className="reader-main">

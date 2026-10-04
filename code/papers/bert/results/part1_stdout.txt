@@ -1,0 +1,12 @@
+sentence: i went to the ____ to deposit my paycheck.   (hidden word: bank)
+  GPT-2, left side only: hospital 0.033, doctor 0.024, store 0.022, gym 0.018, office 0.015
+  BERT, both sides:      bank 0.901, office 0.009, store 0.008, teller 0.008, atm 0.006
+
+sentence: my neighbor's ____ barked at the mailman all morning.   (hidden word: dog)
+  GPT-2, left side only: house 0.071, dog 0.037, son 0.026, car 0.024, daughter 0.023
+  BERT, both sides:      dog 0.651, dogs 0.142, voice 0.020, phone 0.018, had 0.014
+
+sentence: she picked up her ____ and started to play a song.   (hidden word: guitar)
+  GPT-2, left side only: phone 0.100, bag 0.033, gun 0.018, daughter 0.014, own 0.013
+  BERT, both sides:      guitar 0.677, phone 0.081, ipod 0.050, fiddle 0.017, instrument 0.013
+

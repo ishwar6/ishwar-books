@@ -6,6 +6,8 @@
 //   content/writings/<slug>.md                    → /writings/<slug>
 //   content/books/<book>/index.md                 → /books/<book>          (book metadata + intro)
 //   content/books/<book>/[<part>/]<chapter>.md    → /books/<book>/<chapter>
+//   content/papers/<paper>/index.md               → /papers/<paper>        (paper metadata + overview)
+//   content/papers/<paper>/<part>.md              → /papers/<paper>/<part> (one part of a paper breakdown)
 import fs from 'node:fs'
 import path from 'node:path'
 import matter from 'gray-matter'
@@ -34,6 +36,8 @@ const CALLOUTS = {
   caution: 'Caution', danger: 'Danger', example: 'Example', question: 'Question',
   quote: 'Quote', summary: 'Summary', success: 'Success', bug: 'Bug', abstract: 'Summary',
   definition: 'Definition', define: 'Definition', term: 'Definition',
+  paper: 'From the paper',
+  takeaways: 'Key takeaways',
 }
 
 // ---------- helpers ----------
@@ -116,6 +120,29 @@ for (const dir of bookDirs) {
   book.chapters.sort((a, b) => (a.data.order ?? 1e9) - (b.data.order ?? 1e9) || rank(a) - rank(b) || natural(a.rel, b.rel))
 }
 
+const papers = []
+const paperDirs = fs.existsSync(path.join(CONTENT, 'papers'))
+  ? fs.readdirSync(path.join(CONTENT, 'papers'), { withFileTypes: true }).filter((d) => d.isDirectory() && !d.name.startsWith('.'))
+  : []
+for (const dir of paperDirs) {
+  const root = path.join(CONTENT, 'papers', dir.name)
+  const paperSlug = slugOf(dir.name)
+  const indexFile = path.join(root, 'index.md')
+  const index = fs.existsSync(indexFile) ? matter(fs.readFileSync(indexFile, 'utf8')) : { data: {}, content: '' }
+  const paper = { slug: paperSlug, data: index.data, parts: [] }
+  papers.push(paper)
+  pages.push({ file: indexFile, collection: 'paper-index', slug: paperSlug, paper: paperSlug, route: `papers/${paperSlug}`, data: index.data, body: index.content })
+  for (const file of fs.readdirSync(root).filter((f) => f.endsWith('.md') && f !== 'index.md').map((f) => path.join(root, f))) {
+    const { data, content } = matter(fs.readFileSync(file, 'utf8'))
+    if (data.draft && process.env.NODE_ENV === 'production') continue
+    const slug = data.slug ?? slugOf(file)
+    const page = { file, collection: 'paper-part', slug, paper: paperSlug, route: `papers/${paperSlug}/${slug}`, data, body: content }
+    paper.parts.push(page)
+    pages.push(page)
+  }
+  paper.parts.sort((a, b) => (a.data.part ?? 1e9) - (b.data.part ?? 1e9) || natural(a.slug, b.slug))
+}
+
 const byFile = new Map(pages.map((p) => [path.resolve(p.file), p]))
 const byName = new Map(pages.map((p) => [path.basename(p.file, '.md').toLowerCase(), p]))
 
@@ -136,6 +163,20 @@ function remarkCallouts() {
       const isDef = ['definition', 'define', 'term'].includes(kind)
       node.children.unshift({ type: 'paragraph', data: { hProperties: { className: ['callout-title'] } }, children: [{ type: 'text', value: title }] })
       if (isDef) node.data.hProperties.className = ['callout', 'callout-definition']
+    })
+}
+
+/** Paper section markers:  ## Masked LM {§3.1}  → <h2 data-sec="§3.1">Masked LM</h2> (shown as a "Paper §3.1" badge) */
+function remarkSectionMarks() {
+  return (tree) =>
+    visit(tree, 'heading', (node) => {
+      const last = node.children[node.children.length - 1]
+      const m = last?.type === 'text' && last.value.match(/\s*\{(§[^}]+)\}\s*$/)
+      if (!m) return
+      last.value = last.value.slice(0, m.index)
+      const raw = m[1].trim()
+      const sec = /^§\s*([A-Z](\.\d+)*|\d+(\.\d+)*)$/.test(raw) ? raw : raw.replace(/^§\s*/, '')   // §3.1, §A.2 keep the §; "§Abstract" → "Abstract"
+      node.data = { ...(node.data ?? {}), hProperties: { ...(node.data?.hProperties ?? {}), dataSec: sec } }
     })
 }
 
@@ -234,7 +275,7 @@ function rehypeToc({ toc }) {
   return (tree) =>
     visit(tree, 'element', (node) => {
       if ((node.tagName === 'h2' || node.tagName === 'h3') && node.properties.id)
-        toc.push({ depth: Number(node.tagName[1]), id: String(node.properties.id), text: toString(node).replace(/#$/, '').trim() })
+        toc.push({ depth: Number(node.tagName[1]), id: String(node.properties.id), text: toString(node).replace(/#$/, '').trim(), ...(node.properties.dataSec ? { sec: String(node.properties.dataSec) } : {}) })
     })
 }
 
@@ -263,6 +304,7 @@ async function render(page) {
     .use(remarkGfm)
     .use(remarkMath, { singleDollarTextMath: false })
     .use(remarkCallouts)
+    .use(remarkSectionMarks)
     .use(remarkWikilinks)
     .use(remarkRehype, { allowDangerousHtml: true })
     .use(rehypeRaw)
@@ -336,8 +378,12 @@ const metaOf = (p) => {
     ...(p.data.series ? { series: p.data.series, seriesPart: p.data.series_part ?? 1 } : {}),
     ...(p.collection === 'videos' ? videoMeta(p.data) : {}),
     ...(p.part ? { part: p.part } : {}),
+    ...(p.collection === 'paper-part' ? { partNumber: p.data.part, covers: p.data.covers ?? '', short: p.data.short ?? '' } : {}),
   }
 }
+
+const paperShort = (slug) => papers.find((x) => x.slug === slug)?.data.short ?? pretty(slug)
+const pageLabel = (p) => `${paperShort(p.paper)}, Part ${p.data.part}`
 
 let rendered = 0
 const search = [] // one document per section: route, anchor, page title, heading, text, book
@@ -350,7 +396,8 @@ for (const p of pages) {
   for (const sec of sections) {
     const text = sec.text.join(' ').replace(/\s+/g, ' ').trim()
     if (!text && !sec.heading) continue
-    search.push({ id: search.length, r: p.route, a: sec.id, t: p.meta.title, h: sec.heading, x: text, b: p.book ?? null })
+    const label = p.collection === 'paper-part' ? `${pageLabel(p)}: ${p.meta.title}` : p.meta.title
+    search.push({ id: search.length, r: p.route, a: sec.id, t: label, h: sec.heading, x: text, b: p.book ?? null })
   }
   rendered++
 }
@@ -371,8 +418,22 @@ const bookList = books.map((b) => ({
   chapters: b.chapters.map((c) => c.meta),
 })).sort((a, b) => a.order - b.order || natural(a.slug, b.slug))
 
+const paperList = papers.map((x) => {
+  const d = x.data
+  return {
+    slug: x.slug, route: `papers/${x.slug}`,
+    title: d.title ?? pretty(x.slug), short: d.short ?? pretty(x.slug),
+    description: d.description ?? '', authors: d.authors ?? [], org: d.org ?? '', year: d.year, venue: d.venue ?? '',
+    arxiv: d.arxiv ? String(d.arxiv) : undefined, code: d.code, accent: d.accent ?? '#4fc3d9',
+    learn: d.learn ?? [], tags: d.tags ?? [], date: toDate(d.date), updated: toDate(d.updated), order: d.order ?? 1e9,
+    plannedParts: d.parts ?? x.parts.length,
+    minutes: x.parts.reduce((n, p) => n + p.meta.minutes, 0),
+    parts: x.parts.map((p) => p.meta),
+  }
+}).sort((a, b) => a.order - b.order || (b.date ?? '').localeCompare(a.date ?? ''))
+
 fs.writeFileSync(path.join(OUT_PUBLIC, 'search.json'), JSON.stringify(search))
 const videos = pages.filter((p) => p.collection === 'videos').map((p) => p.meta)
   .sort((a, b) => (b.date ?? '').localeCompare(a.date ?? '') || (a.seriesPart ?? 0) - (b.seriesPart ?? 0))
-fs.writeFileSync(OUT_MANIFEST, JSON.stringify({ writings, books: bookList, videos }, null, 2))
-console.log(`content: rendered ${rendered} pages, ${search.length} search sections (${writings.length} writings, ${bookList.length} books, ${videos.length} videos)`)
+fs.writeFileSync(OUT_MANIFEST, JSON.stringify({ writings, books: bookList, videos, papers: paperList }, null, 2))
+console.log(`content: rendered ${rendered} pages, ${search.length} search sections (${writings.length} writings, ${bookList.length} books, ${videos.length} videos, ${paperList.length} papers)`)

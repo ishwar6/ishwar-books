@@ -115,7 +115,7 @@ function SearchDialog({ book, onClose }: { book?: (typeof books)[number]; onClos
         <ul className="search-results" ref={list}>
           {query.trim().length < 2 ? (
             <li className="search-empty">
-              {scope === 'book' && book ? <>Searching <strong>{book.title}</strong>. Press Tab to search the entire site.</> : 'Search every writing and book chapter.'}
+              {scope === 'book' && book ? <>Searching <strong>{book.title}</strong>. Press Tab to search the entire site.</> : 'Search every writing, research paper and book chapter.'}
             </li>
           ) : loading && !hits.length ? (
             <li className="search-empty">Searching…</li>

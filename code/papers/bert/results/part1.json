@@ -1,0 +1,151 @@
+{
+ "fill": [
+  {
+   "left": "i went to the",
+   "word": "bank",
+   "right": "to deposit my paycheck.",
+   "gpt2": [
+    [
+     "hospital",
+     0.033
+    ],
+    [
+     "doctor",
+     0.024
+    ],
+    [
+     "store",
+     0.022
+    ],
+    [
+     "gym",
+     0.018
+    ],
+    [
+     "office",
+     0.015
+    ]
+   ],
+   "bert": [
+    [
+     "bank",
+     0.901
+    ],
+    [
+     "office",
+     0.009
+    ],
+    [
+     "store",
+     0.008
+    ],
+    [
+     "teller",
+     0.008
+    ],
+    [
+     "atm",
+     0.006
+    ]
+   ]
+  },
+  {
+   "left": "my neighbor's",
+   "word": "dog",
+   "right": "barked at the mailman all morning.",
+   "gpt2": [
+    [
+     "house",
+     0.071
+    ],
+    [
+     "dog",
+     0.037
+    ],
+    [
+     "son",
+     0.026
+    ],
+    [
+     "car",
+     0.024
+    ],
+    [
+     "daughter",
+     0.023
+    ]
+   ],
+   "bert": [
+    [
+     "dog",
+     0.651
+    ],
+    [
+     "dogs",
+     0.142
+    ],
+    [
+     "voice",
+     0.02
+    ],
+    [
+     "phone",
+     0.018
+    ],
+    [
+     "had",
+     0.014
+    ]
+   ]
+  },
+  {
+   "left": "she picked up her",
+   "word": "guitar",
+   "right": "and started to play a song.",
+   "gpt2": [
+    [
+     "phone",
+     0.1
+    ],
+    [
+     "bag",
+     0.033
+    ],
+    [
+     "gun",
+     0.018
+    ],
+    [
+     "daughter",
+     0.014
+    ],
+    [
+     "own",
+     0.013
+    ]
+   ],
+   "bert": [
+    [
+     "guitar",
+     0.677
+    ],
+    [
+     "phone",
+     0.081
+    ],
+    [
+     "ipod",
+     0.05
+    ],
+    [
+     "fiddle",
+     0.017
+    ],
+    [
+     "instrument",
+     0.013
+    ]
+   ]
+  }
+ ]
+}

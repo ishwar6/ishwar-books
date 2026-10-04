@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { projects, site } from '../data/site'
-import { books, videos, writings } from '../lib/content'
+import { books, papers, videos, writings } from '../lib/content'
 import { useTitle } from '../lib/hooks'
 import { BookCard, ProjectCard, VideoCard, WritingCard } from '../components/Cards'
 import { GitHub, Mail, X, YouTube } from '../components/icons'
@@ -11,6 +11,7 @@ export default function Home() {
   const explore = [
     { to: '/writings', count: writings.length, label: 'Writings', desc: 'Long-form essays and deep dives, written from first principles.' },
     { to: '/books', count: books.length, label: 'Books', desc: `${chapters}+ chapters on GPUs, LLMs, RAG and agents.` },
+    { to: '/papers', count: papers.length, label: 'Research papers', desc: 'Landmark papers explained section by section, with code.' },
     { to: '/projects', count: projects.length, label: 'Projects', desc: 'Tools and pipelines I build, like an explainer-video studio.' },
     { to: '/videos', count: videos.length, label: 'Videos', desc: 'Animated explainers, each with a written companion.' },
   ]

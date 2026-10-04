@@ -1,0 +1,390 @@
+---
+title: "The Big Idea: Reading in Both Directions"
+description: "The title, the abstract and the introduction of the BERT paper, line by line: what pre-training is, the two ways to reuse a pre-trained model, why reading only left to right is a real limit, and BERT's fix of filling in blanks. With a real run of GPT-2 and BERT on the same sentences."
+part: 1
+covers: "Title, Abstract, §1"
+date: 2026-10-04
+tags: [bert, nlp, transformers]
+---
+
+In October 2018, four researchers at Google posted a paper called **BERT**. It reported new best results on eleven language tasks at once. A year later, in October 2019, Google wrote that BERT would help its search engine understand about one in ten English searches in the US. BERT-style models are still used today inside search engines, spam filters, support-ticket routers and retrieval systems.
+
+This series reads the paper slowly, in the paper's own order. Each piece follows the same pattern:
+
+1. **The exact lines from the paper**, as a highlighted screenshot in a teal box like the one below.
+2. **A plain-English explanation**, with a yellow box for every new word.
+3. **A picture**, and **real code** when it helps, with its real output.
+4. **Why it matters**, and only then the next piece.
+
+The small `Paper §1` tag above each heading tells you which section of the paper you are reading. The screenshots come from the paper's second arXiv version (May 2019), the one most people read today.
+
+> [!DEFINITION] Definition boxes
+> A yellow box like this explains one technical word in plain language, the first time it appears. If you already know the word, skip the box.
+
+## The title {§Title}
+
+> [!PAPER] Devlin et al. (2018), BERT · Title · page 1
+> [![The title of the BERT paper: BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding, by Jacob Devlin, Ming-Wei Chang, Kenton Lee and Kristina Toutanova, Google AI Language](/img/papers/bert/p1-title.png)](/img/papers/bert/p1-title.png)
+>
+> **Context:** the first thing on page 1. The paper was posted to arXiv in October 2018 and published at NAACL 2019, a major conference on language technology.
+>
+> **What it says:** "BERT: Pre-training of Deep **Bidirectional Transformers** for Language Understanding."
+>
+> **Why it matters:** every word of the title is one idea of the paper. If you understand the title, you understand the paper.
+
+Let us take the title apart, one word at a time.
+
+- **Pre-training.** First, train a model on a huge pile of ordinary text, before it ever sees the real task. This is the expensive part, and it is done once.
+- **Deep.** The model is a tall stack of layers (12 or 24 of them). Each layer refines what the layer below understood.
+- **Bidirectional.** Every word looks at the words on its **left and** on its **right**. This is the key idea of the paper.
+- **Transformers.** The kind of neural network used. It was introduced in 2017 in the paper *Attention Is All You Need*.
+- **Language Understanding.** The goal: tasks where a model must understand text (classify it, answer questions about it, find names in it), not write new text.
+
+> [!DEFINITION] Neural network and model
+> A **neural network** is a program made of many simple maths steps whose numbers (called **weights** or **parameters**) are learned from examples. A **model** is one such network with its learned weights. BERT is a model with about 110 million weights in its smaller version.
+
+> [!DEFINITION] Transformer
+> A neural network design built around **attention**: every word computes how much it should "look at" every other word, and mixes in information from the words it looks at. If attention is new to you, the [attention series](/writings/attention-1-self-attention/) explains it from zero. For this paper you only need the idea: words look at other words.
+
+> [!DEFINITION] Pre-training
+> Training a model on a large amount of general text first, so it learns how language works. The model is later adapted to a specific job. It is like a student who reads thousands of books before taking any particular exam.
+
+## What BERT is {§Abstract}
+
+> [!PAPER] Devlin et al. (2018), BERT · Abstract · page 1
+> [![The first half of the BERT abstract, with three highlights: Bidirectional Encoder Representations from Transformers; jointly conditioning on both left and right context in all layers; one additional output layer](/img/papers/bert/p1-abstract-what.png)](/img/papers/bert/p1-abstract-what.png)
+>
+> **Context:** the abstract, the paper's summary of itself in two paragraphs. This is the first paragraph.
+>
+> **What it says:** BERT stands for **B**idirectional **E**ncoder **R**epresentations from **T**ransformers. It is pre-trained on "unlabeled text by jointly conditioning on both left and right context in all layers". Afterwards it can be fine-tuned "with just one additional output layer" for many tasks, such as question answering.
+>
+> **Why it matters:** these three sentences are the whole recipe. Learn from plain text, look both ways, then add one small layer per task.
+
+The name has four parts. You already know **bidirectional** and **transformers** from the title. The two new words are **encoder** and **representations**.
+
+> [!DEFINITION] Representation (embedding)
+> A list of numbers that stands for a piece of text. A model turns each word into such a list, for example 768 numbers. Words with similar meanings in similar contexts get similar lists. "Representation", "embedding" and "vector" are used almost interchangeably in this paper.
+
+> [!DEFINITION] Encoder
+> The part of a Transformer that **reads** text and turns every word into a representation. (The other part, a **decoder**, writes text one word at a time.) BERT is only an encoder: it understands, it does not write.
+
+The abstract makes three claims. Let us translate each one.
+
+**1. "Pre-train deep bidirectional representations from unlabeled text."** BERT learns from text that nobody has labelled: Wikipedia and a collection of books. Nobody had to mark which sentences are happy or sad. Labelled data is expensive. Plain text is almost free, and there is a lot of it.
+
+> [!DEFINITION] Labeled and unlabeled data
+> **Labeled** data has the right answer attached by a person, like a movie review marked "positive". **Unlabeled** data is just text, with no answers attached.
+
+**2. "Jointly conditioning on both left and right context in all layers."** When BERT builds the representation of a word, it uses the words before it *and* the words after it, and it does this at every layer, not just at the end. "Conditioning on" simply means "using as input".
+
+**3. "Fine-tuned with just one additional output layer."** After pre-training, you take BERT, put one small new layer on top, and keep training the whole thing a little on your task. The same pre-trained BERT can become a sentiment classifier, a question-answering system or a name finder.
+
+> [!DEFINITION] Fine-tuning
+> Taking a pre-trained model and training it a bit more on a specific task with labeled examples. All the weights move a little; nothing starts from zero except the small new layer. It is much cheaper than pre-training: minutes or hours instead of days.
+
+{{FIG:p1_two_steps|The whole BERT recipe. Pre-train once on unlabeled text (the expensive step). Then, for every task, start from a copy of the pre-trained model, add one small output layer, and fine-tune.}}
+
+**Use case.** A company that wants to sort support emails into "billing", "bug report" and "feature request" does not need to teach a model English. It starts from pre-trained BERT and fine-tunes it on a few thousand labelled emails.
+
+## The results in the abstract {§Abstract}
+
+> [!PAPER] Devlin et al. (2018), BERT · Abstract · page 1
+> [![The second paragraph of the BERT abstract: new state-of-the-art results on eleven tasks, GLUE score 80.5 percent, MultiNLI accuracy 86.7 percent, SQuAD v1.1 Test F1 93.2 and SQuAD v2.0 Test F1 83.1](/img/papers/bert/p1-abstract-results.png)](/img/papers/bert/p1-abstract-results.png)
+>
+> **Context:** the second paragraph of the abstract, right after the description of BERT.
+>
+> **What it says:** BERT is "conceptually simple and empirically powerful". It sets new best results on eleven tasks, and the abstract lists four of them with how much it improved.
+>
+> **Why it matters:** these were large jumps. Benchmarks usually move by fractions of a point at a time.
+
+> [!DEFINITION] State of the art (SOTA)
+> The best result anyone has published so far on a task. "New state of the art" means "better than every earlier system".
+
+> [!DEFINITION] Benchmark
+> A fixed, public test that everyone uses, so results can be compared fairly. A model is given the test questions, and its answers are scored.
+
+Here are the four results from the abstract, in plain words:
+
+| Benchmark | What it tests | BERT's score | Improvement |
+|---|---|---|---|
+| GLUE | nine sentence-understanding tasks, averaged | 80.5 | +7.7 points |
+| MultiNLI | does sentence B follow from sentence A? | 86.7% accuracy | +4.6 points |
+| SQuAD v1.1 | find the answer to a question in a paragraph | 93.2 Test F1 | +1.5 points |
+| SQuAD v2.0 | the same, but some questions have no answer | 83.1 Test F1 | +5.1 points |
+
+> [!DEFINITION] Accuracy and F1
+> **Accuracy** is the share of answers that are exactly right. **F1** is a score between 0 and 100 that gives partial credit: for question answering, it measures how many words of the predicted answer overlap with the true answer. Part 4 explains both properly.
+
+A note on the wording "7.7% point absolute improvement": it means the score went up by 7.7 **points** (for example from 72.8 to 80.5), not by 7.7 percent of the old score. Part 4 goes through every one of these tasks and every table of results.
+
+## Pre-training already worked, for two kinds of tasks {§1}
+
+Now the introduction. Its first paragraph sets the scene.
+
+> [!PAPER] Devlin et al. (2018), BERT · Section 1 · page 1
+> [![The first paragraph of the introduction: language model pre-training has been shown to be effective for sentence-level tasks such as natural language inference and paraphrasing, and token-level tasks such as named entity recognition and question answering](/img/papers/bert/p1-intro-tasks.png)](/img/papers/bert/p1-intro-tasks.png)
+>
+> **Context:** the opening paragraph of Section 1 (Introduction).
+>
+> **What it says:** "Language model pre-training" already helps many tasks. These come in two kinds: **sentence-level tasks**, which look at whole sentences ("analyzing them holistically"), and **token-level tasks**, which need an answer for every single word ("fine-grained output at the token level").
+>
+> **Why it matters:** BERT wants to be good at **both** kinds with the same model. Keep the two kinds in mind; the argument of the next paragraphs depends on them.
+
+> [!DEFINITION] Token
+> A small piece of text: usually a word, sometimes part of a word or a punctuation mark. Models read tokens, not letters. Part 2 shows exactly how BERT cuts text into tokens.
+
+The paper names four example tasks:
+
+> [!DEFINITION] Natural language inference (NLI)
+> Given two sentences, decide if the second one **follows from** the first (entailment), **contradicts** it, or is **neutral**. "A man is playing a guitar" → "A person is making music": entailment.
+
+> [!DEFINITION] Paraphrasing
+> Deciding whether two sentences mean the same thing, even with different words.
+
+> [!DEFINITION] Named entity recognition (NER)
+> Marking every word that is part of a name, and what kind of name it is: a person, a place, an organisation, and so on.
+
+> [!DEFINITION] Question answering (QA)
+> Given a question and a paragraph, find the words in the paragraph that answer the question.
+
+{{FIG:p1_tasks|Two kinds of tasks. A sentence-level task (here, natural language inference) gives one answer for the whole input. A token-level task (here, named entity recognition) gives an answer for every token.}}
+
+## Two ways to reuse a pre-trained model {§1}
+
+> [!PAPER] Devlin et al. (2018), BERT · Section 1 · page 1
+> [![The second paragraph of the introduction: there are two existing strategies, feature-based and fine-tuning. ELMo uses task-specific architectures that include the pre-trained representations as additional features. OpenAI GPT is trained by simply fine-tuning all pre-trained parameters. Both use unidirectional language models](/img/papers/bert/p1-intro-strategies.png)](/img/papers/bert/p1-intro-strategies.png)
+>
+> **Context:** the second paragraph of the introduction. It describes the two ways people used pre-trained models in 2018.
+>
+> **What it says:** the **feature-based** approach (ELMo) feeds the pre-trained representations as extra inputs into a model built specially for each task. The **fine-tuning** approach (OpenAI GPT) adds very few new weights and fine-tunes "all pre-trained parameters". Both learn during pre-training with "unidirectional language models".
+>
+> **Why it matters:** BERT picks the fine-tuning side. And the last sentence names the weakness BERT attacks: both approaches pre-train in only one direction.
+
+> [!DEFINITION] Downstream task
+> The real task you care about in the end (sentiment, question answering, and so on), as opposed to the pre-training task. It sits "downstream" of pre-training.
+
+> [!DEFINITION] ELMo
+> A 2018 model by Peters et al. (the "a" in "2018a" just tells two papers by the same authors apart). It reads text with two separate networks, one left to right and one right to left, and gives every word a vector that depends on its sentence. Its vectors are used as **features**: extra inputs for another model.
+
+> [!DEFINITION] OpenAI GPT
+> A 2018 model by Radford et al. at OpenAI (the first "Generative Pre-trained Transformer"). A Transformer trained to predict the next word, left to right. To use it for a task, you fine-tune the whole model with a small extra layer. BERT copies this recipe, and changes the direction.
+
+{{FIG:p1_strategies|The two strategies. Feature-based: the pre-trained model is frozen and only supplies features to a separate task model. Fine-tuning: the whole pre-trained model keeps training on the task, and only a tiny layer is new.}}
+
+Both approaches, the paper says, pre-train with a **language model**. That word is the key to the whole argument, so let us define it carefully.
+
+> [!DEFINITION] Language model (LM)
+> A model that gives a probability to the next word, given the words before it. Shown "I went to the", a good language model gives high probability to "store", "park" or "bank", and low probability to "elephant".
+
+A language model reads left to right and predicts each word from the words before it. Written as an equation, the probability of a whole sentence is built up one word at a time:
+
+$$
+P(w_1, w_2, \dots, w_n) = \prod_{i=1}^{n} P(w_i \mid w_1, \dots, w_{i-1})
+$$
+
+where:
+
+- $$w_1, \dots, w_n$$ are the words of the sentence, in order, and $$n$$ is how many there are;
+- $$P(w_i \mid w_1, \dots, w_{i-1})$$ is the probability of word $$i$$ **given** (that is what the bar $$\mid$$ means) all the words before it;
+- $$\prod$$ means "multiply all of these together", for $$i$$ from 1 to $$n$$.
+
+Look at what is on the right of the bar: only earlier words. That is what **unidirectional** means. The training signal is free (the next word is always in the text), which is why language models are such a good way to pre-train. But each word only ever learns from its left.
+
+> [!DEFINITION] Objective function (training objective)
+> The score a model is trained to improve. For a language model, it is "give high probability to the real next word". Training means nudging the weights, millions of times, so this score gets better.
+
+## The problem: reading in only one direction {§1}
+
+> [!PAPER] Devlin et al. (2018), BERT · Section 1 · page 1
+> [![The third paragraph of the introduction: the major limitation is that standard language models are unidirectional. In OpenAI GPT every token can only attend to previous tokens. This is sub-optimal for sentence-level tasks and could be very harmful for token-level tasks such as question answering, where it is crucial to incorporate context from both directions](/img/papers/bert/p1-intro-limitation.png)](/img/papers/bert/p1-intro-limitation.png)
+>
+> **Context:** the third paragraph of the introduction: the problem statement of the whole paper.
+>
+> **What it says:** "The major limitation is that standard language models are unidirectional." In OpenAI GPT, "every token can only attend to previous tokens". This is "sub-optimal" for sentence-level tasks and "could be very harmful" for token-level tasks like question answering, "where it is crucial to incorporate context from both directions".
+>
+> **Why it matters:** this is the problem BERT solves. Everything else in the paper is the solution and the evidence.
+
+> [!DEFINITION] Attend to
+> In a Transformer, "token A attends to token B" means A looks at B and takes information from it. In GPT, a token may attend only to itself and the tokens before it. A **mask** blocks every token to the right.
+
+Why is one direction a problem? Because the meaning of a word often depends on what comes **after** it. Read this sentence and stop at the blank:
+
+> I went to the ____
+
+You cannot know the missing word. Now read the whole sentence:
+
+> I went to the ____ to deposit my paycheck.
+
+Now it is obviously "bank". The clue was on the right. A left-to-right model building the representation of that position has not seen "deposit my paycheck" yet, so it cannot use it.
+
+{{FIG:p1_context|What the blank can see in three kinds of model. Left to right (GPT): only the earlier words. ELMo: a left reader and a right reader that work separately and are joined only at the very end. BERT: both sides, in every layer.}}
+
+### Let us test it on real models
+
+I gave the same three sentences to two real, public models:
+
+- **GPT-2**, a left-to-right model from 2019 (the small version). It sees only the words before the blank and predicts the next word.
+- **BERT** (`bert-base-uncased`, the model released with this paper). It sees the whole sentence with the blank replaced by a special `[MASK]` token, and predicts the missing word.
+
+```python
+from transformers import AutoTokenizer, BertForMaskedLM, GPT2LMHeadModel
+import torch
+
+btok = AutoTokenizer.from_pretrained("bert-base-uncased")
+bert = BertForMaskedLM.from_pretrained("bert-base-uncased").eval()
+gtok = AutoTokenizer.from_pretrained("openai-community/gpt2")
+gpt2 = GPT2LMHeadModel.from_pretrained("openai-community/gpt2").eval()
+
+# GPT-2: only the left side, predict the next token
+ids = gtok("I went to the", return_tensors="pt").input_ids
+p_gpt2 = torch.softmax(gpt2(ids).logits[0, -1], -1)
+
+# BERT: the whole sentence, predict the [MASK]
+enc = btok("i went to the [MASK] to deposit my paycheck.", return_tensors="pt")
+pos = (enc.input_ids[0] == btok.mask_token_id).nonzero().item()
+p_bert = torch.softmax(bert(**enc).logits[0, pos], -1)
+```
+
+These are the five most likely words each model gave, with their probabilities (the real output of [`bert_part1.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/bert/bert_part1.py)):
+
+```text
+sentence: i went to the ____ to deposit my paycheck.   (hidden word: bank)
+  GPT-2, left side only: hospital 0.033, doctor 0.024, store 0.022, gym 0.018, office 0.015
+  BERT, both sides:      bank 0.901, office 0.009, store 0.008, teller 0.008, atm 0.006
+
+sentence: my neighbor's ____ barked at the mailman all morning.   (hidden word: dog)
+  GPT-2, left side only: house 0.071, dog 0.037, son 0.026, car 0.024, daughter 0.023
+  BERT, both sides:      dog 0.651, dogs 0.142, voice 0.020, phone 0.018, had 0.014
+
+sentence: she picked up her ____ and started to play a song.   (hidden word: guitar)
+  GPT-2, left side only: phone 0.100, bag 0.033, gun 0.018, daughter 0.014, own 0.013
+  BERT, both sides:      guitar 0.677, phone 0.081, ipod 0.050, fiddle 0.017, instrument 0.013
+```
+
+{{FIG:p1_fill|The first sentence as a picture. GPT-2 cannot see "to deposit my paycheck" and spreads its guesses over places you might go. BERT sees both sides and puts 0.901 on "bank".}}
+
+> [!DEFINITION] Probability
+> A number from 0 to 1 that says how likely something is. 0.901 means "about 90% sure". The probabilities over all possible words add up to 1.
+
+What this shows, and what it does not:
+
+- With the right side hidden, the guess is a guess. GPT-2's top answer for the first sentence has a probability of only 0.033.
+- With both sides visible, the answer is nearly certain: BERT gives "bank" 0.901 and "guitar" 0.677.
+- This is **not** a contest between two models. GPT-2 was simply not given the words on the right, because a left-to-right model never gets them at this position. That missing information is exactly the paper's point.
+
+**Use case.** Question answering is the paper's own example. In "Who founded the company that makes the iPhone?", the word "company" needs the words after it to know which company. A model that builds every word's meaning from both sides can answer such questions far better.
+
+## BERT's fix: fill in the blanks {§1}
+
+If language models are one-directional by nature, how do you pre-train a two-directional model? The paper's answer is in the next paragraph.
+
+> [!PAPER] Devlin et al. (2018), BERT · Section 1 · pages 1 and 2
+> [![The fourth paragraph of the introduction: BERT alleviates the unidirectionality constraint by using a masked language model pre-training objective, inspired by the Cloze task. The masked language model randomly masks some of the tokens from the input, and the objective is to predict the original vocabulary id of the masked word](/img/papers/bert/p1-intro-mlm.png)](/img/papers/bert/p1-intro-mlm.png)
+> [![The paragraph continues on page 2: based only on its context. The MLM objective enables the representation to fuse the left and the right context. In addition, a next sentence prediction task jointly pre-trains text-pair representations](/img/papers/bert/p1-intro-mlm2.png)](/img/papers/bert/p1-intro-mlm2.png)
+>
+> **Context:** the fourth paragraph of the introduction, which runs from the bottom of page 1 onto page 2. After the problem, the solution.
+>
+> **What it says:** BERT uses a **"masked language model" (MLM)**, "inspired by the Cloze task". It "randomly masks some of the tokens from the input", and the model must "predict the original vocabulary id of the masked word based only on its context". This lets the representation "fuse the left and the right context". A second task, **"next sentence prediction"**, teaches the model about pairs of sentences.
+>
+> **Why it matters:** this is the trick that makes deep bidirectional pre-training possible. Instead of predicting the *next* word, predict a *hidden* word, using everything around it.
+
+> [!DEFINITION] Cloze task
+> A fill-in-the-blank test. Wilson Taylor described it in 1953 as a way to measure how readable a text is. "The cat sat on the ____." Readers fill in the missing word from the context.
+
+> [!DEFINITION] Masking
+> Hiding a token from the model by replacing it with the special token `[MASK]`. The model must work out what was there.
+
+> [!DEFINITION] Vocabulary id
+> Every token the model knows has a number, its **id**, in a fixed list called the **vocabulary**. BERT's vocabulary has about 30,000 tokens. "Predict the original vocabulary id" just means "say which word was hidden".
+
+You already saw masked language modelling in action: the `[MASK]` sentences above are exactly this pre-training task. The trick works because a hidden word cannot leak its own answer, so the model is free to look in both directions. In Part 3 we will see *why* an ordinary language model cannot simply look both ways (each word would "see itself"), and we will run the exact masking recipe, which has a few surprising details.
+
+The paragraph ends with a second task, **next sentence prediction**: given two pieces of text, guess whether the second really came right after the first. Many tasks are about *pairs* of sentences (does this answer this question? does this sentence follow from that one?), and plain language modelling never practises that. Part 3 covers it too.
+
+## The three contributions {§1}
+
+> [!PAPER] Devlin et al. (2018), BERT · Section 1 · page 2
+> [![The contributions of the paper as three bullet points: the importance of bidirectional pre-training; pre-trained representations reduce the need for heavily-engineered task-specific architectures; BERT advances the state of the art for eleven NLP tasks. The code and models are released on GitHub](/img/papers/bert/p1-contributions.png)](/img/papers/bert/p1-contributions.png)
+>
+> **Context:** the end of the introduction, where the authors list what is new in their paper.
+>
+> **What it says:** three contributions. (1) Bidirectional pre-training matters, and BERT is deeply bidirectional, unlike GPT (one direction) and unlike ELMo's "shallow concatenation of independently trained left-to-right and right-to-left LMs". (2) Pre-trained representations "reduce the need for many heavily-engineered task-specific architectures". (3) BERT "advances the state of the art for eleven NLP tasks", and the code and models are public.
+>
+> **Why it matters:** each claim is tested later. Claim 1 by the ablation studies in Part 5, claims 2 and 3 by the experiments in Part 4.
+
+Let us unpack each contribution.
+
+**1. Deep, not shallow, bidirectionality.** ELMo does look both ways, but in a shallow way: one network reads left to right, another reads right to left, and their outputs are glued together ("concatenated") at the very end. Inside each network, information still flows one way only. In BERT, every layer of one single network mixes both sides. The paper argues this is "strictly more powerful".
+
+> [!DEFINITION] Concatenation
+> Joining two lists of numbers end to end. A list of 512 numbers concatenated with another list of 512 numbers gives one list of 1,024 numbers. Nothing is mixed; the two halves just sit side by side.
+
+> [!DEFINITION] Architecture
+> The design of a model: which layers it has, in what order, and how they connect. A "task-specific architecture" is a design built by hand for one task.
+
+**2. Less hand-made machinery.** Before BERT, the best question-answering systems and the best sentiment classifiers were different, carefully designed networks. With BERT, the same model plus one small output layer does both. That saves months of engineering per task.
+
+**3. Eleven state-of-the-art results**, plus public code and weights. The public release is a big reason BERT spread so fast: anyone could download the model and fine-tune it on a single GPU. The model we ran above is that release.
+
+> [!DEFINITION] NLP
+> Natural language processing: the field of making computers work with human language (text and speech).
+
+## Figure 3: the three designs side by side {§A.4}
+
+The paper puts its clearest picture of this argument in the appendix (Appendix A.4), so we read it now, where it belongs in the story.
+
+> [!PAPER] Devlin et al. (2018), BERT · Appendix A.4, Figure 3 · page 13
+> [![Figure 3 of the BERT paper: three diagrams. BERT, a stack of Transformer blocks where every block connects to every position below. OpenAI GPT, a stack of Transformer blocks where each block connects only to positions on its left. ELMo, a left-to-right LSTM and a right-to-left LSTM whose outputs are combined. The caption says only BERT representations are jointly conditioned on both left and right context in all layers](/img/papers/bert/p1-figure3.png)](/img/papers/bert/p1-figure3.png)
+>
+> **Context:** Appendix A.4 compares BERT, OpenAI GPT and ELMo. Figure 3 draws the three of them.
+>
+> **What it says:** BERT uses a bidirectional Transformer; GPT a left-to-right Transformer; ELMo two separately trained LSTMs, one per direction. "Among the three, only BERT representations are jointly conditioned on both left and right context in all layers." Also, BERT and GPT are fine-tuning approaches, while ELMo is feature-based.
+>
+> **Why it matters:** the whole paper in one picture. Look at the arrows.
+
+How to read the figure:
+
+- **E₁, E₂, …, E_N** (yellow, bottom) are the input embeddings: one vector per input token.
+- **Trm** is one Transformer block (a layer). **Lstm** is one step of an LSTM, an older kind of network that reads one token at a time.
+- **T₁, T₂, …, T_N** (green, top) are the output vectors, one per token.
+- **The arrows** show who can see whom. In the BERT panel, every Trm connects to *every* position in the layer below. In the GPT panel, each Trm connects only to positions on its own left. In the ELMo panel, the arrows inside each LSTM chain all point one way; the two directions only meet at the top.
+
+> [!DEFINITION] LSTM
+> Long short-term memory: a kind of recurrent neural network, the standard way to read text before Transformers. It reads tokens one at a time, carrying a running memory from each token to the next.
+
+Notice also that BERT and GPT have the **same** shape: a stack of Transformer blocks. The only difference is the arrows, that is, which positions each token may look at. This is deliberate. The authors made BERT's smaller version the same size as GPT so the two could be compared fairly. Part 2 opens up that stack.
+
+> [!TAKEAWAYS] Key takeaways
+> - **BERT = Bidirectional Encoder Representations from Transformers**: a Transformer encoder, pre-trained on unlabeled text, that builds every word's representation from both its left and its right, in every layer.
+> - **Two steps:** pre-train once (expensive), then fine-tune a copy for each task with one small extra layer (cheap).
+> - In 2018 there were **two ways** to reuse a pre-trained model: **feature-based** (ELMo: frozen features fed to a task model) and **fine-tuning** (GPT: train everything a little). BERT fine-tunes.
+> - The problem: standard **language models are unidirectional**, so each word learns only from its left. For tasks like question answering, the clue is often on the right.
+> - We checked it on real models: with the right side hidden, GPT-2's best guess for "I went to the ____" had probability 0.033; BERT, seeing "to deposit my paycheck", put **0.901** on "bank".
+> - BERT's fix is the **masked language model**: hide some tokens and predict them from both sides (a Cloze task), plus **next sentence prediction** for sentence pairs.
+> - The results: new state of the art on **eleven tasks**, including GLUE **80.5** (+7.7) and SQuAD v1.1 Test F1 **93.2**.
+
+**Next, in Part 2:** the related work the paper builds on, and the model itself: its layers, its size (and where "110 million parameters" comes from), and how text becomes the numbers BERT reads.
+
+<details>
+<summary>Run it yourself</summary>
+
+The script behind the GPT-2 and BERT comparison is [`code/papers/bert/bert_part1.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/bert/bert_part1.py). It runs on a laptop CPU in under a minute and downloads `bert-base-uncased` (about 440 MB) and GPT-2 (about 550 MB) the first time.
+
+```bash
+pip install torch transformers
+python bert_part1.py      # prints the table above, writes results/part1.json
+```
+
+<figure><img src="/img/papers/bert/part1-run.png" alt="Terminal output of bert_part1.py: for each of three sentences, GPT-2's top five next-word guesses from the left side only, and BERT's top five guesses for the masked word using both sides" loading="lazy" /><figcaption>The real output of bert_part1.py.</figcaption></figure>
+
+</details>
+
+## References
+
+1. J. Devlin, M.-W. Chang, K. Lee, K. Toutanova. [*BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding*](https://arxiv.org/abs/1810.04805). NAACL 2019. arXiv:1810.04805.
+2. M. Peters et al. [*Deep contextualized word representations*](https://arxiv.org/abs/1802.05365) (ELMo). NAACL 2018.
+3. A. Radford, K. Narasimhan, T. Salimans, I. Sutskever. *Improving Language Understanding by Generative Pre-Training* (OpenAI GPT). OpenAI, 2018.
+4. P. Nayak. [*Understanding searches better than ever before*](https://blog.google/products/search/search-language-understanding-bert/). Google blog, 25 October 2019.
+5. A. Vaswani et al. [*Attention Is All You Need*](https://arxiv.org/abs/1706.03762). NeurIPS 2017.
+6. W. L. Taylor. *Cloze procedure: A new tool for measuring readability*. Journalism Bulletin, 1953.
+7. Google Research. [BERT code and pre-trained models](https://github.com/google-research/bert).

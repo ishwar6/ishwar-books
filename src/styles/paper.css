@@ -1,0 +1,187 @@
+/* ---------- research papers: a "reading a paper" theme for /papers ----------
+   Teal is the paper colour (it matches the "From the paper" boxes). Headings use a book serif, like a printed paper.
+   Everything is built from the site's theme tokens, so dark, dim and light all work. */
+.paper-theme {
+  --paper: #4fc3d9;
+  --paper-ink: #4fc3d9;
+  --paper-soft: rgba(79, 195, 217, 0.08);
+  --paper-line: rgba(79, 195, 217, 0.28);
+  --serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, 'Times New Roman', serif;
+  --h2: #6fd0e2;
+  --h3: #b7a4ff;
+  --h4: #5fd4b0;
+}
+:root[data-theme='light'] .paper-theme {
+  --paper-ink: #0f7286;
+  --paper-soft: rgba(17, 128, 154, 0.06);
+  --paper-line: rgba(17, 128, 154, 0.3);
+  --h2: #0f6f86;
+  --h3: #6a3fc8;
+  --h4: #0f8a68;
+}
+
+/* index page */
+.papers-head h1 .grad {
+  background: linear-gradient(90deg, var(--paper-ink), var(--h3));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.paper-list { display: grid; gap: 22px; }
+.paper-card {
+  display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 0; border-radius: 18px; overflow: hidden;
+  border: 1px solid var(--border-soft); background: var(--bg-soft); transition: border-color 0.2s, transform 0.2s;
+}
+.paper-card:hover { border-color: var(--paper-line); transform: translateY(-2px); }
+.paper-card-sheet {
+  position: relative; display: flex; flex-direction: column; justify-content: space-between; gap: 14px; padding: 26px 24px;
+  background:
+    repeating-linear-gradient(180deg, transparent 0 21px, var(--paper-line) 21px 22px),
+    linear-gradient(160deg, var(--paper-soft), transparent 70%), var(--surface);
+  border-right: 1px solid var(--border-soft);
+}
+.ps-short { font-family: var(--serif); font-size: 46px; font-weight: 700; color: var(--text-strong); letter-spacing: -0.01em; line-height: 1; }
+.ps-lines { display: grid; gap: 7px; }
+.ps-lines i { display: block; height: 5px; border-radius: 3px; background: var(--border); }
+.ps-lines i:nth-child(2n) { width: 82%; }
+.ps-lines i:nth-child(3) { width: 64%; background: var(--paper-line); }
+.ps-year { font-family: var(--font-mono); font-size: 13px; color: var(--paper-ink); font-weight: 700; }
+.paper-card-body { display: flex; flex-direction: column; gap: 10px; padding: 26px 28px; min-width: 0; }
+.paper-card h3 { margin: 0; font-family: var(--serif); font-size: 25px; line-height: 1.25; color: var(--text-strong); font-weight: 700; }
+.paper-card h3 a:hover { color: var(--paper-ink); }
+.paper-card p { margin: 0; color: var(--muted); font-size: 15.5px; line-height: 1.65; }
+.paper-card-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-top: 6px; font-size: 14px; color: var(--faint); }
+@media (max-width: 720px) {
+  .paper-card { grid-template-columns: minmax(0, 1fr); }
+  .paper-card-sheet { flex-direction: row; align-items: center; border-right: 0; border-bottom: 1px solid var(--border-soft); padding: 18px 20px; }
+  .ps-short { font-size: 34px; }
+  .ps-lines { display: none; }
+  .paper-card-body { padding: 20px; }
+  .paper-card h3 { font-size: 21px; }
+}
+
+.paper-cite { font-family: var(--font-mono); font-size: 12.5px; letter-spacing: 0.02em; color: var(--paper-ink); font-weight: 600; }
+.paper-authors { color: var(--text); font-size: 15px; line-height: 1.5; }
+
+/* the paper's title card */
+.paper-sheet {
+  position: relative; margin: 6px 0 28px; padding: 24px 26px 22px; border-radius: 14px;
+  border: 1px solid var(--paper-line); border-top: 4px solid var(--paper-ink);
+  background: linear-gradient(170deg, var(--paper-soft), transparent 60%), var(--bg-soft);
+}
+.paper-sheet-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; margin-bottom: 10px; }
+.paper-kicker { font-size: 11.5px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--paper-ink); }
+.paper-sheet .paper-cite { color: var(--muted); }
+.paper-sheet .paper-title { display: block; font-family: var(--serif); font-size: 26px; line-height: 1.3; font-weight: 700; color: var(--text-strong); margin-bottom: 8px; }
+.paper-sheet a.paper-title:hover { color: var(--paper-ink); }
+.paper-org { color: var(--muted); }
+.paper-links { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; margin-top: 14px; }
+.paper-links a {
+  display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px; font-size: 13.5px; font-weight: 600;
+  border: 1px solid var(--paper-line); color: var(--text-strong); background: var(--paper-soft); transition: border-color 0.15s;
+}
+.paper-links a:hover { border-color: var(--paper-ink); }
+.paper-links a svg { width: 13px; height: 13px; }
+.paper-time { font-size: 13.5px; color: var(--muted); margin-left: 4px; }
+.paper-learn { margin-top: 20px; padding-top: 16px; border-top: 1px dashed var(--border); }
+.paper-learn h2 { margin: 0 0 8px; font-size: 13px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-strong); }
+.paper-learn ul { margin: 0; padding-left: 0; list-style: none; display: grid; gap: 7px; font-size: 15.5px; line-height: 1.55; }
+.paper-learn li { position: relative; padding-left: 24px; }
+.paper-learn li::before { content: ''; position: absolute; left: 2px; top: 0.45em; width: 10px; height: 10px; border-radius: 3px; background: var(--paper-ink); opacity: 0.8; }
+.paper-sheet.compact { padding: 14px 18px 14px; margin: 0 0 26px; border-top-width: 3px; }
+.paper-sheet.compact .paper-title { font-size: 17px; margin-bottom: 4px; }
+.paper-sheet.compact .paper-authors { font-size: 13.5px; }
+.paper-sheet.compact .paper-links { margin-top: 10px; }
+.paper-sheet.compact .paper-links a { padding: 3px 10px; font-size: 12.5px; }
+@media (max-width: 640px) {
+  .paper-sheet { padding: 18px 16px; }
+  .paper-sheet .paper-title { font-size: 21px; }
+  .paper-sheet.compact .paper-title { font-size: 16px; }
+}
+
+/* part header */
+.paper-head h1 { font-family: var(--serif); letter-spacing: -0.01em; font-weight: 700; }
+.paper-head .part-label { color: var(--paper-ink); }
+.paper-head .part-label .covers { color: var(--muted); text-transform: none; letter-spacing: 0; font-weight: 600; }
+
+/* Part 1..N navigator */
+.part-nav { margin-top: 26px; }
+.part-nav ol { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
+.part-nav li > a, .part-nav li > span {
+  display: flex; flex-direction: column; gap: 3px; height: 100%; padding: 12px 14px; border-radius: 12px;
+  border: 1px solid var(--border-soft); background: var(--bg-soft); transition: border-color 0.15s, background 0.15s;
+}
+.part-nav li > a:hover { border-color: var(--paper-line); background: var(--surface); }
+.part-nav .pn { font-size: 11.5px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); }
+.part-nav .pt { font-size: 14.5px; font-weight: 700; line-height: 1.35; color: var(--text); }
+.part-nav .pc { font-size: 12.5px; color: var(--faint); line-height: 1.4; }
+.part-nav li.current > span { border-color: var(--paper-ink); background: var(--paper-soft); box-shadow: inset 0 3px 0 var(--paper-ink); }
+.part-nav li.current .pn { color: var(--paper-ink); }
+.part-nav li.current .pt { color: var(--text-strong); }
+@media (max-width: 640px) { .part-nav ol { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; } .part-nav .pc { display: none; } .part-nav li > a, .part-nav li > span { padding: 10px 11px; } }
+.paper-parts { margin-top: 56px; }
+.paper-parts h2 { font-family: var(--serif); font-size: 28px; font-weight: 700; color: var(--text-strong); margin: 0 0 4px; }
+.paper-parts .part-nav ol { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+
+/* prose inside paper pages */
+.paper-theme .prose h2, .paper-theme .prose h3 { font-family: var(--serif); font-weight: 700; letter-spacing: -0.005em; }
+.paper-theme .prose h2 { border-top: 1px solid var(--border-soft); padding-top: 1.1em; }
+/* "Paper §3.1" markers that mirror the paper's own section numbers */
+.prose [data-sec]::before {
+  content: 'Paper ' attr(data-sec);
+  display: table; margin-bottom: 0.55em; padding: 0.22em 0.65em; border-radius: 6px;
+  font-family: var(--font-mono); font-size: 12.5px; font-weight: 700; letter-spacing: 0.04em; line-height: 1.4;
+  color: var(--paper-ink, var(--accent)); background: var(--paper-soft, var(--accent-soft)); border: 1px solid var(--paper-line, var(--border));
+}
+.toc .toc-sec { font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: var(--paper-ink, var(--accent)); margin-right: 6px; }
+
+/* the paper excerpt boxes stand out more inside the paper theme */
+.paper-theme .prose .callout-paper { --c: var(--paper-ink); border-width: 1px 1px 1px 5px; }
+.paper-theme .prose .callout-paper img { box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25); }
+:root[data-theme='light'] .paper-theme .prose .callout-paper img { box-shadow: 0 1px 6px rgba(15, 23, 42, 0.12); }
+
+/* Key takeaways at the end of each part */
+.prose .callout-takeaways {
+  --c: #34c38f;
+  --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm-1.5 14.6-4.1-4.1 1.4-1.4 2.7 2.7 6-6 1.4 1.4-7.4 7.4Z'/%3E%3C/svg%3E");
+  background: linear-gradient(160deg, rgba(52, 195, 143, 0.12), rgba(52, 195, 143, 0.03));
+  border: 1px solid rgba(52, 195, 143, 0.45); border-left: 5px solid #34c38f; padding: 1.2em 1.4em;
+}
+.prose .callout-takeaways .callout-title { font-size: 1.05em; }
+.prose .callout-takeaways ul { list-style: none; padding-left: 0; margin-bottom: 0; }
+.prose .callout-takeaways li { position: relative; padding-left: 1.6em; }
+.prose .callout-takeaways li::before {
+  content: ''; position: absolute; left: 0.1em; top: 0.5em; width: 0.85em; height: 0.85em; background: #34c38f;
+  -webkit-mask: var(--icon) center / contain no-repeat; mask: var(--icon) center / contain no-repeat;
+}
+:root[data-theme='light'] .prose .callout-takeaways { --c: #13875d; border-left-color: #13875d; }
+:root[data-theme='light'] .prose .callout-takeaways li::before { background: #13875d; }
+
+/* figure classes used by the paper figures (tokens, segments, positions, masks) */
+.fig .box-4 { fill: var(--series-4); fill-opacity: 0.22; stroke: var(--series-4); stroke-width: 1.5; }
+.fig .box-mask { fill: var(--h3); fill-opacity: 0.2; stroke: var(--h3); stroke-width: 1.8; stroke-dasharray: 5 3; }
+.fig .box-on { fill: var(--h2); fill-opacity: 0.25; stroke: var(--h2); stroke-width: 2; }
+.fig .box-ghost { fill: none; stroke: var(--border); stroke-width: 1.2; stroke-dasharray: 4 4; }
+.fig .t-big { font-size: 16px; font-weight: 800; fill: var(--text-strong); }
+.fig .t-mono { font-family: var(--font-mono); font-size: 13px; fill: var(--text-strong); }
+.fig .t-muted { font-size: 12px; fill: var(--muted); }
+.fig .t-s1 { fill: var(--series-1); font-weight: 700; }
+.fig .t-s2 { fill: var(--series-2); font-weight: 700; }
+.fig .t-s3 { fill: var(--series-3); font-weight: 700; }
+.fig .t-s4 { fill: var(--series-4); font-weight: 700; }
+.fig .t-on { fill: var(--h2); font-weight: 700; }
+.fig .t-bad { fill: #f06a6a; font-weight: 700; }
+.fig .edge-2 { stroke: var(--series-2); stroke-width: 2; fill: none; }
+.fig .edge-1 { stroke: var(--series-1); stroke-width: 2; fill: none; }
+.fig .edge-3 { stroke: var(--series-3); stroke-width: 2; fill: none; }
+.fig .edge-dim { stroke: var(--border); stroke-width: 1.5; fill: none; stroke-dasharray: 3 4; }
+.fig .bad-line { stroke: #f06a6a; stroke-width: 2.5; fill: none; }
+.fig .s-mask { fill: var(--h3); }
+
+/* terminal screenshots and paper figures inside the paper theme */
+.paper-theme .prose figure:not(.fig) img { border-radius: 12px; }
+.fig .t-s1, .fig .t-s2, .fig .t-s3, .fig .t-s4, .fig .t-on, .fig .t-bad { font-size: 13px; }
+.fig .edge-on { stroke: var(--h2); stroke-width: 2; fill: none; }
+
+/* paper screenshots keep their natural size (no blurry upscaling of one-column crops) */
+.paper-theme .prose .callout-paper img { width: auto; max-width: 100%; }
+.paper-theme .prose > h2:first-child { border-top: 0; padding-top: 0; }
+@media (max-width: 640px) { .prose .callout-paper .callout-title::after { display: none; } }

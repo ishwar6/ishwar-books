@@ -39,7 +39,8 @@ const crumbs = (items) => ({
 
 // ---------------------------------------------------------------- page definitions
 const pages = []
-const nav = `<nav><a href="${BASE}">Home</a> · <a href="${BASE}writings/">Writings</a> · <a href="${BASE}books/">Books</a> · <a href="${BASE}videos/">Videos</a> · <a href="${BASE}projects/">Projects</a> · <a href="${BASE}about/">About</a></nav>`
+const papers = manifest.papers ?? []
+const nav = `<nav><a href="${BASE}">Home</a> · <a href="${BASE}writings/">Writings</a> · <a href="${BASE}books/">Books</a> · <a href="${BASE}papers/">Research papers</a> · <a href="${BASE}videos/">Videos</a> · <a href="${BASE}projects/">Projects</a> · <a href="${BASE}about/">About</a></nav>`
 const list = (items) => `<ul>${items.map(([href, title, desc]) => `<li><a href="${href}">${esc(title)}</a>${desc ? `<p>${esc(desc)}</p>` : ''}</li>`).join('')}</ul>`
 
 pages.push({
@@ -48,6 +49,7 @@ pages.push({
   body: `<h1>${esc(site.name)}</h1><p>${esc(site.tagline)}</p>${site.bio.map((p) => `<p>${esc(p)}</p>`).join('')}
     <h2>Writings</h2>${list(manifest.writings.map((w) => [`${BASE}${w.route}/`, w.title, w.description]))}
     <h2>Videos</h2>${list((manifest.videos ?? []).map((v) => [`${BASE}${v.route}/`, v.title, v.description]))}
+    <h2>Research papers</h2>${list(papers.map((p) => [`${BASE}${p.route}/`, `${p.short}, explained`, p.description]))}
     <h2>Books</h2>${list(manifest.books.map((b) => [`${BASE}books/${b.slug}/`, b.title, b.description]))}
     <h2>Projects</h2>${list(projects.map((p) => [`${BASE}projects/`, p.name, p.tagline]))}`,
 })
@@ -94,6 +96,48 @@ for (const w of manifest.writings) {
       timeRequired: `PT${w.minutes}M`, inLanguage: 'en', author, publisher: author, ...series,
     }, crumbs([['Home', ''], ['Writings', 'writings'], [w.title, w.route]])],
     body: `<article><h1>${esc(w.title)}</h1><p>${esc(w.description)}</p>${content(w.route)}</article>`,
+  })
+}
+
+pages.push({
+  route: 'papers', title: `Research papers · ${site.name}`,
+  description: 'Landmark research papers read slowly, section by section: highlighted excerpts of the paper, plain-English explanations, definitions, figures and code you can run.',
+  image: ogImage('papers'), type: 'website',
+  ld: [{ '@type': 'CollectionPage', name: 'Research papers', url: url('papers'), isPartOf: { '@id': website['@id'] } }, crumbs([['Home', ''], ['Research papers', 'papers']])],
+  body: `<h1>Research papers</h1>${list(papers.map((p) => [`${BASE}${p.route}/`, `${p.short}, explained`, p.description]))}`,
+})
+for (const p of papers) {
+  const scholarly = {
+    '@type': 'ScholarlyArticle', name: p.title, headline: p.title, datePublished: p.year ? String(p.year) : undefined,
+    author: p.authors.map((name) => ({ '@type': 'Person', name })), ...(p.arxiv ? { url: `https://arxiv.org/abs/${p.arxiv}`, sameAs: `https://arxiv.org/abs/${p.arxiv}` } : {}),
+  }
+  const cite = `<p>${esc(p.title)}. ${esc(p.authors.join(', '))}. ${esc([p.venue, p.year].filter(Boolean).join(', '))}.${p.arxiv ? ` <a href="https://arxiv.org/abs/${p.arxiv}">arXiv:${p.arxiv}</a>` : ''}</p>`
+  pages.push({
+    route: p.route, title: `${p.short}, explained: ${p.title} · ${site.name}`, description: p.description, image: ogImage(`paper-${p.slug}`), type: 'article',
+    published: iso(p.date), modified: iso(p.updated ?? p.date), tags: p.tags,
+    ld: [{
+      '@type': 'TechArticle', headline: `${p.short}, explained`, description: p.description, url: url(p.route), mainEntityOfPage: url(p.route),
+      image: ogImage(`paper-${p.slug}`), inLanguage: 'en', author, publisher: author, about: scholarly, keywords: p.tags.join(', '),
+      hasPart: p.parts.map((x) => ({ '@type': 'TechArticle', headline: x.title, position: x.partNumber, url: url(x.route) })),
+    }, crumbs([['Home', ''], ['Research papers', 'papers'], [p.short, p.route]])],
+    body: `<article><h1>${esc(p.short)}, explained</h1><p>${esc(p.description)}</p>${cite}${p.learn.length ? `<h2>What you will learn</h2><ul>${p.learn.map((l) => `<li>${esc(l)}</li>`).join('')}</ul>` : ''}${content(p.route)}
+      <h2>Parts</h2>${list(p.parts.map((x) => [`${BASE}${x.route}/`, `Part ${x.partNumber}: ${x.title}`, x.description]))}</article>`,
+  })
+  p.parts.forEach((x, i) => {
+    const prev = p.parts[i - 1], next = p.parts[i + 1]
+    const img = ogImage(`paper-${p.slug}-${x.slug}`)
+    pages.push({
+      route: x.route, title: `${p.short}, Part ${x.partNumber}: ${x.title} · ${site.name}`, description: x.description, image: img, type: 'article',
+      published: iso(x.date), modified: iso(x.updated ?? x.date), tags: x.tags,
+      ld: [{
+        '@type': 'TechArticle', headline: `${p.short}, Part ${x.partNumber}: ${x.title}`, description: x.description, url: url(x.route), mainEntityOfPage: url(x.route),
+        image: img, datePublished: iso(x.date), dateModified: iso(x.updated ?? x.date), inLanguage: 'en', timeRequired: `PT${x.minutes}M`,
+        keywords: x.tags.join(', '), author, publisher: author, about: scholarly, position: x.partNumber,
+        isPartOf: { '@type': 'TechArticle', headline: `${p.short}, explained`, url: url(p.route) },
+      }, crumbs([['Home', ''], ['Research papers', 'papers'], [p.short, p.route], [`Part ${x.partNumber}`, x.route]])],
+      body: `<article><p><a href="${BASE}${p.route}/">${esc(p.short)}, explained</a> · Part ${x.partNumber} of ${p.parts.length}${x.covers ? ` · Covers ${esc(x.covers)}` : ''}</p><h1>${esc(x.title)}</h1><p>${esc(x.description)}</p>${cite}${content(x.route)}
+        <nav>${prev ? `<a href="${BASE}${prev.route}/">Previous: Part ${prev.partNumber}, ${esc(prev.title)}</a>` : ''} ${next ? `<a href="${BASE}${next.route}/">Next: Part ${next.partNumber}, ${esc(next.title)}</a>` : ''}</nav></article>`,
+    })
   })
 }
 
@@ -215,9 +259,10 @@ ${pages.map((pg) => `  <url><loc>${url(pg.route)}</loc><lastmod>${(pg.modified ?
 fs.writeFileSync(path.join(DIST, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${ORIGIN}${BASE}sitemap.xml\n`)
 fs.writeFileSync(path.join(DIST, 'rss.xml'), `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel>
-<title>${esc(site.name)}: writings</title><link>${ORIGIN}${BASE}</link><description>${esc(site.description)}</description><language>en</language>
+<title>${esc(site.name)}: writings and research papers</title><link>${ORIGIN}${BASE}</link><description>${esc(site.description)}</description><language>en</language>
 <atom:link href="${ORIGIN}${BASE}rss.xml" rel="self" type="application/rss+xml" />
-${manifest.writings.map((w) => `<item><title>${esc(w.title)}</title><link>${url(w.route)}</link><guid>${url(w.route)}</guid><pubDate>${new Date(w.date + 'T00:00:00Z').toUTCString()}</pubDate><description>${esc(w.description)}</description></item>`).join('\n')}
+${[...manifest.writings, ...papers.flatMap((p) => p.parts.map((x) => ({ ...x, title: `${p.short}, Part ${x.partNumber}: ${x.title}` })))]
+  .sort((a, b) => (b.date ?? '').localeCompare(a.date ?? '')).map((w) => `<item><title>${esc(w.title)}</title><link>${url(w.route)}</link><guid>${url(w.route)}</guid><pubDate>${new Date(w.date + 'T00:00:00Z').toUTCString()}</pubDate><description>${esc(w.description)}</description></item>`).join('\n')}
 </channel></rss>
 `)
 fs.writeFileSync(path.join(DIST, '.nojekyll'), '')
