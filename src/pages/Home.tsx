@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { projects, site } from '../data/site'
 import { books, papers, videos, writings } from '../lib/content'
+import { PaperCard } from '../components/PaperBits'
 import { useTitle } from '../lib/hooks'
 import { BookCard, ProjectCard, VideoCard, WritingCard } from '../components/Cards'
 import { GitHub, Mail, X, YouTube } from '../components/icons'
@@ -66,6 +67,16 @@ export default function Home() {
         </div>
         <div className="book-grid">{books.map((b) => <BookCard key={b.slug} book={b} />)}</div>
       </section>
+
+      {papers.length > 0 && (
+        <section className="section paper-theme">
+          <div className="section-head">
+            <h2>Research papers</h2>
+            <Link to="/papers" className="more-link">All papers →</Link>
+          </div>
+          <div className="paper-list">{papers.slice(0, 2).map((p) => <PaperCard key={p.slug} paper={p} />)}</div>
+        </section>
+      )}
 
       <section className="section">
         <div className="section-head">
