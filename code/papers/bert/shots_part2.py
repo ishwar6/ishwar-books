@@ -53,7 +53,55 @@ JOBS = [
     dict(name='p2-figure2', page=4, anchor='Figure 2: BERT input representation',
          highlight=['The input embeddings are the sum of the token embeddings, the segmentation embeddings and the position embeddings'],
          figure=True, column='full', below=0),
+    # ---- v2: the tensor2tensor and Annotated Transformer footnotes, and excerpts from the papers Section 2 and 3 cite
+    dict(name='p2-footnotes12', page=2, anchor='1https://github.com/tensorflow/tensor2tensor',
+         highlight=['github.com/tensorflow/tensor2tensor', 'nlp.seas.harvard.edu/2018/04/03/attention.html'],
+         end='2http://nlp.seas.harvard.edu/2018/04/03/attention.html', above=4),
+    dict(name='p2-ext-skipgram-fig1', arxiv_id='1310.4546', page=1, anchor='Figure 1: The Skip-gram model architecture.',
+         highlight=['good at predicting the nearby words'], figure=True, column='full', below=0),
+    dict(name='p2-ext-skipgram-neg', arxiv_id='1310.4546', page=2, anchor='We define Negative sampling (NEG) by the objective',
+         highlight=['Negative sampling (NEG)'], above=30, below=40),
+    dict(name='p2-ext-skipthought-fig1', arxiv_id='1506.06726', page=1, anchor='Figure 1: The skip-thoughts model.',
+         highlight=['the sentence si is encoded and tries to reconstruct the previous sentence si−1 and next sentence si+1'], figure=True, column='full', below=0),
+    dict(name='p2-ext-quickthought-fig1', arxiv_id='1803.02893', page=2, anchor='Figure 1: Overview.',
+         highlight=['replaces the decoder with a classifier which chooses the target sentence'], figure=True, column='full', below=0),
+    dict(name='p2-ext-hill-sdae', arxiv_id='1602.03483', page=2, anchor='representation-learning objective based on denoising autoencoders',
+         highlight=['N deletes w with (independent) probability po', 'swaps wi and wi+1 with probability px', 'predict (as target) the original source sentence'],
+         end='quences into distributed representations.', above=4),
+    dict(name='p2-ext-vaswani-fig1', arxiv_id='1706.03762', page=2, anchor='Figure 1: The Transformer - model architecture.',
+         highlight=['The Transformer - model architecture'], figure=True, column='full', below=0),
+    dict(name='p2-ext-vaswani-eq1', arxiv_id='1706.03762', page=3, anchor='In practice, we compute the attention function on a set',
+         highlight=['packed together into a matrix Q', 'We compute the matrix of outputs as:'], end='Dot-product attention is identical to our algorithm', above=4),
+    dict(name='p2-ext-vaswani-mha', arxiv_id='1706.03762', page=4, anchor='Multi-head attention allows the model to jointly attend',
+         highlight=['jointly attend to information from different representation subspaces at different positions'],
+         end='In this work we employ h = 8 parallel attention layers', above=4),
+    dict(name='p2-ext-vaswani-ffn', arxiv_id='1706.03762', page=4, anchor='In addition to attention sub-layers, each of the layers',
+         highlight=['applied to each position separately and identically', 'two linear transformations with a ReLU activation in between'],
+         end='Another way of describing this is as two convolutions', above=4),
+    dict(name='p2-ext-wu-wordpiece', arxiv_id='1609.08144', page=6, anchor='Here is an example of a word sequence and the corresponding',
+         highlight=['wordpieces:', 'is a special character added to mark the beginning of a word'], end='character added to mark the beginning of a word.', above=4),
 ]
+
+
+
+def trim_peek(name, limit=24):
+    """Cut off a sliver of the previous line that peeks in at the top of a tightly spaced crop."""
+    import os
+    from PIL import Image
+    from paper_shots import OUT
+    p = os.path.join(OUT, name + '.png')
+    im = Image.open(p).convert('L')
+    w, h = im.size
+    rows = [min(im.getpixel((x, y)) for x in range(0, w, 2)) for y in range(limit)]
+    if rows[0] < 200:                                   # ink touches the top edge: a clipped line
+        gap = next((y for y, v in enumerate(rows) if v > 245), None)
+        if gap:
+            Image.open(p).crop((0, gap, w, h)).save(p)
+            print(f'{name}: trimmed {gap}px peek at the top')
+
 
 if __name__ == '__main__':
     run(JOBS)
+    import os
+    if not os.environ.get('ONLY') or 'p2-ext-hill-sdae' in os.environ['ONLY']:
+        trim_peek('p2-ext-hill-sdae')

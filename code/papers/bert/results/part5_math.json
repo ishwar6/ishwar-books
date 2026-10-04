@@ -1,0 +1,368 @@
+{
+ "ppl": [
+  {
+   "sentence": "she opened the door with her key and walked into the kitchen .",
+   "masked": "she opened the [MASK] with her [MASK] and walked into the [MASK] .",
+   "bert": [
+    {
+     "word": "door",
+     "p": 0.9586,
+     "nll": 0.0423,
+     "top3": [
+      "door",
+      "gate",
+      "box"
+     ]
+    },
+    {
+     "word": "key",
+     "p": 0.1324,
+     "nll": 2.0222,
+     "top3": [
+      "key",
+      "hand",
+      "keys"
+     ]
+    },
+    {
+     "word": "kitchen",
+     "p": 0.1823,
+     "nll": 1.7022,
+     "top3": [
+      "room",
+      "kitchen",
+      "house"
+     ]
+    }
+   ],
+   "bert_mean_nll": 1.2554,
+   "bert_ppl": 3.51,
+   "gpt2": [
+    {
+     "word": "door",
+     "left": "she opened the",
+     "p": 0.4204,
+     "nll": 0.8666
+    },
+    {
+     "word": "key",
+     "left": "she opened the door with her",
+     "p": 0.0006,
+     "nll": 7.3912
+    },
+    {
+     "word": "kitchen",
+     "left": "she opened the door with her key and walked into the",
+     "p": 0.0577,
+     "nll": 2.8526
+    }
+   ],
+   "gpt2_mean_nll": 3.7125,
+   "gpt2_ppl": 40.96
+  },
+  {
+   "sentence": "the cat sat on the mat because it was tired .",
+   "masked": "the [MASK] sat on the [MASK] because it was [MASK] .",
+   "bert": [
+    {
+     "word": "cat",
+     "p": 0.015,
+     "nll": 4.2025,
+     "top3": [
+      "car",
+      "man",
+      "dog"
+     ]
+    },
+    {
+     "word": "mat",
+     "p": 0.0015,
+     "nll": 6.4933,
+     "top3": [
+      "floor",
+      "ground",
+      "bed"
+     ]
+    },
+    {
+     "word": "tired",
+     "p": 0.0008,
+     "nll": 7.1757,
+     "top3": [
+      "cold",
+      "empty",
+      "dark"
+     ]
+    }
+   ],
+   "bert_mean_nll": 5.9443,
+   "bert_ppl": 381.57,
+   "gpt2": [
+    {
+     "word": "cat",
+     "left": "the",
+     "p": 0.0001,
+     "nll": 9.1011
+    },
+    {
+     "word": "mat",
+     "left": "the cat sat on the",
+     "p": 0.0039,
+     "nll": 5.5572
+    },
+    {
+     "word": "tired",
+     "left": "the cat sat on the mat because it was",
+     "p": 0.0082,
+     "nll": 4.8016
+    }
+   ],
+   "gpt2_mean_nll": 6.5202,
+   "gpt2_ppl": 678.75
+  }
+ ],
+ "params": [
+  {
+   "L": 3,
+   "H": 768,
+   "A": 12,
+   "embeddings": 23837184,
+   "attention": 7087104,
+   "feed_forward": 14167296,
+   "layer_norms": 9216,
+   "pooler": 590592,
+   "per_layer": 7087872,
+   "total": 45691392,
+   "counted": 45691392
+  },
+  {
+   "L": 6,
+   "H": 768,
+   "A": 3,
+   "embeddings": 23837184,
+   "attention": 14174208,
+   "feed_forward": 28334592,
+   "layer_norms": 18432,
+   "pooler": 590592,
+   "per_layer": 7087872,
+   "total": 66955008,
+   "counted": 66955008
+  },
+  {
+   "L": 6,
+   "H": 768,
+   "A": 12,
+   "embeddings": 23837184,
+   "attention": 14174208,
+   "feed_forward": 28334592,
+   "layer_norms": 18432,
+   "pooler": 590592,
+   "per_layer": 7087872,
+   "total": 66955008,
+   "counted": 66955008
+  },
+  {
+   "L": 12,
+   "H": 768,
+   "A": 12,
+   "embeddings": 23837184,
+   "attention": 28348416,
+   "feed_forward": 56669184,
+   "layer_norms": 36864,
+   "pooler": 590592,
+   "per_layer": 7087872,
+   "total": 109482240,
+   "counted": 109482240
+  },
+  {
+   "L": 12,
+   "H": 1024,
+   "A": 16,
+   "embeddings": 31782912,
+   "attention": 50380800,
+   "feed_forward": 100724736,
+   "layer_norms": 49152,
+   "pooler": 1049600,
+   "per_layer": 12596224,
+   "total": 183987200,
+   "counted": 183987200
+  },
+  {
+   "L": 24,
+   "H": 1024,
+   "A": 16,
+   "embeddings": 31782912,
+   "attention": 100761600,
+   "feed_forward": 201449472,
+   "layer_norms": 98304,
+   "pooler": 1049600,
+   "per_layer": 12596224,
+   "total": 335141888,
+   "counted": 335141888
+  }
+ ],
+ "layers_only_6x1024": 75577344,
+ "layers_only_64x512": 201752576,
+ "concat_cost": {
+  "device": "mps",
+  "params_one": 109482240,
+  "params_two": 218964480,
+  "ms_one": 133,
+  "ms_two": 261,
+  "ratio": 1.96
+ },
+ "tagger": {
+  "sentence": [
+   "Ada",
+   "Lovelace",
+   "met",
+   "Charles",
+   "Babbage",
+   "in",
+   "London",
+   "."
+  ],
+  "wordpieces": [
+   "[CLS]",
+   "Ada",
+   "Love",
+   "##lace",
+   "met",
+   "Charles",
+   "Ba",
+   "##bba",
+   "##ge",
+   "in",
+   "London",
+   ".",
+   "[SEP]"
+  ],
+  "shapes": {
+   "WordPiece tokens": [
+    13
+   ],
+   "all hidden states": [
+    13,
+    13,
+    768
+   ],
+   "first sub-token of each word": [
+    8,
+    13,
+    768
+   ],
+   "concat last four layers": [
+    8,
+    3072
+   ],
+   "BiLSTM output": [
+    8,
+    768
+   ],
+   "tag scores": [
+    8,
+    9
+   ]
+  },
+  "lstm_layer1": 10622976,
+  "lstm_layer2": 3545088,
+  "classifier": 6921,
+  "tagger_total": 14174985,
+  "bert_frozen": 108310272
+ },
+ "bio": {
+  "index": 99,
+  "words": [
+   "Lithuania",
+   "-",
+   "Danius",
+   "Gleveckas",
+   "(",
+   "13rd",
+   ")"
+  ],
+  "tags": [
+   "B-LOC",
+   "O",
+   "B-PER",
+   "I-PER",
+   "O",
+   "O",
+   "O"
+  ],
+  "pieces": [
+   [
+    "Lithuania"
+   ],
+   [
+    "-"
+   ],
+   [
+    "Dani",
+    "##us"
+   ],
+   [
+    "G",
+    "##lev",
+    "##eck",
+    "##as"
+   ],
+   [
+    "("
+   ],
+   [
+    "13",
+    "##rd"
+   ],
+   [
+    ")"
+   ]
+  ]
+ },
+ "crf": {
+  "words": [
+   "met",
+   "Ada",
+   "Lovelace"
+  ],
+  "tags": [
+   "O",
+   "B-PER",
+   "I-PER"
+  ],
+  "scores": [
+   [
+    3.0,
+    0.5,
+    0.20000000298023224
+   ],
+   [
+    1.2000000476837158,
+    1.0,
+    0.4000000059604645
+   ],
+   [
+    0.30000001192092896,
+    0.6000000238418579,
+    2.5
+   ]
+  ],
+  "greedy": [
+   "O",
+   "O",
+   "I-PER"
+  ],
+  "greedy_sum": 6.7,
+  "best": [
+   "O",
+   "B-PER",
+   "I-PER"
+  ],
+  "best_sum": 6.5
+ },
+ "signal": {
+  "tokens": 131072,
+  "mlm": 19661,
+  "ratio": 6.67
+ }
+}

@@ -1,0 +1,68 @@
+1. the masked-LM head of bert-base-uncased
+   transform: dense (768, 768) + GELU + LayerNorm(768)
+   decoder weight (30522, 768), bias (30522,)
+   decoder weight is the input token-embedding matrix (same memory): True
+
+   sentence: [CLS] the man went to the [MASK] to buy a gallon of milk . [SEP]   (masked position i = 6, original word "store")
+   T_i: (768,), first 4 numbers: +0.388, +0.178, -0.210, +0.139
+   scores z = h E^T + b: (30522,); largest score 12.814; smallest -12.503
+   top 5 scores and their probabilities:
+     store      z =  12.814   exp(z - max) = 1.0000   p = 0.4743
+     refrigerator z =  10.991   exp(z - max) = 0.1615   p = 0.0766
+     fridge     z =  10.915   exp(z - max) = 0.1496   p = 0.0710
+     kitchen    z =  10.707   exp(z - max) = 0.1215   p = 0.0576
+     counter    z =  10.278   exp(z - max) = 0.0792   p = 0.0375
+   log of the softmax denominator, log sum_v exp(z_v) = 13.5602
+   p("store") = exp(12.814 - 13.560) = 0.4743
+   cross-entropy = -log p("store") = 0.7459   (library: 0.7459)
+   rank of "store": 1 of 30,522; probability mass in the top 5: 0.7170
+   for scale: a uniform guess over 30,522 tokens gives -log(1/30522) = 10.3262
+
+2. the 80/10/10 rule: expected share of all tokens
+   mask       12.000%
+   random     1.500%
+   same       1.500%
+   untouched  85.000%
+   tokens that look like the original text: untouched + same = 86.500%
+   tokens that carry a loss (chosen): mask + random + same = 15.000%
+   measured on 261,324 WikiText-103 tokens (part3_mlm.json, seed 0): mask 12.07%, random 1.51%, same 1.50%, untouched 84.92%; look original 86.42%
+   per sequence of 128 tokens: about 19.2 chosen = 15.4 [MASK] + 1.92 random + 1.92 unchanged
+   per sequence of 512 tokens: about 76.8 chosen = 61.4 [MASK] + 7.68 random + 7.68 unchanged
+
+3. the NSP head, worked by hand on the two examples of Appendix A.1
+   pooler: dense (768, 768) + tanh; classifier W (2, 768), b (2,); class 0 = IsNext, 1 = NotNext
+   A: the man went to [MASK] store | B: he bought a gallon [MASK] milk | label IsNext
+     C: (768,), first 4: -0.942, -0.565, -0.833, +0.846
+     scores W C + b = [5.111, -4.188]   (library: [5.111, -4.188])
+     softmax: P(IsNext) = 0.999908, P(NotNext) = 0.000092; loss -log P(IsNext) = 0.000092
+   A: the man [MASK] to the store | B: penguin [MASK] are flightless birds | label NotNext
+     C: (768,), first 4: +0.270, +0.588, +1.000, -0.781
+     scores W C + b = [-2.080, 4.691]   (library: [-2.080, 4.691])
+     softmax: P(IsNext) = 0.001145, P(NotNext) = 0.998855; loss -log P(NotNext) = 0.001146
+
+4. the pre-training loss on the two A.1 examples as one batch
+   (the paper does not print the hidden words; we restore the obvious ones: "the", "of", "went", and "##s" of "penguins")
+   pair 1, position  5, target "the": p = 0.8087, loss 0.2123
+   pair 1, position 12, target "of": p = 0.9986, loss 0.0014
+   pair 2, position  3, target "went": p = 0.0755, loss 2.5830
+   pair 2, position  9, target "##s": p = 0.0032, loss 5.7557
+   mean MLM loss over 4 masked positions: 2.1381
+   NSP loss per pair: 0.000092, 0.001146; mean 0.000619
+   total = 2.1381 + 0.000619 = 2.1387   (BertForPreTraining: 2.1387)
+
+5. GELU(x) = x * Phi(x), and the tanh formula of the released code
+   x = -2.0: Phi(x) = 0.0228, GELU = -2.0 x 0.0228 = -0.0455; tanh formula -0.0454; ReLU +0.0
+   x = -1.0: Phi(x) = 0.1587, GELU = -1.0 x 0.1587 = -0.1587; tanh formula -0.1588; ReLU +0.0
+   x = -0.5: Phi(x) = 0.3085, GELU = -0.5 x 0.3085 = -0.1543; tanh formula -0.1543; ReLU +0.0
+   x = +0.5: Phi(x) = 0.6915, GELU = +0.5 x 0.6915 = +0.3457; tanh formula +0.3457; ReLU +0.5
+   x = +1.0: Phi(x) = 0.8413, GELU = +1.0 x 0.8413 = +0.8413; tanh formula +0.8412; ReLU +1.0
+   x = +2.0: Phi(x) = 0.9772, GELU = +2.0 x 0.9772 = +1.9545; tanh formula +1.9546; ReLU +2.0
+
+6. attention cost in BERT-base (L = 12 layers, A = 12 heads, H = 768), multiply-adds per layer
+   n = 128: scores per head 16,384; per layer (12 heads) 196,608; all 12 layers 2,359,296 numbers
+      multiply-adds per layer: projections + feed-forward 12 n H^2 = 905,969,664; attention scores and mixing 2 n^2 H = 25,165,824
+      attention share of a layer's work: 2.7%; work per token 7,274,496
+   n = 512: scores per head 262,144; per layer (12 heads) 3,145,728; all 12 layers 37,748,736 numbers
+      multiply-adds per layer: projections + feed-forward 12 n H^2 = 3,623,878,656; attention scores and mixing 2 n^2 H = 402,653,184
+      attention share of a layer's work: 10.0%; work per token 7,864,320
+   512 vs 128: score matrix 16x, whole-sequence work 4.32x (4x the tokens), work per token 1.08x

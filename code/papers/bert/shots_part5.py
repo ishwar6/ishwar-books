@@ -81,7 +81,30 @@ JOBS = [
          highlight=['fine-tuning is surprisingly robust to different masking strategies',
                     'using only the MASK strategy was problematic when applying the feature-based approach to NER',
                     'using only the RND strategy performs much worse than our strategy as well'], end='than our strategy as well.', above=4),
+    # ---- added in the second pass: the A.4 opening, and the other papers Section 5 talks to
+    dict(name='p5-a4-open', page=13, anchor='Comparison of BERT, ELMo',
+         highlight=['BERT and OpenAI GPT are fine-tuning approaches, while ELMo is a feature-based approach',
+                    'intentionally made to make it as close to GPT as possible', 'account for the majority of the empirical improvements'],
+         end='between how BERT and GPT were trained:', above=6),
+    dict(name='p5-vaswani-table3', arxiv_id='1706.03762', page=8, anchor='Table 3: Variations on the Transformer architecture',
+         highlight=['big 6 1024 4096 16', '213'], column='full', end='big 6 1024 4096 16', above=4),
+    dict(name='p5-alrfou-table1', arxiv_id='1808.04444', page=3, anchor='Table 1: Comparison of various models on text8',
+         highlight=['T64 (ours) 235 219 1.13', 'Parameters'], figure=True, below=0, fig_top=104, column='full'),
+    dict(name='p5-alrfou-abstract', arxiv_id='1808.04444', page=0, anchor='In this paper, we show that a deep',
+         highlight=['a deep (64-layer) transformer model'], end='by a large margin', above=4, below=30),
+    dict(name='p5-elmo-eq1', arxiv_id='1802.05365', page=2, anchor='as in TagLM (Peters et al., 2017) and CoVe',
+         highlight=['task specific weighting of all biLM layers', 'softmax-normalized weights'], end='allows the task model to scale the entire ELMo vector', above=4),
+    dict(name='p5-conll-format', arxiv_id='cs/0306050', page=1, anchor='All data files contain one word per line with empty',
+         highlight=['the I-XXX tag is used for words inside a named entity of type XXX', 'will be tagged B-XXX', 'the IOB scheme originally put forward by Ramshaw and Marcus (1995)'], end='Ramshaw and Marcus (1995)', above=24),
 ]
 
 if __name__ == '__main__':
     run(JOBS)
+    import os
+    from PIL import Image
+    from paper_shots import OUT
+    f = os.path.join(OUT, 'p5-alrfou-table1.png')        # the table is wider than its column: keep the table, drop the next column's text
+    if (not os.environ.get('ONLY') or 'p5-alrfou-table1' in os.environ['ONLY']) and os.path.exists(f):
+        im = Image.open(f)
+        if im.width > 1000:
+            im.crop((0, 0, 700, im.height)).save(f)

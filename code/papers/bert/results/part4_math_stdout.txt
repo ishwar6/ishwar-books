@@ -1,0 +1,102 @@
+== 1a. GLUE head, toy: H = 4, K = 3
+C = [0.5, -1.0, 2.0, 0.1]   (shape (4,))
+W = [[1.0, 0.0, 0.5, 0.0], [0.0, 1.0, -0.5, 2.0], [-0.5, 0.5, 0.0, 1.0]]   (shape (3, 4))
+  logit 0 = C . W[0] = (0.5)(1) + (-1)(0) + (2)(0.5) + (0.1)(0) = 1.500
+  logit 1 = C . W[1] = (0.5)(0) + (-1)(1) + (2)(-0.5) + (0.1)(2) = -1.800
+  logit 2 = C . W[2] = (0.5)(-0.5) + (-1)(0.5) + (2)(0) + (0.1)(1) = -0.650
+softmax: exp(logits) = [4.482, 0.165, 0.522], sum = 5.169, P = [0.867, 0.032, 0.101]
+correct label y = 0: log softmax = -0.143, loss = -log P(y) = 0.143
+
+== 1b. GLUE head, real: textattack/bert-base-uncased-SST-2
+"a gorgeous, witty, seductive movie."  gold label 1
+  C: shape (768,), first 8 numbers [-0.045, 0.128, 0.488, 0.521, 0.539, 0.561, 0.821, 0.199]
+  W: shape (2, 768), bias [-0.000, 0.000]
+  C W^T = [-4.316, 4.135], + bias = logits [-4.316, 4.135]  (library: [-4.316, 4.135])
+  softmax = [0.0002, 0.9998];  loss = -log P(gold) = 0.0002
+"the plot is dull and the acting is worse."  gold label 0
+  C: shape (768,), first 8 numbers [0.168, -0.169, -0.337, -0.504, -0.587, -0.554, -0.840, -0.092]
+  W: shape (2, 768), bias [-0.000, 0.000]
+  C W^T = [3.883, -3.500], + bias = logits [3.883, -3.499]  (library: [3.883, -3.499])
+  softmax = [0.9994, 0.0006];  loss = -log P(gold) = 0.0006
+
+== 7. SST-2 model: 109,483,778 weights in total; 1,538 are new (K x H + K = 2 x 768 + 2); 109,483,778 have requires_grad = True during fine-tuning (all of them)
+  new weights, GLUE, K = 2 (SST-2): 1,538
+  new weights, GLUE, K = 3 (MNLI): 2,307
+  new weights, SQuAD (S and E): 1,538
+  new weights, SWAG (one vector V): 769
+
+== 2. packed pair in csarron/bert-base-uncased-squad-v1
+tokens: ['[CLS]', 'where', 'was', 'ada', 'born', '?', '[SEP]', 'ada', 'love', '##lace', 'was', 'born', 'in', 'london', 'in', '1815', '.', '[SEP]']
+segment A (question) positions [1, 2, 3, 4, 5], segment B (passage) positions [7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+  layer  1: question -> passage 0.190   passage -> question 0.107   question -> [CLS]/[SEP] 0.306
+  layer  2: question -> passage 0.188   passage -> question 0.072   question -> [CLS]/[SEP] 0.491
+  layer  3: question -> passage 0.204   passage -> question 0.091   question -> [CLS]/[SEP] 0.407
+  layer  4: question -> passage 0.169   passage -> question 0.122   question -> [CLS]/[SEP] 0.500
+  layer  5: question -> passage 0.148   passage -> question 0.128   question -> [CLS]/[SEP] 0.519
+  layer  6: question -> passage 0.170   passage -> question 0.072   question -> [CLS]/[SEP] 0.503
+  layer  7: question -> passage 0.088   passage -> question 0.054   question -> [CLS]/[SEP] 0.687
+  layer  8: question -> passage 0.062   passage -> question 0.022   question -> [CLS]/[SEP] 0.659
+  layer  9: question -> passage 0.135   passage -> question 0.043   question -> [CLS]/[SEP] 0.603
+  layer 10: question -> passage 0.191   passage -> question 0.196   question -> [CLS]/[SEP] 0.414
+  layer 11: question -> passage 0.156   passage -> question 0.117   question -> [CLS]/[SEP] 0.690
+  layer 12: question -> passage 0.087   passage -> question 0.045   question -> [CLS]/[SEP] 0.740
+averaged over all 12 layers and heads, "born" (question) gives 0.162 of its attention to the passage
+
+== 3a. span scoring, toy (4 passage tokens)
+S.T_i = [0.5, 1.0, 3.0, 0.2]  ->  P_start = [0.064, 0.106, 0.782, 0.048]
+E.T_j = [2.8, 0.1, 1.0, 1.5]  ->  P_end   = [0.664, 0.045, 0.110, 0.181]
+score(i, j) = S.T_i + E.T_j:
+  i=0:   3.3     0.6     1.5     2.0 
+  i=1:   3.8x    1.1     2.0     2.5 
+  i=2:   5.8x    3.1x    4.0     4.5 
+  i=3:   3.0x    0.3x    1.2x    1.7 
+best without the rule: i=2, j=0 (score 5.8) -> ends before it starts, not allowed
+best with j >= i:      i=2, j=3 (score 4.5);  P_start*P_end = 0.1417
+if the true span is (2, 3): loss = -log 0.7823 - log 0.1811 = 1.9543
+
+== 3b. span scoring on the abstract, csarron/bert-base-uncased-squad-v1
+Q: What does BERT stand for?   gold "Bidirectional Encoder Representations from Transformers" = tokens 21..30 ['bid', '##ire', '##ction', '##al', 'en', '##code', '##r', 'representations', 'from', 'transformers']
+   S, E: shape (768,) each; first 4 of S [-0.033, 0.027, -0.016, 0.022], of E [-0.017, 0.005, -0.034, 0.027]
+   predicted span "Bidirectional Encoder Representations from Transformers" (tokens 21..30, score 15.16)
+   P_start(gold start) = 0.9893, P_end(gold end) = 0.9661, loss = -log P_start - log P_end = 0.0453
+   heatmap window: tokens 17..32 [',', 'which', 'stands', 'for', 'bid', '##ire', '##ction', '##al', 'en', '##code', '##r', 'representations', 'from', 'transformers', '.', 'bert']
+   start scores S.T_i: [-8.65, -1.24, -0.44, -1.42, 7.75, -3.09, -5.69, -2.60, 0.34, -4.13, -3.52, -1.29, -0.82, 3.04, -3.88, -2.33]
+   end scores   E.T_j: [-6.98, -6.96, -6.97, -7.11, -2.00, -6.03, -6.62, -1.34, -4.23, -6.09, 0.32, 3.15, -2.64, 7.41, 3.46, -4.08]
+Q: What does BERT learn from?   gold "unlabeled text" = tokens 46..50 ['un', '##lab', '##ele', '##d', 'text']
+   S, E: shape (768,) each; first 4 of S [-0.033, 0.027, -0.016, 0.022], of E [-0.017, 0.005, -0.034, 0.027]
+   predicted span "Transformers" (tokens 30..30, score 9.87)
+   P_start(gold start) = 0.0615, P_end(gold end) = 0.0407, loss = -log P_start - log P_end = 5.9909
+
+== 4. SQuAD 2.0 no-answer score, deepset/bert-base-uncased-squad2; tau chosen on the dev set = +4.00 (from bert_part4_squad.py)
+Q: What does BERT stand for?
+   s_null = S.C + E.C = 5.08 + 5.10 = 10.18
+   best span "Bidirectional Encoder Representations from Transformers": S.T_i + E.T_j = 11.69 + 11.56 = 23.25
+   tau = 0:     23.25 > 10.18 ?  yes -> answer
+   tau = +4.00: 23.25 > 14.18 ?  yes -> answer
+Q: Who won the football world cup in 2018?
+   s_null = S.C + E.C = 10.51 + 10.63 = 21.13
+   best span "BERT": S.T_i + E.T_j = 0.33 + 0.89 = 1.22
+   tau = 0:     1.22 > 21.13 ?  no -> no answer
+   tau = +4.00: 1.22 > 25.13 ?  no -> no answer
+Q: How many layers does BERT have?
+   s_null = S.C + E.C = 6.61 + 6.58 = 13.19
+   best span "all": S.T_i + E.T_j = 8.45 + 7.71 = 16.16
+   tau = 0:     16.16 > 13.19 ?  yes -> answer
+   tau = +4.00: 16.16 > 17.19 ?  no -> no answer
+
+== 5. EM and F1
+pred "The Denver Broncos." -> "denver broncos" | gold "Denver Broncos" -> "denver broncos"
+   shared words 2, precision 1.000, recall 1.000, F1 1.000, EM 1
+pred "Bidirectional Encoder Representations" -> "bidirectional encoder representations" | gold "Bidirectional Encoder Representations from Transformers" -> "bidirectional encoder representations from transformers"
+   shared words 3, precision 1.000, recall 0.600, F1 0.750, EM 0
+pred "the Broncos defeated the Panthers" -> "broncos defeated panthers" | gold "Denver Broncos" -> "denver broncos"
+   shared words 1, precision 0.333, recall 0.500, F1 0.400, EM 0
+pred "eight" -> "eight" | gold "2" -> "2"
+   shared words 0, precision 0.000, recall 0.000, F1 0.000, EM 0
+
+== 6. SWAG, toy: four C_k (H = 4), one vector V
+  s_1 = V . C_1 = (2)(0.9) + (-1)(0.2) + (0.5)(-0.1) + (1)(0.4) = 1.95
+  s_2 = V . C_2 = (2)(-0.3) + (-1)(0.8) + (0.5)(0.5) + (1)(-0.6) = -1.75
+  s_3 = V . C_3 = (2)(0.1) + (-1)(-0.7) + (0.5)(0.9) + (1)(0) = 1.35
+  s_4 = V . C_4 = (2)(0.4) + (-1)(0.1) + (0.5)(-0.2) + (1)(-0.9) = -0.30
+softmax over the four = [0.596, 0.015, 0.327, 0.063]; if ending 1 is right, loss = -log 0.596 = 0.518

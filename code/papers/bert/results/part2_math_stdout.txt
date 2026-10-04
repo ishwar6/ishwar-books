@@ -1,0 +1,110 @@
+== 1. scaled dot-product attention, tiny example: 3 tokens, d_k = 4 ==
+  Q K^T:
+    the      1.000  0.000  2.000
+    kid      0.000  3.000  2.000
+    smiles   1.000  2.000  3.000
+  / sqrt(d_k):
+    the      0.500  0.000  1.000
+    kid      0.000  1.500  1.000
+    smiles   0.500  1.000  1.500
+  softmax:
+    the      0.307  0.186  0.506
+    kid      0.122  0.547  0.331
+    smiles   0.186  0.307  0.506
+  output = weights V:
+    the      0.814  0.693
+    kid      0.453  0.878
+    smiles   0.693  0.814
+  row sums of the weights: [1.0, 1.0, 1.0]
+
+== 2. why divide by sqrt(d_k): dot products of random vectors with 64 numbers ==
+  10,000 random pairs, each number drawn with mean 0 and spread 1
+  spread (standard deviation) of q.k:          8.002   (about sqrt(64) = 8)
+  spread of q.k / sqrt(64):                     1.000
+  one row of 8 scores (already divided):        [ 0.661,  0.267,  0.062,  0.621, -0.452, -0.166, -1.523,  0.382]
+  softmax WITHOUT the division (scores x 8):    [ 0.530,  0.023,  0.004,  0.385,  0.000,  0.001,  0.000,  0.057]   max 0.530
+  softmax WITH the division:                    [ 0.208,  0.140,  0.114,  0.199,  0.068,  0.091,  0.023,  0.157]   max 0.208
+
+== 3. the real model: shapes of attention in layer 1, and one head's weights ==
+  tokens: ['[CLS]', 'the', 'kid', 'smiles', '[SEP]']  (n = 5)
+  X (input embeddings) (5, 768);  W_Q (768, 768) holds 12 heads of 64 columns
+  per head: Q (5, 64), K (5, 64), V (5, 64); Q K^T (5, 5); output (5, 64)
+  12 heads joined: (5, 768); after W_O (768, 768): (5, 768)
+  head 1 of layer 1, attention weights (rows: the token looking, columns: the token looked at):
+               [CLS]     the     kid  smiles   [SEP]
+    [CLS]      0.108   0.246   0.063   0.076   0.506
+    the        0.198   0.212   0.175   0.217   0.198
+    kid        0.152   0.088   0.139   0.281   0.340
+    smiles     0.144   0.160   0.185   0.235   0.276
+    [SEP]      0.189   0.200   0.091   0.171   0.348
+
+== 4. the feed-forward network: 768 -> 3072 -> 768, for the token "kid" in layer 1 ==
+  in (768,) -> x W1 + b1 (3072,) -> GELU -> x W2 + b2 (768,)
+  W1 (768, 3072), W2 (3072, 768)
+  first 6 of the 3072 numbers before GELU: [-1.334, -0.569, -4.067, -1.991, -1.904, -0.816]
+  the same 6 after GELU:                   [-0.122, -0.162, -0.000, -0.046, -0.054, -0.169]
+  share of the 3072 that are positive before GELU: 0.052
+
+== 5. input embedding of "dog" in the Figure 2 pair, first 6 of 768 numbers ==
+  token "dog" id 3899, segment A (0), position 2
+  Tok[3899]           [-0.015,  0.012,  0.009, -0.014, -0.024, -0.009]  ...
+  Seg[A]              [ 0.000,  0.011,  0.004,  0.002,  0.001, -0.011]  ...
+  Pos[2]              [-0.011, -0.002, -0.012, -0.022, -0.010,  0.012]  ...
+  sum                 [-0.026,  0.021,  0.001, -0.035, -0.034, -0.008]  ...
+  mean of all 768 numbers of the sum: -0.0185; spread (standard deviation): 0.0517
+  (sum - mean)/spread [-0.141,  0.773,  0.382, -0.309, -0.292,  0.200]  ...
+  x gamma + beta      [-0.156,  0.665,  0.352, -0.178, -0.324,  0.166]  ...   (LayerNorm output)
+  model.embeddings    [-0.156,  0.665,  0.352, -0.178, -0.324,  0.166]  ...   max |difference| 0.0e+00
+  lengths: |Tok| 1.069, |Seg| 0.897, |Pos| 0.494, |sum| 1.522, |LayerNorm(sum)| 16.659
+
+== 6. cosine similarity, by hand ==
+  a = [1.0, 2.0, 2.0], b = [2.0, 1.0, 2.0]: a.b = 8, |a| = 3, |b| = 3, cos = 8/(3 x 3) = 0.889
+
+== 7. greedy longest-match-first WordPiece, every try, for "embeddings" ==
+  18 lookups, 4 pieces: em ##bed ##ding ##s
+    embeddings     not in the vocabulary
+    embedding      not in the vocabulary
+    embeddin       not in the vocabulary
+    embeddi        not in the vocabulary
+    embedd         not in the vocabulary
+    embed          not in the vocabulary
+    embe           not in the vocabulary
+    emb            not in the vocabulary
+    em             in the vocabulary -> keep
+    ##beddings     not in the vocabulary
+    ##bedding      not in the vocabulary
+    ##beddin       not in the vocabulary
+    ##beddi        not in the vocabulary
+    ##bedd         not in the vocabulary
+    ##bed          in the vocabulary -> keep
+    ##dings        not in the vocabulary
+    ##ding         in the vocabulary -> keep
+    ##s            in the vocabulary -> keep
+
+== 8. parameters term by term (H = hidden size, I = 4H feed-forward size, V = vocabulary, P = positions) ==
+  bert-base-uncased: L=12 H=768 I=3072
+    token table V x H                             23,440,896
+    position table P x H                             393,216
+    segment table 2 x H                                1,536
+    embedding LayerNorm 2H                             1,536
+    Q, K, V, O matrices 4 H x H (per layer)        2,359,296
+    their biases 4H (per layer)                        3,072
+    FFN W1 H x 4H + W2 4H x H (per layer)          4,718,592
+    FFN biases 4H + H (per layer)                      3,840
+    two LayerNorms 4H (per layer)                      3,072
+    pooler H x H + H                                 590,592
+    one layer 7,087,872 x 12 = 85,054,464;  total 109,482,240
+  bert-large-uncased: L=24 H=1024 I=4096
+    token table V x H                             31,254,528
+    position table P x H                             524,288
+    segment table 2 x H                                2,048
+    embedding LayerNorm 2H                             2,048
+    Q, K, V, O matrices 4 H x H (per layer)        4,194,304
+    their biases 4H (per layer)                        4,096
+    FFN W1 H x 4H + W2 4H x H (per layer)          8,388,608
+    FFN biases 4H + H (per layer)                      5,120
+    two LayerNorms 4H (per layer)                      4,096
+    pooler H x H + H                               1,049,600
+    one layer 12,596,224 x 24 = 302,309,376;  total 335,141,888
+  OpenAI GPT (openai-gpt config): L=12 H=768 heads=12 vocabulary=40478 positions=512
+    parameters counted on the meta device: 116,534,784

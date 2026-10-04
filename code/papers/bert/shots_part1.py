@@ -28,6 +28,14 @@ JOBS = [
     dict(name='p1-figure3', page=12, anchor='Figure 3: Differences in pre-training model architectures',
          highlight=['Among the three, only BERT representations are jointly conditioned on both left and right context in all layers'],
          figure=True, column='full', below=0),
+    dict(name='p1-transformer-fig1', arxiv_id='1706.03762', page=2, anchor='Figure 1: The Transformer - model architecture.',
+         highlight=['Figure 1: The Transformer - model architecture.'], figure=True, column='full', below=0),
+    dict(name='p1-transformer-halves', arxiv_id='1706.03762', page=2, anchor='The Transformer follows this overall architecture',
+         highlight=['encoder and decoder, shown in the left and right halves of Figure 1', 'prevent positions from attending to subsequent positions',
+                    'can depend only on the known outputs at positions less than'], end='at positions less than i.', above=4, below=200),
+    dict(name='p1-elmo-bilm', arxiv_id='1802.05365', page=2, anchor='Recent state-of-the-art neural language models',
+         highlight=['predicting the previous token given the future context', 'jointly maximizes the log likelihood of the forward and backward directions',
+                    'separate parameters for the LSTMs in each direction'], end='for the LSTMs in each direction', above=80, below=200),
 ]
 
 if __name__ == '__main__':

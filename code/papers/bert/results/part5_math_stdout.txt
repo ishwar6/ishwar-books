@@ -1,0 +1,75 @@
+1. Perplexity on one sentence, three masked words (bert-base-uncased)
+  input: she opened the [MASK] with her [MASK] and walked into the [MASK] .
+  door     p = 0.9586   -log p = 0.0423   (top 3 guesses: door, gate, box)
+  key      p = 0.1324   -log p = 2.0222   (top 3 guesses: key, hand, keys)
+  kitchen  p = 0.1823   -log p = 1.7022   (top 3 guesses: room, kitchen, house)
+  mean NLL = (0.0423 + 2.0222 + 1.7022) / 3 = 1.2554 nats -> perplexity = exp(1.2554) = 3.51
+  GPT-2, left side only: "she opened the ___"  p(door) = 0.4204   -log p = 0.8666
+  GPT-2, left side only: "she opened the door with her ___"  p(key) = 0.0006   -log p = 7.3912
+  GPT-2, left side only: "she opened the door with her key and walked into the ___"  p(kitchen) = 0.0577   -log p = 2.8526
+  GPT-2 mean NLL = 3.7125 -> perplexity 40.96  (same three words, left context only)
+
+  input: the [MASK] sat on the [MASK] because it was [MASK] .
+  cat      p = 0.0150   -log p = 4.2025   (top 3 guesses: car, man, dog)
+  mat      p = 0.0015   -log p = 6.4933   (top 3 guesses: floor, ground, bed)
+  tired    p = 0.0008   -log p = 7.1757   (top 3 guesses: cold, empty, dark)
+  mean NLL = (4.2025 + 6.4933 + 7.1757) / 3 = 5.9443 nats -> perplexity = exp(5.9443) = 381.57
+  GPT-2, left side only: "the ___"  p(cat) = 0.0001   -log p = 9.1011
+  GPT-2, left side only: "the cat sat on the ___"  p(mat) = 0.0039   -log p = 5.5572
+  GPT-2, left side only: "the cat sat on the mat because it was ___"  p(tired) = 0.0082   -log p = 4.8016
+  GPT-2 mean NLL = 6.5202 -> perplexity 678.75  (same three words, left context only)
+
+  sanity check: a model that is uniform over 4 words has NLL = log 4 = 1.3863 and perplexity 4.0
+
+2. Parameters term by term (V = 30,522 tokens, 512 positions, 2 segments, feed-forward 4H)
+  L     H   A   embeddings    attention     feed-fwd  LayerNorm     pooler         total       counted
+  3   768  12   23,837,184    7,087,104   14,167,296      9,216    590,592    45,691,392    45,691,392
+  6   768   3   23,837,184   14,174,208   28,334,592     18,432    590,592    66,955,008    66,955,008
+  6   768  12   23,837,184   14,174,208   28,334,592     18,432    590,592    66,955,008    66,955,008
+ 12   768  12   23,837,184   28,348,416   56,669,184     36,864    590,592   109,482,240   109,482,240
+ 12  1024  16   31,782,912   50,380,800  100,724,736     49,152  1,049,600   183,987,200   183,987,200
+ 24  1024  16   31,782,912  100,761,600  201,449,472     98,304  1,049,600   335,141,888   335,141,888
+per layer: 12H^2 + 13H = 7,087,872 for H = 768 and 12,596,224 for H = 1024
+Vaswani et al. 2017, big encoder: L=6, H=1024: the layers alone, if shaped like BERT's (12H^2 + 13H each) = 75,577,344   (paper says 100M for the encoder)
+Al-Rfou et al. 2018: L=64, H=512: the layers alone, if shaped like BERT's (12H^2 + 13H each) = 201,752,576   (paper says 235M)
+
+3. Two one-way models glued together (ELMo style) versus one bidirectional model, BERT-base size
+  parameters: one bidirectional model 109,482,240; LTR + RTL = 218,964,480
+  vector per token: bidirectional (512, 768) ; LTR (512, 768) + RTL (512, 768) -> concat (512, 1536)
+  time for a batch of 8 x 512 tokens on mps (median of 5): one model 133 ms, LTR + RTL 261 ms -> 1.96x
+  in a sequence of 6 tokens, which positions can token 3 use (1-based)?
+    bidirectional, any layer: [1, 2, 3, 4, 5, 6]
+    LTR stack, any layer:     [1, 2, 3]    RTL stack, any layer: [3, 4, 5, 6]
+    concatenation: both lists, but only side by side at the very top; no layer ever mixes them
+
+4. The feature-based NER tagger (Section 5.3): shapes and parameters
+  sentence: Ada Lovelace met Charles Babbage in London .
+  WordPiece: ['[CLS]', 'Ada', 'Love', '##lace', 'met', 'Charles', 'Ba', '##bba', '##ge', 'in', 'London', '.', '[SEP]']
+  WordPiece tokens               [13]
+  all hidden states              [13, 13, 768]
+  first sub-token of each word   [8, 13, 768]
+  concat last four layers        [8, 3072]
+  BiLSTM output                  [8, 768]
+  tag scores                     [8, 9]
+  BiLSTM layer 1 (input 3072): 2 directions x 4 x (384*3072 + 384*384 + 2*384) = 10,622,976
+  BiLSTM layer 2 (input 768):  2 directions x 4 x (384*768 + 384*384 + 2*384)  = 3,545,088
+  classifier 9 x 768 + 9 = 6,921;  tagger total 14,174,985 trainable, BERT-base-cased frozen (108,310,272 parameters never change)
+
+5. BIO tags and first sub-tokens on a real CoNLL-2003 dev sentence
+  dev sentence #99: Lithuania - Danius Gleveckas ( 13rd )
+  Lithuania      B-LOC   pieces ['Lithuania']  -> the tagger reads "Lithuania"
+  -              O       pieces ['-']  -> the tagger reads "-"
+  Danius         B-PER   pieces ['Dani', '##us']  -> the tagger reads "Dani"
+  Gleveckas      I-PER   pieces ['G', '##lev', '##eck', '##as']  -> the tagger reads "G"
+  (              O       pieces ['(']  -> the tagger reads "("
+  13rd           O       pieces ['13', '##rd']  -> the tagger reads "13"
+  )              O       pieces [')']  -> the tagger reads ")"
+
+6. Per-token argmax versus a decoder that knows "I-PER cannot follow O" (hand-made scores, for illustration)
+  scores (rows = words ['met', 'Ada', 'Lovelace'], columns = ['O', 'B-PER', 'I-PER']): 3.0, 0.5, 0.2; 1.2, 1.0, 0.4; 0.3, 0.6, 2.5
+  per-token argmax: ['O', 'O', 'I-PER']  (sum 6.7; O followed by I-PER is invalid)
+  best valid sequence: ['O', 'B-PER', 'I-PER']  (sum 6.5)
+
+7. Training signal per batch (Appendix C.1)
+  one batch = 256 x 512 = 131,072 tokens; masked LM predicts 15% = 19,661; left-to-right LM predicts every next token, about 131,072
+  over 1,000,000 steps: 19,661,000,000 masked-LM predictions versus about 131,072,000,000 for LTR (6.67x more)

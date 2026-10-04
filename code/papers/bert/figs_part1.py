@@ -129,5 +129,7 @@ def tasks():
 
 F['p1_tasks'] = tasks()
 
+exec(open('figs_part1_new.py').read())
+
 json.dump(F, open('results/figs_part1.json', 'w'))
 print('figures:', ', '.join(F))

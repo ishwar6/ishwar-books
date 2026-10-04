@@ -1,0 +1,36 @@
+1. Sliding windows over a long text
+   formula: number of windows = 1 + ceil((N - w) / s) = 1 + ceil((720 - 510) / 382) = 2
+   by slicing the token list: 2 windows, content tokens 0-509, 382-719; lengths with [CLS] and [SEP]: [512, 340]
+   N =    720: windows =   2; attention entries per head per layer: one long input (N+2)^2 =     521,284; windows padded to 512, k*512^2 =     524,288; ratio 0.99
+   N =   2000: windows =   5; attention entries per head per layer: one long input (N+2)^2 =   4,008,004; windows padded to 512, k*512^2 =   1,310,720; ratio 3.06
+   N =  10000: windows =  26; attention entries per head per layer: one long input (N+2)^2 = 100,040,004; windows padded to 512, k*512^2 =   6,815,744; ratio 14.68
+
+2. Two blanks: independent guesses versus the chain rule
+   "new town":  p(a) = 0.0424, p(b) = 0.0678, p(b | a) = 0.0000
+      independent p(a) p(b) = 0.002876;  chain rule p(a) p(b | a) = 0.000000
+   "new york":  p(a) = 0.0424, p(b) = 0.0440, p(b | a) = 0.9794
+      independent p(a) p(b) = 0.001868;  chain rule p(a) p(b | a) = 0.041548
+   best pair by the independent score (over 29 candidate pairs): "new town" 0.002876
+   best pair by the chain rule:                                  "new york" 0.041548
+   top 5 by the chain rule: new york 0.0415, chicago back 0.0109, san francisco 0.0107, the airport 0.0067, portland back 0.0052
+
+3. Cosine similarity for one real pair of [CLS] vectors (bert-base-uncased)
+   a = C("A man is playing a guitar."), b = C("A person is making music."), each with 768 numbers
+   first 4 numbers: a = [-0.096, 0.474, -0.437, -0.202], b = [-0.09, 0.171, -0.207, 0.054]
+   a . b = 199.086;  |a| = 15.498;  |b| = 15.086
+   cos = a . b / (|a| |b|) = 199.086 / (15.498 x 15.086) = 0.851   (torch: 0.851)
+   toy check in 2-D: a = (3, 4), b = (4, 3): a . b = 24, |a| = |b| = 5, cos = 24 / 25 = 0.96
+
+4. Knowledge distillation: teacher bert-base-uncased, student distilbert-base-uncased
+   encoder parameters: teacher 108,891,648 (12 layers), student 66,362,880 (6 layers), ratio 0.609
+   teacher top 5: bank 0.901, office 0.009, store 0.008, teller 0.008, atm 0.006
+   student top 5: bank 0.365, store 0.035, mall 0.025, hotel 0.022, supermarket 0.020
+   hard-label loss  -log s(bank)               = 1.009
+   soft-target loss -sum_w t(w) log s(w)       = 1.467   (teacher entropy, the smallest possible value: 0.774)
+
+5. The pre-training budget, from the numbers in Appendix A.2
+   tokens per batch = 256 x 512 = 131,072  (the paper rounds to 128,000)
+   tokens seen      = 1,000,000 steps x 131,072 = 131,072,000,000  (an upper bound: 90% of steps use length 128)
+   with 90% of steps at length 128 and 10% at 512: 1,000,000 x 256 x (0.9 x 128 + 0.1 x 512) = 42,598,400,000
+   predicted tokens (15%) of that: 6,389,760,000
+   chip-days: BERT-base 16 chips x 4 days = 64; BERT-large 64 chips x 4 days = 256

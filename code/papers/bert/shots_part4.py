@@ -4,7 +4,8 @@ from paper_shots import run
 JOBS = [
     # Section 3.2 Fine-tuning BERT (page 5, right column)
     dict(name='p4-finetune-swap', page=4, anchor='Fine-tuning is straightforward since the self',
-         highlight=['swapping out the appropriate inputs and outputs', 'effectively includes bidirectional cross attention between two sentences'],
+         highlight=['swapping out the appropriate inputs and outputs', 'independently encode text pairs before applying bidirectional cross attention',
+                    'effectively includes bidirectional cross attention between two sentences'],
          end='bidirectional cross attention between two sentences.', above=4),
     dict(name='p4-finetune-inputs', page=4, anchor='For each task, we simply plug in the task',
          highlight=['fine-tune all the parameters end-to-end', '(1) sentence pairs in paraphrasing', '(2) hypothesis-premise pairs in entailment',
@@ -94,6 +95,29 @@ JOBS = [
          highlight=['RTE', 'WNLI', 'performed worse than the 65.1 baseline accuracy of predicting the majority class',
                     'We therefore exclude this set to be fair to OpenAI GPT'],
          end='We therefore exclude this set to be fair to OpenAI GPT', above=4),
+    # new in v2: more of Section 4's own lines and footnotes
+    dict(name='p4-gpt-arch', page=5, anchor='Note that BERTBASE and OpenAI GPT are nearly',
+         highlight=['nearly identical in terms of model architecture apart from the at', 'BERT obtains a 4.6% absolute accuracy improvement'],
+         end='absolute accuracy improvement.', above=4),
+    dict(name='p4-footnote9', page=5, anchor='GLUE data set distribution does not include the Test',
+         highlight=['we only made a single GLUE evaluation server submission'], above=4, below=22),
+    dict(name='p4-footnote11', page=5, anchor='is described in Yu et al. (2018), but the',
+         highlight=['the system has improved substantially after publication'], end='substantially after publication.', above=4),
+    dict(name='p4-footnote12', page=6, anchor='TriviaQA data we used consists of paragraphs',
+         highlight=['first 400 tokens in documents', 'at least one of the provided possible answers'], end='possible answers.', above=4),
+    # the papers Part 4 leans on: SQuAD, SQuAD 2.0, SWAG, GLUE, BiDAF, decomposable attention
+    dict(name='p4-x-squad-fig1', arxiv_id='1606.05250', page=0, anchor='Figure 1: Question-answer pairs for a sample passage',
+         highlight=['Each of the answers is a segment of text from'], figure=True, fig_top=236, below=30),
+    dict(name='p4-x-squad2-fig1', arxiv_id='1806.03822', page=0, anchor='Two unanswerable questions written by',
+         highlight=['Two unanswerable questions written by'], figure=True, fig_top=150, below=0),
+    dict(name='p4-x-swag-table1', arxiv_id='1808.05326', page=0, anchor='Table 1: Examples from Swag',
+         highlight=['the correct answer is bolded'], figure=True, fig_top=192, below=0),
+    dict(name='p4-x-glue-table1', arxiv_id='1804.07461', page=1, anchor='Table 1: Task descriptions and statistics',
+         highlight=['Matthews corr.', 'matched acc./mismatched acc.'], figure=True, column='full', fig_top=180, below=0),
+    dict(name='p4-x-bidaf-fig1', arxiv_id='1611.01603', page=1, anchor='Figure 1: BiDirectional Attention Flow Model',
+         highlight=['Attention Flow Layer'], figure=True, column='full', below=0),
+    dict(name='p4-x-decomp-fig1', arxiv_id='1606.01933', page=1, anchor='Figure 1: Pictoral overview of the approach',
+         highlight=['showing the Attend', 'Compare (center)', 'Aggregate (right)'], figure=True, fig_top=95, below=16),
 ]
 
 if __name__ == '__main__':

@@ -65,7 +65,48 @@ JOBS = [
          highlight=['16 TPU chips', '64 TPU chips total', 'Each pre-training took 4 days to complete',
                     'attention is quadratic to the sequence length', 'sequence length of 128 for 90% of the steps', 'the rest 10% of the steps of sequence of 512'],
          end='to learn the positional embeddings.', above=4),
+    dict(name='p3-figure1', page=2, anchor='Figure 1: Overall pre-training and fine-tuning procedures for BERT',
+         highlight=['the same architectures are used in both pre-training and fine-tuning'], figure=True, column='full', below=0),
+    dict(name='p3-gelu-paper', arxiv_id='1606.08415', page=0, anchor='We propose the Gaussian Error Linear Unit',
+         highlight=['The GELU activation function is', 'the standard Gaussian cumulative distribution function', 'weights inputs by their value, rather than gates inputs by their sign'],
+         end='rather than gates inputs by their sign as in ReLUs', above=4),
+    dict(name='p3-billion', arxiv_id='1312.3005', page=1, anchor='Because the original data had already randomized',
+         highlight=['already randomized sentence order', 'not useful for experiments with models that capture long context dependencies across sentence boundaries'],
+         end='dependencies across sentence boundaries.', above=4),
+    dict(name='p3-billion-steps', arxiv_id='1312.3005', page=1, anchor='Sentence order was randomized',
+         highlight=['Sentence order was randomized'], end='into 100 disjoint partitions', above=4),
+    dict(name='p3-bookcorpus', arxiv_id='1506.06724', page=3, anchor='The learning signal of the model depends on having',
+         highlight=['depends on having contiguous text, where sentences follow one another in sequence', 'a large collection of books'],
+         end='a large collection of books.', above=4),
+    dict(name='p3-bookcorpus-table', arxiv_id='1506.06724', page=2, anchor='Table 2: Summary statistics of our BookCorpus dataset',
+         highlight=['11,038', '984,846,357'], figure=True, fig_top=30, below=0),
+    dict(name='p3-logeswaran', arxiv_id='1803.02893', page=0, anchor='In this work we propose a simple and efficient framework',
+         highlight=['reformulate the problem of predicting the context in which a sentence appears as a classification problem',
+                    'distinguishes context sentences from other contrastive sentences'],
+         end='sentences from other contrastive sentences based on their vector representations.', above=4),
+    dict(name='p3-jernite', arxiv_id='1705.00557', page=2, anchor='Many coherence relations are',
+         highlight=['two adjacent sentences will generally be more coherent than two more distant ones', 'decide which candidate immediately follows the initial three'],
+         end='immediately follows the initial three in the source text.', above=14),
 ]
 
+# crops of other papers' abstracts start in the left margin, next to arXiv's rotated stamp: trim it (pixels at 190 dpi)
+TRIM = {'p3-gelu-paper': (300, 0), 'p3-logeswaran': (300, 0), 'p3-billion': (0, 14), 'p3-bookcorpus-table': (0, 20)}
+
+
+def trim(names):
+    import os
+    from PIL import Image
+    from paper_shots import OUT
+    for n in names:
+        if n in TRIM:
+            p = os.path.join(OUT, n + '.png')
+            im = Image.open(p)
+            left, top = TRIM[n]
+            im.crop((left, top, im.width, im.height)).save(p)
+
+
 if __name__ == '__main__':
+    import os
     run(JOBS)
+    only = os.environ.get('ONLY')
+    trim(only.split(',') if only else [j['name'] for j in JOBS])

@@ -1,0 +1,47 @@
+1. The chain rule on GPT-2: "The kid smiles at the dog."
+   vocabulary size V = 50,257; one output vector of V scores per position
+    i  word     given (left side only)     P(word | left)    log P
+    1  The      (start)                          0.037700   -3.278
+    2  kid      The                              0.000040  -10.114
+    3  smiles   The kid                          0.000257   -8.268
+    4  at       The kid smiles                   0.087426   -2.437
+    5  the      The kid smiles at                0.150418   -1.894
+    6  dog      The kid smiles at the            0.002395   -6.034
+    7  .        The kid smiles at the dog        0.177917   -1.726
+   n = 7 tokens
+   sum of log P = -33.752
+   P(sentence) = exp(-33.752) = 2.196e-15
+   average negative log-likelihood = 4.822  (perplexity exp of that = 124.2)
+
+2. The same word, two ways of predicting it: "smiles"
+   GPT-2  P(smiles | "The kid")                    = 0.0003   top 5: who 0.1939, is 0.0687, in 0.0596, was 0.0550, 's 0.0507
+   BERT   P(smiles | "the kid [MASK] at the dog.") = 0.0008   top 5: looked 0.3233, stared 0.1029, glanced 0.0795, pointed 0.0620, glared 0.0595
+   BERT shapes: T_i has 768 numbers; output scores over V = 30,522 WordPiece tokens
+
+3. Attention on "the kid smiles": rows = queries (the word that looks), columns = keys (the word looked at)
+   GPT-2 layer 1, head 1: query and key vectors have d_k = 64 numbers each
+   scores s = q.k / sqrt(64):
+     the     -0.618   -1.104   -0.860
+     kid      0.770   -0.374   -0.562
+     smiles   0.345   -0.316   -0.987
+   mask M (0 = allowed, -inf = blocked: a key to the right of the query):
+     the      0.000     -inf     -inf
+     kid      0.000    0.000     -inf
+     smiles   0.000    0.000    0.000
+   weights a = softmax(s + M), row by row:
+     the      1.000    0.000    0.000   (row sum 1.000)
+     kid      0.758    0.242    0.000   (row sum 1.000)
+     smiles   0.562    0.290    0.148   (row sum 1.000)
+   max difference from the library's own attention weights: 0.0e+00
+
+   layer 1, averaged over the 12 heads
+   GPT-2 (causal):
+     the    1.000  0.000  0.000
+     kid    0.576  0.424  0.000
+     smiles 0.397  0.190  0.413
+   BERT (bidirectional):              [CLS]      the      kid   smiles    [SEP]
+     [CLS]    0.620    0.170    0.047    0.053    0.110
+     the      0.321    0.131    0.151    0.220    0.177
+     kid      0.190    0.153    0.155    0.321    0.181
+     smiles   0.208    0.096    0.206    0.239    0.251
+     [SEP]    0.314    0.152    0.071    0.220    0.243
