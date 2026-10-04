@@ -50,7 +50,63 @@ The problem: one fixed-size summary has to hold the whole sentence, whether it h
 
 {{FIG:p1_bottleneck|Left: the old way squeezes the whole sentence into one vector. Right: with attention, the model looks back at every input word and decides how much each one matters right now (the weights shown are illustrative).}}
 
+Here is how the paper that introduced attention describes that problem, in its very first section:
+
+> [!PAPER] Bahdanau, Cho, Bengio (2014) · Section 1, Introduction · page 1
+> [![The introduction of the Bahdanau paper, with the sentence about compressing a whole sentence into a fixed-length vector highlighted](/img/attention/papers/bahdanau-bottleneck.png)](/img/attention/papers/bahdanau-bottleneck.png)
+>
+> **Context:** The authors first describe the standard translation model of 2014: an *encoder* RNN reads the source sentence, a *decoder* RNN writes the translation. Then they point at its weak spot.
+>
+> **What it says:** All the information of the source sentence must be squeezed into one fixed-length vector. Long sentences do not fit, and translation quality "deteriorates rapidly" as sentences get longer.
+>
+> **Why it matters:** This one paragraph is the reason attention exists. Every later idea in this series is still fighting the same enemy: how to give a model access to a lot of text without one fixed-size bottleneck.
+>
+> [Read the paper on arXiv](https://arxiv.org/abs/1409.0473)
+
 In 2014, Bahdanau, Cho and Bengio had a simple idea: **let the model look back at every word**, every time it writes a word, and learn how much to pay attention to each one. To write "cat" it looks mostly at "chat"; to write "black", mostly at "noir". That weighting is **attention**.
+
+### The first attention equations
+
+Their version works like this. The encoder leaves one vector $$h_j$$ for each source word $$j$$ (they call these **annotations**). When the decoder is about to write target word $$i$$, it does three things:
+
+$$
+e_{ij} = a(s_{i-1}, h_j)
+\qquad\qquad
+\alpha_{ij} = \frac{\exp(e_{ij})}{\sum_{k=1}^{T_x} \exp(e_{ik})}
+\qquad\qquad
+c_i = \sum_{j=1}^{T_x} \alpha_{ij}\, h_j
+$$
+
+where:
+
+- $$s_{i-1}$$ is the decoder's current state (what it has written so far);
+- $$a$$ is a small learned network, the **alignment model**, that scores how well source word $$j$$ fits the next target word;
+- $$e_{ij}$$ is that score, and $$\alpha_{ij}$$ is the score turned into a weight by softmax (the same softmax you will meet below);
+- $$T_x$$ is the number of source words;
+- $$c_i$$ is the **context vector**: a weighted mix of all the source words, made fresh for every target word.
+
+> [!DEFINITION] Encoder and decoder
+> An **encoder** reads the input (for example an English sentence) and turns it into vectors. A **decoder** writes the output (the French sentence) one word at a time. Translation models of 2014 had both. Today's chatbots are decoder-only: they read and write with the same stack of layers.
+
+> [!PAPER] Bahdanau et al. (2014) · Section 3.1, Decoder · page 3, Equation (6)
+> [![Equation 6 of the Bahdanau paper, the softmax that turns alignment scores into attention weights, highlighted](/img/attention/papers/bahdanau-weights.png)](/img/attention/papers/bahdanau-weights.png)
+>
+> **Context:** This is the heart of the paper: how the decoder decides how much weight $$\alpha_{ij}$$ to give each source word.
+>
+> **What it says:** The weight is a softmax over alignment scores $$e_{ij}$$, and each score comes from a small network $$a$$ that compares the decoder state with one source word.
+>
+> **Why it matters:** "Score every input, softmax the scores, take the weighted average" is still exactly what every attention layer does today. The 2017 transformer only changed *how* the score is computed (a dot product instead of a small network).
+
+The paper also drew the weights as pictures, and they show something nobody had programmed:
+
+> [!PAPER] Bahdanau et al. (2014) · Section 5.2.1, Alignment · page 6, Figure 3
+> [![Figure 3 of the Bahdanau paper: four attention matrices between English source words and French output words](/img/attention/papers/bahdanau-alignments.png)](/img/attention/papers/bahdanau-alignments.png)
+>
+> **Context:** Each square is one translation. Columns are English words, rows are the French words the model wrote, and a white pixel means "a lot of attention".
+>
+> **What it says:** The bright cells mostly follow the diagonal, because French and English often use the same word order. But look at panel (a): "European Economic Area" became "zone économique européenne", in **reverse** order, and the bright cells turn around to follow it.
+>
+> **Why it matters:** The model learned word alignment, a classic hard problem in translation, purely from example translations. This was the first clear evidence that attention weights are not just a trick: they can be read, and they often mean something.
 
 In 2017 the paper *Attention Is All You Need* went further. It threw the word-by-word reading away and made attention the **main** way words share information. That design is called the **transformer**, and every modern chatbot is one. When the words of one text attend to each other, it is called **self-attention**.
 
@@ -135,6 +191,26 @@ where:
 - $$d$$ is the length of each key vector;
 - $$M$$ is the causal mask: $$0$$ where looking is allowed, $$-\infty$$ where it is not.
 
+This is the equation from *Attention Is All You Need* (Vaswani et al., 2017), the paper that introduced the transformer. Here it is in the original:
+
+> [!PAPER] Vaswani et al. (2017), Attention Is All You Need · Section 3.2.1 · page 4, Equation (1)
+> [![Section 3.2.1 of Attention Is All You Need, with the definition of scaled dot-product attention and Equation 1 highlighted](/img/attention/papers/vaswani-scaled-dot.png)](/img/attention/papers/vaswani-scaled-dot.png)
+>
+> **Context:** Section 3.2 defines the attention used inside the transformer. The authors call it **scaled dot-product attention**.
+>
+> **What it says:** Take the dot products of a query with all keys, divide each by $$\sqrt{d_k}$$, apply softmax, and use the result to weight the values. For many queries at once, stack them into matrices: $$\operatorname{softmax}(QK^T/\sqrt{d_k})V$$.
+>
+> **Why it matters:** This one line replaced Bahdanau's small scoring network with a single matrix multiplication. Matrix multiplications are exactly what GPUs are fastest at, which is a big reason transformers could be trained on so much more data. The paper writes $$d_k$$ where this article writes $$d$$, and leaves the mask out of the equation (Figure 2 shows it as an optional "Mask" step).
+
+> [!PAPER] Vaswani et al. (2017) · Section 3.2 · page 4, Figure 2
+> [![Figure 2 of Attention Is All You Need: block diagrams of scaled dot-product attention and multi-head attention](/img/attention/papers/vaswani-figure2.png)](/img/attention/papers/vaswani-figure2.png)
+>
+> **Context:** The paper's own diagram of the two pieces this article builds: the attention calculation (left) and several of them in parallel (right).
+>
+> **What it says:** Read the left diagram from the bottom up: multiply Q and K (MatMul), Scale by $$1/\sqrt{d_k}$$, Mask (optional), SoftMax, then multiply by V. Those are exactly steps 1 to 5 above.
+>
+> **Why it matters:** This figure is probably the most reproduced diagram in modern AI. If you can read it, you can read the attention part of almost any model's code.
+
 ### A tiny example you can check
 
 Here is the same thing in a few lines of Python, using PyTorch:
@@ -200,6 +276,47 @@ I measured it: 10,000 random queries, each scored against 64 random keys, for fo
 
 The spread grows exactly as $$\sqrt{d}$$: 4, 8, 16, 32. Without the division, at $$d = 1{,}024$$ one random key already takes 95% of the attention before the model has learned anything. When softmax is that lopsided, its learning signals (gradients) become tiny and training stalls. Dividing by $$\sqrt{d}$$ cancels the growth: the top weight stays near 0.107 at every size.
 
+### Where the √d comes from (the math in four lines)
+
+> [!DEFINITION] Mean and variance
+> The **mean** is the average value. The **variance** is the average of the squared distance from the mean; it measures spread. The standard deviation (the "spread" in the table above) is the square root of the variance.
+
+Suppose every number in $$q$$ and $$k$$ is random, with mean 0 and variance 1, and all are independent. Look at one term of the dot product, $$q_i k_i$$:
+
+$$
+\mathbb{E}[q_i k_i] = \mathbb{E}[q_i]\,\mathbb{E}[k_i] = 0 \cdot 0 = 0,
+\qquad
+\operatorname{Var}(q_i k_i) = \mathbb{E}[q_i^2]\,\mathbb{E}[k_i^2] = 1 \cdot 1 = 1
+$$
+
+The dot product adds $$d$$ such independent terms, and variances of independent terms simply add up:
+
+$$
+\operatorname{Var}(q \cdot k) = \sum_{i=1}^{d} \operatorname{Var}(q_i k_i) = d
+\qquad\Longrightarrow\qquad
+\text{spread}(q \cdot k) = \sqrt{d}
+$$
+
+So dividing by $$\sqrt{d}$$ brings the spread back to exactly 1, whatever the vector length:
+
+$$
+\operatorname{Var}\!\left(\frac{q \cdot k}{\sqrt{d}}\right) = \frac{d}{d} = 1
+$$
+
+where $$\mathbb{E}$$ means "average value" (expected value) and $$\operatorname{Var}$$ means variance. That is exactly what my measurement showed: spreads of 4, 8, 16, 32 for $$d$$ = 16, 64, 256, 1,024, which are $$\sqrt{d}$$.
+
+The transformer paper gives the same reasoning, in one sentence and one footnote:
+
+> [!PAPER] Vaswani et al. (2017) · Section 3.2.1 · page 4
+> [![The paragraph of Attention Is All You Need explaining that large dot products push softmax into regions with extremely small gradients](/img/attention/papers/vaswani-why-sqrt.png)](/img/attention/papers/vaswani-why-sqrt.png)
+> [![Footnote 4 of Attention Is All You Need: the dot product of two random vectors has mean 0 and variance d_k](/img/attention/papers/vaswani-footnote.png)](/img/attention/papers/vaswani-footnote.png)
+>
+> **Context:** Right after defining attention, the authors explain why they divide by $$\sqrt{d_k}$$, which earlier dot-product attention did not do.
+>
+> **What it says:** For large $$d_k$$ the dot products "grow large in magnitude", pushing softmax into regions with "extremely small gradients". Footnote 4 gives the reason: for random $$q$$ and $$k$$, the dot product has mean 0 and variance $$d_k$$.
+>
+> **Why it matters:** Note the word "suspect": the authors gave the argument, not a measurement. The experiment above measures it directly: without the division, one random key takes 95% of the attention at $$d = 1{,}024$$.
+
 ## Many heads instead of one
 
 One attention calculation learns one pattern. But a word often needs several kinds of information at once: the word just before it, the subject of the sentence, the matching bracket in some code. So models run several attention calculations side by side.
@@ -227,7 +344,24 @@ where:
 - **Concat** places the heads' results side by side into one long vector per token;
 - $$W_o$$ is the **output matrix** that mixes the heads back together.
 
-Each head works with shorter vectors (with 8 heads and 64 numbers per token, each head gets 8), so 8 heads cost about the same as one big head.
+Each head works with shorter vectors, so $$h$$ heads cost about the same as one big head:
+
+$$
+d_{\text{head}} = \frac{d_{\text{model}}}{h}
+\qquad\text{for example}\qquad
+\frac{512}{8} = 64
+$$
+
+where $$d_{\text{model}}$$ is the length of each token's vector and $$h$$ the number of heads. The original transformer used exactly these numbers: 512 per token, 8 heads, 64 per head. Total work is $$h \times d_{\text{head}} = d_{\text{model}}$$, the same as one head of full size.
+
+> [!PAPER] Vaswani et al. (2017) · Section 3.2.2, Multi-Head Attention · page 5
+> [![Section 3.2.2 of Attention Is All You Need: the sentence on attending to different representation subspaces, and the MultiHead equations highlighted](/img/attention/papers/vaswani-multihead.png)](/img/attention/papers/vaswani-multihead.png)
+>
+> **Context:** After defining one attention calculation, the paper explains why it runs several in parallel.
+>
+> **What it says:** "Multi-head attention allows the model to jointly attend to information from different representation subspaces at different positions. With a single attention head, averaging inhibits this." Then the two equations: the heads are computed separately, concatenated, and multiplied by $$W^O$$.
+>
+> **Why it matters:** "Averaging inhibits this" is the key idea. One softmax produces one weighted average, which blurs together everything a token might want. Several heads let it gather several different things at once, and the real heads below show exactly that kind of specialisation.
 
 ```python
 class MultiHeadAttention(torch.nn.Module):
@@ -296,6 +430,28 @@ Three kinds of head stood out:
 
 Six out of six. One honest note: in every one of these sentences, the right word is also the main noun near the start, so this head might be finding "the main noun" rather than truly understanding who "it" is. Either way, nobody programmed this. It appeared on its own during training.
 
+### The same patterns, found by researchers
+
+These findings are not special to Qwen. Two well-known papers found the same kinds of heads in other models.
+
+> [!PAPER] Clark, Khandelwal, Levy, Manning (2019), What Does BERT Look At? · Figure 5 · page 5
+> [![The coreference row of Figure 5 of the Clark et al. paper: BERT head 5-4 links pronouns such as she and her to the noun they refer to](/img/attention/papers/clark-coref.png)](/img/attention/papers/clark-coref.png)
+>
+> **Context:** The authors examined every attention head in BERT, a 2018 transformer, and checked which heads line up with grammar relations. Figure 5 shows examples; this crop shows its last row.
+>
+> **What it says:** Head 5-4 (layer 5, head 4) links "coreferent mentions" to their antecedents: "she" and "her" point back to "Kim", "negotiations" points back to "talks". It gets the right antecedent 65.1% of the time. Other heads in the same figure find verbs' objects (86.8%) and nouns' determiners (94.3%).
+>
+> **Why it matters:** This is the same kind of "pronoun head" we found in Qwen2.5-0.5B (layer 5, head 5), in a different model trained in a different way. It suggests that heads like this are something transformers reliably discover, not an accident of one model.
+
+> [!PAPER] Xiao et al. (2023), Efficient Streaming Language Models with Attention Sinks · Figure 2 · page 3
+> [![Figure 2 of the StreamingLLM paper: attention maps of Llama-2-7B where most layers put heavy attention on the first token](/img/attention/papers/xiao-sinks-figure.png)](/img/attention/papers/xiao-sinks-figure.png)
+>
+> **Context:** The authors averaged Llama-2-7B's attention over 256 short sentences and drew the maps for several layers (red = high, blue = low).
+>
+> **What it says:** Layers 0 and 1 attend mostly to nearby tokens (the red diagonal). From layer 2 on, almost every head puts a lot of attention on the **first** token: the red column on the left.
+>
+> **Why it matters:** That red first column is the attention sink, the same pattern we measured in 68% of Qwen2.5-0.5B's heads. It looks like a harmless quirk, but Part 3 shows that cutting off that first token breaks a model completely, and Part 4 shows a fix (gated attention).
+
 ## The cost that every other part tries to cut
 
 Attention has two costs, and both grow with the length of the text:
@@ -314,6 +470,20 @@ $$
 
 where the 2 counts one key and one value, and $$d_{\text{head}}$$ is the length of each head's vectors. For Llama 2 7B that is $$2 \times 32 \times 32 \times 128 \times 2 = 524{,}288$$ bytes, or **512 KiB per token**. At its full 4,096-token length, one conversation needs **2 GiB** just for this memory.
 
+The transformer paper itself lists this cost, comparing attention with the older layer types:
+
+> [!PAPER] Vaswani et al. (2017) · Section 4, Why Self-Attention · page 6, Table 1
+> [![Table 1 of Attention Is All You Need comparing self-attention, recurrent and convolutional layers, with the self-attention row highlighted](/img/attention/papers/vaswani-table1.png)](/img/attention/papers/vaswani-table1.png)
+>
+> **Context:** Section 4 argues why a network built only from attention is a good idea, by comparing three kinds of layer. $$n$$ is the text length and $$d$$ the vector length.
+>
+> **What it says:** Self-attention costs $$O(n^2 \cdot d)$$ per layer, but needs only $$O(1)$$ sequential steps, and any two tokens are connected in $$O(1)$$ steps. A recurrent layer costs $$O(n \cdot d^2)$$ but needs $$n$$ steps one after another, and information between distant tokens must pass through $$O(n)$$ steps.
+>
+> **Why it matters:** This table is the whole trade-off of the transformer. **No sequential steps** means training runs in parallel on GPUs, which is why transformers won. **$$n^2$$** is the bill, paid later, when texts became 100,000 tokens long. Parts 2 to 4 are about that $$n^2$$.
+
+> [!DEFINITION] Big-O notation
+> A shorthand for how a cost grows with size, ignoring constant factors. $$O(n^2)$$: double the text, four times the work. $$O(n)$$: double the text, double the work. $$O(1)$$: the cost does not depend on $$n$$ at all.
+
 Every idea in the rest of the series cuts one of these two costs:
 
 | Part | Idea | What it cuts |
@@ -321,6 +491,52 @@ Every idea in the rest of the series cuts one of these two costs:
 | 2 | MQA, GQA, MLA | **memory**: each token stores fewer or smaller keys and values |
 | 3 | sliding-window and sparse attention | **work and memory**: each token looks at fewer tokens |
 | 4 | linear attention, Gated DeltaNet, hybrids | **both**: most layers stop keeping a growing memory at all |
+
+## How attention changed everything
+
+It is hard to overstate what these two papers started. A short timeline of what happened next:
+
+| Year | What happened | Role of attention |
+|---|---|---|
+| 2014 | Bahdanau et al.: attention for translation | a helper for an RNN translator |
+| 2017 | Vaswani et al.: the transformer | attention **replaces** the RNN entirely |
+| 2018 | BERT and GPT | transformers pre-trained on huge amounts of text |
+| 2020 | Vision Transformer (ViT) | images cut into patches and treated as tokens |
+| 2021 to 2022 | AlphaFold 2, Whisper | attention for protein structures and for speech |
+| 2022 onward | ChatGPT, Llama, Qwen, Gemma, DeepSeek | every large chatbot is a stack of attention layers |
+
+> [!PAPER] Vaswani et al. (2017) · Abstract · page 1
+> [![The abstract of Attention Is All You Need, with the English-to-French result of 41.8 BLEU after 3.5 days of training on eight GPUs highlighted](/img/attention/papers/vaswani-abstract-result.png)](/img/attention/papers/vaswani-abstract-result.png)
+>
+> **Context:** The abstract's main claim: the new model is both better and cheaper to train than the best translation systems of the time.
+>
+> **What it says:** A new single-model record of 41.8 BLEU on English-to-French "after training for 3.5 days on eight GPUs, a small fraction of the training costs of the best models from the literature".
+>
+> **Why it matters:** "Better" got attention noticed; "cheaper to train" made it take over. Because attention trains in parallel, researchers could afford much bigger models on much more text, and that scaling is what eventually produced today's chatbots.
+
+> [!DEFINITION] BLEU score
+> A standard score for machine translation, from 0 to 100. It counts how many short word sequences in the model's translation also appear in human reference translations. Higher is better; a gain of 1 to 2 points was considered a big step at the time.
+
+## Use cases: where you meet this today
+
+Everything in this part runs, almost unchanged, inside products you use:
+
+- **Translation.** The original use case. Attention lets the model align words across languages, as Figure 3 of Bahdanau et al. showed above.
+- **Chatbots and writing assistants.** ChatGPT, Gemini, Llama, Qwen and DeepSeek are stacks of the multi-head attention built in this part (plus the efficiency tricks of Parts 2 to 4). Each word they write is one round of exactly this attention over the conversation so far.
+- **Search and understanding.** Encoder transformers such as BERT read a query and documents and match their meaning, not just their words. The heads Clark et al. found (objects, determiners, coreference) are part of why this works.
+- **Code assistants.** The same attention links a variable to where it was defined, or a closing bracket to its opening one, exactly like the previous-token and pronoun heads above.
+- **Long conversations.** Attention sinks matter in practice: some systems that keep a chat going for a very long time keep the first few tokens in memory for exactly this reason (Part 3 tests it).
+
+The translation results that started it all:
+
+> [!PAPER] Vaswani et al. (2017) · Section 6.1, Machine Translation · page 8, Table 2
+> [![Table 2 of Attention Is All You Need: BLEU scores and training costs of earlier translation systems and the Transformer, with the Transformer (big) row highlighted](/img/attention/papers/vaswani-bleu.png)](/img/attention/papers/vaswani-bleu.png)
+>
+> **Context:** The main results table: earlier systems, including ensembles of several models, against the transformer on two standard translation tests (English to German, English to French).
+>
+> **What it says:** The big transformer scores 28.4 (EN-DE) and 41.8 (EN-FR), beating every earlier system including ensembles. Its training cost (last two columns, in FLOPs) is about 3 to 50 times lower than those ensembles, and the smaller base model is cheaper still.
+>
+> **Why it matters:** This is the use case that made attention famous. Translation was the hardest benchmark of its day, and a model built *only* from the attention in this part won it.
 
 ## Summary
 
@@ -330,7 +546,9 @@ Every idea in the rest of the series cuts one of these two costs:
 - The **causal mask** stops tokens from seeing the future; every row of weights adds up to 1.
 - **Dividing by √d** keeps scores from growing with vector length. Without it, the top weight reached 0.95; with it, 0.107.
 - **Multi-head attention** runs several heads side by side. Our version matched PyTorch's to $$1.7 \times 10^{-16}$$.
-- Real heads specialise: in Qwen2.5-0.5B, **68%** are attention sinks, one follows the previous token (84%), and one links pronouns to nouns (6 out of 6 test sentences).
+- Real heads specialise: in Qwen2.5-0.5B, **68%** are attention sinks, one follows the previous token (84%), and one links pronouns to nouns (6 out of 6 test sentences). BERT (Clark et al.) and Llama-2 (Xiao et al.) show the same patterns.
+- The √d comes from simple statistics: the dot product of two random vectors has variance $$d$$, so dividing by $$\sqrt{d}$$ brings it back to 1.
+- The transformer won because attention needs no sequential steps (fast, parallel training), at the price of $$O(n^2)$$ work.
 - Attention's work grows with the square of the text length, and its memory (the KV cache) with the length. Parts 2 to 4 are about cutting both.
 
 <details>

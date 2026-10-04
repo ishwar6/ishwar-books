@@ -34,6 +34,7 @@ const CALLOUTS = {
   caution: 'Caution', danger: 'Danger', example: 'Example', question: 'Question',
   quote: 'Quote', summary: 'Summary', success: 'Success', bug: 'Bug', abstract: 'Summary',
   definition: 'Definition', define: 'Definition', term: 'Definition',
+  paper: 'From the paper',
 }
 
 // ---------- helpers ----------

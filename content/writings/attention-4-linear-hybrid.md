@@ -62,12 +62,28 @@ Here is that equation as it appears in the paper:
 
 <figure class="fig"><svg viewBox="0 0 760 236" role="img" aria-label="Gated attention: the attention output Y is multiplied elementwise by a sigmoid gate computed from the input, before the output projection."><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0,0L10,5L0,10z"/></marker><marker id="ah-on" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-on" d="M0,0L10,5L0,10z"/></marker><marker id="ah-2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-2" d="M0,0L10,5L0,10z"/></marker></defs><rect class="box" x="20.0" y="70.0" width="90.0" height="44.0" rx="10"/><text class="t-math" x="65.0" y="97.0" text-anchor="middle">x</text><line class="edge" x1="112.0" y1="92.0" x2="160.0" y2="92.0" marker-end="url(#ah)"/><rect class="box-1" x="160.0" y="70.0" width="140.0" height="44.0" rx="10"/><text class="t-note" x="230.0" y="90.0" text-anchor="middle">attention</text><text class="t-tick" x="230.0" y="106.0" text-anchor="middle">(softmax)</text><line class="edge" x1="302.0" y1="92.0" x2="380.0" y2="92.0" marker-end="url(#ah)"/><text class="t-math" x="340.0" y="84.0" text-anchor="middle">Y</text><circle class="node" cx="400" cy="92" r="18"/><text class="t-note" x="400.0" y="98.0" text-anchor="middle">×</text><path class="edge" d="M65,116 V170 H400 V112" fill="none" marker-end="url(#ah)"/><rect class="box-2" x="250.0" y="150.0" width="120.0" height="40.0" rx="8"/><text class="t-note" x="310.0" y="175.0" text-anchor="middle">σ(x Wθ)</text><line class="edge" x1="420.0" y1="92.0" x2="470.0" y2="92.0" marker-end="url(#ah)"/><rect class="box-3" x="470.0" y="70.0" width="110.0" height="44.0" rx="10"/><text class="t-note" x="525.0" y="97.0" text-anchor="middle">× Wo</text><line class="edge" x1="582.0" y1="92.0" x2="620.0" y2="92.0" marker-end="url(#ah)"/><text class="t-note" x="630.0" y="97.0" text-anchor="start">output</text><text class="t-tick" x="20.0" y="30.0" text-anchor="start">Gated attention: each output number is multiplied by a gate between 0 and 1, computed from the token x.</text><text class="t-tick" x="20.0" y="222.0" text-anchor="start">A gate near 0 lets a head say "nothing useful here" without dumping attention on the first token.</text></svg><figcaption>Gated attention. The attention output Y is multiplied, number by number, by a gate between 0 and 1 computed from the input x. Only then does it go through the output matrix.</figcaption></figure>
 
-> [!QUOTE] Gated Attention paper
-> "Our central finding is that a simple modification ... applying a head-specific sigmoid gate after the Scaled Dot-Product Attention (SDPA) ... consistently improves performance."
+> [!PAPER] Qiu et al. (2025), Gated Attention for LLMs · Section 1 · page 2, Figure 1
+> [![Figure 1 of the gated attention paper: the five positions where a gate was tested, the change in perplexity and MMLU for each, and the training loss with and without the gate](/img/attention/papers/ga-figure1.png)](/img/attention/papers/ga-figure1.png)
 >
-> On attention sinks: "The baseline model suffers from a significant attention sink, with an average of 46.7% of attention scores across layers directed towards the first token. Introducing a gate effectively alleviates this, reducing the proportion to 4.8%."
+> **Context:** Where should a gate go? The authors tried five places, marked $$G_1$$ to $$G_5$$ on the left: after the attention output ($$G_1$$), on the values ($$G_2$$), keys ($$G_3$$), queries ($$G_4$$), and after the output matrix ($$G_5$$).
 >
-> Source: [Qiu et al., 2025](https://arxiv.org/abs/2505.06708)
+> **What it says:** Middle: on 15B mixture-of-experts models, the gate after attention ($$G_1$$) lowered average perplexity by 0.265 and raised MMLU by 2.03 points, the best of the five. Right: on a 1.7B dense model trained on 3.5 trillion tokens, the gated model's training loss (blue) is lower and has far fewer **loss spikes** than the baseline (grey).
+>
+> **Why it matters:** One extra matrix and a sigmoid, placed at exactly the right spot, improved quality **and** made training more stable. "Our central finding is that a simple modification ... applying a head-specific sigmoid gate after the Scaled Dot-Product Attention (SDPA) ... consistently improves performance."
+>
+> [Read the paper on arXiv](https://arxiv.org/abs/2505.06708)
+
+> [!DEFINITION] Loss spike
+> A sudden jump in the training error, usually caused by a few numbers inside the model growing too large. Spikes waste training time and can ruin a run, so anything that removes them is valuable at large scale.
+
+> [!PAPER] Gated Attention for LLMs · Section 4 · page 3, Figure 2
+> [![Figure 2 of the gated attention paper: share of attention on the first token per layer, about 47% on average without the gate and about 5% with it, plus attention maps of layers 21 and 23](/img/attention/papers/ga-figure2.png)](/img/attention/papers/ga-figure2.png)
+>
+> **Context:** Left column: how much attention each layer puts on the very first token, without the gate (top) and with it (bottom). Right: attention maps (query rows, key columns) of layers 21 and 23.
+>
+> **What it says:** Without the gate, "an average of 46.7% of attention scores across layers" go to the first token, and layer 21 puts 83% there (the bright left column). With the gate this drops to 4.8% on average, and layer 21 to 4%.
+>
+> **Why it matters:** This is the attention sink of Parts 1 and 3, removed by design. A model without sinks no longer depends on keeping its first token, which matters for long texts and sliding windows.
 
 <figure class="fig paper"><img src="/img/attention/paper-gated-attention.png" width="841" alt="arXiv page of Gated Attention for Large Language Models: Non-linearity, Sparsity, and Attention-Sink-Free, with authors and abstract" loading="lazy" /><figcaption>The paper on arXiv (2505.06708). They tested 30 variants on models up to 15B parameters trained on 3.5 trillion tokens.</figcaption></figure>
 
@@ -141,6 +157,40 @@ where:
 > [!DEFINITION] Outer product
 > Multiplying a column vector by a row vector, $$a\,b^\top$$, gives a whole matrix: entry $$(r, c)$$ is $$a_r \times b_c$$. It is how one key-value pair is "written" into a matrix memory: the key decides *where*, the value decides *what*.
 
+This is exactly what the linear transformer paper writes (its Equation 5 is the version without the mask; Equation 9 below adds it):
+
+> [!PAPER] Katharopoulos et al. (2020), Transformers are RNNs · Section 3.2 · page 3
+> [![Equations 5 and 6 of the Transformers are RNNs paper: linear attention, and the regrouping that computes phi of K transposed times V once and reuses it for every query](/img/attention/papers/kath-linearized.png)](/img/attention/papers/kath-linearized.png)
+>
+> **Context:** Section 3.2, "Linearized Attention", after the authors replace the softmax similarity with $$\phi(q)^\top \phi(k)$$.
+>
+> **What it says:** Equation (6) is the bracket move: $$(\phi(Q)\phi(K)^T)V = \phi(Q)(\phi(K)^T V)$$. Softmax attention costs $$O(N^2)$$, but the linear version is $$O(N)$$ because the sums over keys can be computed "once and reuse[d] for every query".
+>
+> **Why it matters:** That single regrouping is the whole idea of linear attention, and everything in this part (DeltaNet, Mamba-2, Gated DeltaNet, KDA) starts from it.
+>
+> [Read the paper on arXiv](https://arxiv.org/abs/2006.16236)
+
+The paper also gives the cost in multiplications (Section 3.2.1). With $$N$$ tokens, keys and queries of length $$D$$ and values of length $$M$$:
+
+$$
+\text{softmax attention: } O\big(N^2 \max(D, M)\big)
+\qquad\qquad
+\text{linear attention: } O\big(N\,D\,M\big)
+$$
+
+where $$N^2$$ comes from comparing every pair of tokens, and $$D\,M$$ is the size of the memory matrix that each token updates. When the text is longer than the head size ($$N > D$$), linear attention does less work, and the gap grows with $$N$$.
+
+For text written left to right, the sums only run over earlier tokens, which the paper writes like this:
+
+> [!PAPER] Transformers are RNNs · Section 3.3, Causal Masking · page 4
+> [![Equations 8 and 9 of the Transformers are RNNs paper: masked attention summing only over earlier positions j up to i, and its linearized version](/img/attention/papers/kath-masked.png)](/img/attention/papers/kath-masked.png)
+>
+> **Context:** Generating text needs a causal mask (Part 1): token $$i$$ may only use tokens $$j \le i$$.
+>
+> **What it says:** Equation (8) is ordinary masked attention with a general similarity; Equation (9) is the linearized version, where the sums run from $$j = 1$$ to $$i$$.
+>
+> **Why it matters:** Because each sum only adds one new term per token, it can be kept as a running total. That is the step that turns attention into an RNN, just below.
+
 And here is the punchline: $$S_t$$ can be **updated one token at a time**:
 
 $$
@@ -149,17 +199,28 @@ $$
 
 That is an **RNN**: a fixed-size state, updated once per token. Each step costs the same, no matter how long the text is, and there is no KV cache that grows.
 
+> [!PAPER] Transformers are RNNs · Section 3.4, Transformers are RNNs · page 5
+> [![Equations 16 to 20 of the Transformers are RNNs paper: the attention memory s and normalizer memory z updated at every step, and the output y computed from them](/img/attention/papers/kath-rnn.png)](/img/attention/papers/kath-rnn.png)
+>
+> **Context:** The section that gives the paper its title.
+>
+> **What it says:** "The resulting RNN has two hidden states, namely the attention memory $$s$$ and the normalizer memory $$z$$." Each step adds $$\phi(x_i W_K)(x_i W_V)^T$$ to $$s$$ (Equation 18) and $$\phi(x_i W_K)$$ to $$z$$ (Equation 19), then reads the output (Equation 20).
+>
+> **Why it matters:** These are exactly the $$S_t$$ and $$z_t$$ above, in the paper's notation ($$x_i W_K$$ is the key, $$x_i W_V$$ the value, $$x_i W_Q$$ the query). The paper's $$f_l$$ is the rest of the transformer layer (the feed-forward part), and $$+ x_i$$ is the usual "add the input back".
+
 > [!DEFINITION] RNN and state
 > A **recurrent neural network** reads a sequence one step at a time and carries a fixed-size **state** from step to step. Each new input updates the state; the output is read from the state. Part 1 met RNNs as the thing attention replaced; linear attention brings them back in a new form.
 
 <figure class="fig"><svg viewBox="0 0 780 280" role="img" aria-label="Softmax attention keeps every key and value in a growing list; linear attention and its successors keep one fixed-size memory matrix and update it once per token."><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0,0L10,5L0,10z"/></marker><marker id="ah-on" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-on" d="M0,0L10,5L0,10z"/></marker><marker id="ah-2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-2" d="M0,0L10,5L0,10z"/></marker></defs><text class="t-title" x="20.0" y="24.0" text-anchor="start">Softmax attention: a list that keeps growing</text><text class="t-title" x="20.0" y="168.0" text-anchor="start">Linear attention / Gated DeltaNet: one fixed-size memory</text><rect class="box-3" x="20.0" y="40.0" width="52.0" height="26.0" rx="5"/><text class="t-tick" x="46.0" y="58.0" text-anchor="middle">k1 v1</text><rect class="box-3" x="82.0" y="40.0" width="52.0" height="26.0" rx="5"/><text class="t-tick" x="108.0" y="58.0" text-anchor="middle">k2 v2</text><rect class="box-3" x="144.0" y="40.0" width="52.0" height="26.0" rx="5"/><text class="t-tick" x="170.0" y="58.0" text-anchor="middle">k3 v3</text><rect class="box-3" x="206.0" y="40.0" width="52.0" height="26.0" rx="5"/><text class="t-tick" x="232.0" y="58.0" text-anchor="middle">k4 v4</text><rect class="box-3" x="268.0" y="40.0" width="52.0" height="26.0" rx="5"/><text class="t-tick" x="294.0" y="58.0" text-anchor="middle">k5 v5</text><rect class="box-3" x="330.0" y="40.0" width="52.0" height="26.0" rx="5"/><text class="t-tick" x="356.0" y="58.0" text-anchor="middle">k6 v6</text><rect class="box-3" x="392.0" y="40.0" width="52.0" height="26.0" rx="5"/><text class="t-tick" x="418.0" y="58.0" text-anchor="middle">k7 v7</text><rect class="box-3" x="454.0" y="40.0" width="52.0" height="26.0" rx="5"/><text class="t-tick" x="480.0" y="58.0" text-anchor="middle">k8 v8</text><rect class="box-3" x="516.0" y="40.0" width="52.0" height="26.0" rx="5"/><text class="t-tick" x="542.0" y="58.0" text-anchor="middle">k9 v9</text><text class="t-tick" x="590.0" y="58.0" text-anchor="start">… + one more per token</text><text class="t-tick" x="20.0" y="92.0" text-anchor="start">Each new token reads ALL stored keys and values. Memory and work grow with the text.</text><text class="t-tick" x="20.0" y="112.0" text-anchor="start">Nothing is ever forgotten, so recall is exact, but at 1M tokens the list is huge.</text><rect class="box-1" x="20.0" y="186.0" width="120.0" height="76.0" rx="8"/><text class="t-note" x="80.0" y="222.0" text-anchor="middle">memory S</text><text class="t-tick" x="80.0" y="242.0" text-anchor="middle">d × d numbers</text><line class="path" x1="150.0" y1="224.0" x2="210.0" y2="224.0" marker-end="url(#ah-on)"/><rect class="box" x="210.0" y="196.0" width="150.0" height="56.0" rx="8"/><text class="t-tick" x="285.0" y="220.0" text-anchor="middle">write: add or</text><text class="t-tick" x="285.0" y="238.0" text-anchor="middle">correct one fact</text><line class="path" x1="362.0" y1="224.0" x2="420.0" y2="224.0" marker-end="url(#ah-on)"/><rect class="box-1" x="420.0" y="186.0" width="120.0" height="76.0" rx="8"/><text class="t-note" x="480.0" y="222.0" text-anchor="middle">memory S</text><text class="t-tick" x="480.0" y="242.0" text-anchor="middle">same size</text><text class="t-tick" x="560.0" y="214.0" text-anchor="start">Every token does one small</text><text class="t-tick" x="560.0" y="232.0" text-anchor="start">update. The size never changes,</text><text class="t-tick" x="560.0" y="250.0" text-anchor="start">so old facts must share space.</text></svg><figcaption>Two kinds of memory. Softmax attention keeps every key and value in a list that grows forever. Linear attention (and everything after it in this part) keeps one fixed-size matrix and updates it once per token.</figcaption></figure>
 
-> [!QUOTE] Transformers are RNNs (Katharopoulos et al., 2020)
-> "we express the self-attention as a linear dot-product of kernel feature maps and make use of the associativity property of matrix products to reduce the complexity from O(N²) to O(N)"
+> [!PAPER] Transformers are RNNs · Section 4.1 · page 6, Figure 1
+> [![Figure 1 of the Transformers are RNNs paper: time and GPU memory for a forward and backward pass against sequence length, for softmax, linear and Reformer attention](/img/attention/papers/kath-figure1.png)](/img/attention/papers/kath-figure1.png)
 >
-> "Our linear transformers achieve similar performance to vanilla transformers and they are up to 4000x faster on autoregressive prediction of very long sequences."
+> **Context:** Time and GPU memory for one training step (forward and backward pass), as the sequence grows from $$2^9 = 512$$ to $$2^{16} = 65{,}536$$ tokens. Both axes are logarithmic.
 >
-> Source: [Katharopoulos et al., 2020](https://arxiv.org/abs/2006.16236)
+> **What it says:** Softmax attention (red, dashed) rises steeply and stops at $$2^{12}$$ tokens, where it runs out of memory. Linear attention (black) rises along a straight line of slope 1: double the length, double the cost.
+>
+> **Why it matters:** On a log-log plot, slope 2 means $$N^2$$ and slope 1 means $$N$$. This plot is the $$O(N^2)$$ versus $$O(N)$$ formulas above, measured. The abstract's headline: linear transformers are "up to 4000x faster on autoregressive prediction of very long sequences".
 
 <figure class="fig paper"><img src="/img/attention/paper-linear-transformers.png" width="841" alt="arXiv page of Transformers are RNNs: Fast Autoregressive Transformers with Linear Attention" loading="lazy" /><figcaption>The 2020 paper that started linear attention for transformers (arXiv 2006.16236).</figcaption></figure>
 
@@ -246,6 +307,22 @@ Linear attention says **x = 6**: it added the new value on top of the old one.
 
 Two lessons. Plain adding gets worse with every fact (by 64 facts, the error is as big as the signal). And even the better rule cannot escape the limit: **a fixed-size memory has a fixed capacity**. Keep this in mind; it is why hybrid models exist (section 9).
 
+A 2023 study found that this is exactly where cheaper models lose to attention on real text:
+
+> [!PAPER] Arora et al. (2023), Zoology · Section 3 · page 2, Figure 1
+> [![Figure 1 of the Zoology paper: perplexity of attention, Hyena and RWKV on tokens that repeat an earlier bigram versus first occurrences, and diagrams of how attention and gated convolutions aggregate information](/img/attention/papers/zoology-figure1.png)](/img/attention/papers/zoology-figure1.png)
+>
+> **Context:** The authors split real text into two kinds of tokens: "associative recall hits", where the next word repeats a pair of words seen earlier in the same text ("common buzzard ... a common buzzard"), and everything else.
+>
+> **What it says:** On ordinary tokens (middle plot), attention (blue) and two attention-free models (Hyena, RWKV) are about equally good. On recall hits (left plot), the attention-free models are clearly worse, especially for word pairs that were rare in training. In the abstract's words, "82% of the gap is explained by each model's ability to recall information that is previously mentioned in-context".
+>
+> **Why it matters:** This is the capacity problem of my 64 × 64 test, showing up in real language: a fixed memory struggles to look up an exact earlier detail. It is the main reason the best models keep a few attention layers.
+>
+> [Read the paper on arXiv](https://arxiv.org/abs/2312.04927)
+
+> [!DEFINITION] Associative recall
+> Remembering what went with what: if the text said "Kim met Tim Rice in March 2018", and later says "Tim", the model should recall "Rice". Attention can look the pair up directly; a fixed-size memory has to have stored it well.
+
 ## 4. The delta rule: write by correcting
 
 The fix for overwriting is old: the **delta rule** (Widrow and Hoff, 1960), brought to transformers as "DeltaNet" (Schlag et al., 2021; Yang et al., 2024). The idea in plain words:
@@ -325,16 +402,29 @@ The important word is **data-dependent**: $$\alpha_t$$ is computed from token $$
 
 Gating is good at forgetting **everything a bit**. The delta rule is good at changing **one fact exactly**. Gated DeltaNet (Yang, Kautz and Hatamizadeh, ICLR 2025) uses both:
 
-> [!QUOTE] Gated DeltaNet paper
-> "gating enables rapid memory erasure while the delta rule facilitates targeted updates."
+> [!PAPER] Yang, Kautz, Hatamizadeh (2025), Gated Delta Networks · Section 1 · page 2
+> [![The Gated DeltaNet introduction proposing the gated delta rule, which can clear memory by setting alpha to zero or switch to the pure delta rule by setting alpha to one](/img/attention/papers/gdn-intro.png)](/img/attention/papers/gdn-intro.png)
 >
-> Source: [Yang, Kautz, Hatamizadeh, 2025](https://arxiv.org/abs/2412.06464)
+> **Context:** The introduction, right after the authors explain that gating and the delta rule each solve half of the memory problem.
+>
+> **What it says:** The gated delta rule "can promptly clear memory by setting $$\alpha_t \to 0$$, while selectively updating specific content without affecting other information by setting $$\alpha_t \to 1$$ (effectively switching to the pure delta rule)". The abstract sums it up: "gating enables rapid memory erasure while the delta rule facilitates targeted updates."
+>
+> **Why it matters:** One rule, two behaviours, chosen token by token. That flexibility is why it beat both of its parents (Mamba-2 and DeltaNet) in their experiments.
+>
+> [Read the paper on arXiv](https://arxiv.org/abs/2412.06464)
 
 <figure class="fig paper"><img src="/img/attention/paper-gated-deltanet.png" width="841" alt="arXiv page of Gated Delta Networks: Improving Mamba2 with Delta Rule, by Songlin Yang, Jan Kautz and Ali Hatamizadeh, with the abstract" loading="lazy" /><figcaption>The Gated DeltaNet paper on arXiv (2412.06464).</figcaption></figure>
 
 The **gated delta rule**, as printed in the paper:
 
-<figure class="fig paper"><img src="/img/attention/paper-eq-gated-delta-rule.png" width="565" alt="Equation 10 from the Gated DeltaNet paper: S t equals S t minus 1 times alpha t times I minus beta t k t k t transposed, plus beta t v t k t transposed" loading="lazy" /><figcaption>Equation (10) of the Gated DeltaNet paper: the gated delta rule.</figcaption></figure>
+> [!PAPER] Gated Delta Networks · Section 3.1 · page 4, Equation (10)
+> [![Equation 10 of the Gated DeltaNet paper, the gated delta rule, with the sentence saying alpha controls state decay](/img/attention/papers/gdn-rule.png)](/img/attention/papers/gdn-rule.png)
+>
+> **Context:** The formal definition of the gated delta rule.
+>
+> **What it says:** $$S_t = S_{t-1}\big(\alpha_t(I - \beta_t k_t k_t^\top)\big) + \beta_t v_t k_t^\top$$, where "the data-dependent gating term $$\alpha_t \in (0, 1)$$ controls state decay".
+>
+> **Why it matters:** This is the equation that runs in 36 of Qwen3-Next's 48 layers. It is checked against Qwen3-Next's own code further below.
 
 $$
 S_t = S_{t-1}\Big(\alpha_t\big(I - \beta_t\, k_t k_t^\top\big)\Big) + \beta_t\, v_t k_t^\top,
@@ -353,6 +443,44 @@ where:
 - if $$\alpha_t = 1$$ it becomes the plain delta rule; if $$\beta_t = 0$$ it only forgets.
 
 <figure class="fig"><svg viewBox="0 0 780 214" role="img" aria-label="One step of Gated DeltaNet: decay the memory by alpha, look up the value stored under the key, correct it towards the new value by beta, then read with the query."><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0,0L10,5L0,10z"/></marker><marker id="ah-on" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-on" d="M0,0L10,5L0,10z"/></marker><marker id="ah-2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-2" d="M0,0L10,5L0,10z"/></marker></defs><text class="t-title" x="20.0" y="24.0" text-anchor="start">One Gated DeltaNet step for token t</text><rect class="box-2" x="20.0" y="44.0" width="166.0" height="86.0" rx="10"/><text class="t-note" x="103.0" y="68.0" text-anchor="middle">1. forget</text><text class="t-tick" x="103.0" y="94.0" text-anchor="middle">S ← αₜ · S</text><text class="t-tick" x="103.0" y="116.0" text-anchor="middle">shrink every old fact</text><line class="edge" x1="188.0" y1="87.0" x2="204.0" y2="87.0" marker-end="url(#ah)"/><rect class="box" x="206.0" y="44.0" width="166.0" height="86.0" rx="10"/><text class="t-note" x="289.0" y="68.0" text-anchor="middle">2. look up</text><text class="t-tick" x="289.0" y="94.0" text-anchor="middle">old = S kₜ</text><text class="t-tick" x="289.0" y="116.0" text-anchor="middle">what is stored at kₜ now?</text><line class="edge" x1="374.0" y1="87.0" x2="390.0" y2="87.0" marker-end="url(#ah)"/><rect class="box-1" x="392.0" y="44.0" width="166.0" height="86.0" rx="10"/><text class="t-note" x="475.0" y="68.0" text-anchor="middle">3. correct</text><text class="t-tick" x="475.0" y="94.0" text-anchor="middle">S ← S + βₜ (vₜ − old) kₜᵀ</text><text class="t-tick" x="475.0" y="116.0" text-anchor="middle">move it toward vₜ</text><line class="edge" x1="560.0" y1="87.0" x2="576.0" y2="87.0" marker-end="url(#ah)"/><rect class="box-3" x="578.0" y="44.0" width="166.0" height="86.0" rx="10"/><text class="t-note" x="661.0" y="68.0" text-anchor="middle">4. read</text><text class="t-tick" x="661.0" y="94.0" text-anchor="middle">oₜ = S qₜ</text><text class="t-tick" x="661.0" y="116.0" text-anchor="middle">answer the query</text><text class="t-tick" x="20.0" y="160.0" text-anchor="start">αₜ (between 0 and 1): how much of the old memory to keep. Near 1 = remember, near 0 = wipe.</text><text class="t-tick" x="20.0" y="180.0" text-anchor="start">βₜ (between 0 and 1): how strongly to write. 1 = fully replace what was stored at kₜ.</text><text class="t-tick" x="20.0" y="200.0" text-anchor="start">Both are computed from the token itself, so the model decides, token by token, what to forget and what to write.</text></svg><figcaption>One Gated DeltaNet step, in four moves: forget a little, look up what is stored at the key, correct it towards the new value, and read the answer with the query.</figcaption></figure>
+
+### Every rule as "learning while reading"
+
+There is a neat way to see all these memories as one family. At each token, the new memory $$S_t$$ is the answer to a tiny optimisation problem: stay close to the old memory, but fit the new fact.
+
+For plain linear attention:
+
+$$
+S_t = \arg\min_S \;\underbrace{\lVert S - S_{t-1} \rVert_F^2}_{\text{stay close}} \;-\; 2\,\underbrace{\langle S\,k_t,\; v_t \rangle}_{\text{point toward } v_t}
+\quad\Longrightarrow\quad
+S_t = S_{t-1} + v_t k_t^\top
+$$
+
+For the delta rule, the second term instead points toward the **error** $$v_t - S_{t-1}k_t$$, scaled by $$\beta_t$$:
+
+$$
+S_t = \arg\min_S \;\lVert S - S_{t-1} \rVert_F^2 \;-\; 2\,\big\langle S\,k_t,\; \beta_t (v_t - S_{t-1} k_t) \big\rangle
+\quad\Longrightarrow\quad
+S_t = S_{t-1}(I - \beta_t k_t k_t^\top) + \beta_t v_t k_t^\top
+$$
+
+where:
+
+- $$\arg\min_S$$ means "the $$S$$ that makes this smallest";
+- $$\lVert A \rVert_F^2$$ (the squared **Frobenius norm**) is the sum of the squares of all entries of a matrix: here, how much the memory changed;
+- $$\langle a, b \rangle$$ is the dot product of two vectors;
+- setting the slope (gradient) to zero gives the update on the right. For the first one: $$2(S - S_{t-1}) - 2\,v_t k_t^\top = 0$$, so $$S = S_{t-1} + v_t k_t^\top$$.
+
+The Gated DeltaNet paper lists the whole family in one table:
+
+> [!PAPER] Gated Delta Networks · Section 2 · page 5, Table 1
+> [![Table 1 of the Gated DeltaNet paper: the online learning objective and the resulting online update for linear attention, Mamba2, Longhorn, DeltaNet and Gated DeltaNet](/img/attention/papers/gdn-table1.png)](/img/attention/papers/gdn-table1.png)
+>
+> **Context:** Five recent designs written in the same "online learning" form (after Liu et al., 2024).
+>
+> **What it says:** Linear attention (LA) and Mamba2 just add $$v_t k_t^\top$$ (Mamba2 first multiplies the old memory by $$\alpha_t$$). DeltaNet and Gated DeltaNet subtract the part of the old memory along $$k_t$$ first, the $$(I - \beta_t k_t k_t^\top)$$ factor. Gated DeltaNet is the only row with both $$\alpha_t$$ and $$\beta_t$$.
+>
+> **Why it matters:** It shows that these "new architectures" differ only in the small loss each token minimises. Read down the Online Update column and you have sections 2 to 6 of this article in five lines.
 
 ### Where α and β come from
 
@@ -373,6 +501,15 @@ where:
 
 > [!DEFINITION] Softplus
 > A smooth version of ReLU: $$\operatorname{softplus}(x) = \log(1 + e^x)$$. It is always positive, close to 0 for very negative $$x$$, and close to $$x$$ for large $$x$$.
+
+> [!PAPER] Gated Delta Networks · Section 3.3 · page 7, Figure 1
+> [![Figure 1 of the Gated DeltaNet paper: hybrid layer stacks H1 and H2 with sliding window attention and Mamba2, and the block design with linear projections, short convolutions, L2 norm, the gated delta rule, a norm and an output gate](/img/attention/papers/gdn-figure1.png)](/img/attention/papers/gdn-figure1.png)
+>
+> **Context:** Left: two hybrid stacks the paper tested (H1: Gated DeltaNet + sliding-window attention; H2: Mamba2 + Gated DeltaNet + sliding-window attention). Right: what is inside one Gated DeltaNet block.
+>
+> **What it says:** Queries and keys go through a linear projection, a short convolution ("Conv"), SiLU and L2 normalisation; values through a projection, convolution and SiLU; $$\alpha$$ and $$\beta$$ through their own small projections. The memory update is the "Gated Delta Rule" box, followed by a norm and an output gate ($$\otimes$$).
+>
+> **Why it matters:** This is the block Qwen3-Next uses, and the block I trained in my own code. Even the paper already proposed mixing it with attention layers (H1, H2): hybrids were part of the design from the start.
 
 A real Gated DeltaNet layer adds a few more parts around this core: queries and keys are normalised to length 1 (so $$k_t k_t^\top$$ behaves well), a **short convolution** mixes each token with its 3 neighbours before the memory step, and the output passes through a norm and an output gate. The Gated DeltaNet paper describes the query and key path as "linear proj., shortconv., SiLU and L2 norm".
 
@@ -429,6 +566,23 @@ where everything is as in Gated DeltaNet, except that $$\alpha_t$$ is now a **ve
 
 Why would that help? Some channels can hold **long-lived** facts (α near 1) while others act as **scratch space** that is quickly cleared (α small), all inside one head.
 
+Written out entry by entry, the forget step of KDA is
+
+$$
+\big(\operatorname{Diag}(\alpha_t)\, S_{t-1}\big)_{ij} = \alpha_{t,i} \cdot (S_{t-1})_{ij}
+$$
+
+where $$i$$ indexes the key channels (rows of KDA's $$d_k \times d_v$$ memory) and $$j$$ the value channels. Every entry in row $$i$$ fades at its own rate $$\alpha_{t,i}$$. In Gated DeltaNet the same step is $$\alpha_t \cdot (S_{t-1})_{ij}$$: one rate for the whole head.
+
+> [!PAPER] Kimi Linear · Section 4 · page 6, Figure 3
+> [![Figure 3 of the Kimi Linear paper: the model stack with N KDA layers and one MLA layer, each followed by a mixture-of-experts layer, and the inside of a KDA block](/img/attention/papers/kimi-figure3.png)](/img/attention/papers/kimi-figure3.png)
+>
+> **Context:** The whole Kimi Linear model. Left: the stack, with $$N$$ KDA blocks for every one MLA block ($$N = 3$$), each followed by a mixture-of-experts (MoE) layer. Right: what is inside MoE (top) and KDA (bottom).
+>
+> **What it says:** The KDA block looks very much like Gated DeltaNet's: projections, short convolutions, L2 norm, the "Kimi Delta Attention" memory, a norm and a sigmoid output gate. The differences are inside the memory update (the per-channel $$\alpha$$) and in small details of the projections.
+>
+> **Why it matters:** Comparing this with Gated DeltaNet's Figure 1 above shows how quickly the field converged: two independent teams arrived at nearly the same block.
+
 <figure class="fig paper"><img src="/img/attention/paper-kimi-linear.png" width="841" alt="arXiv page of Kimi Linear: An Expressive, Efficient Attention Architecture, with the abstract" loading="lazy" /><figcaption>The Kimi Linear paper on arXiv (2510.26692).</figcaption></figure>
 
 ## 8. Speed and memory: the payoff
@@ -475,22 +629,30 @@ Section 3 showed the weakness: a fixed-size memory has fixed capacity, so it can
 
 **Kimi Linear 48B** (Moonshot AI, 2025): 27 layers; layers 4, 8, 12, 16, 20, 24 and 27 are MLA (the compressed attention from [Part 2](attention-2-mqa-gqa-mla.md)), the other 20 are KDA.
 
-> [!QUOTE] Kimi Linear paper
-> "Kimi Linear interleaves KDA with periodic full attention layers in a uniform 3:1 ratio. This hybrid structure reduces memory and KV-cache usage by up to 75% during long-sequence generation while preserving global information flow via the full attention layers."
+> [!PAPER] Kimi Linear · Section 4 · page 6
+> [![The Kimi Linear paragraphs on the hybrid architecture, with the 3 to 1 KDA to MLA ratio and the use of no position encoding in the MLA layers highlighted](/img/attention/papers/kimi-nope.png)](/img/attention/papers/kimi-nope.png)
 >
-> And a surprising detail: "In Kimi Linear, we apply NoPE to all full attention (MLA) layers. This design delegates the entire responsibility for encoding positional information and recency bias (see § 6.1) to the KDA layers."
+> **Context:** How the KDA and MLA layers are combined.
 >
-> Source: [Kimi Team, 2025](https://arxiv.org/abs/2510.26692)
+> **What it says:** "Long-context retrieval remains the primary bottleneck for pure linear attention", so they add a few full attention (MLA) layers; "a uniform 3:1 ratio, i.e., repeating 3 KDA layers to 1 full MLA layer, provided the best quality–throughput trade-off". And: "we apply NoPE to all full attention (MLA) layers", leaving all position information to the KDA layers.
+>
+> **Why it matters:** The first sentence is the Zoology finding (section 3) stated as a design rule. The NoPE choice is a nice side effect of hybrids: the linear layers read in order, so the attention layers do not need RoPE at all, which also removes the RoPE complication from Part 2's MLA.
 
 > [!DEFINITION] NoPE
 > "No Position Encoding": attention layers without RoPE or any other position signal. It works in a hybrid because the KDA layers, which read tokens in order, already know where everything is. The attention layers then only need to find **what** matches, not **where** it is.
 
 **Nemotron-H** (NVIDIA, 2025) uses Mamba-2 (the gated linear attention from section 5) instead of a delta rule:
 
-> [!QUOTE] Nemotron-H paper
-> "we replace the majority of self-attention layers in the common Transformer model architecture with Mamba layers that perform constant computation and require constant memory per generated token."
+> [!PAPER] NVIDIA (2025), Nemotron-H · Section 2 · page 3, Figure 2
+> [![Figure 2 of the Nemotron-H paper: the layer layout of the 8B and 56B models, mostly Mamba-2 and feed-forward layers with a few attention layers spread evenly](/img/attention/papers/nemo-figure2.png)](/img/attention/papers/nemo-figure2.png)
 >
-> Source: [NVIDIA, 2025](https://arxiv.org/abs/2504.03624)
+> **Context:** The layer layout of the 8B and 56B models, read left to right; "x4" and "x10" mean the middle group is repeated.
+>
+> **What it says:** "Roughly 8% of the total layers in the model are self-attention layers; these layers are evenly dispersed throughout the model. The rest of the model is made up of alternating Mamba-2 and FFN layers." The abstract adds that the Mamba layers "perform constant computation and require constant memory per generated token".
+>
+> **Why it matters:** Nemotron-H is the most extreme hybrid of the three: only 4 attention layers out of 52 in the 8B model. It shows how few attention layers a strong model can get away with.
+>
+> [Read the paper on arXiv](https://arxiv.org/abs/2504.03624)
 
 ### How much memory does the hybrid save?
 
@@ -598,6 +760,56 @@ Both scripts, with their real outputs:
 <figure class="fig"><img src="/img/attention/part4-linear-run.png" alt="Terminal output of part4_linear.py: linear attention equivalence, overwrite test, capacity test, forget gate fading, comparison with Qwen3-Next reference code, memory and decode timing" loading="lazy" /><figcaption>Output of part4_linear.py on an Apple M5 Pro.</figcaption></figure>
 
 <figure class="fig"><img src="/img/attention/part4-train-run.png" alt="Terminal output of part4_train.py for the three small models: parameters, bits per byte, recall accuracy and first-token attention" loading="lazy" /><figcaption>Output of part4_train.py: the three models, each trained from scratch, plus the two extra recall checks.</figcaption></figure>
+
+## The impact, and where you meet it
+
+In 2024, linear attention was mostly a research topic. By late 2025, three major model families shipped it in most of their layers. The results the companies reported are what made the difference:
+
+> [!PAPER] Kimi Linear · Abstract and Section 5 · page 1, Figure 1
+> [![Figure 1 of the Kimi Linear paper: performance against decoding acceleration for Kimi Linear, GDN-H and MLA, and time per output token against decoding length up to 1 million tokens](/img/attention/papers/kimi-figure1.png)](/img/attention/papers/kimi-figure1.png)
+>
+> **Context:** Kimi Linear against a full-attention MLA model and a Gated DeltaNet hybrid (GDN-H), all trained the same way on 1.4 trillion tokens.
+>
+> **What it says:** (a) On long-context tests (RULER at 128K) Kimi Linear scores highest (84.3) while decoding about 4 times faster than MLA. (b) Time per output token: at 1 million tokens, Kimi Linear takes 1.84 ms against 11.48 ms for MLA, "6.3× faster".
+>
+> **Why it matters:** "Faster" is expected; "better" is the surprise. The abstract claims it is the first hybrid linear design that "outperforms full attention under fair comparisons".
+>
+> [Read the paper on arXiv](https://arxiv.org/abs/2510.26692)
+
+> [!PAPER] Kimi Linear · Section 5 · page 13
+> [![The Kimi Linear efficiency paragraph: comparable to MLA at short lengths, 2.3 and 2.9 times faster at 512k and 1M for prefilling, and 6 times faster decoding at 1M context](/img/attention/papers/kimi-6x.png)](/img/attention/papers/kimi-6x.png)
+>
+> **Context:** The efficiency results, in words.
+>
+> **What it says:** At short lengths (4K to 16K) Kimi Linear is about as fast as MLA. It pulls ahead from 128K: 2.3× faster at 512K and 2.9× at 1M tokens for processing the prompt, and "for decoding at 1M context length, Kimi Linear is 6× faster than full attention".
+>
+> **Why it matters:** The same pattern as my own timing in section 8: no gain for short texts, a growing gain for long ones.
+
+> [!PAPER] Nemotron-H · Section 1 · page 2, Figure 1
+> [![Figure 1 of the Nemotron-H paper: MMLU-Pro accuracy against output tokens per second per GPU for Nemotron-H 56B and 47B, Qwen-2.5-72B and Llama-3.1 models, with a 65,536-token input](/img/attention/papers/nemo-figure1.png)](/img/attention/papers/nemo-figure1.png)
+>
+> **Context:** Accuracy (MMLU-Pro) against throughput (output tokens per second per GPU), with a 65,536-token input and 1,024 output tokens.
+>
+> **What it says:** Nemotron-H-56B matches or beats the transformer models of similar size in accuracy while generating about **2.4 times** as many tokens per second as Qwen-2.5-72B and Llama-3.1-70B. The smaller 47B version is faster still.
+>
+> **Why it matters:** For a company serving millions of long requests, 2.4 times more tokens per GPU is 2.4 times fewer GPUs for the same work.
+
+> [!PAPER] Transformers are RNNs · Section 4.2.1 · page 7, Table 1
+> [![Table 1 of the Transformers are RNNs paper: bits per dimension and images per second for softmax, LSH and linear attention on MNIST image generation, with linear attention 317 times faster](/img/attention/papers/kath-table1.png)](/img/attention/papers/kath-table1.png)
+>
+> **Context:** The 2020 paper's own use case: generating images of handwritten digits one pixel at a time (each pixel is a "token").
+>
+> **What it says:** Linear attention reaches almost the same quality as softmax (0.644 against 0.621 bits per dimension, lower is better) but generates 142.8 images per second against 0.45: **317 times faster**.
+>
+> **Why it matters:** Generating one pixel or one word at a time is exactly where the fixed-size memory shines: every new step costs the same, however much has been generated.
+
+**Use cases in one line each:**
+
+- **Very long documents and codebases** (hundreds of thousands to millions of tokens): hybrids keep memory and per-token cost almost flat.
+- **Reasoning models and agents** that write very long outputs: each new token stays cheap, as in Kimi Linear's 6× faster decoding at 1M tokens.
+- **High-volume serving**: more requests per GPU (Nemotron-H's 2.4× throughput) means lower cost per answer.
+- **Devices with little memory**: a fixed-size state means a long conversation does not need a growing cache.
+- **Where full attention still wins**: exact lookups of details far back in the text. That is why every model above keeps some attention layers.
 
 ## The whole series in one table
 

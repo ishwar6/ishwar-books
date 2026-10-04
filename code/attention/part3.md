@@ -49,6 +49,16 @@ Here is what that means in numbers:
 
 At 128K tokens, full attention makes **8.6 billion** comparisons, in every head of every layer. A window of 1,024 tokens makes 64 times fewer.
 
+In arithmetic operations, each comparison is a dot product of length $$d$$ (about $$2d$$ multiply-and-add steps), and the weighted mix of values costs about the same again. So per head and layer:
+
+$$
+\text{work}_{\text{full}} \approx 2 \cdot 2d \cdot \frac{T(T+1)}{2} \;\approx\; 2\,d\,T^2
+\qquad\qquad
+\text{work}_{\text{window}} \approx 2 \cdot 2d \cdot T\,W \;=\; 4\,d\,T\,W
+$$
+
+where $$T$$ is the text length, $$W$$ the window and $$d$$ the head size. The first grows with $$T^2$$, the second only with $$T$$: doubling a document doubles the windowed cost but quadruples the full cost.
+
 There is also a memory cost while the model writes. The KV cache grows by one token at every step, and **every step reads all of it**. Twice the conversation means twice the memory and twice the reading per step.
 
 > [!NOTE] The hopeful observation
@@ -149,14 +159,36 @@ $$
 
 The Mistral 7B paper says the same thing (counting the window with its $$W+1$$ convention):
 
-> [!QUOTE] Mistral 7B paper
-> "At each attention layer, information can move forward by W tokens. Hence, after k attention layers, information can move forward by up to k × W tokens."
+> [!PAPER] Jiang et al. (2023), Mistral 7B · Section 2 · page 2, Figure 1
+> [![Figure 1 of the Mistral 7B paper: vanilla attention, sliding window attention and the effective context length growing across layers](/img/attention/papers/mistral-figure1.png)](/img/attention/papers/mistral-figure1.png)
 >
-> "At the last layer, using a window size of W = 4096, we have a theoretical attention span of approximately 131K tokens."
+> **Context:** The first figure of the Mistral 7B paper. Left: ordinary causal attention on "The cat sat on the" (1 = may look). Middle: a sliding window of $$W = 3$$. Right: how the reach grows through the layers.
 >
-> Source: [Jiang et al., 2023](https://arxiv.org/abs/2310.06825)
+> **What it says:** "each token can attend to at most W tokens from the previous layer", yet "tokens outside the sliding window still influence next word prediction", because "after k attention layers, information can move forward by up to k × W tokens".
+>
+> **Why it matters:** The right-hand panel is the same idea as the receptive-field figure above, drawn by the people who shipped it in a popular open model.
+>
+> [Read the paper on arXiv](https://arxiv.org/abs/2310.06825)
 
-(32 layers × 4,096 = 131,072.)
+> [!PAPER] Mistral 7B · Section 2, Architectural details · page 2
+> [![The Mistral 7B paragraph on sliding window attention, with the theoretical attention span of about 131K tokens highlighted, next to the model architecture table](/img/attention/papers/mistral-span.png)](/img/attention/papers/mistral-span.png)
+>
+> **Context:** The paragraph that defines SWA in Mistral 7B, next to Table 1 with the model's settings (window_size 4096, 32 layers, 8 key/value heads).
+>
+> **What it says:** "At the last layer, using a window size of W = 4096, we have a theoretical attention span of approximately 131K tokens." In practice, at 16K tokens, their kernels gave "a 2x speed improvement over a vanilla attention baseline".
+>
+> **Why it matters:** 32 layers × 4,096 = 131,072: the reach formula with real numbers. And the table shows Mistral also used GQA (n_kv_heads 8 for 32 heads), combining Part 2 and Part 3 in one model.
+
+Longformer (2020) wrote the same rule in its own notation, with $$\ell$$ layers and window $$w$$:
+
+> [!PAPER] Beltagy, Peters, Cohan (2020), Longformer · Section 3.1 · page 4
+> [![The Longformer sentence stating that in a transformer with l layers the receptive field size at the top layer is l times w](/img/attention/papers/longformer-receptive.png)](/img/attention/papers/longformer-receptive.png)
+>
+> **Context:** Longformer's description of its sliding window.
+>
+> **What it says:** "In a transformer with $$\ell$$ layers, the receptive field size at the top layer is $$\ell \times w$$ (assuming $$w$$ is fixed for all layers)."
+>
+> **Why it matters:** Two papers, three years apart, the same formula; and my gradient measurement above confirms it exactly.
 
 **Proof.** I stacked 1 to 6 sliding-window layers ($$W = 4$$, with the usual "add the input back" connection that real models use), and asked PyTorch which input tokens the last output depends on. It can tell exactly, by computing the **gradient**.
 
@@ -185,8 +217,14 @@ With a window, a token never needs keys and values older than $$W$$ steps. So th
 > [!DEFINITION] Rolling (ring) buffer
 > A fixed number of slots used in a circle. When the last slot is filled, writing goes back to slot 0 and overwrites the oldest item. Token $$i$$ goes into slot $$i \bmod W$$ ("the remainder when $$i$$ is divided by $$W$$").
 
-> [!QUOTE] Mistral 7B paper
-> "The cache has a fixed size of W, and the keys and values for the timestep i are stored in position i mod W of the cache. As a result, when the position i is larger than W, past values in the cache are overwritten, and the size of the cache stops increasing."
+> [!PAPER] Mistral 7B · Section 2 · page 3, Figure 2
+> [![Figure 2 of the Mistral 7B paper: a rolling buffer cache of 4 slots for three sentences over three time steps](/img/attention/papers/mistral-rolling.png)](/img/attention/papers/mistral-rolling.png)
+>
+> **Context:** Three sentences being written at once, over three time steps, each with a 4-slot cache. Orange marks the slot written at that step.
+>
+> **What it says:** "Keys and values for position $$i$$ are stored in position $$i \bmod W$$ of the cache. When the position $$i$$ is larger than $$W$$, past values in the cache are overwritten." Look at the first row: at step $$i+2$$, "of" overwrites "This" in slot 0.
+>
+> **Why it matters:** This is exactly the loop in the code below, and the out-of-order slots ("of is an example") are why the next paragraph has to explain that order does not matter.
 
 {{FIG:p3_ring|A rolling buffer with W = 4 slots while writing token 9. Token i goes into slot i mod 4. Tokens 0 to 5 have been overwritten; the cache always holds just the last 4 tokens.}}
 
@@ -236,10 +274,14 @@ For Mistral 7B (32 layers, 8 key/value heads, head size 128, window 4,096) at 32
    Mistral 7B at 32K: full 4.00 GiB, window 4096 0.50 GiB (8x smaller)
 ```
 
-> [!QUOTE] Mistral 7B paper
-> "On a sequence length of 32k tokens, this reduces the cache memory usage by 8x, without impacting the model quality."
-
-My calculation gives the same 8×.
+> [!PAPER] Mistral 7B · Section 2, Rolling Buffer Cache · page 2
+> [![The Mistral 7B rolling buffer cache paragraph, highlighting that on a 32k-token sequence it reduces cache memory usage by 8x without impacting model quality](/img/attention/papers/mistral-8x.png)](/img/attention/papers/mistral-8x.png)
+>
+> **Context:** The paragraph that introduces the rolling buffer cache.
+>
+> **What it says:** "On a sequence length of 32k tokens, this reduces the cache memory usage by 8x, without impacting the model quality."
+>
+> **Why it matters:** 32,768 ÷ 4,096 = 8. My calculation from Mistral's published configuration gives the same 8×.
 
 ### And speed?
 
@@ -266,10 +308,19 @@ A pure sliding-window model has the weakness from the warning above: it can neve
 
 This idea is older than chatbots. Longformer (2020) already combined the two inside one layer:
 
-> [!QUOTE] Longformer
-> "Longformer's attention mechanism is a drop-in replacement for the standard self-attention and combines a local windowed attention with a task motivated global attention."
+> [!PAPER] Longformer · Section 3.1, Attention Pattern · page 3, Figure 2
+> [![Figure 2 of the Longformer paper: full n squared attention, sliding window attention, dilated sliding window and global plus sliding window patterns](/img/attention/papers/longformer-figure2.png)](/img/attention/papers/longformer-figure2.png)
 >
-> Source: [Beltagy et al., 2020](https://arxiv.org/abs/2004.05150)
+> **Context:** Four attention patterns drawn as grids, like this article's own mask figure (a dark cell = may look).
+>
+> **What it says:** (a) full attention; (b) a sliding window; (c) a **dilated** window that skips every other token to reach further at the same cost; (d) a window plus a few **global** tokens (the full rows and columns) that see and are seen by everything.
+>
+> **Why it matters:** Pattern (d) is the ancestor of today's local and global layers: Longformer mixed them inside one layer, Gemma and gpt-oss mix them across layers. And the global tokens play the same role as the attention sinks of section 6.
+>
+> [Read the paper on arXiv](https://arxiv.org/abs/2004.05150)
+
+> [!DEFINITION] Dilated window
+> A window with gaps: instead of the last $$W$$ tokens, look at every 2nd (or every 4th) of the last $$2W$$ (or $$4W$$) tokens. Same cost, longer reach, but some nearby tokens are skipped.
 
 Today's models do it **layer by layer**:
 
@@ -277,12 +328,38 @@ Today's models do it **layer by layer**:
 - **Gemma 3** (2025) goes further: **5 local : 1 global**, and shrinks the window to **1,024**.
 - **gpt-oss** (OpenAI, 2025) alternates **1 : 1** with a tiny window of just **128** tokens.
 
-> [!QUOTE] Gemma 3 Technical Report
-> "We alternate between a local sliding window self-attention and global self-attention, with a pattern of 5 local layers for every global layer, starting with a local layer as the first layer of the model."
+> [!PAPER] Gemma Team (2024), Gemma 2 · Section 2 · page 2
+> [![The Gemma 2 paragraph stating that local sliding window and global attention alternate in every other layer, with a 4096-token window and an 8192-token global span](/img/attention/papers/gemma2-alternate.png)](/img/attention/papers/gemma2-alternate.png)
 >
-> Source: [Gemma Team, 2025](https://arxiv.org/abs/2503.19786)
+> **Context:** Gemma 2's list of architecture changes.
+>
+> **What it says:** Local and global attention alternate "in every other layer. The sliding window size of local attention layers is set to 4096 tokens, while the span of the global attention layers is set to 8192 tokens."
+>
+> **Why it matters:** With a maximum length of 8,192, the window covers half of it, so Gemma 2's saving is modest. Gemma 3 pushed the same idea much further.
+>
+> [Read the paper on arXiv](https://arxiv.org/abs/2408.00118)
 
-They also say why: long context causes "the memory explosion of the KV cache during inference". In their tests, changing the local:global ratio had "minimal impact on perplexity".
+> [!PAPER] Gemma Team (2025), Gemma 3 Technical Report · Section 1 · page 1
+> [![The Gemma 3 introduction, highlighting that a challenge with long context is the memory explosion of the KV cache during inference](/img/attention/papers/gemma3-memory.png)](/img/attention/papers/gemma3-memory.png)
+>
+> **Context:** The introduction, explaining the second main change from Gemma 2: a context of 128K tokens.
+>
+> **What it says:** "A challenge with long context is the memory explosion of the KV cache during inference. To reduce this issue, we interleave multiple local layers between each global layer", with a pattern of 5 local layers for every global layer and "a smaller span of only 1024 tokens" for the local ones.
+>
+> **Why it matters:** The reason is not speed but **memory**: at 128K tokens, the cache of an all-global model would be larger than the model itself (see the memory math below).
+>
+> [Read the paper on arXiv](https://arxiv.org/abs/2503.19786)
+
+Do the local layers hurt quality? Gemma 3 tested it:
+
+> [!PAPER] Gemma 3 · Section 5, Ablations · page 6, Figure 3
+> [![Figure 3 of the Gemma 3 report: change in perplexity as the local to global ratio goes from 1:1 to 7:1 for 2B and 9B models, staying almost flat](/img/attention/papers/gemma3-figure3.png)](/img/attention/papers/gemma3-figure3.png)
+>
+> **Context:** The change in perplexity (lower is better) relative to Gemma 2's 1:1 pattern, as more local layers are used per global layer, for 2B and 9B models.
+>
+> **What it says:** "The impact is minimal, even with 7-to-1 local to global." All the lines stay within about ±0.03 perplexity.
+>
+> **Why it matters:** This is the evidence behind 5:1. Most layers simply do not need to see far back, as long as a few layers still can.
 
 {{FIG:p3_gemma|The real layer pattern of Gemma 3 27B: five local layers (blue, window 1,024), then one global layer (orange), repeated. 52 local and 10 global layers in total. Hover a bar to see the layer.}}
 
@@ -327,12 +404,37 @@ where $$L_{\text{global}}$$ and $$L_{\text{local}}$$ are the numbers of global a
 
 {{FIG:p3_kv|KV cache of Gemma 3 27B for one conversation. If every layer were global, 128K tokens would need 62 GiB. With the real 5:1 pattern it needs 10.4 GiB.}}
 
+Gemma 3's own measurement, for a 2B model, shows the same shape:
+
+> [!PAPER] Gemma 3 · Section 5 · page 7, Figure 6
+> [![Figure 6 of the Gemma 3 report: KV cache memory versus context length for a 2B model, global only against the 5:1 pattern with a 1024 window](/img/attention/papers/gemma3-figure6.png)](/img/attention/papers/gemma3-figure6.png)
+>
+> **Context:** KV cache memory (in MB) against context length, for a 2B model with only global layers (yellow) and with Gemma 3's design (red).
+>
+> **What it says:** Global-only grows to about 7,000 MB at 128K tokens; the 5:1 design with 1,024-token windows stays near 1,100 MB.
+>
+> **Why it matters:** Same curve as my Gemma 3 27B calculation above, from the authors. The red line still grows (the global layers), just much more slowly.
+
 At the full 128K context: **62 GiB → 10.4 GiB**. The savings can never pass 6.2× (62 layers ÷ 10 global layers), because the global layers still grow with the text. They become the main cost.
 
 For gpt-oss-20b (24 layers alternating, 8 key/value heads, head size 64, window 128), at 128K tokens the cache drops from 6.00 GiB to 3.00 GiB: half the layers keep almost nothing.
 
-> [!NOTE] A detail worth knowing: two RoPE speeds
-> Gemma 3 uses different RoPE settings for the two kinds of layer: "We increase RoPE base frequency from 10k to 1M on global self-attention layers, and keep the frequency of the local layers at 10k." Global layers must tell apart positions up to 128K tokens apart, so their rotation turns more slowly (a larger base). Local layers only ever see 1,024 tokens, so the usual setting is fine.
+> [!PAPER] Gemma 3 · Section 2, Long context · page 2
+> [![The Gemma 3 paragraph on long context, highlighting the increase of the RoPE base frequency from 10k to 1M on global layers while local layers keep 10k](/img/attention/papers/gemma3-rope.png)](/img/attention/papers/gemma3-rope.png)
+>
+> **Context:** How Gemma 3 handles positions at 128K tokens.
+>
+> **What it says:** "We increase RoPE base frequency from 10k to 1M on global self-attention layers, and keep the frequency of the local layers at 10k."
+>
+> **Why it matters:** RoPE (Part 2) turns each pair of numbers by an angle $$m\theta$$. A larger base makes $$\theta$$ smaller, so the angles turn more slowly and positions 100,000 tokens apart still look different. Local layers never see more than 1,024 tokens, so they keep the usual setting.
+
+The RoPE angle for pair $$i$$ of a head of size $$d$$ is
+
+$$
+\theta_i = \text{base}^{-2i/d}, \qquad i = 0, 1, \dots, \tfrac{d}{2} - 1
+$$
+
+where "base" is 10,000 normally and 1,000,000 in Gemma 3's global layers. The slowest pair ($$i = d/2 - 1$$) has a period, in tokens, of about $$2\pi \cdot \text{base}$$: roughly 63,000 tokens for base 10k, roughly 6.3 million for base 1M. That is why the global layers need the larger base to tell positions apart across 128K tokens.
 
 | Model | Pattern | Window | Why it matters |
 |---|---|---|---|
@@ -345,10 +447,25 @@ For gpt-oss-20b (24 layers alternating, 8 key/value heads, head size 64, window 
 
 All the models above were **trained** with their windows, so they learned to live with them. What happens if you take a normal model, trained with full attention, and simply force a window on it? This is what "StreamingLLM" studied, and the answer surprised people.
 
-> [!QUOTE] StreamingLLM
-> "Window attention, where only the most recent KVs are cached, is a natural approach -- but we show that it fails when the text length surpasses the cache size. We observe an interesting phenomenon, namely attention sink, that keeping the KV of initial tokens will largely recover the performance of window attention."
+> [!PAPER] Xiao et al. (2023), StreamingLLM · Section 1 · page 2, Figure 1
+> [![Figure 1 of the StreamingLLM paper comparing dense attention, window attention, sliding window with re-computation and StreamingLLM, with their complexity and perplexity](/img/attention/papers/streaming-figure1.png)](/img/attention/papers/streaming-figure1.png)
 >
-> Source: [Xiao et al., 2023](https://arxiv.org/abs/2309.17453)
+> **Context:** Four ways to run a model on a text much longer than it was trained on, with the cost and the perplexity (PPL, lower is better) of Llama-2-13B on a 65K-token book.
+>
+> **What it says:** (a) Dense attention: $$O(T^2)$$ and PPL 5,641 (broken, because the text is longer than training). (b) Window attention: cheap, but PPL 5,158: it "breaks when initial tokens are evicted". (c) Recomputing a window for each token works (PPL 5.43) but is very slow. (d) StreamingLLM, window plus the first few tokens (yellow, the attention sink): cheap **and** PPL 5.40.
+>
+> **Why it matters:** Panel (b) versus (d) is the whole discovery: the only difference is keeping a handful of first tokens, and perplexity goes from 5,158 to 5.40.
+>
+> [Read the paper on arXiv](https://arxiv.org/abs/2309.17453)
+
+> [!PAPER] StreamingLLM · Section 3.1 · page 4, Figure 3
+> [![Figure 3 of the StreamingLLM paper: log perplexity over 20K tokens for Llama-2-7B, Pythia-12B, Falcon-7B and MPT-7B under dense attention, window attention, sliding window with recomputation and StreamingLLM](/img/attention/papers/streaming-figure3.png)](/img/attention/papers/streaming-figure3.png)
+>
+> **Context:** Log perplexity over 20,000 tokens for four different model families. The dashed lines mark the cache size and the training length.
+>
+> **What it says:** Dense attention (blue) fails once the text passes the training length. Window attention (orange) jumps up as soon as the first tokens leave the cache. StreamingLLM (red) stays flat, matching the slow recomputation baseline (green).
+>
+> **Why it matters:** It is not one model's quirk: Llama, Pythia, Falcon and MPT all behave the same. My Qwen2.5 experiment below adds a fifth family.
 
 Remember the **attention sink** from [Part 1](attention-1-self-attention.md): in Qwen2.5-0.5B, 68% of heads put most of their attention on the very first token, because softmax forces the weights to add up to 1 and the heads need somewhere harmless to "park" them. A sliding window cuts that first token off.
 
@@ -379,6 +496,23 @@ What this shows:
 - **Keeping just 4 sink tokens fixes almost all of it.** With 1,024 tokens of budget, 4 sinks plus a window give 17.80, very close to full attention's 17.39.
 - **A bigger window does not save you if the sink is gone.** The 1,024-token window without sinks was the *worst* of all (508.9), even though it sees 16 times more text than the 64-token window. I did not expect this. It shows the problem is not missing information: the model is thrown off by losing its "parking spot".
 
+> [!PAPER] StreamingLLM · Section 4.3, Ablation · page 9
+> [![The StreamingLLM ablation paragraph stating that one or two initial tokens are not enough, while a threshold of four initial tokens appears enough](/img/attention/papers/streaming-four.png)](/img/attention/papers/streaming-four.png)
+>
+> **Context:** How many first tokens must be kept?
+>
+> **What it says:** "merely one or two initial tokens" are not sufficient, while "a threshold of four initial tokens appears enough, with subsequent additions contributing marginal effects."
+>
+> **Why it matters:** This is why my experiment kept exactly 4 sink tokens.
+
+With $$S$$ sink tokens and a window of $$W$$ recent tokens, the cache holds a fixed
+
+$$
+\text{cache size} = (S + W) \times \text{bytes per token}
+$$
+
+whatever the length of the conversation: 4 + 1,020 = 1,024 tokens in my 1,024-budget test.
+
 > [!NOTE] How this differs from StreamingLLM exactly
 > StreamingLLM also renumbers the positions inside the cache when it evicts tokens. I kept the original positions and only changed which tokens are visible. The lesson is the same: a model trained with full attention depends on its first tokens, and **"just use a window" is not safe for a model that was not trained with one**. Models like Mistral and Gemma learn to cope with windows during training.
 
@@ -400,10 +534,16 @@ DeepSeek's answer: compute the scores with a **much smaller, much cheaper** mode
 
 DSA arrived with DeepSeek-V3.2 (2025). It has two pieces.
 
-> [!QUOTE] DeepSeek-V3.2 paper
-> "The prototype of DSA primarily consists of two components: a lightning indexer and a fine-grained token selection mechanism."
+> [!PAPER] DeepSeek-AI (2025), DeepSeek-V3.2 · Section 2.1 · page 4, Figure 2
+> [![Figure 2 of the DeepSeek-V3.2 paper: the MLA attention architecture with the lightning indexer and top-k selector added in green](/img/attention/papers/dsv32-figure2.png)](/img/attention/papers/dsv32-figure2.png)
 >
-> Source: [DeepSeek-AI, 2025](https://arxiv.org/abs/2512.02556)
+> **Context:** The full attention block of DeepSeek-V3.2. The black parts are MLA from Part 2 (compressed latent $$c_t^{KV}$$, separate RoPE key $$k_t^R$$). The green parts are new.
+>
+> **What it says:** The lightning indexer (green box) reads the input $$h_t$$ through its own small queries $$q^I_{t,j}$$, keys $$k^I_t$$ and weights $$w^I_{t,j}$$, scores all earlier tokens (the little bar chart), and the "Top-k Selector" passes only the best entries $$[c_t^{KV}; k_t^R]$$ to the main "Multi-Query Attention (Core Attention)".
+>
+> **Why it matters:** DSA does not replace MLA, it sits in front of it like a filter. Everything from Part 2 is still there; it just runs on 2,048 chosen tokens instead of all of them.
+>
+> [Read the paper on arXiv](https://arxiv.org/abs/2512.02556)
 
 {{FIG:p3_dsa|DeepSeek Sparse Attention. The lightning indexer is small and cheap, but it scores every earlier token. Top-k keeps the best k. The big main attention then runs only over those k tokens.}}
 
@@ -435,6 +575,15 @@ where:
 
 The paper explains both choices: ReLU was chosen "for throughput consideration", and the indexer "can be implemented in FP8".
 
+> [!PAPER] DeepSeek-V3.2 · Section 2.1 · page 3, Equation (1)
+> [![Equation 1 of the DeepSeek-V3.2 paper: the lightning indexer score as a weighted sum over indexer heads of ReLU of query-key dot products](/img/attention/papers/dsv32-indexer.png)](/img/attention/papers/dsv32-indexer.png)
+>
+> **Context:** The definition of the lightning indexer, the heart of DSA.
+>
+> **What it says:** Exactly the equation above, with each symbol explained: $$H^I$$ indexer heads, $$q^I_{t,j}$$ and $$w^I_{t,j}$$ from the query token, $$k^I_s$$ from the earlier token. "Given that the lightning indexer has a small number of heads and can be implemented in FP8, its computational efficiency is remarkable."
+>
+> **Why it matters:** Compare it with softmax attention: there is no softmax and no value mix, just a score. The indexer only has to **rank** tokens, which is a much easier job than attending to them.
+
 ### Piece 2: top-k token selection
 
 For each query token $$t$$, keep only the $$k$$ earlier tokens with the highest index scores, and run the real attention over just those:
@@ -455,13 +604,38 @@ DeepSeek-V3.2 uses $$k = 2{,}048$$.
 
 ### What it saves
 
-> [!QUOTE] DeepSeek-V3.2 paper
-> DSA "reduces the core attention complexity of the main model from O(L²) to O(Lk)". And: "Although the lightning indexer still has a complexity of O(L²), it requires much less computation compared with MLA."
+> [!PAPER] DeepSeek-V3.2 · Section 2.3, Inference Costs · page 5
+> [![The DeepSeek-V3.2 inference cost paragraph: DSA reduces core attention complexity from O(L squared) to O(Lk), while the lightning indexer still has O(L squared) complexity but much less computation](/img/attention/papers/dsv32-complexity.png)](/img/attention/papers/dsv32-complexity.png)
+>
+> **Context:** The paper's own cost argument.
+>
+> **What it says:** "DSA reduces the core attention complexity of the main model from $$O(L^2)$$ to $$O(Lk)$$". The indexer "still has a complexity of $$O(L^2)$$", but "requires much less computation compared with MLA".
+>
+> **Why it matters:** "Much less" can be put in numbers; see just below.
 
 > [!DEFINITION] Big-O notation
 > A shorthand for how cost grows with size. $$O(L^2)$$: grows with the square of the length $$L$$. $$O(Lk)$$: grows with $$L$$ times a fixed number $$k$$, so only linearly in $$L$$.
 
 So the expensive part (the big attention with 128 heads) becomes linear in length. The cheap part (the indexer) is still quadratic, but it is so small and so fast that it costs much less.
+
+**How much less, exactly?** DeepSeek-V3.2's published configuration gives the sizes: the indexer has $$H^I = 64$$ heads of size $$d^I = 128$$; the main attention has 128 heads, each scoring against a cached entry of $$512 + 64 = 576$$ numbers. Counting multiply-adds for the scoring step only:
+
+$$
+\text{dense} \approx P \times 128 \times 576,
+\qquad
+\text{DSA} \approx \underbrace{P \times 64 \times 128}_{\text{indexer, FP8}} + \underbrace{L\,k \times 128 \times 576}_{\text{main, top-}k}
+$$
+
+where $$P = L(L+1)/2$$ is the number of (query, earlier token) pairs and $$k = 2{,}048$$. At $$L = 131{,}072$$ tokens:
+
+| | Pairs scored | Multiply-adds per pair | Total |
+|---|---|---|---|
+| Dense MLA | 8.59 billion | 73,728 | $$6.3 \times 10^{14}$$ |
+| DSA indexer | 8.59 billion | 8,192 (in FP8) | $$7.0 \times 10^{13}$$ |
+| DSA main | 0.27 billion (at most) | 73,728 | $$2.0 \times 10^{13}$$ |
+| **DSA total** | | | $$9.0 \times 10^{13}$$, about **7× less** |
+
+The indexer still touches every pair, but each touch is 9 times cheaper and runs in 8-bit numbers. The main attention touches 32 times fewer pairs. (This counts only the scoring arithmetic. Real speed also depends on memory reads and GPU code; the paper's Figure 3 below shows the measured result.)
 
 ### How the indexer learns: two training stages
 
@@ -469,8 +643,16 @@ The indexer starts out random. How does it learn which tokens matter? It copies 
 
 **Stage 1, dense warm-up.** Keep normal full attention, **freeze the whole model**, and train only the indexer to predict where the model's attention goes.
 
-> [!QUOTE] DeepSeek-V3.2 paper
+> [!QUOTE] DeepSeek-V3.2 paper, Section 2.1.1
 > "for the t-th query token, we first aggregate the main attention scores by summing across all attention heads. This sum is then L1-normalized along the sequence dimension to produce a target distribution $$p_{t,:}$$"
+
+As an equation, with $$A^{(h)}_{t,s}$$ the main attention weight of head $$h$$ from token $$t$$ to token $$s$$:
+
+$$
+p_{t,s} = \frac{\sum_{h} A^{(h)}_{t,s}}{\sum_{s'} \sum_{h} A^{(h)}_{t,s'}}
+$$
+
+The top sums over heads; the bottom divides by the row total so the numbers add up to 1.
 
 The training loss compares the indexer's scores (turned into a distribution by softmax) with that target:
 
@@ -585,6 +767,40 @@ Both scripts, exactly as they ran (the same outputs quoted above):
 
 <figure class="fig"><img src="/img/attention/part3-qwen-run.png" alt="Terminal output of part3_qwen.py: window and sink perplexities, indexer warm-up losses per layer, attention captured and sparse perplexities" loading="lazy" /><figcaption>Output of part3_qwen.py: Qwen2.5-0.5B with windows, sinks and trained lightning indexers. The whole run took 106 seconds.</figcaption></figure>
 
+## The impact, and where you meet it
+
+Long context went from a research problem to a standard feature between 2023 and 2025, and the ideas in this part are a big reason why:
+
+- **Mistral 7B** (2023) made sliding windows and the rolling cache standard in open models.
+- **Gemma 2 and 3, gpt-oss** made local and global layers the default way to reach 128K tokens with a manageable cache.
+- **StreamingLLM** showed how to keep a model running on a never-ending stream; keeping attention sinks is now a standard trick in serving systems.
+- **DeepSeek-V3.2** showed that a learned top-k selection can keep quality while cutting long-context cost sharply.
+
+> [!PAPER] DeepSeek-V3.2 · Section 2.3 · page 6, Figure 3
+> [![Figure 3 of the DeepSeek-V3.2 paper: cost per million tokens against token position for prefilling and decoding, DeepSeek-V3.1-Terminus rising steeply and DeepSeek-V3.2 staying low](/img/attention/papers/dsv32-figure3.png)](/img/attention/papers/dsv32-figure3.png)
+>
+> **Context:** The measured serving cost (in dollars per million tokens, on H800 GPUs) of the same model family with dense attention (V3.1-Terminus, blue) and with DSA (V3.2, orange), against the position of the token in the text.
+>
+> **What it says:** With dense attention, cost grows steadily with position: a token at position 128K costs about \$2.1 per million to decode. With DSA it stays near \$0.25. For short texts (the far left) DSA is slightly more expensive, because the indexer is extra work.
+>
+> **Why it matters:** This is the use case in one picture: long documents, long chats and long reasoning traces become several times cheaper to serve, which in turn makes them practical to offer at all.
+
+> [!PAPER] StreamingLLM · Section 4.5, Efficiency · page 9, Figure 10
+> [![Figure 10 of the StreamingLLM paper: per-token latency and memory of sliding window with recomputation against StreamingLLM for Llama-2-7B and Llama-2-13B](/img/attention/papers/streaming-figure10.png)](/img/attention/papers/streaming-figure10.png)
+>
+> **Context:** Time per token (latency) and memory, for the slow-but-correct recomputation baseline (grey) and StreamingLLM (red), at cache sizes from 256 to 4,096 tokens.
+>
+> **What it says:** With a 4,096-token cache on Llama-2-13B, recomputation takes 2,355 ms per token; StreamingLLM takes 106 ms, "a remarkable speedup of up to 22.2× per token", with about the same memory.
+>
+> **Why it matters:** The practical use case: chat assistants and agents that run for hours, or read a live stream (logs, transcripts), without their memory or their speed getting worse over time.
+
+**Use cases in one line each:**
+
+- **Long documents** (contracts, books, codebases): local and global layers keep the cache affordable at 128K tokens.
+- **Endless chats and live streams:** a rolling window plus attention sinks keeps memory fixed for as long as the stream runs.
+- **Reasoning models** that write tens of thousands of tokens: sparse attention (DSA) keeps each new token cheap, however long the reasoning gets.
+- **Retrieval inside long context** ("find the clause that mentions X"): this needs global layers or a learned selector, because a pure window cannot look that far directly.
+
 ## Which one to use?
 
 | | Each token looks at | KV cache | Can look far back directly? | Used by |
@@ -609,6 +825,7 @@ All of these still use softmax attention over *some* set of tokens. Part 4 goes 
 - A model trained with full attention **breaks** under a plain window (perplexity 17.4 → up to 509) because it loses its **attention sink**. Keeping 4 first tokens fixes most of it (17.80).
 - **DeepSeek Sparse Attention** uses a tiny **lightning indexer**, $$I_{t,s} = \sum_j w^I_{t,j}\,\operatorname{ReLU}(q^I_{t,j} \cdot k^I_s)$$, to pick the top-k tokens, so the main attention costs $$O(Lk)$$ instead of $$O(L^2)$$.
 - My indexer for Qwen2.5-0.5B, trained only with the warm-up KL loss, caught **77.6%** of the real attention with 64 tokens and brought perplexity to **17.62** with 256 tokens (full: 17.39).
+- With DeepSeek-V3.2's real sizes, DSA scores a 128K-token text with about **7× fewer** multiply-adds than dense attention, and the paper's measured decode cost at 128K drops from about \$2.1 to \$0.25 per million tokens.
 
 <details>
 <summary>Run it yourself</summary>

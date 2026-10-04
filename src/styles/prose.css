@@ -329,3 +329,22 @@
 
 /* screenshots of papers: keep them as white "paper" cards with a frame in every theme */
 .prose .fig.paper img { background: #fff; padding: 14px 18px; border: 1px solid var(--border); border-radius: var(--radius); max-width: 100%; height: auto; box-sizing: border-box; margin: 0.6em auto; }
+
+/* "From the paper" boxes: a highlighted excerpt of a research paper, with where it is and what it means */
+.prose .callout-paper {
+  --c: #4fc3d9;
+  --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 2h8l6 6v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1Zm7 1.5V9h5.5L13 3.5ZM8 12v1.5h8V12H8Zm0 3.5V17h8v-1.5H8Z'/%3E%3C/svg%3E");
+  background: rgba(79, 195, 217, 0.06);
+}
+.prose .callout-paper .callout-title::after {
+  content: 'From the paper'; margin-left: auto; font-size: 0.72em; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--c); opacity: 0.85;
+}
+.prose .callout-paper img {
+  display: block; width: 100%; height: auto; box-sizing: border-box; margin: 0.4em 0 0.9em;
+  background: #fff; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius);
+}
+.prose .callout-paper p > strong:first-child {
+  color: var(--c); font-size: 0.78em; letter-spacing: 0.07em; text-transform: uppercase; margin-right: 0.3em;
+}
+:root[data-theme='light'] .prose .callout-paper { --c: #11809a; background: rgba(17, 128, 154, 0.05); }
