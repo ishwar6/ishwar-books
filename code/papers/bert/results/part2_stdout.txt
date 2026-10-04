@@ -1,0 +1,64 @@
+== 1. parameters: formula vs the real model ==
+bert-base-uncased: L=12 H=768 A=12 feed-forward=3072
+  embeddings   23,837,184   one layer   7,087,872   x12 =   85,054,464   pooler   590,592
+  formula total  109,482,240   counted in the model  109,482,240   same: True
+  without the pooler 108,891,648
+bert-large-uncased: L=24 H=1024 A=16 feed-forward=4096
+  embeddings   31,782,912   one layer  12,596,224   x24 =  302,309,376   pooler 1,049,600
+  formula total  335,141,888   counted in the model  335,141,888   same: True
+  without the pooler 334,092,288
+  in one base layer: attention 2,362,368, feed-forward 4,722,432, layer norms 3,072
+
+== 2. the WordPiece vocabulary of bert-base-uncased ==
+entries in vocab.txt: 30,522
+  special ([PAD] [UNK] [CLS] [SEP] [MASK])        5   e.g. [PAD] [UNK] [CLS] [SEP] [MASK]
+  unused placeholders ([unused0] ...)           994   e.g. [unused0] [unused1] [unused2] [unused3] [unused4]
+  single characters                             997   e.g. ! " # $ %
+  ## pieces of 1 character (##a ...)            997   e.g. ##s ##a ##e ##i ##n
+  ## pieces, longer (##ing ...)               4,831   e.g. ##ing ##ed ##er ##ly ##es
+  whole tokens, 2+ characters                22,698   e.g. the of and in to
+  (groups add up to 30,522)
+  ids: [PAD]=0, [UNK]=100, [CLS]=101, [SEP]=102, [MASK]=103
+
+== 3. WordPiece splits ==
+  playing         -> playing
+  likes           -> likes
+  cute            -> cute
+  embeddings      -> em ##bed ##ding ##s
+  transformers    -> transformers
+  unaffable       -> una ##ffa ##ble
+  tokenization    -> token ##ization
+  hairy           -> hairy
+  bidirectional   -> bid ##ire ##ction ##al
+our WordPiece function vs the real tokenizer, pages 1-9 of the BERT paper:
+  8,525 words -> 9,878 pieces (ours), 9,878 pieces (real); identical: True
+  distinct words that needed more than one piece: 416
+Figure 2 pair ("my dog is cute", "he likes playing"):
+  tokens:     [CLS]      my     dog      is    cute   [SEP]      he   likes playing   [SEP]
+  ids:          101    2026    3899    2003   10140     102    2002    7777    2652     102
+  segment:        A       A       A       A       A       A       B       B       B       B
+  position:       0       1       2       3       4       5       6       7       8       9
+
+== 4. input embedding = LayerNorm(token + segment + position) ==
+  tables: token (30522, 768), segment (2, 768), position (512, 768)
+  output shape (1, 10, 768) (1 sequence, 10 tokens, 768 numbers each)
+  max |difference|, our LayerNorm(sum) vs the model: 0.00e+00
+  max |difference|, plain sum without LayerNorm vs the model: 9.15
+
+== 5. "bank": one static vector, many contextual vectors ==
+  the input (static) vector of "bank" is the same row of the table in every sentence: cosine 1.000
+  cosine similarity of BERT's output vectors for "bank":
+  [1] 1.000  0.747  0.477  0.432   he sat on the river bank and watched the water.
+  [2] 0.747  1.000  0.458  0.479   the bank of the river was covered in mud.
+  [3] 0.477  0.458  1.000  0.786   she opened a savings account at the bank.
+  [4] 0.432  0.479  0.786  1.000   the bank approved my loan yesterday.
+  average, same meaning (river-river, money-money): 0.766
+  average, different meaning (river-money):         0.462
+
+== 6. the [CLS] vector C and the released pooler ==
+  C = final hidden vector of [CLS], shape (768,)
+  pooler = tanh(W C + b), W shape (768, 768); max |difference| vs model.pooler_output: 0.00e+00
+
+== 7. layer 1 of BERT, recomputed by hand ==
+  12 heads of 64 numbers each; every attention row sums to 1: True
+  max |difference|, our layer vs the model's layer 1: 8.34e-07

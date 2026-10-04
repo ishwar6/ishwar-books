@@ -1,0 +1,6 @@
+text: WikiText-2, 2,211,267 training and 228,859 validation word pieces; vocabulary 8,192; windows of 64 tokens
+A: left-to-right, 2 layers   training loss: step 1 9.30 -> step 3000 4.65   validation loss 5.05 (perplexity 156.1)   362 s
+B: both sides, 1 layer       training loss: step 1 9.20 -> step 3000 3.95   validation loss 4.37 (perplexity 79.1)   316 s
+C: both sides, 2 layers      training loss: step 1 9.17 -> step 3000 0.87   validation loss 0.90 (perplexity 2.5)   383 s
+
+a guess spread evenly over the 8,192 ids would have loss ln(8192) = 9.01

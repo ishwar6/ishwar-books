@@ -1,0 +1,37 @@
+SQuAD v1.1 model: the output layer is (2, 768) -> row 0 is the start vector S, row 1 the end vector E (H = 768)
+  it also has a bias: start +0.0049, end +0.0048 (a constant added to every position, so it cancels in the softmax)
+Q: What does BERT stand for?
+   answer: "Bidirectional Encoder Representations from Transformers"  (tokens 21..30, span score S.T_i + E.T_j = 15.16)
+   runner-up spans: "Bidirectional Encoder Representations from Transformers." 11.21; "Bidirectional Encoder Representations" 10.90
+   most likely start tokens: bid 0.989, transformers 0.009, en 0.001
+   check: |S.T_i by hand - model start logit| max = 1.0e-05; softmax with vs without bias differs by 3.6e-07
+Q: What is the GLUE score of BERT?
+   answer: "80.5%"  (tokens 91..94, span score S.T_i + E.T_j = 16.81)
+   runner-up spans: "to 80.5%" 10.68; "80.5% and SQuAD v1.1 question answering Test F1 to 93.2" 10.14
+   most likely start tokens: 80 0.996, to 0.002, pushing 0.001
+   check: |S.T_i by hand - model start logit| max = 7.6e-06; softmax with vs without bias differs by 1.2e-08
+Q: On how many tasks does BERT get new results?
+   answer: "eleven"  (tokens 81..81, span score S.T_i + E.T_j = 11.59)
+   runner-up spans: "eleven natural language processing tasks" 9.38; "eleven natural language processing" 6.92
+   most likely start tokens: eleven 0.990, on 0.002, natural 0.002
+   check: |S.T_i by hand - model start logit| max = 8.6e-06; softmax with vs without bias differs by 1.2e-07
+Q: What does BERT learn from?
+   answer: "Transformers"  (tokens 30..30, span score S.T_i + E.T_j = 9.87)
+   runner-up spans: "Bidirectional Encoder Representations from Transformers" 7.65; "Transformers. BERT is designed to pre-train deep bidirectional representations from unlabeled text" 6.76
+   most likely start tokens: transformers 0.810, bid 0.088, un 0.061
+   check: |S.T_i by hand - model start logit| max = 6.7e-06; softmax with vs without bias differs by 7.5e-08
+SQuAD v1.1 dev: 10570 questions (10753 windows of 384 tokens, stride 128): EM 80.79, F1 88.08  (9.3 min)
+   a miss: Q "What was the theme of Super Bowl 50?" predicted "to determine the champion of the National Football League (NFL) for the 2015 season", gold ""golden anniversary""
+   a miss: Q "What was the theme of Super Bowl 50?" predicted "to determine the champion of the National Football League (NFL) for the 2015 season", gold ""golden anniversary""
+   a miss: Q "How many times have the Panthers been in the Super Bowl?" predicted "eight", gold "2"
+SQuAD 2.0 Q: What does BERT stand for?
+   s_null = S.C + E.C = 10.18;  best span "Bidirectional Encoder Representations from Transformers" scores 23.25;  difference +13.07
+SQuAD 2.0 Q: What is the GLUE score of BERT?
+   s_null = S.C + E.C = 11.64;  best span "80.5%" scores 22.88;  difference +11.24
+SQuAD 2.0 Q: Who won the football world cup in 2018?
+   s_null = S.C + E.C = 21.13;  best span "BERT" scores 1.22;  difference -19.92
+SQuAD 2.0 Q: How many layers does BERT have?
+   s_null = S.C + E.C = 13.19;  best span "all" scores 16.16;  difference +2.97
+SQuAD v2.0 dev: 11873 questions, 5945 have no answer
+   tau = 0:    F1 78.47, EM 75.47, answers 56.7% of questions
+   best tau = +4.00: F1 78.98, EM 76.22, answers 52.1% of questions  (8.2 min)

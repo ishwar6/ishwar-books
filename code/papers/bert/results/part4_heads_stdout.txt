@@ -1,0 +1,11 @@
+input tokens: ['[CLS]', 'a', 'man', 'is', 'playing', 'a', 'guitar', '.', '[SEP]', 'a', 'person', 'is', 'making', 'music', '.', '[SEP]']
+C (final [CLS] vector): shape (1, 768);  W: shape (3, 768)  (K = 3 labels, H = 768)
+logits from the library:  [-0.1763, -0.9611, 0.0659]
+logits by hand (pooled C): [-0.1763, -0.9611, 0.0659]
+loss from the library 1.004374  vs  -log softmax(C W^T)[label] by hand 1.004374
+probabilities (untrained W, so they mean nothing yet): [0.366, 0.167, 0.467]
+with the raw C instead of the pooled C the logits would be [-0.0016, -0.1106, -0.1406] (the library uses the pooled C)
+new parameters for this task: 2,307 out of 109,484,547 (0.0021%)
+SWAG input: (1, 4, 16) = (batch, 4 choices, tokens); the vector w: (1, 768)
+scores C.w by hand: [-0.3572, 0.141, -0.337, -0.0369];  library: [-0.3572, 0.141, -0.337, -0.0369]
+softmax over the 4 choices (untrained w): [0.198, 0.326, 0.202, 0.273]

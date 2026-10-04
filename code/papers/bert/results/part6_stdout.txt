@@ -1,0 +1,35 @@
+1. The 512-token limit
+   position embedding table: 512 rows x 768 numbers
+   a long text has 722 tokens; with truncation it keeps 512; the rest is thrown away
+   feeding all 722 tokens: RuntimeError: The size of tensor a (722) must match the size of tensor b (512) at non-singleton dimension 1
+
+2. Sentence similarity (cosine, 1 = same direction)
+   sentence-transformers/all-MiniLM-L6-v2: model_type=bert, layers=6, hidden=384, params=22.7M
+   pair (R = related, U = unrelated)                                   raw [CLS]  raw mean  MiniLM
+   R A man is playing a guitar.   | A person is making music.              0.851     0.746   0.590
+   R How do I reset my password?  | I forgot my login details.             0.929     0.672   0.541
+   R The weather is lovely today. | It is sunny and warm outside.          0.951     0.857   0.705
+   U A man is playing a guitar.   | The stock market fell sharply.         0.776     0.584  -0.064
+   U How do I reset my password?  | Penguins live in Antarctica.           0.795     0.517  -0.035
+   U The weather is lovely today. | He parked the truck in the garage.     0.873     0.598   0.013
+   average related / unrelated:  raw [CLS] 0.910 / 0.815,  raw mean 0.758 / 0.566,  MiniLM 0.612 / -0.029
+
+3. Two [MASK]s at once: each one is predicted on its own
+   i flew from [MASK] [MASK] to london last week.
+     mask 1: new 0.042, the 0.037, chicago 0.037, la 0.028, portland 0.019
+     mask 2: town 0.068, york 0.044, beach 0.025, city 0.021, ##town 0.017
+   i flew from new [MASK] to london last week.  -> york 0.979, orleans 0.012, jersey 0.003
+   i flew from los [MASK] to london last week.  -> angeles 1.000, vegas 0.000, ' 0.000
+   i flew from hong [MASK] to london last week. -> kong 0.999, ##kong 0.001, china 0.000
+
+4. Named entities with dslim/bert-base-NER (BERT-base-cased fine-tuned on CoNLL-2003)
+   Ada Lovelace was born in London and worked with Charles Babbage on the Analytical Engine.
+     Ada Lovelace           PER   0.999
+     London                 LOC   0.999
+     Charles Babbage        PER   0.932
+     Analy                  ORG   0.723
+     Engine                 ORG   0.781
+   token by token, for "Analytical Engine":
+     Ana                    B-ORG  0.901
+     ##ly                   I-ORG  0.544
+     Engine                 I-ORG  0.781

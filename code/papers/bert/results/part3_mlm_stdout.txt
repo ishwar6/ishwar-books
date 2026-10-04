@@ -1,0 +1,32 @@
+text: WikiText-103 test split, 62 articles, 261,428 WordPiece tokens -> 2,074 sequences of 128 tokens
+
+1. the masking procedure (paper version), seed 0
+   word-piece tokens (not counting [CLS]/[SEP]): 261,324
+   chosen for prediction: 39,406 = 15.08% of tokens
+   of the chosen: [MASK] 31,548 (80.06%), random 3,933 (9.98%), unchanged 3,925 (9.96%)
+   random replacements as a share of ALL tokens: 1.51%   (paper: 10% of 15% = 1.5%)
+   random draws that happened to pick the original token: 0
+
+2. the released create_pretraining_data.py logic (max_predictions_per_seq=20, length 128)
+   predictions per 128-token sequence: round(0.15 x 128) = 19 (cap 20)
+   chosen: 39,406 of 261,324 word-piece tokens = 15.08%
+
+3. "my dog is hairy." with token 4 chosen (Appendix A.1). What the model predicts at position 4:
+   input: [CLS] my dog is [MASK] . [SEP]
+     P(hairy) = 1.7e-05   P(apple) = 1.5e-06   top 5: dead 0.131, here 0.096, fine 0.080, gone 0.069, missing 0.036
+   input: [CLS] my dog is apple . [SEP]
+     P(hairy) = 2.3e-10   P(apple) = 0.9997   top 5: apple 1.000, apples 0.000, oak 0.000, orchard 0.000, orange 0.000
+   input: [CLS] my dog is hairy . [SEP]
+     P(hairy) = 0.9999   P(apple) = 9.0e-10   top 5: hairy 1.000, furry 0.000, shaggy 0.000, ugly 0.000, covered 0.000
+
+4. top-1 accuracy of bert-base-uncased on the chosen positions of 400 sequences (7,600 predictions)
+   all chosen positions: 61.1%
+   [MASK]        58.3%  (3,555 of 6,095)
+   random token  47.7%  (368 of 771)
+   unchanged     97.7%  (717 of 734)
+
+5. pre-training loss on one real batch of 8 sentence pairs (58 masked positions)
+   mean masked-LM loss       2.1302
+   mean next-sentence loss   0.0001
+   sum                       2.1303
+   loss computed by BertForPreTraining: 2.1303

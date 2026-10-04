@@ -1,0 +1,296 @@
+{
+ "bert-base-uncased": {
+  "config": {
+   "L": 12,
+   "H": 768,
+   "A": 12,
+   "ffn": 3072,
+   "vocab": 30522,
+   "positions": 512,
+   "segments": 2
+  },
+  "formula": {
+   "embeddings": 23837184,
+   "attention_per_layer": 2362368,
+   "ffn_per_layer": 4722432,
+   "layernorm_per_layer": 3072,
+   "per_layer": 7087872,
+   "all_layers": 85054464,
+   "pooler": 590592,
+   "total": 109482240
+  },
+  "counted": 109482240,
+  "counted_parts": {
+   "embeddings": 23837184,
+   "encoder": 85054464,
+   "pooler": 590592
+  },
+  "match": true
+ },
+ "bert-large-uncased": {
+  "config": {
+   "L": 24,
+   "H": 1024,
+   "A": 16,
+   "ffn": 4096,
+   "vocab": 30522,
+   "positions": 512,
+   "segments": 2
+  },
+  "formula": {
+   "embeddings": 31782912,
+   "attention_per_layer": 4198400,
+   "ffn_per_layer": 8393728,
+   "layernorm_per_layer": 4096,
+   "per_layer": 12596224,
+   "all_layers": 302309376,
+   "pooler": 1049600,
+   "total": 335141888
+  },
+  "counted": 335141888,
+  "counted_parts": {
+   "embeddings": 31782912,
+   "encoder": 302309376,
+   "pooler": 1049600
+  },
+  "match": true
+ },
+ "vocab": {
+  "size": 30522,
+  "groups": {
+   "special ([PAD] [UNK] [CLS] [SEP] [MASK])": 5,
+   "unused placeholders ([unused0] ...)": 994,
+   "single characters": 997,
+   "## pieces of 1 character (##a ...)": 997,
+   "## pieces, longer (##ing ...)": 4831,
+   "whole tokens, 2+ characters": 22698
+  },
+  "covered": 30522,
+  "ids": {
+   "[PAD]": 0,
+   "[UNK]": 100,
+   "[CLS]": 101,
+   "[SEP]": 102,
+   "[MASK]": 103
+  },
+  "examples": {
+   "special ([PAD] [UNK] [CLS] [SEP] [MASK])": [
+    "[PAD]",
+    "[UNK]",
+    "[CLS]",
+    "[SEP]",
+    "[MASK]"
+   ],
+   "unused placeholders ([unused0] ...)": [
+    "[unused0]",
+    "[unused1]",
+    "[unused2]",
+    "[unused3]",
+    "[unused4]",
+    "[unused5]"
+   ],
+   "single characters": [
+    "!",
+    "\"",
+    "#",
+    "$",
+    "%",
+    "&"
+   ],
+   "## pieces of 1 character (##a ...)": [
+    "##s",
+    "##a",
+    "##e",
+    "##i",
+    "##n",
+    "##o"
+   ],
+   "## pieces, longer (##ing ...)": [
+    "##ing",
+    "##ed",
+    "##er",
+    "##ly",
+    "##es",
+    "##on"
+   ],
+   "whole tokens, 2+ characters": [
+    "the",
+    "of",
+    "and",
+    "in",
+    "to",
+    "was"
+   ]
+  }
+ },
+ "splits": {
+  "playing": [
+   "playing"
+  ],
+  "likes": [
+   "likes"
+  ],
+  "cute": [
+   "cute"
+  ],
+  "embeddings": [
+   "em",
+   "##bed",
+   "##ding",
+   "##s"
+  ],
+  "transformers": [
+   "transformers"
+  ],
+  "unaffable": [
+   "una",
+   "##ffa",
+   "##ble"
+  ],
+  "tokenization": [
+   "token",
+   "##ization"
+  ],
+  "hairy": [
+   "hairy"
+  ],
+  "bidirectional": [
+   "bid",
+   "##ire",
+   "##ction",
+   "##al"
+  ]
+ },
+ "figure2": {
+  "tokens": [
+   "[CLS]",
+   "my",
+   "dog",
+   "is",
+   "cute",
+   "[SEP]",
+   "he",
+   "likes",
+   "playing",
+   "[SEP]"
+  ],
+  "input_ids": [
+   101,
+   2026,
+   3899,
+   2003,
+   10140,
+   102,
+   2002,
+   7777,
+   2652,
+   102
+  ],
+  "token_type_ids": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   1,
+   1,
+   1
+  ],
+  "position_ids": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ]
+ },
+ "wordpiece_check": {
+  "words": 8525,
+  "pieces_ours": 9878,
+  "pieces_real": 9878,
+  "identical": true,
+  "words_split": 416,
+  "examples": []
+ },
+ "embedding_check": {
+  "max_abs_diff_with_layernorm": 0.0,
+  "max_abs_diff_plain_sum": 9.151605606079102,
+  "shape": [
+   1,
+   10,
+   768
+  ],
+  "table_shapes": {
+   "token": [
+    30522,
+    768
+   ],
+   "segment": [
+    2,
+    768
+   ],
+   "position": [
+    512,
+    768
+   ]
+  }
+ },
+ "bank": {
+  "sentences": [
+   "he sat on the river bank and watched the water.",
+   "the bank of the river was covered in mud.",
+   "she opened a savings account at the bank.",
+   "the bank approved my loan yesterday."
+  ],
+  "cosine": [
+   [
+    1.0,
+    0.747,
+    0.477,
+    0.432
+   ],
+   [
+    0.747,
+    1.0,
+    0.458,
+    0.479
+   ],
+   [
+    0.477,
+    0.458,
+    1.0,
+    0.786
+   ],
+   [
+    0.432,
+    0.479,
+    0.786,
+    1.0
+   ]
+  ],
+  "avg_same_meaning": 0.766,
+  "avg_different_meaning": 0.462
+ },
+ "pooler": {
+  "C_shape": [
+   768
+  ],
+  "max_abs_diff": 0.0,
+  "pooler_weight_shape": [
+   768,
+   768
+  ]
+ },
+ "layer_check": {
+  "max_abs_diff": 8.344650268554688e-07,
+  "head_size": 64,
+  "attention_rows_sum_to_one": true
+ }
+}

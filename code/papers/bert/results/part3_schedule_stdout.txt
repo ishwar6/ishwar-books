@@ -1,0 +1,27 @@
+batch: 256 sequences x 512 tokens = 131,072 tokens (the paper rounds this to 128,000)
+1,000,000 steps x 128,000 tokens = 128,000,000,000 tokens
+divided by the 3.3 billion words of BooksCorpus + Wikipedia = 38.8 passes  ("approximately 40 epochs")
+with the exact 131,072 tokens per batch: 39.7 passes
+
+learning rate (released optimization.py: linear warmup, then linear decay to 0):
+   step         0: 0.000e+00
+   step     2,500: 2.500e-05
+   step     5,000: 5.000e-05
+   step    10,000: 9.900e-05
+   step   100,000: 9.000e-05
+   step   500,000: 5.000e-05
+   step   900,000: 1.000e-05
+   step 1,000,000: 0.000e+00
+
+GELU: largest gap between the exact form x*Phi(x) and the tanh formula of the released code: 4.7e-04
+   x = -3.0: ReLU +0.000   GELU -0.0040
+   x = -1.0: ReLU +0.000   GELU -0.1587
+   x = -0.5: ReLU +0.000   GELU -0.1543
+   x = +0.0: ReLU +0.000   GELU +0.0000
+   x = +0.5: ReLU +0.500   GELU +0.3457
+   x = +1.0: ReLU +1.000   GELU +0.8413
+   x = +3.0: ReLU +3.000   GELU +2.9960
+   lowest GELU value on [-4, 4]: -0.1700 at x = -0.75
+
+attention scores per sequence: 128^2 = 16,384, 512^2 = 262,144 -> 16x more for a 4x longer sequence
+per token: 4x more attention work at length 512

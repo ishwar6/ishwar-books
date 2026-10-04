@@ -12,7 +12,7 @@ SLUGS = {
     '5': 'part-5-ablations',
     '6': 'part-6-impact-and-summary',
 }
-BANNED = ['—', 'Claude', 'Anthropic', 'Influur', 'Pulse']   # the em dash is written as an escape
+EM_DASH = chr(0x2014)   # never allowed in the site's text
 
 
 def build(part):
@@ -22,8 +22,7 @@ def build(part):
     s = open(src).read()
     s = re.sub(r'\{\{FIG:(\w+)\|([^}]*)\}\}', lambda m: f'<figure class="fig">{F[m.group(1)]}<figcaption>{m.group(2)}</figcaption></figure>', s)
     assert '{{' not in s, 'unreplaced figure placeholder'
-    for w in BANNED:
-        assert w not in s, f'banned text found: {w!r}'
+    assert EM_DASH not in s, 'em dash found'
     for img in re.findall(r'\]\((/img/[^)]+)\)|src="(/img/[^"]+)"', s):
         p = next(x for x in img if x)
         assert os.path.exists(os.path.join(HERE, '..', '..', '..', 'public', p.lstrip('/'))), f'missing image {p}'

@@ -1,0 +1,8 @@
+CoNLL-2003: 5000 training sentences used, 3250 dev sentences; labels: ['O', 'B-PER', 'I-PER', 'B-ORG', 'I-ORG', 'B-LOC', 'I-LOC', 'B-MISC', 'I-MISC']
+features: 67634 train words, 51362 dev words, 13 layers x 768 numbers each, 34 s
+Embeddings                   dev F1 = 82.66   (seeds: 82.73, 82.42, 82.82; 113 s)
+Second-to-last hidden        dev F1 = 89.94   (seeds: 88.72, 90.25, 90.84; 127 s)
+Last hidden                  dev F1 = 88.64   (seeds: 88.13, 89.03, 88.77; 161 s)
+Weighted sum last four       dev F1 = 90.37   (seeds: 90.08, 90.00, 91.05; 311 s)
+Concat last four             dev F1 = 91.17   (seeds: 90.94, 91.41, 91.16; 484 s)
+Weighted sum all 12 layers   dev F1 = 90.49   (seeds: 91.28, 89.60, 90.59; 450 s)

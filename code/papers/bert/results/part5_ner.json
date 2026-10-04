@@ -1,0 +1,62 @@
+{
+ "n_train_sentences": 5000,
+ "n_dev_sentences": 3250,
+ "seeds": [
+  0,
+  1,
+  2
+ ],
+ "epochs": 4,
+ "classifier": "2-layer BiLSTM, 384 units per direction, Adam lr 1e-3, batch 32",
+ "model": "bert-base-cased (frozen)",
+ "results": {
+  "Embeddings": {
+   "scores": [
+    82.73,
+    82.42,
+    82.82
+   ],
+   "mean": 82.66
+  },
+  "Second-to-last hidden": {
+   "scores": [
+    88.72,
+    90.25,
+    90.84
+   ],
+   "mean": 89.94
+  },
+  "Last hidden": {
+   "scores": [
+    88.13,
+    89.03,
+    88.77
+   ],
+   "mean": 88.64
+  },
+  "Weighted sum last four": {
+   "scores": [
+    90.08,
+    90.0,
+    91.05
+   ],
+   "mean": 90.37
+  },
+  "Concat last four": {
+   "scores": [
+    90.94,
+    91.41,
+    91.16
+   ],
+   "mean": 91.17
+  },
+  "Weighted sum all 12 layers": {
+   "scores": [
+    91.28,
+    89.6,
+    90.59
+   ],
+   "mean": 90.49
+  }
+ }
+}

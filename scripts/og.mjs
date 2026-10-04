@@ -1,5 +1,6 @@
 // Run locally after adding a writing: npm run build && npx vite preview --port 4173, then
 // npx -y -p playwright node scripts/og.mjs   (writes public/og/<slug>.png; commit the images)
+// PORT=<n> picks another preview port.
 // Social preview cards (1200x630): one per writing (its cover + title) and one for the site.
 import { chromium } from 'playwright'
 import fs from 'node:fs'
@@ -8,7 +9,7 @@ fs.mkdirSync(OUT, { recursive: true })
 const manifest = JSON.parse(fs.readFileSync(new URL('../src/generated/manifest.json', import.meta.url).pathname, 'utf8'))
 const b = await chromium.launch()
 const p = await b.newPage({ viewport: { width: 1440, height: 1200 } })
-await p.goto('http://localhost:4173/writings'); await p.waitForTimeout(1200)
+await p.goto(`http://localhost:${process.env.PORT ?? 4173}/writings`); await p.waitForTimeout(1200)
 const covers = await p.evaluate(() => Object.fromEntries([...document.querySelectorAll('.writing-card')].map((c) => [c.querySelector('h3 a').getAttribute('href'), c.querySelector('.cover').innerHTML])))
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;')
 const card = (title, kicker, cover) => `<!doctype html><html><head><meta charset="utf-8"><style>
@@ -36,5 +37,21 @@ for (const w of manifest.writings) {
 const first = Object.values(covers)[0] ?? ''
 await shot(card('First-principles guides to LLM inference, RAG and GPUs', 'Writings and books', first), 'site.png')
 for (const bk of manifest.books) await shot(card(bk.title, 'Book', first), `book-${bk.slug}.png`)
+
+// research papers: a "sheet of paper" card in the paper theme's teal
+const paperArt = (short, lines) => `<svg viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#0d0e16"/>
+  <g transform="translate(790 70) rotate(4)"><rect width="330" height="440" rx="14" fill="#16303a" stroke="#4fc3d9" stroke-opacity=".5"/></g>
+  <g transform="translate(770 90)"><rect width="330" height="440" rx="14" fill="#f4f6f8"/>
+    <text x="34" y="92" font-family="Georgia, serif" font-size="64" font-weight="700" fill="#111">${esc(short)}</text>
+    ${Array.from({ length: lines }, (_, i) => `<rect x="34" y="${130 + i * 26}" width="${i % 3 === 2 ? 180 : 262}" height="9" rx="4" fill="${i === 3 || i === 4 ? '#ffdc33' : '#c9ced6'}"/>`).join('')}
+  </g></svg>`
+const papers = manifest.papers ?? []
+const paperCard = (title, kicker, short) => card(title, kicker, paperArt(short, 12)).replace('color:#8fb4ff', 'color:#4fc3d9')
+await shot(paperCard('Research papers, one section at a time', 'Research papers', 'BERT'), 'papers.png')
+for (const pp of papers) {
+  await shot(paperCard(`${pp.short}, explained`, `Research paper · ${pp.parts.length} parts`, pp.short), `paper-${pp.slug}.png`)
+  for (const x of pp.parts) await shot(paperCard(x.title, `${pp.short} · Part ${x.partNumber} of ${pp.parts.length}`, pp.short), `paper-${pp.slug}-${x.slug}.png`)
+}
 console.log(fs.readdirSync(OUT))
 await b.close()

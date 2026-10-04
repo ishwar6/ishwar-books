@@ -1,0 +1,19 @@
+1. the pre-trained NSP head on single pairs: probability of IsNext
+    0.9999  [paper A.1, labelled IsNext]  A: the man went to [MASK] store  |  B: he bought a gallon [MASK] milk
+    0.0011  [paper A.1, labelled NotNext]  A: the man [MASK] to the store  |  B: penguin [MASK] are flight ##less birds
+    1.0000  [ours, true next]  A: she opened the fridge.  |  B: there was nothing left but an old lemon.
+   3.5e-06  [ours, random]  A: she opened the fridge.  |  B: the treaty was signed in 1648 by both parties.
+    1.0000  [ours, true next]  A: the match was delayed by rain.  |  B: play finally started two hours late.
+   1.1e-05  [ours, random]  A: the match was delayed by rain.  |  B: photosynthesis turns light into chemical energy.
+
+2. NSP accuracy on 1000 real sentence pairs from 61 WikiText-103 test articles (one sentence each side, no masks)
+   IsNext pairs:  486 of 500 right (97.2%)
+   NotNext pairs: 478 of 500 right (95.6%)
+   overall:       96.4%
+
+3. cosine similarity of the raw final [CLS] vectors (no fine-tuning)
+   0.923  related    A man is playing a guitar on stage.  |  A musician performs a song for the crowd.
+   0.909  related    The stock market fell sharply today.  |  Share prices dropped a lot this afternoon.
+   0.766  unrelated  A man is playing a guitar on stage.  |  The stock market fell sharply today.
+   0.807  unrelated  Penguins cannot fly.  |  The invoice is due next Monday.
+   0.977  opposite   I loved this movie.  |  I hated this movie.

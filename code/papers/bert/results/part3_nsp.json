@@ -1,0 +1,83 @@
+{
+ "examples": [
+  {
+   "name": "paper A.1, labelled IsNext",
+   "a": "the man went to [MASK] store",
+   "b": "he bought a gallon [MASK] milk",
+   "p_isnext": 0.999908447265625
+  },
+  {
+   "name": "paper A.1, labelled NotNext",
+   "a": "the man [MASK] to the store",
+   "b": "penguin [MASK] are flight ##less birds",
+   "p_isnext": 0.0011452591279521585
+  },
+  {
+   "name": "ours, true next",
+   "a": "she opened the fridge.",
+   "b": "there was nothing left but an old lemon.",
+   "p_isnext": 0.9999922513961792
+  },
+  {
+   "name": "ours, random",
+   "a": "she opened the fridge.",
+   "b": "the treaty was signed in 1648 by both parties.",
+   "p_isnext": 3.4599165701365564e-06
+  },
+  {
+   "name": "ours, true next",
+   "a": "the match was delayed by rain.",
+   "b": "play finally started two hours late.",
+   "p_isnext": 0.999995231628418
+  },
+  {
+   "name": "ours, random",
+   "a": "the match was delayed by rain.",
+   "b": "photosynthesis turns light into chemical energy.",
+   "p_isnext": 1.0920017302851193e-05
+  }
+ ],
+ "accuracy": {
+  "n": 1000,
+  "docs": 61,
+  "isnext": 0.972,
+  "notnext": 0.956,
+  "all": 0.964,
+  "correct": {
+   "0": 486,
+   "1": 478
+  }
+ },
+ "cls_cosine": [
+  {
+   "kind": "related",
+   "a": "A man is playing a guitar on stage.",
+   "b": "A musician performs a song for the crowd.",
+   "cos": 0.9233194589614868
+  },
+  {
+   "kind": "related",
+   "a": "The stock market fell sharply today.",
+   "b": "Share prices dropped a lot this afternoon.",
+   "cos": 0.9093926548957825
+  },
+  {
+   "kind": "unrelated",
+   "a": "A man is playing a guitar on stage.",
+   "b": "The stock market fell sharply today.",
+   "cos": 0.7658836245536804
+  },
+  {
+   "kind": "unrelated",
+   "a": "Penguins cannot fly.",
+   "b": "The invoice is due next Monday.",
+   "cos": 0.8066678643226624
+  },
+  {
+   "kind": "opposite",
+   "a": "I loved this movie.",
+   "b": "I hated this movie.",
+   "cos": 0.9768989086151123
+  }
+ ]
+}

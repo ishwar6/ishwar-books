@@ -1,0 +1,19 @@
+Table 5 (Dev set): change in points
+                                                MNLI-m    QNLI    MRPC   SST-2   SQuAD
+cost of removing NSP                              -0.5    -3.5    -0.2    -0.1    -0.6
+cost of left-to-right instead of MLM              -1.8    -0.6    -9.0    -0.5   -10.1
+effect of adding a BiLSTM to the LTR model        +0.0    -0.2    -1.8    -0.5    +7.1
+
+Table 6 model sizes: parameters counted in a real BertModel (built on the meta device)
+ #L    #H  #A        params       formula  embeddings   ppl  MNLI-m  MRPC  SST-2
+  3   768  12    45,691,392    45,691,392  23,837,184  5.84    77.9  79.8   88.4
+  6   768   3    66,955,008    66,955,008  23,837,184  5.24    80.6  82.2   90.7
+  6   768  12    66,955,008    66,955,008  23,837,184  4.68    81.9  84.8   91.3
+ 12   768  12   109,482,240   109,482,240  23,837,184  3.99    84.4  86.7   92.9
+ 12  1024  16   183,987,200   183,987,200  31,782,912  3.54    85.7  86.9   93.3
+ 24  1024  16   335,141,888   335,141,888  31,782,912  3.23    86.6  87.8   93.7
+(includes the 768x768 or 1024x1024 pooler layer; the formula matches the count exactly for every row)
+
+WikiText-2 test: 261,428 WordPiece tokens -> 512 sequences of 512 ([CLS] + 510 + [SEP])
+predicted positions: 38,984 of 261,120 (14.93%): 31,282 [MASK], 3,947 random, 3,755 unchanged
+mean cross-entropy = 1.9967 nats -> masked-LM perplexity = 7.36   (top-1 accuracy 63.6%)

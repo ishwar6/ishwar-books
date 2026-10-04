@@ -1,0 +1,238 @@
+{
+ "limit": {
+  "position_rows": 512,
+  "hidden": 768,
+  "long_tokens": 722,
+  "kept": 512,
+  "error": "RuntimeError: The size of tensor a (722) must match the size of tensor b (512) at non-singleton dimension 1"
+ },
+ "gap": {
+  "cls": {
+   "related": 0.91,
+   "unrelated": 0.815,
+   "lowest_related": 0.851,
+   "highest_unrelated": 0.873
+  },
+  "mean": {
+   "related": 0.758,
+   "unrelated": 0.566,
+   "lowest_related": 0.672,
+   "highest_unrelated": 0.598
+  },
+  "st": {
+   "related": 0.612,
+   "unrelated": -0.029,
+   "lowest_related": 0.541,
+   "highest_unrelated": 0.013
+  }
+ },
+ "similarity": [
+  {
+   "a": "A man is playing a guitar.",
+   "b": "A person is making music.",
+   "kind": "related",
+   "cls": 0.851,
+   "mean": 0.746,
+   "st": 0.59
+  },
+  {
+   "a": "How do I reset my password?",
+   "b": "I forgot my login details.",
+   "kind": "related",
+   "cls": 0.929,
+   "mean": 0.672,
+   "st": 0.541
+  },
+  {
+   "a": "The weather is lovely today.",
+   "b": "It is sunny and warm outside.",
+   "kind": "related",
+   "cls": 0.951,
+   "mean": 0.857,
+   "st": 0.705
+  },
+  {
+   "a": "A man is playing a guitar.",
+   "b": "The stock market fell sharply.",
+   "kind": "unrelated",
+   "cls": 0.776,
+   "mean": 0.584,
+   "st": -0.064
+  },
+  {
+   "a": "How do I reset my password?",
+   "b": "Penguins live in Antarctica.",
+   "kind": "unrelated",
+   "cls": 0.795,
+   "mean": 0.517,
+   "st": -0.035
+  },
+  {
+   "a": "The weather is lovely today.",
+   "b": "He parked the truck in the garage.",
+   "kind": "unrelated",
+   "cls": 0.873,
+   "mean": 0.598,
+   "st": 0.013
+  }
+ ],
+ "st_model": {
+  "name": "sentence-transformers/all-MiniLM-L6-v2",
+  "model_type": "bert",
+  "layers": 6,
+  "hidden": 384,
+  "params": 22713216
+ },
+ "conditional": [
+  {
+   "first": "new",
+   "top3": [
+    [
+     "york",
+     0.979
+    ],
+    [
+     "orleans",
+     0.012
+    ],
+    [
+     "jersey",
+     0.003
+    ]
+   ]
+  },
+  {
+   "first": "los",
+   "top3": [
+    [
+     "angeles",
+     1.0
+    ],
+    [
+     "vegas",
+     0.0
+    ],
+    [
+     "'",
+     0.0
+    ]
+   ]
+  },
+  {
+   "first": "hong",
+   "top3": [
+    [
+     "kong",
+     0.999
+    ],
+    [
+     "##kong",
+     0.001
+    ],
+    [
+     "china",
+     0.0
+    ]
+   ]
+  }
+ ],
+ "two_masks": [
+  {
+   "sentence": "i flew from [MASK] [MASK] to london last week.",
+   "top5": [
+    [
+     [
+      "new",
+      0.042
+     ],
+     [
+      "the",
+      0.037
+     ],
+     [
+      "chicago",
+      0.037
+     ],
+     [
+      "la",
+      0.028
+     ],
+     [
+      "portland",
+      0.019
+     ]
+    ],
+    [
+     [
+      "town",
+      0.068
+     ],
+     [
+      "york",
+      0.044
+     ],
+     [
+      "beach",
+      0.025
+     ],
+     [
+      "city",
+      0.021
+     ],
+     [
+      "##town",
+      0.017
+     ]
+    ]
+   ]
+  }
+ ],
+ "ner": {
+  "model": "dslim/bert-base-NER",
+  "text": "Ada Lovelace was born in London and worked with Charles Babbage on the Analytical Engine.",
+  "entities": [
+   {
+    "word": "Ada Lovelace",
+    "group": "PER",
+    "score": 0.999
+   },
+   {
+    "word": "London",
+    "group": "LOC",
+    "score": 0.999
+   },
+   {
+    "word": "Charles Babbage",
+    "group": "PER",
+    "score": 0.932
+   },
+   {
+    "word": "Analy",
+    "group": "ORG",
+    "score": 0.723
+   },
+   {
+    "word": "Engine",
+    "group": "ORG",
+    "score": 0.781
+   }
+  ],
+  "analytical_engine_tokens": [
+   {
+    "token": "Ana",
+    "label": "B-ORG",
+    "score": 0.901
+   },
+   {
+    "token": "##ly",
+    "label": "I-ORG",
+    "score": 0.544
+   },
+   {
+    "token": "Engine",
+    "label": "I-ORG",
+    "score": 0.781
+   }
+  ]
+ }
+}

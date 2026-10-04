@@ -33,7 +33,7 @@ export function PaperSheet({ paper, compact = false }: { paper: Paper; compact?:
         {paper.arxiv && <a href={arxivAbs(paper.arxiv)} target="_blank" rel="noreferrer">arXiv page <Arrow /></a>}
         {paper.arxiv && <a href={arxivPdf(paper.arxiv)} target="_blank" rel="noreferrer">PDF <Arrow /></a>}
         {paper.code && <a href={paper.code} target="_blank" rel="noreferrer">Original code <Arrow /></a>}
-        {!compact && <span className="paper-time">{paper.parts.length} parts · about {paper.minutes} min of reading</span>}
+        {!compact && <span className="paper-time">{paper.parts.length} {paper.parts.length === 1 ? 'part' : 'parts'} · about {paper.minutes} min of reading</span>}
       </div>
       {!compact && paper.learn.length > 0 && (
         <div className="paper-learn">
@@ -85,7 +85,7 @@ export function PaperCard({ paper }: { paper: Paper }) {
         <div className="paper-authors">{authorLine(paper.authors)}</div>
         <p>{paper.description}</p>
         <div className="paper-card-foot">
-          <span>{paper.parts.length} parts · {paper.minutes} min</span>
+          <span>{paper.parts.length} {paper.parts.length === 1 ? 'part' : 'parts'} · {paper.minutes} min of reading</span>
           {first && <Link to={`/${first.route}`} className="btn primary">Start with Part 1</Link>}
         </div>
       </div>
