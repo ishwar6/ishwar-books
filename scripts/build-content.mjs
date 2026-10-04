@@ -163,7 +163,53 @@ function remarkCallouts() {
       const isDef = ['definition', 'define', 'term'].includes(kind)
       node.children.unshift({ type: 'paragraph', data: { hProperties: { className: ['callout-title'] } }, children: [{ type: 'text', value: title }] })
       if (isDef) node.data.hProperties.className = ['callout', 'callout-definition']
+      if (kind === 'paper') shapePaperBox(node, title)
     })
+}
+
+/** "From the paper" boxes: split the title into the paper's name and location pills, and tag the
+ *  screenshot and the Context / What it says / Why it matters paragraphs so CSS can lay them out. */
+// paper crops are rendered at 190 dpi; showing them at 1/1.6 of their pixel width makes the paper's text about 16px
+const PAPER_SCALE = 1.6
+function pngWidth(url) {
+  try {
+    const buf = fs.readFileSync(path.join(ROOT, 'public', decodeURI(url.replace(BASE, '/'))))
+    return buf.readUInt32BE(16)
+  } catch { return 0 }
+}
+const PAPER_LABELS = { 'Context:': ['pp-ctx', 'Where this is'], 'What it says:': ['pp-says', 'What it says'], 'Why it matters:': ['pp-why', 'Why it matters'] }
+const el = (tag, cls, children) => ({ type: 'pp', data: { hName: tag, hProperties: { className: cls } }, children })
+function shapePaperBox(node, title) {
+  const [name, ...where] = title.split(' · ').map((t) => t.trim())
+  node.children[0] = el('div', ['pp-head'], [
+    el('span', ['pp-kicker'], [{ type: 'text', value: 'From the paper' }]),
+    el('span', ['pp-name'], [{ type: 'text', value: name }]),
+    ...(where.length ? [el('span', ['pp-where'], where.map((w) => el('span', ['pp-pill'], [{ type: 'text', value: w }])))] : []),
+  ])
+  for (const p of node.children.slice(1)) {
+    if (p.type !== 'paragraph') continue
+    const kids = p.children.filter((c) => !(c.type === 'text' && !c.value.trim()))
+    const isShot = kids.length && kids.every((c) => c.type === 'image' || (c.type === 'link' && c.children.length === 1 && c.children[0].type === 'image'))
+    if (isShot) {
+      p.data = { hName: 'div', hProperties: { className: ['pp-shot'] } }
+      p.children = kids.map((c) => {
+        if (c.type === 'link') c.data = { hProperties: { className: ['pp-zoom'], title: 'Click to enlarge' } }
+        const img = c.type === 'image' ? c : c.children[0]
+        const w = pngWidth(img.url)
+        if (w) img.data = { hProperties: { width: Math.round(w / PAPER_SCALE), loading: 'lazy' } }
+        return c
+      })
+      continue
+    }
+    const first = p.children[0]
+    const label = first?.type === 'strong' && first.children[0]?.type === 'text' ? PAPER_LABELS[first.children[0].value.trim()] : null
+    if (label) {
+      p.data = { hName: 'div', hProperties: { className: ['pp-note', label[0]] } }
+      p.children = [el('span', ['pp-label'], [{ type: 'text', value: label[1] }]), { type: 'paragraph', children: p.children.slice(1).map((c, i) => (i === 0 && c.type === 'text' ? { ...c, value: c.value.replace(/^\s+/, '').replace(/^[a-z]/, (ch) => ch.toUpperCase()) } : c)) }]
+      continue
+    }
+    if (kids.length === 1 && kids[0].type === 'link') p.data = { hProperties: { className: ['pp-link'] } }
+  }
 }
 
 /** Paper section markers:  ## Masked LM {§3.1}  → <h2 data-sec="§3.1">Masked LM</h2> (shown as a "Paper §3.1" badge) */

@@ -41,6 +41,20 @@ export default function Prose({ html }: { html: string }) {
         })
         return
       }
+      const zoom = target.closest<HTMLAnchorElement>('a.pp-zoom')
+      if (zoom && !e.metaKey && !e.ctrlKey && !e.shiftKey) {     // paper screenshot: open it full screen
+        e.preventDefault()
+        const box = document.createElement('div')
+        box.className = 'pp-lightbox'
+        box.innerHTML = `<img src="${zoom.getAttribute('href')}" alt=""><span>Click or press Esc to close</span>`
+        box.querySelector('img')!.alt = zoom.querySelector('img')?.alt ?? ''
+        const close = () => { box.remove(); window.removeEventListener('keydown', onKey) }
+        const onKey = (ev: KeyboardEvent) => { if (ev.key === 'Escape') close() }
+        box.addEventListener('click', close)
+        window.addEventListener('keydown', onKey)
+        document.body.appendChild(box)
+        return
+      }
       const a = target.closest<HTMLAnchorElement>('a[href]')
       if (!a || a.target === '_blank' || e.metaKey || e.ctrlKey || e.shiftKey) return
       const href = a.getAttribute('href')!

@@ -330,21 +330,80 @@
 /* screenshots of papers: keep them as white "paper" cards with a frame in every theme */
 .prose .fig.paper img { background: #fff; padding: 14px 18px; border: 1px solid var(--border); border-radius: var(--radius); max-width: 100%; height: auto; box-sizing: border-box; margin: 0.6em auto; }
 
-/* "From the paper" boxes: a highlighted excerpt of a research paper, with where it is and what it means */
+/* "From the paper" boxes: a highlighted excerpt of a research paper, then where it is, what it says and why it matters.
+   Built from the markdown by shapePaperBox() in scripts/build-content.mjs. */
 .prose .callout-paper {
-  --c: #4fc3d9;
-  --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 2h8l6 6v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1Zm7 1.5V9h5.5L13 3.5ZM8 12v1.5h8V12H8Zm0 3.5V17h8v-1.5H8Z'/%3E%3C/svg%3E");
-  background: rgba(79, 195, 217, 0.06);
+  --c: #5cc8dc; --why: #5fd4b0;
+  --pp-line: rgba(92, 200, 220, 0.22); --pp-soft: rgba(92, 200, 220, 0.07);
+  margin: 2.6em 0; padding: 0; overflow: hidden; font-size: 1em;
+  border: 1px solid var(--pp-line); border-radius: 16px; background: var(--bg-soft);
 }
-.prose .callout-paper .callout-title::after {
-  content: 'From the paper'; margin-left: auto; font-size: 0.72em; font-weight: 700; letter-spacing: 0.08em;
-  text-transform: uppercase; color: var(--c); opacity: 0.85;
+:root[data-theme='light'] .prose .callout-paper {
+  --c: #0f7286; --why: #12805c; --pp-line: rgba(15, 114, 134, 0.22); --pp-soft: rgba(15, 114, 134, 0.05);
+  background: #fbfcfd;
 }
-.prose .callout-paper img {
-  display: block; width: 100%; height: auto; box-sizing: border-box; margin: 0.4em 0 0.9em;
-  background: #fff; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius);
+.prose .callout-paper > :last-child { margin-bottom: 0; }
+.prose .pp-head {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px;
+  padding: 16px 24px 15px; background: var(--pp-soft); border-bottom: 1px solid var(--pp-line);
 }
-.prose .callout-paper p > strong:first-child {
-  color: var(--c); font-size: 0.78em; letter-spacing: 0.07em; text-transform: uppercase; margin-right: 0.3em;
+.prose .pp-kicker {
+  flex-basis: 100%; display: flex; align-items: center; gap: 8px;
+  font-size: 11.5px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--c);
 }
-:root[data-theme='light'] .prose .callout-paper { --c: #11809a; background: rgba(17, 128, 154, 0.05); }
+.prose .pp-kicker::before {
+  content: ''; width: 15px; height: 15px; background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 2h8l6 6v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1Zm7 1.5V9h5.5L13 3.5ZM8 12v1.5h8V12H8Zm0 3.5V17h8v-1.5H8Z'/%3E%3C/svg%3E") center / contain no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 2h8l6 6v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1Zm7 1.5V9h5.5L13 3.5ZM8 12v1.5h8V12H8Zm0 3.5V17h8v-1.5H8Z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.prose .pp-name { font-size: 1.08em; font-weight: 700; color: var(--text-strong); margin-right: 4px; line-height: 1.35; }
+.prose .pp-where { display: flex; flex-wrap: wrap; gap: 6px; }
+.prose .pp-pill {
+  font-family: var(--font-mono); font-size: 12px; font-weight: 600; line-height: 1.5; color: var(--c);
+  padding: 2px 10px; border-radius: 999px; border: 1px solid var(--pp-line); background: var(--bg);
+}
+.prose .pp-shot { display: grid; justify-items: center; gap: 16px; padding: 26px 24px 8px; }
+.prose .pp-zoom { position: relative; display: block; max-width: 100%; border-radius: 10px; cursor: zoom-in; }
+.prose .pp-shot img {
+  display: block; max-width: 100%; height: auto; box-sizing: border-box; margin: 0;
+  background: #fff; padding: 18px 22px; border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+:root[data-theme='light'] .prose .pp-shot img { box-shadow: 0 6px 22px rgba(15, 23, 42, 0.12), 0 0 0 1px rgba(15, 23, 42, 0.08); }
+.prose .pp-zoom::after {
+  content: 'Click to enlarge'; position: absolute; right: 10px; bottom: 10px;
+  font-size: 11.5px; font-weight: 600; color: #1d2433; background: rgba(255, 255, 255, 0.94);
+  padding: 4px 9px; border-radius: 6px; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2); opacity: 0; transition: opacity 0.15s;
+}
+.prose .pp-zoom:hover::after, .prose .pp-zoom:focus-visible::after { opacity: 1; }
+.prose .pp-note { padding: 18px 28px 0; }
+.prose .pp-label {
+  display: block; margin-bottom: 7px; font-size: 11.5px; font-weight: 800; letter-spacing: 0.11em;
+  text-transform: uppercase; color: var(--c);
+}
+.prose .pp-note p { margin: 0; font-size: 1.02em; line-height: 1.78; color: var(--text); }
+.prose .pp-says p { padding-left: 16px; border-left: 3px solid var(--c); color: var(--text-strong); }
+.prose .pp-why {
+  margin: 22px 24px 0; padding: 16px 20px 17px; border-radius: 12px;
+  background: color-mix(in srgb, var(--why) 9%, transparent); border: 1px solid color-mix(in srgb, var(--why) 28%, transparent);
+}
+.prose .pp-why .pp-label { color: var(--why); }
+.prose .callout-paper > .pp-link { margin: 0; padding: 16px 28px 0; font-size: 0.95em; }
+.prose .callout-paper::after { content: ''; display: block; height: 24px; }
+@media (max-width: 640px) {
+  .prose .pp-head { padding: 14px 16px; }
+  .prose .pp-shot { padding: 18px 12px 4px; }
+  .prose .pp-shot img { padding: 10px 12px; }
+  .prose .pp-note { padding: 16px 18px 0; }
+  .prose .pp-why { margin: 18px 14px 0; padding: 14px 16px; }
+  .prose .callout-paper > .pp-link { padding: 14px 18px 0; }
+}
+
+/* full-screen zoom for paper screenshots */
+.pp-lightbox {
+  position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 24px;
+  background: rgba(6, 8, 12, 0.88); backdrop-filter: blur(3px); cursor: zoom-out; animation: pp-fade 0.15s ease;
+}
+.pp-lightbox img { max-width: min(1400px, 100%); max-height: 100%; object-fit: contain; background: #fff; padding: 16px; border-radius: 10px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); }
+.pp-lightbox span { position: fixed; top: 16px; right: 20px; color: #fff; font-size: 13px; opacity: 0.8; }
+@keyframes pp-fade { from { opacity: 0; } to { opacity: 1; } }

@@ -134,9 +134,6 @@
 .toc .toc-sec { font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: var(--paper-ink, var(--accent)); margin-right: 6px; }
 
 /* the paper excerpt boxes stand out more inside the paper theme */
-.paper-theme .prose .callout-paper { --c: var(--paper-ink); border-width: 1px 1px 1px 5px; }
-.paper-theme .prose .callout-paper img { box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25); }
-:root[data-theme='light'] .paper-theme .prose .callout-paper img { box-shadow: 0 1px 6px rgba(15, 23, 42, 0.12); }
 
 /* Key takeaways at the end of each part */
 .prose .callout-takeaways {
@@ -182,6 +179,4 @@
 .fig .edge-on { stroke: var(--h2); stroke-width: 2; fill: none; }
 
 /* paper screenshots keep their natural size (no blurry upscaling of one-column crops) */
-.paper-theme .prose .callout-paper img { width: auto; max-width: 100%; }
 .paper-theme .prose > h2:first-child { border-top: 0; padding-top: 0; }
-@media (max-width: 640px) { .prose .callout-paper .callout-title::after { display: none; } }
