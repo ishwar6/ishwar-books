@@ -1,0 +1,31 @@
+(a) Attention weights per head per layer: every token looks at every token, so n tokens need n x n weights
+    tokens are                                n            n x n  float32 memory
+    32 x 32 CIFAR pixels                  1,024        1,048,576         4.19 MB
+    224 x 224 ImageNet pixels            50,176    2,517,630,976        10.07 GB
+    ViT-B/32 patches + [class] (7x7+1)       50            2,500         10.0 kB
+    ViT-B/16 patches + [class] (14x14+1)      197           38,809        155.2 kB
+    ViT-B/16 at 384 px (24x24+1)            577          332,929         1.33 MB
+    pixels / patch tokens = 50,176 / 197 = 254.7 x more tokens, so 64,872 x more attention weights
+    ViT-B/16 has 12 heads x 12 layers = 144 attention tables of 197 x 197 = 5,588,496 weights for one image
+
+(b) A convolution is translation equivariant: shift the input, the output shifts by the same amount
+    toy image (12, 12), bright square at rows 3-7, columns 2-6; filter (3, 3) (vertical edges)
+    filter weights: [[-1.0, 0.0, 1.0], [-2.0, 0.0, 2.0], [-1.0, 0.0, 1.0]]
+    output (10, 10); strongest response in the original at column 0, in the shifted at column 2
+    max |shifted output moved back by 2 - original output| = 0.0
+    row 5 of the output, original:    4    4    0    0    0   -4   -4    0    0    0
+    row 5 of the output, shifted:     0    0    4    4    0    0    0   -4   -4    0
+    the same filter weights (9 numbers) are used at every one of the 100 output positions (weight sharing)
+
+(c) Patch tokens are not shift equivariant: the real cat picture, shifted right by k pixels, through ViT-B/16 patch embeddings
+    patch embedding layer: Conv2d(3, 768, kernel_size=(16, 16), stride=(16, 16))
+    patch vectors: (196, 768) = 196 patches x 768 numbers, arranged on a 14 x 14 grid
+     shift k  grid moved back  mean cosine  min cosine   ViT-B/16 top-1             ResNet-50 top-1           
+           0                0        1.000       1.000   Egyptian cat 0.937         tiger cat 0.942           
+           1                0        0.935       0.643   Egyptian cat 0.888         tiger cat 0.939           
+           4                0        0.649      -0.219   Egyptian cat 0.861         tiger cat 0.847           
+           8                0        0.507      -0.353   Egyptian cat 0.939         tiger cat 0.826           
+          12                0        0.457      -0.446   Egyptian cat 0.847         tiger cat 0.607           
+          16                1        1.000       1.000   Egyptian cat 0.908         tiger cat 0.737           
+    for k = 16 compared at the SAME grid position (no moving back): mean cosine = 0.428  (each slot now holds its left neighbour)
+    a 16-pixel shift moves whole patches, so the token vectors are the same, just one slot over; smaller shifts change every vector

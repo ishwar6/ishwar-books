@@ -1,0 +1,105 @@
+{
+ "picture": {
+  "width": 640,
+  "height": 480,
+  "saved": "480x360"
+ },
+ "vit": {
+  "shape": [
+   1,
+   3,
+   224,
+   224
+  ],
+  "numbers": 150528,
+  "patch": 16,
+  "n_patches": 196,
+  "per_patch": 768,
+  "seq_len": 197,
+  "hidden": 768,
+  "layers": 12,
+  "heads": 12,
+  "params": 86567656,
+  "top5": [
+   [
+    "Egyptian cat",
+    0.9374
+   ],
+   [
+    "tabby",
+    0.0384
+   ],
+   [
+    "tiger cat",
+    0.0144
+   ],
+   [
+    "lynx",
+    0.0033
+   ],
+   [
+    "Siamese cat",
+    0.0007
+   ]
+  ]
+ },
+ "resnet": {
+  "shape": [
+   1,
+   3,
+   224,
+   224
+  ],
+  "params": 25557032,
+  "stages": [
+   [
+    64,
+    56,
+    56
+   ],
+   [
+    256,
+    56,
+    56
+   ],
+   [
+    512,
+    28,
+    28
+   ],
+   [
+    1024,
+    14,
+    14
+   ],
+   [
+    2048,
+    7,
+    7
+   ]
+  ],
+  "top5": [
+   [
+    "tiger cat",
+    0.9416
+   ],
+   [
+    "tabby",
+    0.0344
+   ],
+   [
+    "remote control",
+    0.0016
+   ],
+   [
+    "Egyptian cat",
+    0.0014
+   ],
+   [
+    "jinrikisha",
+    0.0008
+   ]
+  ]
+ },
+ "agree": false
+}
