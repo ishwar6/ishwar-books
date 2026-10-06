@@ -454,16 +454,16 @@ a.project-card:hover { transform: translateY(-2px); }
 .map-key i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
 .map-wrap { position: relative; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); padding: 8px; }
 .map-svg { width: 100%; height: auto; display: block; }
-.map-edge { stroke: var(--border); stroke-width: 1.6; transition: stroke 0.15s, opacity 0.15s; }
-.map-edge.on { stroke: var(--text); stroke-width: 2.4; }
+.map-edge { stroke: #8a8c9a; stroke-opacity: 0.45; stroke-width: 1.6; transition: stroke 0.15s, opacity 0.15s; }
+.map-edge.on { stroke: #c9cbd6; stroke-opacity: 1; stroke-width: 2.4; }
 .map-edge.dim { opacity: 0.25; }
 .map-node { cursor: pointer; transition: opacity 0.15s; outline: none; }
 .map-node.dim { opacity: 0.22; }
 .map-node .map-halo { opacity: 0; transition: opacity 0.15s; }
 .map-node:hover .map-halo, .map-node.sel .map-halo, .map-node:focus-visible .map-halo { opacity: 0.28; }
-.map-node circle { stroke: var(--surface); stroke-width: 2; }
-.map-label { font-size: 13px; font-weight: 600; fill: var(--text-strong); pointer-events: none; }
-.map-label-bg { fill: var(--surface); opacity: 0.88; pointer-events: none; }
+.map-node circle { stroke: #ffffff; stroke-opacity: 0.35; stroke-width: 2; }
+.map-label { font-size: 13px; font-weight: 600; fill: #ffffff; pointer-events: none; }
+.map-label-bg { fill: #15161f; fill-opacity: 0.92; stroke: #ffffff; stroke-opacity: 0.14; pointer-events: none; }
 .map-panel { position: absolute; right: 18px; top: 18px; width: 260px; padding: 14px 16px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); box-shadow: var(--shadow); pointer-events: none; opacity: 0; transition: opacity 0.15s; }
 .map-panel.show { opacity: 1; pointer-events: auto; }
 .map-panel h3 { margin: 8px 0 6px; font-size: 17px; color: var(--text-strong); }
