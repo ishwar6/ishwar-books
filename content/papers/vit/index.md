@@ -35,7 +35,7 @@ The Vision Transformer (ViT) became the base of most of today's image models and
 Each part follows the paper's own sections:
 
 1. **[The Big Idea: An Image Is Worth 16×16 Words](part-1-the-big-idea.md)**: the title, the Abstract and §1. Why convolutions dominated, what a patch is, and the claim that data beats built-in assumptions.
-2. **Inside ViT: Patches, Embeddings and the Encoder** (coming soon): §2, §3.1, Figure 1, Equations 1 to 4 and Appendix A. The related work, and every step from pixels to a class prediction, with the real model's numbers.
+2. **[Inside ViT: Patches, Embeddings and the Encoder](part-2-the-model.md)**: §2, §3.1, Figure 1, Equations 1 to 4 and Appendix A. The related work, and every step from pixels to a class prediction, with the real model's numbers.
 3. **Fine-tuning, Higher Resolution and the Setup** (coming soon): §3.2, §4.1, Tables 1, 3 and 4, Appendix B.1. How a pre-trained ViT is adapted, the datasets, the baselines, and the training recipe.
 4. **Results: Beating Big CNNs, and How Much Data It Takes** (coming soon): §4.2, §4.3, Table 2, Figures 2 to 4, Table 5, Appendix D.1, D.9 and D.10. Every result table and what it proves.
 5. **Scaling, Looking Inside ViT, and Self-supervision** (coming soon): §4.4 to §4.6, Figures 5 to 7, Table 6, Appendix B.1.2 and D.2 to D.8. Compute versus accuracy, what the model learns, and masked patch prediction.

@@ -1,0 +1,111 @@
+== Eq. 5 to 8 on a tiny example: N = 4 tokens, D = 6, k = 2 heads, D_h = D/k = 3 ==
+  z (the input, one row per token)  shape (4, 6)
+       t0      0      1      0      0      1      0
+       t1      0      1      1      1      2      1
+       t2      1      1      1      0      0      0
+       t3      2      2      2      1      2      1
+-- head 1 --
+  U_qkv (head 1): D x 3 D_h  shape (6, 9)
+               0      1      0      0      0      0     -1      1      0
+               1     -1      1      0      1      0      0      0      1
+               0      1      0     -1      1      1     -1      1      0
+               1      1     -1     -1      0     -1     -1     -1      0
+               1      0      1      1     -1      0      0     -1     -1
+               0     -1     -1      1      0     -1      0      0     -1
+  [q, k, v] = z U_qkv  (the first 3 columns are q, the next 3 k, the last 3 v)  shape (4, 9)
+       t0      2     -1      2      1      0      0      0     -1      0
+       t1      4      0      1      1      0     -1     -2     -2     -2
+       t2      1      1      1     -1      2      1     -2      2      1
+       t3      5      2      2      0      2      0     -5      1     -1
+  q k^T  (row i = query of token i, column j = key of token j)  shape (4, 4)
+       t0      2      0     -2     -2
+       t1      4      3     -3      0
+       t2      1      0      2      2
+       t3      5      3      1      4
+  q k^T / sqrt(D_h) = q k^T / 1.732  shape (4, 4)
+       t0  1.155  0.000 -1.155 -1.155
+       t1  2.309  1.732 -1.732  0.000
+       t2  0.577  0.000  1.155  1.155
+       t3  2.887  1.732  0.577  2.309
+  A = softmax(row by row)  shape (4, 4)
+       t0  0.661  0.208  0.066  0.066
+       t1  0.596  0.335  0.010  0.059
+       t2  0.195  0.110  0.348  0.348
+       t3  0.506  0.160  0.050  0.284
+    row sums: [1.0, 1.0, 1.0, 1.0]
+  SA(z) = A v  (row i = weighted average of the value rows, weights = row i of A)  shape (4, 3)
+       t0 -0.876 -0.880 -0.416
+       t1 -0.986 -1.185 -0.718
+       t2 -2.653  0.629 -0.219
+       t3 -1.840 -0.440 -0.553
+-- head 2 --
+  U_qkv (head 2): D x 3 D_h  shape (6, 9)
+               0      0      0      0     -1     -1      0     -1      0
+               0     -1      1     -1      1      1      1      1      0
+              -1      1      1      0      1      0     -1      1     -1
+               0     -1      0      1      1      0      1     -1      1
+               0      0      0      0      0      0      0      0      1
+              -1     -1     -1     -1      1      1      0     -1     -1
+  [q, k, v] = z U_qkv  (the first 3 columns are q, the next 3 k, the last 3 v)  shape (4, 9)
+       t0      0     -1      1     -1      1      1      1      1      1
+       t1     -2     -2      1     -1      4      2      1      0      1
+       t2     -1      0      2     -1      1      0      0      1     -1
+       t3     -3     -2      3     -2      4      1      1      0      0
+  q k^T  (row i = query of token i, column j = key of token j)  shape (4, 4)
+       t0      0     -2     -1     -3
+       t1      1     -4      0     -3
+       t2      3      5      1      4
+       t3      4      1      1      1
+  q k^T / sqrt(D_h) = q k^T / 1.732  shape (4, 4)
+       t0  0.000 -1.155 -0.577 -1.732
+       t1  0.577 -2.309  0.000 -1.732
+       t2  1.732  2.887  0.577  2.309
+       t3  2.309  0.577  0.577  0.577
+  A = softmax(row by row)  shape (4, 4)
+       t0  0.487  0.153  0.273  0.086
+       t1  0.583  0.032  0.327  0.058
+       t2  0.160  0.506  0.050  0.284
+       t3  0.653  0.116  0.116  0.116
+    row sums: [1.0, 1.0, 1.0, 1.0]
+  SA(z) = A v  (row i = weighted average of the value rows, weights = row i of A)  shape (4, 3)
+       t0  0.727  0.760  0.367
+       t1  0.673  0.910  0.288
+       t2  0.950  0.210  0.615
+       t3  0.884  0.769  0.653
+-- Eq. 8 --
+  [SA_1(z); SA_2(z)]  (the two heads side by side: 4 x 6)  shape (4, 6)
+       t0 -0.876 -0.880 -0.416  0.727  0.760  0.367
+       t1 -0.986 -1.185 -0.718  0.673  0.910  0.288
+       t2 -2.653  0.629 -0.219  0.950  0.210  0.615
+       t3 -1.840 -0.440 -0.553  0.884  0.769  0.653
+  U_msa: k D_h x D = 6 x 6  shape (6, 6)
+               0     -1      0      0      0      0
+               0      1      0     -1     -1     -1
+              -1     -1      0      1      1      0
+               1      0      0      0     -1     -1
+               0      0      0     -1     -1     -1
+               1     -1      0      1      0      1
+  MSA(z) = [SA_1(z); SA_2(z)] U_msa  shape (4, 6)
+       t0  1.510  0.045  0.000  0.070 -1.023 -0.240
+       t1  1.679  0.231  0.000 -0.155 -1.116 -0.110
+       t2  1.784  2.885  0.000 -0.442 -2.007 -1.173
+       t3  2.091  1.299  0.000 -0.228 -1.766 -0.560
+
+  check one entry by hand (head 1, row t0): exp of the scaled scores = [3.173, 1.0, 0.315, 0.315], sum = 4.803
+  A[t0, t0] = 3.173 / 4.803 = 0.661   (printed above: 0.661)
+
+== permutation equivariance: shuffle the input rows, the output rows shuffle the same way ==
+  new order of the tokens: ['t2', 't0', 't3', 't1']
+  MSA(z) in the original order  shape (4, 6)
+       t0  1.510  0.045  0.000  0.070 -1.023 -0.240
+       t1  1.679  0.231  0.000 -0.155 -1.116 -0.110
+       t2  1.784  2.885  0.000 -0.442 -2.007 -1.173
+       t3  2.091  1.299  0.000 -0.228 -1.766 -0.560
+  MSA(z shuffled)  shape (4, 6)
+       t2  1.784  2.885  0.000 -0.442 -2.007 -1.173
+       t0  1.510  0.045  0.000  0.070 -1.023 -0.240
+       t3  2.091  1.299  0.000 -0.228 -1.766 -0.560
+       t1  1.679  0.231  0.000 -0.155 -1.116 -0.110
+  MSA(z shuffled) == MSA(z) with its rows shuffled the same way: True   (max |difference| 4.8e-07)
+  so without position embeddings the model cannot tell where a patch came from: only the set of patches matters.
+  with a position row added before attention (z + E_pos), the shuffled run no longer matches: max |difference| 3.875

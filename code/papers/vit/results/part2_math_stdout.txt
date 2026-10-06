@@ -1,0 +1,123 @@
+== 0. the model and the picture ==
+  checkpoint: google/vit-base-patch16-224   D=768 L=12 heads=12 D_h=64 MLP=3072 P=16 C=3
+  picture: 640x480 photo of two cats, resized to 224x224; x shape (3, 224, 224) (C, H, W), values in [-1.00, 0.99]
+  N = HW / P^2 = 224*224 / 16^2 = 50176 / 256 = 196 patches, each P^2*C = 16*16*3 = 768 numbers
+
+== 1. cut x (3, 224, 224) into 196 patches of 16x16x3 and flatten each to 768 numbers ==
+  x.unfold -> (3, 14, 14, 16, 16)  (channels, 14 rows of patches, 14 columns, 16, 16)
+  x_p = flattened patches: (196, 768)   (N = 196 patches, P^2*C = 768 numbers each)
+  patch 0 (top-left corner), first 8 of its 768 numbers: [  0.114,   0.169,   0.184,   0.200,   0.208,   0.239,   0.231,   0.200]
+  patch 0, number 0 is red channel, pixel (0,0): x[0,0,0] = 0.114; number 256 is green (0,0): -0.804; number 512 is blue (0,0): -0.545
+  check: patch 17 (row 1, col 3) == x[:, 16:32, 48:64] flattened: True
+
+== 2. the patch embedding E: the library's Conv2d(3, 768, kernel 16, stride 16) equals Linear(768 -> 768) on x_p ==
+  conv weight (768, 3, 16, 16) reshaped to E (768, 768) (rows = the 768 pixel numbers of a patch, columns = D = 768)
+  x_p E: (196 x 768) . (768 x 768) = (196, 768)
+  max |difference|, our x_p E + b vs the library conv: 5.13e-06
+  patch 0 embedding, first 6 of 768: [  0.058,  -0.024,  -0.248,   3.689,   0.356,   0.098]
+
+== 3. Eq. 1: z_0 = [x_class; x_p^1 E; ...; x_p^N E] + E_pos ==
+  x_class (1, 768)   [x_class; patches] (197, 768)   E_pos (197, 768)   z_0 (197, 768)
+  x_class, first 6:        [  0.010,   0.015,  -0.267,  -0.001,   0.405,   0.054]
+  E_pos[0] (for [class]):  [  0.010,   0.015,  -0.267,  -0.000,   0.406,   0.054]
+  z_0[0] = x_class + E_pos[0]: [  0.020,   0.030,  -0.534,  -0.001,   0.811,   0.108]
+  E_pos[1] (for patch 1):  [  0.156,  -0.124,   0.447,   0.009,   0.428,  -0.462]
+  z_0[1] = x_p^1 E + E_pos[1]: [  0.214,  -0.148,   0.198,   3.698,   0.783,  -0.365]
+  max |difference|, our z_0 vs the library embedding output: 5.13e-06
+
+== 4. layer 1 by hand: LayerNorm, q k v, attention of head 1 for the [class] token, concat, U_msa, residual, LN, MLP, residual ==
+  LayerNorm of the [class] token (768 numbers), eps = 1e-12:
+    input, first 6:            [  0.020,   0.030,  -0.534,  -0.001,   0.811,   0.108]
+    mean mu = 0.0034   variance = 0.0349   std = sqrt(var + eps) = 0.1869
+    (x - mu)/std, first 6:     [  0.086,   0.141,  -2.875,  -0.023,   4.320,   0.561]
+    gamma, first 6:            [  0.156,   0.191,   0.033,   0.119,   0.065,   0.126]
+    beta, first 6:             [  0.008,   0.016,   0.091,   0.067,   0.007,  -0.034]
+    gamma*(..)+beta, first 6:  [  0.022,   0.043,  -0.005,   0.064,   0.287,   0.036]
+    library LayerNorm:         [  0.022,   0.043,  -0.005,   0.064,   0.287,   0.036]   max |difference| 6.0e-08
+  q = LN(z_0) W_q + b_q: (197, 768)  (the same for k and v); split into 12 heads of 64: (12, 197, 64)
+  head 1: q_class . k_j / sqrt(64) for all 197 tokens j: (197,); first 6 scores: [  5.125,  -0.698,  -0.880,  -0.946,  -1.040,  -1.146]
+  softmax -> weights, first 6: [  0.761,   0.002,   0.002,   0.002,   0.002,   0.001]   sum of all 197 = 1.0000   max 0.7613   min 0.0005
+  the 6 largest weights of the [class] query in head 1 of layer 1:
+    token   0  weight 0.7613   [class] itself
+    token  14  weight 0.0026   patch  13 = grid row  0, col 13
+    token   1  weight 0.0023   patch   0 = grid row  0, col  0
+    token 109  weight 0.0022   patch 108 = grid row  7, col 10
+    token  13  weight 0.0021   patch  12 = grid row  0, col 12
+    token 153  weight 0.0020   patch 152 = grid row 10, col 12
+  weight on [class] itself: 0.7613;  on all 196 patches together: 0.2387
+  weight of the [class] query on itself in each of the 12 heads of layer 1: 0.76 0.90 0.78 0.11 0.90 0.65 0.79 0.02 0.82 1.00 0.37 0.39
+  head 8 spreads the [class] query most (self weight 0.022); its top-5 patches:
+    token   0  weight 0.0219   [class] itself
+    token   8  weight 0.0146   patch   7 = grid row  0, col  7
+    token   3  weight 0.0122   patch   2 = grid row  0, col  2
+    token   7  weight 0.0122   patch   6 = grid row  0, col  6
+    token   4  weight 0.0120   patch   3 = grid row  0, col  3
+  SA_1 for [class] = sum_j A_0j v_j: (64,), first 6: [ -0.019,   0.029,  -0.053,   0.131,  -0.007,   0.001]
+  concat of 12 heads: (197, 768);  times U_msa (768, 768) + bias: (197, 768)
+  Eq. 2: z'_1 = MSA + z_0, [class] first 6: [ -0.178,  -0.015,  -0.848,  -0.393,   0.661,   0.162]
+  LN(z'_1) [class] first 6:   [ -0.055,  -0.043,  -0.247,   0.003,   0.249,   0.020]
+  MLP: LN(z') W_1 + b_1 -> (197, 3072); GELU; W_2 + b_2 -> (197, 768)
+  [class] before GELU, first 6: [ -2.016,  -2.504,   0.053,  -1.484,  -0.649,   0.060]
+  [class] after GELU, first 6:  [ -0.044,  -0.015,   0.028,  -0.102,  -0.168,   0.031]
+  share of the 3072 numbers that are positive before GELU ([class]): 0.071
+  Eq. 3: z_1 = MLP + z'_1, [class] first 6: [ -0.212,  -0.046,  -0.840,  -0.748,   0.774,   0.083]
+  max |difference|, our z_1 vs the library hidden_states[1]: 6.68e-06
+  max |difference|, our head-1 weights vs the library attentions[0] (all 12 heads): 2.68e-06
+  GELU(x) = x * Phi(x) at a few values, against torch.nn.functional.gelu:
+    x:                 -3.00   -2.00   -1.00   -0.50    0.00    0.50    1.00    2.00    3.00
+    Phi(x):           0.0013  0.0228  0.1587  0.3085  0.5000  0.6915  0.8413  0.9772  0.9987
+    x*Phi(x):        -0.0040 -0.0455 -0.1587 -0.1543  0.0000  0.3457  0.8413  1.9545  2.9960
+    F.gelu(x):       -0.0040 -0.0455 -0.1587 -0.1543  0.0000  0.3457  0.8413  1.9545  2.9960
+    relu(x):          0.0000  0.0000  0.0000  0.0000  0.0000  0.5000  1.0000  2.0000  3.0000
+
+== 5. all 12 layers, our loop vs the library ==
+  layer  1: z_1 (197, 768)   max |difference| vs hidden_states[1]: 6.68e-06   (largest value in z_1:    21.2, so relative 3.1e-07)
+  layer  2: z_2 (197, 768)   max |difference| vs hidden_states[2]: 8.34e-06   (largest value in z_2:    23.7, so relative 3.5e-07)
+  layer  3: z_3 (197, 768)   max |difference| vs hidden_states[3]: 9.54e-06   (largest value in z_3:    24.1, so relative 4.0e-07)
+  layer  4: z_4 (197, 768)   max |difference| vs hidden_states[4]: 8.39e-05   (largest value in z_4:    56.0, so relative 1.5e-06)
+  layer  5: z_5 (197, 768)   max |difference| vs hidden_states[5]: 9.16e-04   (largest value in z_5:   336.9, so relative 2.7e-06)
+  layer  6: z_6 (197, 768)   max |difference| vs hidden_states[6]: 1.50e-03   (largest value in z_6:   989.2, so relative 1.5e-06)
+  layer  7: z_7 (197, 768)   max |difference| vs hidden_states[7]: 1.65e-03   (largest value in z_7:  1529.4, so relative 1.1e-06)
+  layer  8: z_8 (197, 768)   max |difference| vs hidden_states[8]: 1.65e-03   (largest value in z_8:  1583.5, so relative 1.0e-06)
+  layer  9: z_9 (197, 768)   max |difference| vs hidden_states[9]: 1.71e-03   (largest value in z_9:  1611.4, so relative 1.1e-06)
+  layer 10: z_10 (197, 768)   max |difference| vs hidden_states[10]: 1.77e-03   (largest value in z_10:  1680.9, so relative 1.1e-06)
+  layer 11: z_11 (197, 768)   max |difference| vs hidden_states[11]: 1.77e-03   (largest value in z_11:  1661.9, so relative 1.1e-06)
+  layer 12: z_12 (197, 768)   max |difference| vs hidden_states[12]: 1.83e-03   (largest value in z_12:  1699.6, so relative 1.1e-06)
+  the final logits from our z_12 vs the library differ by at most 2.86e-06 (see step 6)
+
+== 6. Eq. 4: y = LN(z_L^0), then the classification head ==
+  z_L^0 (the [class] token after 12 layers), first 6: [  2.313,   5.512,  11.788,   0.577,   6.548,  -2.913]   mean 0.073 var 34.490
+  y = LN(z_L^0), first 6: [  0.294,   0.835,   1.904,   0.081,   1.039,  -0.518]   max |difference| vs the library: 3.81e-06
+  head of the fine-tuned checkpoint: Linear(in_features=768, out_features=1000, bias=True)   (one linear layer, as Section 3.1 says for fine-tuning)
+  logits = y W_head + b: (1000,)   max |difference| vs model.logits: 2.86e-06
+  top-5 ImageNet classes:
+     0.937  class 285  Egyptian cat
+     0.038  class 281  tabby, tabby cat
+     0.014  class 282  tiger cat
+     0.003  class 287  lynx, catamount
+     0.001  class 284  Siamese cat, Siamese
+  the pre-trained-only checkpoint google/vit-base-patch16-224-in21k ends in: ViTPooler(
+  (dense): Linear(in_features=768, out_features=768, bias=True)
+  (activation): Tanh()
+)
+  fine-tuned checkpoint has a pooler: False;  in21k checkpoint has a pooler: True
+  (the paper: an MLP with one hidden layer at pre-training time, a single linear layer at fine-tuning time)
+
+== 7. counting the parameters ==
+  formula: (P^2 C D + D) + D + (N+1) D + L (12 D^2 + 13 D) + 2 D + (D K + K)
+           patch emb       cls  position  L layers            LN   head
+  ViT-B/16 at 224, K = 1000:
+    patch embedding      590,592   [class]    768   positions   151,296
+    one layer: attention 4(D^2 + D) = 2,362,368   MLP 8D^2 + 5D = 4,722,432   2 LayerNorms 4D = 3,072   -> 7,087,872   x 12 = 85,054,464
+    final LayerNorm 1,536   head D K + K = 769,000
+    formula total 86,567,656   counted in model.parameters() 86,567,656   same: True
+    without the 1000-class head: 85,798,656   (paper, Table 1: 86M)
+    where they sit: attention 28.35M (32.7%)   mlp 56.67M (65.5%)   embeddings 0.74M (0.9%)   layernorms 0.04M (0.0%)   head 0.77M (0.9%)
+  ViT-L/16 at 224 (meta device, no weights): D=1024 L=24 heads=16 MLP=4096 N=196
+    formula 304,326,632   counted 304,326,632   same: True
+    with the 1000-class head 304.3M, without it 303.3M   (paper: 307M)
+  ViT-H/14 at 224 (meta device, no weights): D=1280 L=32 heads=16 MLP=5120 N=256
+    formula 632,045,800   counted 632,045,800   same: True
+    with the 1000-class head 632.0M, without it 630.8M   (paper: 632M)
+
+done.
