@@ -1,0 +1,25 @@
+== Direct vs chain of thought vs ReAct: 12 questions, model gpt-5-mini (reasoning_effort=minimal) ==
+
+-- per question (public = facts the model may know; private = a fictional company it cannot know) --
+ # kind     direct  cot     react   react+  steps steps+  question
+ 1 public   wrong   ok      wrong   ok          8      5  How many years passed between the completion of 
+ 2 public   wrong   wrong   ok      ok          4      5  How many metres taller is Mount Everest than Mou
+ 3 public   wrong   ok      wrong   ok          8      5  How many years after the launch of Sputnik 1 did
+ 4 public   wrong   ok      ok      ok          4      4  How many centuries, rounded down, separate the f
+ 5 public   wrong   ok      wrong   ok          8      5  How many kilometres longer is the Amazon River t
+ 6 public   wrong   wrong   ok      ok          6      5  By how many million people does the population o
+ 7 private  wrong   wrong   ok      ok          2      3  Who is the chief executive of Northwind Freight,
+ 8 private  wrong   wrong   wrong   ok          8      5  How many trucks do the Rotterdam and Gdansk depo
+ 9 private  wrong   wrong   ok      ok          4      4  Which company did the chief executive of Northwi
+10 private  wrong   wrong   wrong   ok          6      5  How many years after the Porto depot of Northwin
+11 private  wrong   wrong   wrong   ok          8      4  In which city was the manager of the Rotterdam d
+12 private  wrong   wrong   ok      ok          3      3  How many locomotives did Harbour Rail have, and 
+
+-- summary (tokens and cost from the API usage fields; price per million: $0.25 in, $2.0 out; react+ = a loop guard that forces the finish after a repeated action + a wiki that lists related entries) --
+condition  acc all  public  private  calls   in tok  out tok   cost $  $/correct
+direct          0%      0%       0%     12      495      176   0.0005        nan
+cot            33%     67%       0%     12      699    1,013   0.0022     0.0006
+react          50%     50%      50%     64   27,233    2,491   0.0118     0.0020
+react+        100%    100%     100%     53   21,221    2,022   0.0093     0.0008
+total spend this run: $0.0238 (141 calls, 49,648 input + 5,702 output tokens, 0 hidden reasoning tokens)
+stub used: no, every answer came from the API

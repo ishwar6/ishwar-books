@@ -1,0 +1,60 @@
+== 1. One task, six patterns: calls, tokens, latency and cost (planning numbers at the top of ch3_cost.py) ==
+prompt 1500 tokens, thought 150, observation 300, 2.0 s per call + 0.02 s per output token, 0.5 s per tool call
+
+pattern                                    calls    input  output  latency   small $  frontier $
+direct answer                                  1    1,500      30     2.6s    0.0004      0.0050
+chain of thought                               1    1,500     350     9.0s    0.0011      0.0098
+ReAct, 5 tool steps                            6   15,750     900    32.5s    0.0057      0.0607
+plan-and-execute, 5 steps (parallel)           7    8,150     800    16.1s    0.0036      0.0364
+tree of thoughts, b=3, d=3                    36   62,100   4,590    40.2s    0.0247      0.2552
+best-of-5 with a model verifier               10   16,750   1,850    11.4s    0.0079      0.0780
+best-of-5 with a free checker (tests)          5    7,500   1,750     9.0s    0.0054      0.0488
+
+relative to the direct answer (frontier price):
+  direct answer                                 1.0x cost    1.0x latency
+  chain of thought                              2.0x cost    3.5x latency
+  ReAct, 5 tool steps                          12.3x cost   12.5x latency
+  plan-and-execute, 5 steps (parallel)          7.4x cost    6.2x latency
+  tree of thoughts, b=3, d=3                   51.5x cost   15.5x latency
+  best-of-5 with a model verifier              15.8x cost    4.4x latency
+  best-of-5 with a free checker (tests)         9.8x cost    3.5x latency
+
+== 2. Expected cost per correct answer = cost per attempt / accuracy ==
+accuracies below are ILLUSTRATIVE except the three marked "mea" (measured in ch3_react.py on twelve questions; the plain ReAct loop,
+not the guarded one, which reached 100% there). A cost per correct answer with zero correct answers is undefined.
+pattern                                     accuracy  $ / attempt  $ / correct
+direct answer                                  0% mea       0.0050    undefined (no correct answers)
+chain of thought                              33% mea       0.0098       0.0293
+ReAct, 5 tool steps                           50% mea       0.0607       0.1215
+plan-and-execute, 5 steps (parallel)          80% ass       0.0364       0.0456
+tree of thoughts, b=3, d=3                    90% ass       0.2552       0.2835
+best-of-5 with a model verifier               80% ass       0.0780       0.0975
+best-of-5 with a free checker (tests)         90% ass       0.0488       0.0542
+
+reading: a pattern that costs 10x more per attempt is still cheaper per correct answer only if it is also more than 10x as accurate,
+or if a wrong answer has a cost of its own (a human review, a refund, a retry) that you add to the numerator.
+
+== 3. With a verifier (tests, a checker, a human), retry up to k times ==
+P(success within k) = 1 - (1 - p)^k      expected cost = c * (1 - (1 - p)^k) / p      (c = cost of one attempt, p = pass rate per attempt)
+one attempt c = $0.0098 (chain of thought, frontier price)
+ p per attempt   k  P(success)  E[attempts]   E[cost]  $/correct
+           30%   1         30%         1.00    0.0098     0.0325
+           30%   2         51%         1.70    0.0166     0.0325
+           30%   3         66%         2.19    0.0214     0.0325
+           30%   5         83%         2.77    0.0270     0.0325
+           50%   1         50%         1.00    0.0098     0.0195
+           50%   2         75%         1.50    0.0146     0.0195
+           50%   3         88%         1.75    0.0171     0.0195
+           50%   5         97%         1.94    0.0189     0.0195
+           70%   1         70%         1.00    0.0098     0.0139
+           70%   2         91%         1.30    0.0127     0.0139
+           70%   3         97%         1.39    0.0136     0.0139
+           70%   5        100%         1.43    0.0139     0.0139
+reading: with a verifier, retries raise the success rate quickly (p=0.5, k=3 gives 88%) and the cost per correct answer barely moves,
+because failed attempts are cheap and recognised. Without a verifier there is nothing to retry on: you pay k times and keep the same accuracy.
+
+== 4. ReAct input tokens against step count (each step re-reads the whole history) ==
+   2 steps: ReAct    5,850 input tokens   plan-and-execute   5,210   ratio 1.1x
+   5 steps: ReAct   15,750 input tokens   plan-and-execute   8,150   ratio 1.9x
+  10 steps: ReAct   41,250 input tokens   plan-and-execute  13,050   ratio 3.2x
+  20 steps: ReAct  126,000 input tokens   plan-and-execute  22,850   ratio 5.5x

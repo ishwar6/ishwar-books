@@ -1,0 +1,36 @@
+== ReAct traces, gpt-5-mini (reasoning_effort=minimal) ==
+
+-- plain ReAct, question 3: the model has the answer after step 2 and repeats the action instead of finishing --
+Question: How many years after the launch of Sputnik 1 did Apollo 11 land on the Moon?
+  Thought: I need Sputnik 1 launch year and Apollo 11 landing year.
+  Action: wiki[Sputnik 1]
+  Observation: First artificial Earth satellite. Launched 4 October 1957 by the Soviet Union.
+  Thought: Apollo 11 landed in 1969; calculate 1969 minus 1957.
+  Action: calc[1969-1957]
+  Observation: 12
+  Thought: Apollo 11 landed in 1969; Sputnik 1 was launched in 1957—compute 1969 minus 1957.
+  Action: calc[1969-1957]
+  ... 13 more lines, same action repeated until the step budget ran out
+=> answer: (step budget exhausted)  (wrong)
+
+-- ReAct with a loop guard and a wiki that lists related entries, question 10 (two private look-ups and a subtraction) --
+Question: How many years after the Porto depot of Northwind Freight opened did the Leeds depot open?
+  Thought: I need the opening years of the Porto and Leeds depots of Northwind Freight.
+  Action: wiki[Northwind Freight]
+  Observation: Fictional logistics company founded in 2011 in Rotterdam. Chief executive: Mira Takacs. Depots: Rotterdam
+  Thought: I need the opening years for the Porto depot and the Leeds depot entries.
+  Action: wiki[Porto depot]
+  Observation: Northwind Freight depot opened 2017. Vehicles: 64 trucks. Manager: Ines Carvalho.
+  Thought: Now get the Leeds depot opening year.
+  Action: wiki[Leeds depot]
+  Observation: Northwind Freight depot opened 2020. Vehicles: 41 trucks. Manager: Sam Hartley.
+  Thought: Calculate difference between Leeds 2020 and Porto 2017.
+  Action: calc[2020-2017]
+  Observation: 3
+  Thought: Leeds opened in 2020 and Porto in 2017, so difference is 3 years.
+  Action: finish[3]
+=> answer: 3  (correct)
+
+-- the same question, direct and chain of thought --
+  direct: 9 years  (wrong)
+  cot:    First think step by step: 1. Identify when the Porto depot opened. 2. Identify when the Leeds depot opened. 3. Subtract the Porto opening year from the Leeds opening year to get the number of years be  (wrong)

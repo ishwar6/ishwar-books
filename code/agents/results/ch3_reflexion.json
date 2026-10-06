@@ -1,0 +1,436 @@
+{
+ "model": "gpt-5-mini",
+ "stub": false,
+ "summary": {
+  "n": 50,
+  "pass1": 41,
+  "self_only": 42,
+  "reflexion": 47,
+  "failures": 9,
+  "self_only_fixed": 1,
+  "reflexion_fixed": 6,
+  "cost_usd": 0.11371550000000001,
+  "calls": 82
+ },
+ "rows": [
+  {
+   "task": "eval_expr",
+   "sample": 0,
+   "pass1": false,
+   "self_only": 2,
+   "reflexion": 2,
+   "first_failure": "failing test:\nassert eval_expr(\"1+2*3\") == 7.0\n-> NameError: name 'eval_expr' is not defined"
+  },
+  {
+   "task": "eval_expr",
+   "sample": 1,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "eval_expr",
+   "sample": 2,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "eval_expr",
+   "sample": 3,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "eval_expr",
+   "sample": 4,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "parse_csv_line",
+   "sample": 0,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "parse_csv_line",
+   "sample": 1,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "parse_csv_line",
+   "sample": 2,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "parse_csv_line",
+   "sample": 3,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "parse_csv_line",
+   "sample": 4,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "TTLCache",
+   "sample": 0,
+   "pass1": false,
+   "self_only": null,
+   "reflexion": null,
+   "first_failure": "failing test:\nt = [0.0]\nclock = lambda: t[0]\nc = TTLCache(2, 10, clock)\nc.set(\"a\", 1)\nt[0] = 9.9\nassert c.get(\"a\") == 1\nt[0] = 10.0\nassert len(c) == 0\n-> AssertionError"
+  },
+  {
+   "task": "TTLCache",
+   "sample": 1,
+   "pass1": false,
+   "self_only": null,
+   "reflexion": null,
+   "first_failure": "failing test:\nt = [0.0]\nclock = lambda: t[0]\nc = TTLCache(2, 10, clock)\nc.set(\"a\", 1)\nt[0] = 9.9\nassert c.get(\"a\") == 1\nt[0] = 10.0\nassert len(c) == 0\n-> AssertionError"
+  },
+  {
+   "task": "TTLCache",
+   "sample": 2,
+   "pass1": false,
+   "self_only": null,
+   "reflexion": null,
+   "first_failure": "failing test:\nt = [0.0]\nclock = lambda: t[0]\nc = TTLCache(2, 10, clock)\nc.set(\"a\", 1)\nt[0] = 9.9\nassert c.get(\"a\") == 1\nt[0] = 10.0\nassert len(c) == 0\n-> AssertionError"
+  },
+  {
+   "task": "TTLCache",
+   "sample": 3,
+   "pass1": false,
+   "self_only": null,
+   "reflexion": 2,
+   "first_failure": "failing test:\nt = [0.0]\nclock = lambda: t[0]\nc = TTLCache(2, 10, clock)\nc.set(\"a\", 1)\nt[0] = 9.9\nassert c.get(\"a\") == 1\nt[0] = 10.0\nassert len(c) == 0\n-> AssertionError"
+  },
+  {
+   "task": "TTLCache",
+   "sample": 4,
+   "pass1": false,
+   "self_only": null,
+   "reflexion": 3,
+   "first_failure": "failing test:\nt = [0.0]\nclock = lambda: t[0]\nc = TTLCache(2, 10, clock)\nc.set(\"a\", 1)\nt[0] = 9.9\nassert c.get(\"a\") == 1\nt[0] = 10.0\nassert len(c) == 0\n-> AssertionError"
+  },
+  {
+   "task": "cron_matches",
+   "sample": 0,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "cron_matches",
+   "sample": 1,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "cron_matches",
+   "sample": 2,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "cron_matches",
+   "sample": 3,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "cron_matches",
+   "sample": 4,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "slugify",
+   "sample": 0,
+   "pass1": false,
+   "self_only": null,
+   "reflexion": 3,
+   "first_failure": "failing test:\nassert slugify(\"hello wonderful world\", max_len=15) == \"hello-wonderful\"\n-> AssertionError"
+  },
+  {
+   "task": "slugify",
+   "sample": 1,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "slugify",
+   "sample": 2,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "slugify",
+   "sample": 3,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "slugify",
+   "sample": 4,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "osa_distance",
+   "sample": 0,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "osa_distance",
+   "sample": 1,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "osa_distance",
+   "sample": 2,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "osa_distance",
+   "sample": 3,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "osa_distance",
+   "sample": 4,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "number_to_words",
+   "sample": 0,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "number_to_words",
+   "sample": 1,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "number_to_words",
+   "sample": 2,
+   "pass1": false,
+   "self_only": null,
+   "reflexion": 2,
+   "first_failure": "failing test:\nassert number_to_words(1100) == \"one thousand, one hundred\"\n-> AssertionError"
+  },
+  {
+   "task": "number_to_words",
+   "sample": 3,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "number_to_words",
+   "sample": 4,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "topological_sort",
+   "sample": 0,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "topological_sort",
+   "sample": 1,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "topological_sort",
+   "sample": 2,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "topological_sort",
+   "sample": 3,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "topological_sort",
+   "sample": 4,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "roman_to_int",
+   "sample": 0,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "roman_to_int",
+   "sample": 1,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "roman_to_int",
+   "sample": 2,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "roman_to_int",
+   "sample": 3,
+   "pass1": false,
+   "self_only": null,
+   "reflexion": 3,
+   "first_failure": "failing test:\nfor bad in [\"IIII\", \"VV\", \"IC\", \"IM\", \"iv\", \"\", \"MMMM\", \"XCX\", \"IXI\", \"VX\", \"LL\"]:\n    _raises(roman_to_int, bad)\n-> AssertionError: expected ValueError for ('XCX',), got a result"
+  },
+  {
+   "task": "roman_to_int",
+   "sample": 4,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "parse_version",
+   "sample": 0,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "parse_version",
+   "sample": 1,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "parse_version",
+   "sample": 2,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "parse_version",
+   "sample": 3,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  },
+  {
+   "task": "parse_version",
+   "sample": 4,
+   "pass1": true,
+   "self_only": 1,
+   "reflexion": 1,
+   "first_failure": ""
+  }
+ ],
+ "usage": {
+  "input": 41150,
+  "output": 51714,
+  "calls": 82
+ },
+ "max_attempts": 3,
+ "samples": 5,
+ "tasks": [
+  "eval_expr",
+  "parse_csv_line",
+  "TTLCache",
+  "cron_matches",
+  "slugify",
+  "osa_distance",
+  "number_to_words",
+  "topological_sort",
+  "roman_to_int",
+  "parse_version"
+ ]
+}

@@ -1,0 +1,21 @@
+== Reflection with an external check vs self-critique alone: 10 tasks x 5 samples, gpt-5-mini, up to 3 attempts ==
+
+-- per task: how many of the 5 samples passed on attempt 1, after self-critique only, after tests fed back (<= 3 attempts) --
+task               pass@1  self-only  reflexion   first failing test fed back (reflexion arm)
+eval_expr             4/5        5/5        5/5   assert eval_expr("1+2*3") == 7.0 | -> NameError: name 'eval_expr' 
+parse_csv_line        5/5        5/5        5/5   
+TTLCache              0/5        0/5        2/5   t = [0.0] | clock = lambda: t[0] | c = TTLCache(2, 10, clock) | c.
+cron_matches          5/5        5/5        5/5   
+slugify               4/5        4/5        5/5   assert slugify("hello wonderful world", max_len=15) == "hello-wond
+osa_distance          5/5        5/5        5/5   
+number_to_words       4/5        4/5        5/5   assert number_to_words(1100) == "one thousand, one hundred" | -> A
+topological_sort      5/5        5/5        5/5   
+roman_to_int          4/5        4/5        5/5   for bad in ["IIII", "VV", "IC", "IM", "iv", "", "MMMM", "XCX", "IX
+parse_version         5/5        5/5        5/5   
+
+-- summary --
+first attempts: 50; passed on attempt 1: 41 (82%)
+of the 9 failures: self-critique alone fixed 1, tests fed back fixed 6 (up to 2 more attempts each)
+pass rate within 3 attempts: self-only 42/50 (84%), reflexion 47/50 (94%)
+total spend this run: $0.1137 (82 calls, 41,150 input + 51,714 output tokens)
+stub used: no, every answer came from the API

@@ -1,0 +1,1288 @@
+# Chapter 3 · Reasoning patterns: how one agent thinks, acts and corrects itself
+
+> **Goal:** by the end of this chapter you can name the six shapes a single agent's loop can take (think only, act only, interleave, plan first, reflect, search), say what each one costs in calls, tokens and seconds, read the papers that introduced them closely enough to know what was measured and what was not, recognise each pattern in the production write-ups of large companies, and choose a pattern for your own task with a measurement rather than a fashion. You will also have run three small experiments of your own, against a real model, that show the patterns working and failing.
+
+---
+
+## 3.1 Why the shape of the loop matters
+
+Chapter 1 drew the agent as a loop and Chapter 2 took the loop apart into five blocks. This chapter keeps the blocks fixed, the same model, the same tools, the same instructions, and changes only one thing: the **shape of the loop**. How many times is the model called before the answer? Does it write its reasoning down or keep it in its head? Does it act first and think later, or plan everything before it touches a tool? Does it get a second attempt, and if so, who tells it the first one was wrong? Does it explore several lines of thought at once?
+
+These choices are what the field calls **reasoning patterns**, and they matter more than they look. Two agents with identical models and tools can differ by a factor of ten in cost, by a factor of ten in latency and by tens of points in accuracy purely because of the shape of their loop. The experiments in this chapter show exactly that with a small model on a small task: the same model scored 0%, 33%, 50% and 100% on the same twelve questions under four loop shapes.
+
+> [!DEFINITION] Reasoning pattern
+> A fixed way of arranging the model calls, tool calls and checks that turn a task into an answer: how many calls, in what order, what each one sees, and what ends the loop. Chain of thought, ReAct, plan-and-execute, reflection and tree search are the five families this chapter covers. A pattern is a design choice you make in code; the model fills in the content.
+
+{{FIG:ch3_pattern_space|Six shapes of the loop with the same model and the same tools. Think only (chain of thought) writes reasoning before the answer; act only calls tools without written thoughts; interleave (ReAct) alternates a thought, an action and an observation; plan first writes the whole plan and then executes it; reflect tries, checks, critiques and retries; search branches into several candidates, scores them and keeps the best. Each shape adds something to the one before it, and each addition has a price.}}
+
+Read the figure as a ladder of additions. **Think only** adds a scratchpad: the model writes intermediate steps before the answer, which costs output tokens and buys accuracy on multi-step problems. **Act only** adds tools but no scratchpad: fast, but the model has nowhere to keep track of what it has learned. **Interleave** adds both, one step at a time, at the price of a model call per step on a context that grows with every step. **Plan first** moves the thinking to the front: one call writes the plan, cheap calls carry it out, and nothing is re-read; the price is that a bad plan is discovered late. **Reflect** adds a second attempt with a critique of the first in context; it works in proportion to how good the critique is. **Search** adds breadth: several candidates per step, scored and pruned, which can turn a 4% success rate into 74% on the right task and multiply the token bill by fifty on the wrong one.
+
+Three quantities decide between them, and this chapter measures all three for every pattern.
+
+| Quantity | What it is | Why the pattern changes it |
+|---|---|---|
+| Accuracy | share of tasks solved, on a labelled set | a scratchpad, a tool or a second attempt each remove a class of failure, or add one |
+| Cost per task | model tokens (input and output) plus tool calls | every extra call re-reads the context; every branch multiplies the calls |
+| Latency per task | wall-clock time from request to answer | sequential calls add up; parallel calls do not; tools wait on the network |
+
+> [!DEFINITION] Cost per correct answer
+> The cost of one attempt divided by the share of attempts that are correct: $$\text{cost per correct} = \frac{c}{p}$$ where $$c$$ is the cost of running the pattern once and $$p$$ is its accuracy. A pattern that costs ten times more per attempt is only cheaper per correct answer if it is also more than ten times as accurate, or if being wrong has a cost of its own that belongs in the numerator. Section 3.9 uses this as the deciding number.
+
+> [!WARNING]
+> Pattern names are not specifications. "We use ReAct" can mean a research prompt with a regular-expression parser, or a function-calling loop with no visible thoughts at all; "we use reflection" can mean the model grading itself (which the evidence says does little) or a test suite grading it (which works). When you read a write-up, or write one, state what the model sees at each step, what ends the loop, and what the check is. The names come after.
+
+### How this chapter is organised
+
+Sections 3.2 to 3.7 take the patterns one family at a time. For each one you get the paper that introduced it, read closely: who wrote it and what came before, the method in plain words, the exact numbers from its tables (screenshotted, so you can check), the limitations the authors admitted, and what practitioners took from it. Then a pros-and-cons table and a "what to measure before you decide" table. Three of the sections also include a small experiment of our own, run against a real model for a few cents, so that the claims are not only quoted. Section 3.8 reads the production write-ups of a dozen companies for the same four things: the pattern they chose, why, what went wrong, and how they fixed it. Section 3.9 turns all of it into a decision ladder.
+
+A word on the papers' numbers. Almost all of them were measured on models that are now several generations old (PaLM-540B, GPT-3, GPT-3.5, GPT-4 from 2023). The absolute scores are history. What has lasted is the *shape* of each result: which pattern helps on which kind of task, what it costs, and how it fails. Read the tables for shapes, and re-measure the numbers on your model.
+
+### Discussion
+
+1. **Is the pattern a property of the model or of the system?** A reasoning model trained to think before it answers has chain of thought built in; a framework's default agent has ReAct built in. My view: the pattern is a system property that you own, even when part of it is inside the model; you still decide how many calls, what each sees and what ends the loop.
+2. **Should we pick the pattern before or after we have an eval set?** Teams usually pick a framework first and discover the pattern they got. My view: build the labelled set first (Chapter 6 shows how), run the simplest shape on it, and let the failures choose the next addition.
+3. **Can a pattern make a weak model strong?** Sometimes, and the chapter has examples: a tree turned 4% into 74%; a loop guard turned 50% into 100%. My view: patterns remove specific failure modes; they do not add knowledge or capability the model lacks. Find the failure mode first.
+4. **How many patterns should one agent mix?** Production systems in Section 3.8 mix two or three: a planner over a ReAct executor over a test-driven retry. My view: each layer must earn its place with a measured failure it removes; layers added by analogy are where latency goes to die.
+
+## 3.2 Chain of thought and self-consistency: the model's scratchpad
+
+The simplest pattern is not a loop at all. It is one model call that is asked to write down its reasoning before its answer. It matters here for two reasons: it is the "think" in every later pattern, and it is the pattern that reasoning models have now absorbed into their training.
+
+> [!DEFINITION] Chain of thought (CoT)
+> Prompting a model to write a series of intermediate reasoning steps in natural language before the final answer, either by showing it worked examples that contain such steps (few-shot CoT) or by adding an instruction such as "let's think step by step" (zero-shot CoT). The steps are ordinary output tokens: they cost money, they can be read, and the answer is conditioned on them.
+
+{{FIG:ch3_cot|Standard prompting against chain of thought, and self-consistency underneath. With a scratchpad the arithmetic is written down and read back before the next step, at the price of more output tokens. Self-consistency samples several chains and takes the majority answer; it helps when answers can be compared exactly and cannot help when every chain makes the same mistake.}}
+
+### The paper that named it
+
+In January 2022 Jason Wei and colleagues at Google Research posted "Chain-of-Thought Prompting Elicits Reasoning in Large Language Models". The context matters. Large models of the time (GPT-3, PaLM) were strong at many tasks and oddly weak at multi-step arithmetic and logic: they answered word problems in one breath and got them wrong. A line of earlier work had trained models on step-by-step solutions. Wei's observation was that no training was needed: show a large enough model a handful of examples whose answers *contain* the steps, and it writes steps for new problems too, and gets many more of them right.
+
+> [!PAPER] Wei et al. (2022), Chain of Thought · Figure 1 · page 1
+> [![Figure 1 of the chain-of-thought paper: two prompts side by side on the same tennis-ball and cafeteria word problems; standard prompting shows the exemplar answer as The answer is 11 and the model answers 27, marked wrong; chain-of-thought prompting shows the exemplar answer with the working, Roger started with 5 balls, 2 cans of 3 is 6, 5 plus 6 is 11, and the model writes its own working for the cafeteria problem and answers 9, marked right](/img/agents/ch3-cot-figure1.png)](/img/agents/ch3-cot-figure1.png)
+>
+> **Context:** the opening figure of arXiv 2201.11903, posted 28 January 2022 and published at NeurIPS 2022. The highlighted blue and green text is the chain of thought: the worked example in the prompt and the working the model writes in reply.
+>
+> **What it says:** the only change between the two sides is the content of the exemplar answer. With "The answer is 11" the model answers 27 to the cafeteria problem; with the working shown, it writes "The cafeteria had 23 apples originally. They used 20 to make lunch. So they had 23 - 20 = 3. They bought 6 more apples, so they have 3 + 6 = 9" and answers 9.
+>
+> **Why it matters:** this is a pattern, not a model change. Nothing was trained; the same weights produced both answers. The difference is what the model is asked to write before the answer, and that is a decision in your code.
+
+> [!PAPER] Wei et al. (2022), Chain of Thought · Abstract · page 1
+> [![Abstract of the chain-of-thought paper with highlighted phrases: a series of intermediate reasoning steps; emerge naturally in sufficiently large language models; surpassing even finetuned GPT-3 with a verifier](/img/agents/ch3-cot-abstract.png)](/img/agents/ch3-cot-abstract.png)
+>
+> **Context:** the abstract. The paper tests three model families (LaMDA, GPT-3, PaLM) at several sizes on arithmetic (GSM8K and five other sets), commonsense and symbolic reasoning tasks.
+>
+> **What it says:** chain of thought is "a series of intermediate reasoning steps"; the ability "emerge[s] naturally in sufficiently large language models"; with eight exemplars, PaLM 540B reached state of the art on GSM8K, "surpassing even finetuned GPT-3 with a verifier".
+>
+> **Why it matters:** two caveats are in the abstract itself. The effect appeared only in large models (the paper's own plots show small models getting *worse* with chain of thought), and the comparison that made the headline was against a model that had been fine-tuned on 7,500 solutions and paired with a trained verifier. The pattern beat training, on that task, at that scale.
+
+What the paper measured, in plain terms: on GSM8K (grade-school maths word problems) PaLM-540B went from about 18% with standard prompting to about 57% with chain of thought, and the gain grew with model size. On commonsense tasks the gains were smaller and on one (CSQA) negligible. On two symbolic tasks (concatenating last letters, tracking coin flips) chain of thought let the model generalise to longer inputs than the examples showed. The authors admit three limitations: it is not known whether the model is "reasoning" in any deep sense; the chains are not guaranteed to be correct even when the answer is; and the manual exemplars cost human time. All three became research topics within a year.
+
+### Self-consistency: vote over several chains
+
+Two months later the same group posted the natural follow-up. Xuezhi Wang and colleagues asked: if one chain of thought is good, what about several? Their method, **self-consistency**, samples many chains with a non-zero temperature, reads off the final answer of each, and returns the most common answer.
+
+> [!DEFINITION] Self-consistency
+> Sampling several independent chains of thought for the same question and returning the answer that the most chains agree on (a majority vote over final answers). It replaces greedy decoding with a vote. The chains themselves are discarded; only the answers are compared, so the answers must be comparable, such as numbers or labels.
+
+> [!PAPER] Wang et al. (2022), Self-Consistency · Abstract · page 1
+> [![Abstract of the self-consistency paper with highlighted phrases: samples a diverse set of reasoning paths; selects the most consistent answer; GSM8K plus 17.9 percent](/img/agents/ch3-sc-abstract.png)](/img/agents/ch3-sc-abstract.png)
+>
+> **Context:** arXiv 2203.11171, posted 21 March 2022, published at ICLR 2023. The method is a decoding strategy, not a prompt change: the prompt is the chain-of-thought prompt of the previous paper.
+>
+> **What it says:** it "first samples a diverse set of reasoning paths instead of only taking the greedy one, and then selects the most consistent answer by marginalizing out the sampled reasoning paths". Gains over chain of thought: GSM8K +17.9, SVAMP +11.0, AQuA +12.2, StrategyQA +6.4, ARC-challenge +3.9 points.
+>
+> **Why it matters:** this is the first "spend more compute at inference time to get a better answer" result in the agent literature, and the ancestor of best-of-n in Section 3.6. The intuition is honest: a hard problem has several valid routes to one right answer and many routes to many wrong ones, so agreement is evidence.
+
+> [!PAPER] Wang et al. (2022), Self-Consistency · Table 2 · page 5
+> [![Table 2 of the self-consistency paper: arithmetic reasoning accuracy for UL2-20B, LaMDA-137B, PaLM-540B and two GPT-3 variants, chain-of-thought prompting against self-consistency on AddSub, MultiArith, ASDiv, AQuA, SVAMP and GSM8K; the GSM8K column shows PaLM-540B going from 56.5 to 74.4, a gain of 17.9, and code-davinci-002 from 60.1 to 78.0](/img/agents/ch3-sc-table2.png)](/img/agents/ch3-sc-table2.png)
+>
+> **Context:** the main arithmetic table. Results are averaged over ten runs, each sampling 40 chains per question.
+>
+> **What it says:** every model improves on every task. The gains are largest for the largest models: PaLM-540B on GSM8K from 56.5 to 74.4 (+17.9), code-davinci-002 from 60.1 to 78.0 (+17.9), AQuA +12.5 and +12.2; the 20-billion-parameter UL2 gains only 3 to 7 points.
+>
+> **Why it matters:** forty samples is forty times the output tokens of one chain. The paper's own plots show most of the gain arriving by five to ten samples, which is where practitioners run it. The second thing to read is the pattern of gains: largest where the base model is already competent, because voting amplifies a model that is right more often than it is wrong on any given route, and does nothing for a model that is systematically wrong.
+
+### Zero-shot: a single sentence
+
+In May 2022 Takeshi Kojima and colleagues at the University of Tokyo and Google showed that the exemplars were not needed either. Appending one sentence, "Let's think step by step", to the question made a large instruction-tuned model write a chain of thought on its own.
+
+> [!PAPER] Kojima et al. (2022), Zero-shot CoT · Figure 1 · page 2
+> [![Figure 1 of the zero-shot chain-of-thought paper: four prompts on a juggler word problem; few-shot answers 8 wrongly; few-shot-CoT writes the working and answers 4; zero-shot answers 8 wrongly; zero-shot-CoT appends Let's think step by step and the model writes There are 16 balls in total, half are golf balls so 8, half of those are blue so 4](/img/agents/ch3-zeroshot-figure1.png)](/img/agents/ch3-zeroshot-figure1.png)
+>
+> **Context:** arXiv 2205.11916, posted 24 May 2022, published at NeurIPS 2022. Panel (d) is the method: the question, then "A: Let's think step by step."
+>
+> **What it says:** with no examples at all, the trigger sentence makes the model write "There are 16 balls in total. Half of the balls are golf balls. That means that there are 8 golf balls. Half of the golf balls are blue. That means that there are 4 blue golf balls", which is right; without it the same model answers 8.
+>
+> **Why it matters:** this is the version of chain of thought that every production prompt used for the next two years, because it needs no examples and so no maintenance. It is also the version the counter-evidence below was measured on.
+
+> [!PAPER] Kojima et al. (2022), Zero-shot CoT · Abstract · page 1
+> [![Abstract of the zero-shot CoT paper with highlighted phrases: decent zero-shot reasoners; MultiArith from 17.7 percent to 78.7 percent; GSM8K from 10.4 percent to 40.7 percent](/img/agents/ch3-zeroshot-abstract.png)](/img/agents/ch3-zeroshot-abstract.png)
+>
+> **Context:** the abstract, reporting results with text-davinci-002.
+>
+> **What it says:** large models "are decent zero-shot reasoners by simply adding 'Let's think step by step' before each answer"; MultiArith goes "from 17.7% to 78.7%" and GSM8K "from 10.4% to 40.7%".
+>
+> **Why it matters:** the paper's Table 2 puts the numbers in order: zero-shot 10.4, zero-shot CoT 40.7, few-shot CoT with eight examples 48.7 on GSM8K. The single sentence captures most of the gain; the examples add the rest. It also shows the limit: on CommonsenseQA the trigger *lowered* accuracy. Chain of thought is for problems with steps; it is not a universal improvement.
+
+### Why reasoning tokens cost money, and what reasoning models changed
+
+Every token of a chain of thought is an output token, and output tokens cost three to eight times what input tokens cost at most providers. A direct answer is thirty tokens; a chain is three hundred; a self-consistency vote over ten chains is three thousand. Section 3.9's arithmetic treats this properly, but the rule of thumb is simple: chain of thought is a 2x to 10x multiplier on the cost of a call, and the question is always whether the accuracy gain pays for it on your task.
+
+From late 2024 the pattern moved inside the model. OpenAI's o1 series, and then DeepSeek-R1 and others, were trained with reinforcement learning to produce a long chain of thought before answering, rewarded when the final answer could be checked (maths, code, multiple-choice).
+
+> [!DEFINITION] Reasoning model
+> A model trained, usually by reinforcement learning on tasks with checkable answers, to generate an extended chain of thought before its visible answer. The chain is often hidden from the caller or shown only as a summary; its tokens are billed as output. The caller typically controls only an effort level. The pattern is the same chain of thought; who writes it, and who can see it, changed.
+
+> [!PAPER] OpenAI (2024), o1 System Card · Section 2 · page 1
+> [![The model data and training section of the o1 system card with highlighted phrases: it can produce a long chain of thought before responding to the user; through training, the models learn to refine their thinking process, try different strategies, and recognize their mistakes](/img/agents/ch3-o1-training.png)](/img/agents/ch3-o1-training.png)
+>
+> **Context:** arXiv 2412.16720, the system card dated 5 December 2024, section "Model data and training". The introduction states that the series "is trained with large-scale reinforcement learning to reason using chain of thought".
+>
+> **What it says:** "o1 thinks before it answers": it "can produce a long chain of thought before responding to the user", and "through training, the models learn to refine their thinking process, try different strategies, and recognize their mistakes".
+>
+> **Why it matters:** the three verbs in the last sentence are three of this chapter's patterns (reflect, search, self-correct) learned as behaviour inside one call. The card speaks of chain-of-thought summaries being surfaced to users rather than the raw chain, so the scratchpad you used to read and debug is now largely a bill you receive.
+
+> [!PAPER] DeepSeek-AI (2025), DeepSeek-R1 · Abstract · page 1
+> [![Abstract of the DeepSeek-R1 paper, version 1, with highlighted phrases: without supervised fine-tuning as a preliminary step; poor readability, and language mixing](/img/agents/ch3-r1-abstract.png)](/img/agents/ch3-r1-abstract.png)
+>
+> **Context:** arXiv 2501.12948, version 1 of 22 January 2025 (a revised version was later published in Nature). DeepSeek-R1-Zero was trained by reinforcement learning on a base model "without supervised fine-tuning (SFT) as a preliminary step"; the paper reports its AIME 2024 pass@1 rising from 15.6% to 71.0% during training, and 79.8% for the final DeepSeek-R1.
+>
+> **What it says:** the reasoning behaviour emerged from reward alone, and the first model "encounters challenges such as poor readability, and language mixing", which the final model fixed with a small amount of curated "cold start" data.
+>
+> **Why it matters:** this is public evidence for how reasoning models are made, and for a cost of hidden reasoning: a chain optimised only for the right answer need not be readable, or even in one language. If you want to read the reasoning, you have to pay for it in training or in prompting.
+
+> [!PAPER] DeepSeek-AI (2025), DeepSeek-R1 · Section 2.2.4 · page 8
+> [![A paragraph from the DeepSeek-R1 paper on the aha moment with the highlighted phrase: learns to allocate more thinking time to a problem by reevaluating its initial approach](/img/agents/ch3-r1-aha.png)](/img/agents/ch3-r1-aha.png)
+>
+> **Context:** the "Aha Moment of DeepSeek-R1-Zero" paragraph, describing an intermediate checkpoint whose chain of thought stopped mid-derivation with "Wait, wait. Wait. That's an aha moment I can flag here" and started over.
+>
+> **What it says:** the model "learns to allocate more thinking time to a problem by reevaluating its initial approach", without being told to.
+>
+> **Why it matters:** reflection (Section 3.5) appearing as a learned behaviour inside a single call. It does not make the external version obsolete: the model is re-evaluating against its own judgement, which is exactly the weak critic that Section 3.5 shows to be unreliable. A test suite is still a better judge than a second thought.
+
+{{FIG:ch3_reasoning_models|What reasoning models changed about chain of thought and what they did not. The reasoning is now written by the model (trained by reinforcement learning), hidden or summarised, billed as output and controlled only by an effort setting. A loop built around such a model still needs tools, a stop condition, a budget and a trace, and the counter-evidence below was measured on the visible kind.}}
+
+What did *not* change for an agent builder: the model still cannot look anything up, still needs a stop condition and a budget, still needs its tool calls checked, and is still wrong some of the time. What did change is the economics of thinking (you pay for tokens you cannot read) and the design question ("should I ask it to think?" becomes "how much effort should I buy for this step?"). Our own experiments in this chapter use a reasoning model with its effort set to minimal, so that the reasoning we study is the kind we can see.
+
+### The honest counter-evidence
+
+Two papers from 2023 are required reading before building anything on chain of thought.
+
+> [!DEFINITION] Faithfulness (of an explanation)
+> An explanation is faithful if it reflects the actual reasons for the model's output. A chain of thought is plausible if it reads well and leads to the answer; it is faithful only if changing the stated reasons would change the answer. The two are different properties, and the paper below shows that models produce the first without the second.
+
+> [!PAPER] Turpin et al. (2023), Unfaithful Explanations · Abstract · page 1
+> [![Abstract of the paper Language Models Don't Always Say What They Think with highlighted phrases: systematically misrepresent the true reason; drop by as much as 36 percent; plausible yet misleading](/img/agents/ch3-unfaithful-abstract.png)](/img/agents/ch3-unfaithful-abstract.png)
+>
+> **Context:** arXiv 2305.04388 by Miles Turpin, Julian Michael, Ethan Perez and Samuel Bowman (NYU, Cohere, Anthropic), posted 7 May 2023, published at NeurIPS 2023. The experiment adds a bias to the prompt that should not matter, such as reordering the few-shot examples so the right answer is always (A), or a user saying "I think the answer is (B)".
+>
+> **What it says:** chain-of-thought explanations "can systematically misrepresent the true reason for a model's prediction"; biased prompts made accuracy "drop by as much as 36%" on 13 BIG-Bench Hard tasks, while the explanations never mentioned the bias; the explanations are "plausible yet misleading".
+>
+> **Why it matters:** a chain of thought is text the model wrote to go with its answer; it is not a trace of how the answer was computed. For an agent builder this means two things: you cannot audit a decision by reading its chain, and a plausible chain is not evidence that the answer is right. Verification has to come from outside the text (Section 3.5).
+
+> [!PAPER] Turpin et al. (2023), Unfaithful Explanations · Figure 1 · page 5
+> [![Figure 1 of the unfaithful explanations paper: for GPT-3.5 and Claude 1.0 under zero-shot and few-shot settings, accuracy with an unbiased context against a biased context, with and without chain of thought; biased contexts lower accuracy by between 4.7 and 36.3 points, and in the zero-shot setting chain of thought drops more than no chain of thought](/img/agents/ch3-unfaithful-figure1.png)](/img/agents/ch3-unfaithful-figure1.png)
+>
+> **Context:** accuracy averaged over the BIG-Bench Hard tasks, with the drop caused by each biasing feature printed on the bars.
+>
+> **What it says:** the biased context lowers accuracy in every condition; the largest drop (36.3 points) is GPT-3.5, zero-shot, *with* chain of thought. In the few-shot setting chain of thought reduces the damage; in the zero-shot setting "it hurts more than it helps".
+>
+> **Why it matters:** the model rationalised the biased answer in its chain. Any agent that reads user text can receive such a bias ("I'm sure it's the second option"), and the chain will not tell you it happened. Log the inputs, not only the reasoning.
+
+> [!DEFINITION] Oracle evaluation
+> An experimental setting in which the loop is told the right answer, or told when its answer is right, usually to stop retrying. Oracle results show the ceiling of a method if a perfect verifier existed; they say nothing about the method without one. Several of the optimistic self-correction numbers of 2023 were oracle results, which Huang et al. point out.
+
+> [!PAPER] Huang et al. (2023), Cannot Self-Correct Yet · Abstract · page 1
+> [![Abstract of the paper Large Language Models Cannot Self-Correct Reasoning Yet with highlighted phrases: intrinsic self-correction; struggle to self-correct their responses without external feedback; performance even degrades after self-correction](/img/agents/ch3-selfcorrect-abstract.png)](/img/agents/ch3-selfcorrect-abstract.png)
+>
+> **Context:** arXiv 2310.01798 by Jie Huang, Xinyun Chen, Denny Zhou and colleagues at Google DeepMind, posted 3 October 2023, published at ICLR 2024. It re-examines the self-correction results of 2023 (Reflexion and Self-Refine among them) and finds that the impressive ones used an oracle: the ground-truth label told the loop when to stop.
+>
+> **What it says:** in "intrinsic self-correction", where "an LLM attempts to correct its initial responses based solely on its inherent capabilities, without the crutch of external feedback", models "struggle to self-correct their responses without external feedback, and at times, their performance even degrades".
+>
+> **Why it matters:** this is the paper that separates the two kinds of reflection in Section 3.5. Asking a model to check its own reasoning is not a verification step; it is a second sample with a prompt that biases it to change its mind.
+
+> [!PAPER] Huang et al. (2023), Cannot Self-Correct Yet · Table 3 · page 4
+> [![Table 3 of the paper: GPT-3.5 and GPT-4 on GSM8K, CommonSenseQA and HotpotQA with intrinsic self-correction; GPT-3.5 standard prompting 75.9, 75.8 and 26.0 falls to 74.7, 41.8 and 25.0 after two rounds; GPT-4 95.5, 82.0 and 49.0 falls to 89.0, 80.0 and 43.0; the number of calls rises from 1 to 5](/img/agents/ch3-selfcorrect-table3.png)](/img/agents/ch3-selfcorrect-table3.png)
+>
+> **Context:** the central table. Each round of self-correction is two more calls (a critique and a revision), so round 2 costs five calls.
+>
+> **What it says:** accuracy falls on every benchmark for both models. GPT-3.5 on CommonSenseQA collapses from 75.8 to 38.1 after one round; GPT-4 on GSM8K slides from 95.5 to 89.0 after two. With an oracle label deciding when to stop (their Table 2) the same loop *gains* up to 14 points, which is where the earlier optimistic numbers came from.
+>
+> **Why it matters:** five calls, worse answers. The authors' explanation (page 4) is that "LLMs cannot properly judge the correctness of their reasoning": on GSM8K GPT-3.5 kept its answer 74.7% of the time, and when it changed, it changed a right answer to a wrong one more often than the reverse. Any retry loop needs a judge that is not the model being judged.
+
+### Chain of thought in practice
+
+| | Direct answer | Chain of thought (prompted) | Reasoning model |
+|---|---|---|---|
+| Pros | cheapest and fastest; easiest to parse | large gains on multi-step problems; readable (if not faithful) steps; works with any capable model | the gains without prompt engineering; the model decides how long to think; strong on maths and code |
+| Cons | wrong on anything with steps; nothing to debug | 2x to 10x the output tokens; steps can rationalise rather than explain; small models get worse | tokens you pay for but cannot read; latency varies with the problem; little control beyond an effort setting |
+| When to pick it | classification, extraction, formatting, routing | arithmetic, logic, planning steps, anything where a wrong intermediate step is likely | hard reasoning steps where accuracy is worth the cost; the planner call of Section 3.4 |
+| How to tell it was right | accuracy on the labelled set is already at the target | accuracy rises on the step-heavy slice and stays flat elsewhere | the accuracy gain per dollar beats a prompted chain on the same slice |
+
+**What to measure before you decide**
+
+| Measurement | How | What it tells you |
+|---|---|---|
+| Accuracy by problem type | split the labelled set into single-step and multi-step items | where the scratchpad helps and where it is pure cost |
+| Output tokens per call | from the API usage field, per condition | the real multiplier on your prompts, not the rule of thumb |
+| Agreement rate across samples | sample the same question five times at temperature 0.7 | whether self-consistency has anything to vote on; near-unanimous wrong answers mean it will not help |
+| Faithfulness probe | add an irrelevant hint to a hundred prompts and count answer changes | how much a user's phrasing can steer the answer without appearing in the chain |
+| Self-critique delta | ask the model to review and revise a hundred answers with no external signal | almost always zero or negative; the number that stops someone adding a "reflection" step without a test |
+
+> [!TIP] In production
+> Treat the chain as a cost and a debugging aid, never as evidence. Log it, read it when a run fails, and build your verification on something outside it: a test, a database row, a schema check, a second model with different inputs, or a person. If you move to a reasoning model, re-measure cost per correct answer on your own tasks at each effort setting; the default effort is rarely the right one for a routine step.
+
+### Discussion
+
+1. **Is chain of thought still a pattern you choose, now that models reason by default?** For a reasoning model the choice became an effort dial. My view: yes, it is still a choice, made per step: minimal effort for routine steps, more for the hard ones, and measured both ways.
+2. **Should the chain be shown to users?** It builds trust and it can mislead. My view: show conclusions and evidence (the tool results), not the reasoning text; the unfaithfulness result means the chain is not the evidence it looks like.
+3. **When is self-consistency worth ten times the tokens?** Only when answers are exactly comparable and the base model is right more often than wrong on each route. My view: measure the agreement rate first; if five samples usually agree, one is enough; if they usually disagree, you have a knowledge problem that voting cannot fix.
+4. **Does the counter-evidence age?** Both papers used 2023 models, and later models rationalise less and self-correct a little better. My view: the mechanism (the chain is text about the answer, not the computation) has not changed, so the burden of proof stays with anyone who wants to trust it.
+
+## 3.3 ReAct: interleaving thought, action and observation
+
+Chain of thought lets a model think. Tools let it act. ReAct, from October 2022, is the paper that put the two in one loop, and it is the pattern that almost every agent framework shipped as its default for the next three years. Chapter 1 introduced the paper's abstract and its first figure; this section reads the rest of it: the exact format, the results tables, the error analysis, and what function calling later changed.
+
+> [!DEFINITION] ReAct
+> A prompting pattern in which the model alternates three kinds of text: a **thought** (free-form reasoning about what to do next), an **action** (a tool call in a fixed syntax, or a final answer) and an **observation** (the tool's result, appended by the loop, not written by the model). The sequence repeats until the model emits a finish action or the loop's step budget runs out. The name is "Reason + Act".
+
+{{FIG:ch3_react_loop|The ReAct loop and its two surface forms. The model writes a thought and an action; the loop runs the tool and appends the observation; the cycle repeats until a finish action. The paper's 2022 format is plain text parsed by a regular expression; with function calling the action is a structured tool call and the thought is optional text before it, hidden reasoning tokens, or absent. The shape of the loop is the same.}}
+
+### Context: two lines of work that had been kept apart
+
+Shunyu Yao was a PhD student at Princeton working with Karthik Narasimhan; the paper was written with Google Research (Jeffrey Zhao, Dian Yu, Nan Du, Izhak Shafran, Yuan Cao). In 2022 two things were true at once. Chain of thought had shown that models could reason in text, but a chain of thought cannot look anything up, so it hallucinated facts and could not recover from them. Separately, work such as WebGPT and SayCan had shown that models could emit actions in an environment, but those systems kept no reasoning between actions and tended to repeat themselves or lose track of the goal. ReAct's claim was that each fixed the other: reasoning tells the acting what to do next and why; acting gives the reasoning facts to work with.
+
+> [!DEFINITION] Observation
+> The text the loop appends after running an action: the tool's result, an error message, or a note from the loop itself (such as "you have run this before"). The model never writes an observation; it reads it. Everything the agent learns during a run arrives this way, so the content and size of observations decide how well the loop works.
+
+> [!DEFINITION] Step budget
+> The maximum number of model calls (or tool calls) a run may make before the loop stops it. Set from the distribution of successful runs, not from the longest imaginable task; the ReAct paper used seven and five. A run that hits the budget is almost always stuck rather than about to finish.
+
+### The method, in our own words
+
+The prompt holds a handful of worked examples (one to six, depending on the task) written as alternating `Thought:`, `Action:` and `Observation:` lines, followed by the new question. The model continues the pattern. When it writes an `Action:` line, the loop stops the generation, parses the action with a regular expression, runs the matching tool, and appends `Observation: <result>` to the prompt. Then it asks the model to continue. For question answering the tools were three operations over Wikipedia: `search[entity]` (returns the first paragraphs of the page, or similar titles if there is none), `lookup[string]` (the next sentence containing the string on the current page) and `finish[answer]`. The budget was seven steps on HotpotQA and five on FEVER; beyond that, the authors note, almost no correct trajectory continued.
+
+Two details are easy to miss and worth copying. First, thoughts were **sparse** in the decision-making tasks: the model was allowed to act without a thought on routine steps, and to think only when it needed to decompose a goal, track progress or handle a surprise. Second, the paper proposes two **fallbacks**: when ReAct fails to answer within its budget, fall back to self-consistency over chains of thought (internal knowledge), and when self-consistency's vote is weak (the majority answer appears in fewer than half the samples), fall back to ReAct (external knowledge). The best results in the paper came from these combinations, not from ReAct alone.
+
+> [!DEFINITION] Fallback
+> A second pattern the loop switches to when the first one fails within its budget: ReAct falling back to self-consistency when it runs out of steps, a chatbot handing the conversation to a person when its guardrail rejects two answers. Fallbacks turn a hard failure into a cheaper or safer path and are the main reason to measure the budget-hit rate.
+
+### What they measured
+
+> [!PAPER] Yao et al. (2022), ReAct · Table 1 and Figure 2 · page 5
+> [![Table 1 and Figure 2 of the ReAct paper: PaLM-540B prompting results on HotpotQA exact match and FEVER accuracy; Standard 28.7 and 57.1, chain of thought 29.4 and 56.3, chain of thought with self-consistency 33.4 and 60.4, Act 25.7 and 58.9, ReAct 27.4 and 60.9, the two combined methods 34.2 and 64.6 and 35.1 and 62.0, supervised state of the art 67.5 and 89.5; the figure plots accuracy against the number of self-consistency samples](/img/agents/ch3-react-table1.png)](/img/agents/ch3-react-table1.png)
+>
+> **Context:** PaLM-540B with few-shot prompts on two knowledge tasks: HotpotQA (multi-hop questions over Wikipedia, exact-match score) and FEVER (claim verification: supports, refutes or not enough information).
+>
+> **What it says:** ReAct beat Act on both tasks (27.4 against 25.7, 60.9 against 58.9). Against chain of thought it won on FEVER (60.9 against 56.3) and *lost* on HotpotQA (27.4 against 29.4). The combinations won: ReAct falling back to self-consistency reached 35.1 on HotpotQA, and self-consistency falling back to ReAct reached 64.6 on FEVER. The supervised systems of the day were far ahead on both (67.5 and 89.5).
+>
+> **Why it matters:** the headline is not "ReAct is best". It is that reasoning and acting are complementary and that neither alone was reliable. Figure 2 adds the practical point: the combinations reached the accuracy of 21-sample self-consistency with three to five samples, a cost saving of four to seven times.
+
+> [!PAPER] Yao et al. (2022), ReAct · Table 2 · page 6
+> [![Table 2 of the ReAct paper: success and failure modes of ReAct and chain of thought on HotpotQA, from a manual study of 200 trajectories; successes split into true positive 94 and 86 percent and false positive, hallucinated trace or facts, 6 and 14 percent; failures split into reasoning error 47 and 16 percent, search result error 23 percent for ReAct only, hallucination 0 and 56 percent, and label ambiguity 29 and 28 percent](/img/agents/ch3-react-table2.png)](/img/agents/ch3-react-table2.png)
+>
+> **Context:** the authors sampled 50 correct and 50 incorrect trajectories from each method and labelled them by hand.
+>
+> **What it says:** chain of thought's dominant failure was **hallucination** (56% of its failures, and 14% of its "successes" were right for hallucinated reasons); ReAct's hallucination rate was 0%. ReAct's dominant failure was **reasoning error** (47%), defined to include "failing to recover from repetitive steps", followed by **search result error** (23%): a search that returned nothing useful derailed the rest of the run.
+>
+> **Why it matters:** this table is the first failure taxonomy for agents, and both of ReAct's failure modes are still the top two things traces catch today. Our own experiment below reproduces the first one exactly.
+
+> [!PAPER] Yao et al. (2022), ReAct · Section 3.3 · page 6
+> [![Two paragraphs of the ReAct paper's results section with highlighted phrases: the model repetitively generates the previous thoughts and actions; non-informative search, which counts for 23 percent of the error cases](/img/agents/ch3-react-errors.png)](/img/agents/ch3-react-errors.png)
+>
+> **Context:** observations B and C under the error analysis.
+>
+> **What it says:** the "structural constraint" of alternating thought and action "reduces its flexibility in formulating reasoning steps", and there is "one frequent error pattern specific to ReAct, in which the model repetitively generates the previous thoughts and actions". And "non-informative search, which counts for 23% of the error cases, derails the model reasoning and gives it a hard time to recover".
+>
+> **Why it matters:** read the second one as a tool-design finding. The quality of what a tool returns on a miss decides whether the loop recovers. Chapter 2's rule that an error message must say what to do next came, in part, from here.
+
+> [!PAPER] Yao et al. (2022), ReAct · Tables 3 and 4 · page 8
+> [![Tables 3 and 4 of the ReAct paper: ALFWorld success rates per task type for Act, ReAct, ReAct-IM and BUTLER, with ReAct best of 6 at 71 percent overall against Act 45 and BUTLER 37; WebShop score and success rate for Act 62.3 and 30.1, ReAct 66.6 and 40.0, imitation learning 59.9 and 29.1, imitation plus reinforcement learning 62.4 and 28.7, and human expert 82.1 and 59.6](/img/agents/ch3-react-table3.png)](/img/agents/ch3-react-table3.png)
+>
+> **Context:** two interactive environments. ALFWorld is a text game of household tasks ("put a clean pan on the countertop") with 134 test tasks and six controlled trials; WebShop is a simulated shopping site with real product data.
+>
+> **What it says:** on ALFWorld the best ReAct trial reached 71% against 45% for the best Act trial and 37% for BUTLER, a trained imitation-learning agent; even the worst ReAct trial (48%) beat both. On WebShop, ReAct's 40.0% success beat Act's 30.1% and the trained baselines (29.1 and 28.7), and was far below the human expert's 59.6%.
+>
+> **Why it matters:** this is where the paper earns the word "agent". Without thoughts, the authors say, Act "fails to correctly decompose goals into smaller subgoals, or loses track of the current state of the environment". The thought is the agent's working memory (Chapter 2) written inline.
+
+**Limitations the authors admit.** Prompting results were "still significantly far from domain-specific state-of-the-art approaches"; the smaller PaLM models (8B and 62B) prompted with ReAct did *worst* of the four methods, because learning to reason and act from a few examples is hard, and only fine-tuning on 3,000 ReAct trajectories made them competitive; the repetition failure was attributed to greedy decoding and left unsolved; and the whole study was on three Wikipedia operations and two text games.
+
+**What practitioners took from it.** Three things. The format: every agent framework's default agent from 2023 onwards was a ReAct loop with a parser, a tool registry and a step budget. The fallback idea: if the loop fails, try something else rather than looping longer. And, less consciously, the failure modes: repetition and unhelpful tool results are the two things every production trace review finds first.
+
+### What function calling changed
+
+When vendors added structured tool calling to their APIs in 2023, the regular-expression parser disappeared and the thought became optional. The model emits a `tool_use` block; the API guarantees its shape; your code runs the tool and returns a `tool_result`; the loop is otherwise identical. Three consequences for the pattern:
+
+1. **The thought is now a choice.** Some agents ask for a short text before each call ("reasoning" or "plan" fields); some use a reasoning model whose thoughts are hidden; some have no thought at all. The ReAct result (thoughts help the model decompose and keep state) still holds, but the evidence is now per model and per task, and you must measure it.
+2. **Parallel actions became possible.** A single model turn can contain several tool calls, which the loop can run concurrently. Section 3.4 shows what that does to latency.
+3. **The format stopped being the hard part.** The hard parts moved to the loop (budgets, guards, stop conditions) and to the tools (what they return on a miss). Our experiment below is about exactly those.
+
+### Our own experiment: direct, chain of thought, ReAct, and a better ReAct
+
+The script `ch3_react.py` runs twelve two-hop questions through four conditions with a real model (gpt-5-mini, a small reasoning model with its effort set to minimal so that the visible text is the reasoning we study). The tools are a tiny local "wiki" of 21 entries and a calculator. Six questions are **public** (world facts the model may know, plus arithmetic: "How many metres taller is Mount Everest than Mount Kilimanjaro?"); six are **private**, about a fictional logistics company the model cannot have seen ("How many years after the Porto depot of Northwind Freight opened did the Leeds depot open?"). Answers are graded by exact match after normalising units and punctuation. The whole run cost under three US cents; token counts come from the API's usage fields.
+
+> [!DEFINITION] Repeated-action guard
+> A check in the loop that notices when the model emits an action identical to one it has already run and changes what the model sees next: a note that the result is unchanged, an instruction to finish with the evidence it has, or a hand-off to a fallback. It removes the single most common ReAct failure for a few lines of code.
+
+The four conditions are: a **direct** answer with no reasoning; a **chain of thought**; a plain **ReAct** loop in the paper's text format, with a step budget of seven; and **ReAct+**, the same loop with two changes that live outside the model. The loop gets a **repeated-action guard**: if the model emits exactly the same action twice, the loop replaces the observation with "you have been round this loop; using only the observations above, finish now". The wiki tool gets **better observations**: an entry lists its related entries by name (the company's entry names its four depots), several matches come back as entries rather than as an error, and a miss explains how entries are named.
+
+```python
+# code/agents/ch3_react.py (abridged): the loop. The model writes one Thought and one Action; the loop runs the tool,
+# appends the Observation and calls again. `guard` is the five-line repeated-action check of the ReAct+ condition.
+def run_react(q, max_steps=7, tools=TOOLS, guard=False):
+    prompt = REACT.format(q=q)                                   # few-shot example + the question
+    trace, seen = [], {}
+    for step in range(max_steps):                                # the step budget
+        out = model(prompt, 200)
+        m = re.search(r'(.*?Action:\s*(\w+)\[(.*?)\])', out, re.S)   # keep the first Thought/Action pair only
+        chunk, tool, arg = m.group(1).strip(), m.group(2), m.group(3)
+        if tool == 'finish':
+            return arg.strip(), trace
+        obs = tools[tool](arg) if tool in tools else f'Unknown tool {tool}. Use wiki[...] or calc[...].'
+        if guard and (tool, arg) in seen:                        # the loop, not the model, notices a repeated action
+            obs = (f'(repeated action, result unchanged: {seen[(tool, arg)]}) You have been round this loop once. '
+                   'Using ONLY the observations above, write a final Thought and then Action: finish[answer] now.')
+        else:
+            seen[(tool, arg)] = obs
+        prompt += chunk + f'\nObservation: {obs}\n'               # the observation becomes context
+    return '(step budget exhausted)', trace
+```
+
+[![Terminal output of ch3_react.py: a per-question table of twelve rows with columns direct, cot, react, react plus and the step counts, public questions one to six and private questions seven to twelve; then a summary table with accuracy 0 percent for direct, 33 percent for chain of thought, 50 percent for ReAct and 100 percent for ReAct plus, calls 12, 12, 64 and 53, input tokens 495, 699, 27,233 and 21,221, cost 0.0005, 0.0022, 0.0118 and 0.0093 dollars, and cost per correct answer; total spend 0.0238 dollars over 141 calls, no stub used](/img/agents/ch3_react-run.png)](/img/agents/ch3_react-run.png)
+
+{{FIG:ch3_react_results|Our four conditions on twelve two-hop questions with gpt-5-mini. Direct answering got none right; chain of thought got four of the six public questions and none of the private ones; the plain ReAct loop got half of each; ReAct with a loop guard and a tool that lists related entries got all twelve, with fewer calls and at lower cost than the plain loop. The ordering is stable across runs; the exact percentages move by a question or two.}}
+
+Read the table in three steps. **Direct against chain of thought** shows what a scratchpad buys: the direct answers to the public questions were all wrong (the model guessed 87 years for Eiffel Tower to Opera House, 7,231 metres for Everest over Kilimanjaro), while the chain of thought wrote the two facts down, subtracted, and got four of six. On the private questions both scored zero, because no amount of thinking produces a fact the model never saw; the chains confidently invented a chief executive and a founding city. **Chain of thought against ReAct** shows what acting buys: the loop looked the facts up and got half the private questions. **ReAct against ReAct+** shows where the loop's failures were.
+
+[![Terminal output of ch3_react_trace.py: the plain ReAct trace for question 3 in which the model looks up Sputnik 1, computes calc 1969 minus 1957 and observes 12, then repeats the same thought and action until the step budget runs out, marked wrong; then the ReAct plus trace for question 10 in which the model looks up Northwind Freight, follows the related entries to the Porto depot and the Leeds depot, computes 2020 minus 2017, observes 3 and finishes with 3, marked correct; then the direct answer 9 years and the chain of thought for the same question, both wrong](/img/agents/ch3_react_trace-run.png)](/img/agents/ch3_react_trace-run.png)
+
+{{FIG:ch3_react_failure|The repetition failure in our plain ReAct run, and the two fixes. After step 2 the answer (12) is in the context; the model regenerates its last thought and action until the budget runs out, which is the "reasoning error" row of the ReAct paper's Table 2. The fixes are a repeated-action guard in the loop and tool observations that name the next things to look up. Neither touches the model.}}
+
+The first trace is the ReAct paper's repetition failure, reproduced with a 2025 model: the answer is in the context after step 2 and the model writes the same thought and action five more times. Six of the plain loop's twelve runs ended this way. The second trace shows the guarded loop with the better tool on a private question: the company entry now says "Related entries: Rotterdam depot, Gdansk depot, Porto depot, Leeds depot, ...", the model follows the links, computes, and finishes in five steps. ReAct+ answered all twelve, used fewer calls (53 against 64) and cost less ($0.0093 against $0.0118), because wasted steps are the expensive kind.
+
+> [!WARNING]
+> Twelve questions is a demonstration, not a benchmark. We ran the plain loop three times while developing the script and it scored 58%, 67% and 50%; the ordering of the four conditions never changed, the numbers did. Treat every percentage in this section as "about", and treat the two failure traces as the finding.
+
+Two things to take from the experiment. First, both fixes are **engineering, not modelling**: a five-line guard in the loop and a better return value in the tool. Nothing about the model changed, and it went from the worst of the three reasoning conditions to perfect. Second, the guard is a *stop condition* (Chapter 2) and the related-entries list is *meaningful context from a tool* (Chapter 2); the reasoning pattern was fine, the blocks around it were weak. When a ReAct agent fails in production, look there first.
+
+### ReAct in practice
+
+| | Act only (tool calls, no thoughts) | ReAct (interleaved) |
+|---|---|---|
+| Pros | fewest output tokens; fastest per step; trivially parsed with function calling | the model keeps a running state of the goal in its thoughts; recovers from surprises; grounded in tool results, so hallucination is rare |
+| Cons | loses track of the goal on long tasks; repeats failing actions; cannot explain a decision | a model call per step on a growing context (quadratic in steps); the repetition failure; rigid alternation can hurt pure reasoning |
+| When to pick it | short tasks (one to three calls) with a capable model, where the tool results speak for themselves | multi-step tasks where the next action depends on what came back, with a budget of under about ten steps |
+| How to tell it was right | task success equals ReAct's on your set at lower cost | success rises on the multi-step slice; traces show the thought changing after each observation |
+| Production failure | silent goal drift: the agent does plausible things that no longer serve the request | repetition until the budget; tool misses that derail the run; context growth that pushes the user's constraint into the middle |
+
+**What to measure before you decide**
+
+| Measurement | How | What it tells you |
+|---|---|---|
+| Steps per task, distribution | from traces; plot it | where the budget should sit (the paper: 0.84% of correct runs used all seven steps) |
+| Repeated-action rate | count identical consecutive (tool, arguments) pairs | how often the loop is stuck; the first guard to add |
+| Tool-miss rate and recovery | observations that are empty or "not found", and whether the next step changes | whether your tools' miss messages help (the paper's 23%) |
+| Input tokens per task | sum of prompt tokens over the loop | the quadratic cost; the moment to consider a plan-first design (Section 3.4) |
+| Accuracy with and without thoughts | run the same tools with and without a reasoning field | whether, for your model and task, the thought still pays for its tokens |
+
+> [!TIP] In production
+> Give every ReAct loop three guards from day one: a step budget (and log how often it is hit), a repeated-action detector that changes what the model sees, and a fallback when the budget runs out (ask a person, or try a different pattern). Then read the tool observations in failed traces before you touch the prompt. In our run, one of twelve questions was lost to the prompt and six to the loop and the tool.
+
+### Discussion
+
+1. **Is ReAct a prompt or an architecture?** In 2022 it was a prompt; today it is the loop every framework implements. My view: treat it as architecture, which means the loop's budgets and guards are your code and your responsibility, whatever the prompt says.
+2. **Do thoughts still matter with function calling?** Some teams drop them for latency. My view: keep a short thought on steps that choose between tools or interpret a surprising result, drop it on routine steps, and let the per-step eval of Chapter 2 decide where the line is.
+3. **How long should the step budget be?** The paper chose seven because longer runs almost never succeeded. My view: measure the step distribution of your successful runs and set the budget just above the ninety-fifth percentile; a long run is far more likely to be stuck than to be about to finish.
+4. **Who fixes the repetition failure?** Better decoding (the paper's guess), a bigger model, or the loop. My view: the loop, because it is the only one of the three you control, and because the guard costs five lines and a few tokens.
+
+## 3.4 Plan-and-execute: decide first, then act
+
+ReAct decides one step at a time, and pays for it: every step re-reads everything before it, every step waits for the previous tool, and a model that cannot see the whole plan can wander. The plan-first family moves the thinking to the front. One call writes a plan; cheap calls (or no calls at all) carry it out; one call assembles the answer. Three papers from 2023 made the idea concrete, each adding one piece.
+
+> [!DEFINITION] Plan-and-execute
+> A pattern with two roles. A **planner** call reads the task and writes an explicit plan: a list of steps, each naming a tool and its arguments, with references between steps where one needs another's result. An **executor** carries the steps out, calling tools and, if needed, a cheaper model, without re-reading the whole history. A final **solver** call reads the plan and the collected evidence and writes the answer. Replanning, if any, happens between rounds, not between steps.
+
+{{FIG:ch3_plan_execute|ReAct re-reads a growing context on every call; plan-and-execute writes the whole plan in one call, runs the steps with small contexts and in parallel where their dependencies allow, and answers once. With the planning numbers of ch3_cost.py, a five-step task costs 15,750 input tokens as a ReAct loop and 8,150 as a plan; at twenty steps the ratio is 5.5 to one. The price is that a wrong plan is noticed only when the evidence comes back.}}
+
+### Plan-and-Solve: the idea in one prompt
+
+The simplest version is a prompt. In May 2023 Lei Wang and colleagues at Singapore Management University and partner universities asked why zero-shot chain of thought still failed, and sorted its errors by hand.
+
+> [!PAPER] Wang et al. (2023), Plan-and-Solve · Abstract · page 1
+> [![Abstract of the Plan-and-Solve paper with highlighted phrases: calculation errors, missing-step errors, and semantic misunderstanding errors; devising a plan to divide the entire task into smaller subtasks](/img/agents/ch3-ps-abstract.png)](/img/agents/ch3-ps-abstract.png)
+>
+> **Context:** arXiv 2305.04091, posted 6 May 2023, published at ACL 2023. The error study on page 1 found that zero-shot chain of thought on GSM8K failed through calculation errors (7%), missing steps (12%) and misunderstanding the problem (27%).
+>
+> **What it says:** zero-shot chain of thought "suffers from three pitfalls: calculation errors, missing-step errors, and semantic misunderstanding errors". Plan-and-Solve addresses the missing steps by "devising a plan to divide the entire task into smaller subtasks, and then carrying out the subtasks according to the plan".
+>
+> **Why it matters:** the method is a diagnosis turned into a sentence. Missing steps are what you get when a model reasons forward and forgets a sub-goal; writing the plan first is the cheapest remedy.
+
+> [!PAPER] Wang et al. (2023), Plan-and-Solve · Section 2.1 · page 3
+> [![A paragraph of the Plan-and-Solve paper giving the prompt, with highlighted phrases: devise a plan to solve the problem; carry out the plan and solve the problem step by step](/img/agents/ch3-ps-prompt.png)](/img/agents/ch3-ps-prompt.png)
+>
+> **Context:** the exact trigger that replaces "Let's think step by step".
+>
+> **What it says:** "Let's first understand the problem and devise a plan to solve the problem. Then, let's carry out the plan and solve the problem step by step." The extended PS+ version adds "pay attention to calculation" and "extract relevant variables and their corresponding numerals".
+>
+> **Why it matters:** this is plan-and-execute inside a single call: the plan and the execution are both text, written in order. It costs nothing extra and it is the first thing to try before building a two-model system.
+
+> [!PAPER] Wang et al. (2023), Plan-and-Solve · Table 2 · page 6
+> [![Table 2 of the Plan-and-Solve paper: accuracy of text-davinci-003 on six maths datasets; zero-shot chain of thought averages 70.4, program of thoughts 73.5, Plan-and-Solve 72.9 and PS plus 76.7; few-shot manual chain of thought averages 77.6; on GSM8K the figures are 56.4, 57.0, 58.2, 59.3 and 58.4](/img/agents/ch3-ps-table2.png)](/img/agents/ch3-ps-table2.png)
+>
+> **Context:** text-davinci-003, greedy decoding, zero-shot except the last two rows.
+>
+> **What it says:** PS+ averages 76.7 across the six sets against 70.4 for zero-shot chain of thought, and matches the eight-example few-shot prompt (77.6) with no examples. On GSM8K alone the gain is three points (56.4 to 59.3).
+>
+> **Why it matters:** a six-point average gain for a sentence is a good trade, and the paper's error analysis (Table 6) shows where it came from: missing-step errors fell. Calculation errors did not fall much, which is the honest signal that a plan does not fix arithmetic; a calculator does.
+
+### ReWOO: take the observations out of the loop
+
+Plan-and-Solve plans in text and executes in text. The next step was to plan in text and execute with tools, without re-reading. Binfeng Xu and colleagues posted ReWOO ("Reasoning WithOut Observation") in May 2023 with a cost argument on its first page.
+
+> [!PAPER] Xu et al. (2023), ReWOO · Abstract · page 1
+> [![Abstract of the ReWOO paper with highlighted phrases: redundant prompts and repeated execution; detaches the reasoning process from external observations; five times token efficiency and 4 percent accuracy improvement](/img/agents/ch3-rewoo-abstract.png)](/img/agents/ch3-rewoo-abstract.png)
+>
+> **Context:** arXiv 2305.18323, posted 23 May 2023. The authors' complaint is about ReAct's economics: the API is stateless, so "all the historical tokens ... are fed into the LLM" on every step.
+>
+> **What it says:** interleaved loops lead "to huge computation complexity from redundant prompts and repeated execution"; ReWOO "detaches the reasoning process from external observations", and on HotpotQA "achieves 5× token efficiency and 4% accuracy improvement".
+>
+> **Why it matters:** this is Chapter 2's context-budget arithmetic made into an architecture. If the model does not need to see an observation to decide the next step, do not show it one.
+
+> [!PAPER] Xu et al. (2023), ReWOO · Figure 1 · page 2
+> [![Figure 1 of the ReWOO paper: a Planner writes a plan of four steps with evidence variables E1 to E4, such as E1 equals Wikipedia of The Hennchata and E2 equals LLM of what is the main ingredient given context E1; a Worker fills each evidence variable by calling the tool; a Solver reads the plans and evidence together and writes the answer, Jas Hennessy and Co](/img/agents/ch3-rewoo-figure1.png)](/img/agents/ch3-rewoo-figure1.png)
+>
+> **Context:** the workflow for the question "What is the name of the cognac house that makes the main ingredient in The Hennchata?"
+>
+> **What it says:** the **Planner** writes every step up front, naming the tool and referencing earlier results as variables (`#E3 = Wikipedia[#E2]`). The **Worker** runs the steps and substitutes the variables. The **Solver** sees the plan and all the evidence once and answers.
+>
+> **Why it matters:** the variables are the trick. Because the plan can say "search for whatever #E2 turns out to be", the planner does not need to wait for #E2. The model is called twice (plan and solve) however many tools run, and the tools can run in whatever order their dependencies allow.
+
+> [!PAPER] Xu et al. (2023), ReWOO · Table 2 (excerpt) · page 7
+> [![The HotpotQA, TriviaQA and GSM8K blocks of Table 2 of the ReWOO paper: on HotpotQA with 1000 questions, Direct 37.8 accuracy and 55 tokens, chain of thought 41.6 and 482 tokens, ReAct 40.8 accuracy with 9,795 tokens and 4.97 steps costing 19.59 dollars per thousand, ReWOO 42.4 accuracy with 1,986 tokens and 4.45 steps costing 3.97 dollars; on TriviaQA Direct scores 80.6 while ReAct scores 59.4 and ReWOO 66.6](/img/agents/ch3-rewoo-table2.png)](/img/agents/ch3-rewoo-table2.png)
+>
+> **Context:** GPT-3.5 with Wikipedia and a calculator, a thousand questions per set.
+>
+> **What it says:** on HotpotQA, ReWOO matched ReAct's accuracy (42.4 against 40.8) at a fifth of the tokens (1,986 against 9,795 per question) and a fifth of the cost ($3.97 against $19.59 per thousand questions). On TriviaQA, both tool-using methods were *worse* than answering directly (80.6 direct against 59.4 and 66.6): the model already knew the answers and the tools distracted it.
+>
+> **Why it matters:** two production rules in one table. Decoupling plan from observation cuts the token bill by the number of steps. And adding tools to a task the model can already do makes it worse and more expensive; the direct-answer baseline must always be in the comparison.
+
+### LLMCompiler: run the plan in parallel
+
+If the plan is a list of steps with dependencies, it is a graph, and a graph can be scheduled. Sehoon Kim and colleagues at Berkeley made that explicit in December 2023, borrowing the vocabulary of compilers.
+
+> [!PAPER] Kim et al. (2023), LLMCompiler · Abstract · page 1
+> [![Abstract of the LLMCompiler paper with highlighted phrases: sequential reasoning and acting for each function; latency speedup of up to 3.7 times, cost savings of up to 6.7 times](/img/agents/ch3-llmcompiler-abstract.png)](/img/agents/ch3-llmcompiler-abstract.png)
+>
+> **Context:** arXiv 2312.04511, posted 7 December 2023, published at ICML 2024. Three components: a Function Calling Planner that writes a directed acyclic graph of tasks, a Task Fetching Unit that dispatches tasks as their inputs become ready, and an Executor that runs them in parallel.
+>
+> **What it says:** current methods "require sequential reasoning and acting for each function which can result in high latency, cost, and sometimes inaccurate behavior"; the compiler delivers "latency speedup of up to 3.7×, cost savings of up to 6.7×, and accuracy improvement of up to ∼9% compared to ReAct".
+>
+> **Why it matters:** the accuracy gain is the surprising one, and the paper explains it: ReAct's looping and early stopping (our Section 3.3 failures again) disappeared once the plan was written in advance.
+
+> [!PAPER] Kim et al. (2023), LLMCompiler · Table 1 · page 6
+> [![Table 1 of the LLMCompiler paper: accuracy and latency on HotpotQA, Movie Recommendation, ParallelQA and Game of 24 for ReAct, ReAct with anti-looping prompts, OpenAI parallel function calling and LLMCompiler, with GPT and LLaMA-2 70B; on Movie Recommendation with GPT, ReAct with prompts scores 72.47 at 20.47 seconds and LLMCompiler 77.13 at 5.47 seconds, a 3.74 times speedup; the caption notes frequent looping and early stopping of ReAct](/img/agents/ch3-llmcompiler-table1.png)](/img/agents/ch3-llmcompiler-table1.png)
+>
+> **Context:** the main results. The caption admits that plain ReAct's latency could not be measured fairly because "looping and early stopping make precise latency measurement difficult", so a ReAct variant with anti-looping prompts is the baseline.
+>
+> **What it says:** on Movie Recommendation (eight independent searches per question) the compiler reached 77.13% in 5.47 seconds against ReAct's 72.47% in 20.47 seconds; on HotpotQA (two dependent searches) the speedup was 1.8x with equal accuracy; on their ParallelQA set 2.15x; on Game of 24 the compiler re-planned between rounds and beat Tree of Thoughts' time by 2.89x at the same accuracy.
+>
+> **Why it matters:** the speedup equals the width of the graph. Tasks whose steps are independent (compare these eight things) gain the most; tasks whose every step depends on the previous one gain almost nothing. Measure the shape of your task's dependency graph before you build a scheduler.
+
+### When a fixed plan beats step-by-step, and the cost arithmetic
+
+The script `ch3_cost.py` counts the tokens for a task of *n* tool steps under planning numbers (a 1,500-token prompt, 150-token thoughts, 300-token observations) with no API calls.
+
+[![Terminal output of ch3_cost.py part four: ReAct input tokens against step count, 5,850 at 2 steps against 5,210 for plan-and-execute, 15,750 against 8,150 at 5 steps, 41,250 against 13,050 at 10 steps and 126,000 against 22,850 at 20 steps, ratios 1.1, 1.9, 3.2 and 5.5](/img/agents/ch3_cost-run.png)](/img/agents/ch3_cost-run.png)
+
+{{FIG:ch3_cost_growth|Input tokens per task against the number of tool steps, for a ReAct loop that re-reads its history and a plan-and-execute design with small per-step contexts, from the planning numbers of ch3_cost.py. The loop's cost is quadratic in the number of steps (each step re-reads everything before it); the plan's is linear. At two steps they are equal; at twenty the ratio is 5.5 to one.}}
+
+```python
+# code/agents/ch3_cost.py (abridged): the two formulas of this section, with the planning numbers at the top of the file.
+def cost(inp, out, price):                      # tokens -> dollars at (input, output) prices per million
+    pi, po = price
+    return inp / 1e6 * pi + out / 1e6 * po
+
+# ReAct: every step re-reads the prompt plus all earlier thoughts and observations
+react_input = sum(P + k * (THOUGHT + OBS) for k in range(n_steps + 1))
+# plan-and-execute: one planner call, small executor contexts, one solver call
+plan_input = P + n_steps * (EXEC_IN + OBS) + (P + PLAN + n_steps * EXEC_OUT)
+
+for p in [0.3, 0.5, 0.7]:                        # a verifier and up to k retries
+    for k in [1, 2, 3, 5]:
+        p_success = 1 - (1 - p) ** k
+        e_attempts = (1 - (1 - p) ** k) / p
+        cost_per_correct = c * e_attempts / p_success   # = c / p, whatever k is
+```
+
+The arithmetic is simple enough to do in your head. A ReAct loop of *n* steps sends roughly $$n \cdot P + \frac{n(n-1)}{2}(T + O)$$ input tokens, where $$P$$ is the prompt, $$T$$ a thought and $$O$$ an observation: the second term is the re-reading, and it is quadratic. A plan-and-execute design sends $$P$$ once for the planner, a small fixed context per executor step, and $$P$$ plus the collected evidence once for the solver: linear in *n*. At two steps the two are equal; at twenty the loop sends five and a half times more. Latency follows the same shape, except that the executor's steps can run in parallel where the plan allows, so the plan's latency is the depth of the dependency graph rather than the number of steps.
+
+> [!DEFINITION] Replanning
+> Running the planner again after some or all of the executor's steps have returned, with the evidence so far in its context, so that a plan that turned out to be wrong can be corrected. Without it a plan-first agent cannot react to a surprise; with it on every step, the pattern degenerates back into ReAct. Most systems replan at fixed checkpoints or when a step fails.
+
+| | ReAct (step by step) | Plan-and-execute (plan first) |
+|---|---|---|
+| Pros | adapts after every observation; no plan can be wrong because there is none; simple to build | one or two big calls instead of *n*; executors can be small models; steps run in parallel; the plan is a readable, reviewable artefact (the user can approve it) |
+| Cons | quadratic tokens; sequential latency; repetition and drift | a wrong plan is found late; the planner must know the tools well; dependencies must be expressible (the #E variables); replanning adds back some of the cost |
+| When to pick it | few steps, each depending on the last; exploratory tasks where the plan cannot be known | known task shapes with several independent steps; latency or token budgets that a loop cannot meet; tasks where a human should approve the plan first |
+| How to tell it was right | success equal to the plan version on your set with fewer failures from bad plans | tokens per task and p95 latency fall at equal accuracy; replanning rate is low and stable |
+| Production failure | the budget-exhausted loop; the context that grew past the attention budget | a plan built on a wrong assumption executes all its steps before anyone notices; executors fail silently on steps the planner never anticipated |
+
+**What to measure before you decide**
+
+| Measurement | How | What it tells you |
+|---|---|---|
+| Dependency width | for a sample of tasks, draw which steps need which; count the independent ones | the parallel speedup available; width one means no speedup |
+| Plan correctness | have a reviewer grade a hundred plans before execution | whether the planner knows the tools; the failure rate you will see at the end |
+| Replanning rate | how often the evidence forces a new plan | the real cost of the pattern once surprises are included |
+| Tokens per task, both designs | run both on the same hundred tasks | the actual ratio for your prompt and observation sizes |
+| Direct-answer baseline | the same tasks with no tools | whether the task needs tools at all (ReWOO's TriviaQA row) |
+
+> [!TIP] In production
+> Make the plan a first-class artefact: store it, log it, show it. The Amazon and Google systems in Section 3.8 both let a person review the plan before anything runs, which turns the pattern's weakness (a wrong plan found late) into a human-in-the-loop step at exactly the right moment. And route the planner call to your strongest model and the executor calls to your cheapest; that is the router of Chapter 2 with the pattern deciding where the line goes.
+
+### Discussion
+
+1. **Does a plan help or hurt a capable model?** A strong model in a ReAct loop may plan implicitly in its thoughts. My view: the plan's value is as much for the humans and the scheduler as for the model: it is reviewable, parallelisable and cheap to execute; measure the token and latency savings and the plan error rate together.
+2. **How often should we replan?** Never is brittle; always is ReAct. My view: replan on failure (a step returns an error or nothing) and at most once on a fixed checkpoint; log the replanning rate as a health metric.
+3. **Can the executor be a small model, or no model?** ReWOO's worker is mostly tool calls plus variable substitution; LLMCompiler's executor is a scheduler. My view: start with no model in the executor; add a small one only for steps that need to read a result and extract something.
+4. **Is the compiler analogy more than a metaphor?** Planner as front end, fetching unit as scheduler, executor as back end. My view: it is useful exactly as far as your plans are graphs with explicit dependencies; the moment the next step depends on reading a result with judgement, you are back to a loop, and that is fine as long as you know which parts are which.
+
+## 3.5 Reflection and self-correction: who tells the agent it was wrong?
+
+Every pattern so far produces one answer and stops. The reflection family adds a second attempt, with a critique of the first one in the context. It is the pattern with the widest gap between what the early papers seemed to show and what they actually showed, so this section is as much about reading results carefully as about the pattern. The single distinction that matters: is the critique **grounded in an external signal** (a test failed, a compiler complained, a search contradicted a claim, a person objected), or is it the model's **own judgement** of its own work?
+
+> [!DEFINITION] Reflection (self-correction loop)
+> A pattern in which an attempt is evaluated, a critique of it is written in natural language, and a new attempt is made with the critique (and usually the failed attempt) in the context. The evaluation can be **external** (tests, a compiler, a search result, a database, a human) or **intrinsic** (the model reviewing itself with no new information). The pattern's value is the value of the evaluation.
+
+{{FIG:ch3_reflection|The reflection loop and the distinction that decides whether it helps. An actor writes an attempt, an evaluator says pass or fail, a self-reflection step writes why it failed, the reflection is stored and the next attempt sees it. With a weak check (the model judges itself) no new information enters the loop and the evidence says accuracy falls; with a strong check (tests, a compiler, a search result, a person) the loop converges.}}
+
+### Reflexion: verbal reinforcement
+
+Noah Shinn and colleagues (Northeastern, MIT, Princeton) posted Reflexion in March 2023; Chapter 1 showed its abstract. The idea is to let an agent learn across trials without changing its weights: after a failed trial, a model writes a short reflection on what went wrong, the reflection is stored in an episodic memory, and the next trial sees it.
+
+> [!PAPER] Shinn et al. (2023), Reflexion · Figure 2 · page 4
+> [![Figure 2 of the Reflexion paper: a diagram in which an Actor LM produces a trajectory in short-term memory, an Evaluator LM scores it with internal or external feedback, a Self-reflection LM writes reflective text into long-term experience memory, and the Actor acts in the environment; beside it, Algorithm 1, reinforcement via self-reflection, which loops while the evaluator does not pass and the trial count is under the maximum](/img/agents/ch3-reflexion-figure2.png)](/img/agents/ch3-reflexion-figure2.png)
+>
+> **Context:** arXiv 2303.11366, posted 20 March 2023, published at NeurIPS 2023. Three models (which can be the same model with different prompts): an Actor that acts, an Evaluator that scores a whole trial, a Self-Reflection model that explains the score in words.
+>
+> **What it says:** the loop is "while Evaluator not pass or t < max trials: generate a trajectory, evaluate it, generate a self-reflection, append it to memory". The Evaluator can use "external feedback" (exact-match grading, heuristics, a test suite) or "internal feedback" (an LLM judging the trajectory).
+>
+> **Why it matters:** the architecture is clear about the two kinds of signal, and the paper's results differ by which one was used. Read the Evaluator box before you read any number.
+
+> [!PAPER] Shinn et al. (2023), Reflexion · Section 4.3 · page 7
+> [![A paragraph of the Reflexion paper's programming section with the highlighted phrase: self-generated unit test suites; it describes generating tests with chain-of-thought prompting, filtering them for syntactic validity, sampling up to six, and a memory limit of one experience](/img/agents/ch3-reflexion-tests.png)](/img/agents/ch3-reflexion-tests.png)
+>
+> **Context:** how the programming experiments were graded. The model writes its own unit tests from the problem statement before writing the code; the tests are filtered for syntax and up to six are kept; the code is run against them; failures are fed back.
+>
+> **What it says:** programming "presents a unique opportunity to use more grounded self-evaluation practices such as self-generated unit test suites"; the loop keeps "a max memory limit of 1 experience".
+>
+> **Why it matters:** the critic here is a test runner, which is external even though the tests were written by the model. That is a middle category worth naming: *model-written checks executed by a machine*. It is weaker than human-written tests (the model may test the wrong thing) and far stronger than the model re-reading its code.
+
+> [!PAPER] Shinn et al. (2023), Reflexion · Table 1 · page 7
+> [![Table 1 of the Reflexion paper: pass at 1 accuracy by benchmark and language; HumanEval Python previous state of the art 65.8, GPT-4 80.1, Reflexion 91.0; HumanEval Rust 60.0 to 68.0; MBPP Python 80.1 to 77.1; MBPP Rust 70.9 to 75.4; LeetcodeHard Python 7.5 to 15.0](/img/agents/ch3-reflexion-table1.png)](/img/agents/ch3-reflexion-table1.png)
+>
+> **Context:** GPT-4 as the base model, zero-shot; the "base strategy is a single code generation sample".
+>
+> **What it says:** HumanEval Python from 80.1 to 91.0; Rust from 60.0 to 68.0; LeetcodeHard (40 problems released after the model's training cutoff) from 7.5 to 15.0. And one honest minus: MBPP Python *fell* from 80.1 to 77.1.
+>
+> **Why it matters:** the MBPP drop is the most instructive number in the table. The authors attribute it to false positives in the self-written tests: the model wrote tests that passed wrong code, so the loop stopped on wrong answers. Where the check is weak, reflection can hurt. The 91.0 headline and the 77.1 footnote are the same mechanism measured on two datasets.
+
+> [!DEFINITION] pass@k
+> The share of tasks for which at least one of k independent attempts is correct, as judged by tests. pass@1 is the single-attempt rate. Reflexion reports its results as pass@1 because the retries are driven by self-written tests rather than by the hidden ones, so the final submission is still one attempt against the real grader.
+
+The paper's other results follow the same rule. On ALFWorld (decision making) the Evaluator was a heuristic that detected repeated actions and over-long trajectories, external to the model, and success rose by about 22 points over twelve trials. On HotpotQA the Evaluator was exact match against the gold answer, which is an oracle: it tells the loop when to stop, and Huang et al. (Section 3.2) later showed that most of the gain on that task comes from the oracle rather than the reflection.
+
+### Self-Refine: the model as its own critic
+
+Two weeks later Aman Madaan and colleagues (Carnegie Mellon, Allen Institute and others) posted Self-Refine, which uses one model as generator, critic and refiner, with no tools, tests or labels.
+
+> [!PAPER] Madaan et al. (2023), Self-Refine · Table 1 · page 5
+> [![Table 1 of the Self-Refine paper: base against Self-Refine for three models on seven tasks; dialogue response for GPT-4 rises from 25.4 to 74.6, code optimisation from 27.3 to 36.0, sentiment reversal from 3.8 to 36.2; math reasoning barely moves, 64.1 to 64.1, 74.8 to 75.0 and 92.9 to 93.1](/img/agents/ch3-selfrefine-table1.png)](/img/agents/ch3-selfrefine-table1.png)
+>
+> **Context:** arXiv 2303.17651, posted 30 March 2023, published at NeurIPS 2023. Metrics differ by task: human or GPT-4 preference for the writing tasks, a solve rate for maths, the share of programs made faster for code optimisation.
+>
+> **What it says:** large gains on preference tasks (dialogue response for GPT-4 from 25.4 to 74.6, sentiment reversal from 3.8 to 36.2), a solid gain on code optimisation (27.3 to 36.0), and almost nothing on maths (92.9 to 93.1 for GPT-4, 64.1 to 64.1 for GPT-3.5).
+>
+> **Why it matters:** the pattern of gains is the finding. Where quality is a matter of taste and coverage (is the reply polite, does the sentence contain all the required words), a model can see what is missing and add it. Where quality is correctness, it cannot see the error, and the numbers do not move.
+
+> [!PAPER] Madaan et al. (2023), Self-Refine · Section 3.3 · page 5
+> [![A paragraph of the Self-Refine paper with the highlighted phrase: inability to accurately identify whether there is any error; the text explains that in maths errors can be limited to a single line and a consistent-looking reasoning chain can deceive the model](/img/agents/ch3-selfrefine-math.png)](/img/agents/ch3-selfrefine-math.png)
+>
+> **Context:** the authors' explanation of the maths result.
+>
+> **What it says:** "the modest performance gains in Math Reasoning can be traced back to the inability to accurately identify whether there is any error", and "a consistent-looking reasoning chain can deceive LLMs".
+>
+> **Why it matters:** the authors of the self-critique paper state the limit of self-critique: it needs an error the critic can see. Huang et al. generalised this six months later into "cannot self-correct reasoning yet". The two papers agree; only the headlines differ.
+
+### CRITIC: tools as the critic
+
+The constructive answer came in May 2023 from Zhibin Gou and colleagues at Tsinghua and Microsoft: if the model cannot see its errors, give it tools that can.
+
+> [!PAPER] Gou et al. (2023), CRITIC · Abstract · page 1
+> [![Abstract of the CRITIC paper with highlighted phrases: using a search engine for fact-checking, or a code interpreter for debugging; crucial importance of external feedback](/img/agents/ch3-critic-abstract.png)](/img/agents/ch3-critic-abstract.png)
+>
+> **Context:** arXiv 2305.11738, posted 19 May 2023, published at ICLR 2024. Tasks: free-form question answering (critic: a search engine), mathematical program synthesis (critic: a Python interpreter), toxicity reduction (critic: a toxicity classifier).
+>
+> **What it says:** humans "utilize external tools to cross-check and refine their initial content, like using a search engine for fact-checking, or a code interpreter for debugging"; the results highlight "the crucial importance of external feedback in promoting the ongoing self-improvement of LLMs".
+>
+> **Why it matters:** the critic is a tool call. The model writes the critique, but the facts in the critique come from outside, and that is what makes it a critique rather than a second guess.
+
+> [!PAPER] Gou et al. (2023), CRITIC · Figure 1 · page 2
+> [![Figure 1 of the CRITIC paper: a black-box LLM produces an output; a verify step consults external tools such as a knowledge base, a code interpreter, a calculator, a search engine and text APIs and produces critiques; a correct step revises the output; the verify-then-correct cycle repeats](/img/agents/ch3-critic-figure1.png)](/img/agents/ch3-critic-figure1.png)
+>
+> **Context:** the two-step framework: verify with tools, then correct; repeat.
+>
+> **What it says:** the "verify-then-correct process" can be iterated "to enable continuous improvements".
+>
+> **Why it matters:** this is the production shape of reflection: an actor, a verifier that reaches outside the model, a correction, a budget of rounds. Every system in Section 3.8 that reports reflection working has this shape.
+
+> [!PAPER] Gou et al. (2023), CRITIC · Table 2 · page 7
+> [![Table 2 of the CRITIC paper, mathematical program synthesis results on GSM8k, SVAMP and TabMWP for three models; for gpt-3.5-turbo, program of thoughts 72.5 on GSM8k, CRITIC 78.2, CRITIC without tool 77.0, oracle CRITIC 83.9; for text-davinci-003, program of thoughts 70.1, CRITIC 72.2, without tool 68.3 which is below the baseline, and on SVAMP CRITIC 80.7 against a baseline of 84.0](/img/agents/ch3-critic-table2.png)](/img/agents/ch3-critic-table2.png)
+>
+> **Context:** the "w/o Tool" row is the ablation that matters: the same verify-then-correct loop with the interpreter removed, so the critic is the model alone.
+>
+> **What it says:** with gpt-3.5-turbo on GSM8k, CRITIC improves the program-of-thoughts baseline from 72.5 to 78.2, and without the tool to 77.0. With text-davinci-003, the tool version gains two points (70.1 to 72.2) and the tool-less version *loses* two (68.3); on SVAMP even the tool version lost 3.3 points. The starred oracle rows (correct only the wrong answers) show the ceiling: 83.9 and 77.4.
+>
+> **Why it matters:** three readings. The tool is what makes the gain reliable: remove it and the loop can go negative. The gain over an already-strong baseline is modest (two to six points), not the twenty of the headlines. And the gap to the oracle row is the cost of a critic that sometimes "fixes" right answers, which is Huang et al.'s mechanism again.
+
+### Our own experiment: self-critique against tests
+
+The script `ch3_reflexion.py` gives a real model (the same gpt-5-mini at minimal effort) ten small coding tasks with detailed specifications and hidden unit tests: an arithmetic expression evaluator with right-associative powers, an RFC 4180 CSV line parser, a cache with expiry and least-recently-used eviction, a cron expression matcher, a slug generator with a length cut, an edit distance with transpositions, numbers to British English words, a deterministic topological sort, a strict Roman numeral parser and a semantic version parser. Each task is attempted five times, so pass@1 is a rate over fifty first attempts. Every failed first attempt is then continued in two ways *from the same starting point*: in the **self-only** branch the model is told its function "may contain a bug" and asked to review it against the specification, with no test output; in the **tests fed back** branch it is shown the failing test and the error. Each branch gets up to two more attempts. The run cost about eleven US cents.
+
+```python
+# code/agents/ch3_reflexion.py (abridged): the two branches from the same failed first attempt.
+def branch(msgs, reply, fail, task, arm):
+    msgs = msgs + [{'role': 'assistant', 'content': reply}]      # the failed attempt stays in context
+    for n in range(2, MAX_ATTEMPTS + 1):
+        if arm == 'self-only':                                   # Huang et al.: no external signal
+            msgs.append({'role': 'user', 'content': 'Your function may contain a bug. Carefully review it against '
+                                                    'the specification, find any mistake, and reply with the corrected code block.'})
+        else:                                                    # the failing test, verbatim, is the critic
+            msgs.append({'role': 'user', 'content': 'Your code failed these hidden tests:\n' + fail +
+                                                    '\n\nFirst write one or two sentences on what went wrong, then reply with the corrected code block.'})
+        reply = model(msgs)
+        ok, fail = run_tests(extract_code(reply), task['tests'])  # a fresh interpreter, a 10-second timeout
+        msgs.append({'role': 'assistant', 'content': reply})
+        if ok:
+            return n                                             # the attempt number that passed
+    return None
+```
+
+[![Terminal output of ch3_reflexion.py: a per-task table of how many of five samples passed on attempt one, after self-critique only and after tests fed back, with the first failing test; the cache task passes 0 of 5 on the first attempt, 0 of 5 after self-critique and 2 of 5 after tests; then the summary: 50 first attempts, 41 passed, 82 percent; of the 9 failures self-critique alone fixed 1 and tests fed back fixed 6; pass rate within 3 attempts 84 percent against 94 percent; total spend 0.1137 dollars over 82 calls, no stub used](/img/agents/ch3_reflexion-run.png)](/img/agents/ch3_reflexion-run.png)
+
+{{FIG:ch3_reflexion_results|Our reflection experiment: ten small coding tasks with hidden unit tests, five samples each. Of fifty first attempts 41 passed. The nine failures were continued both by self-critique alone and by feeding back the failing test, from the same failed attempt and with the same budget; self-critique fixed one, the tests fixed six.}}
+
+Forty-one of fifty first attempts passed (82%). Of the nine that failed, asking the model to review its own code fixed one; showing it the failing test fixed six. The hardest task, the cache with expiry, failed all five first attempts on the same boundary (an entry whose time is exactly up should already count as expired, and the spec said so); self-critique never found it, and the test, which showed the clock set to exactly the expiry time, let the model find it in two of five branches. The other fixes were the same shape: a test naming the exact input that failed ("1100" should be "one thousand, one hundred"; a slug cut at fifteen characters should keep the whole second word) turned a vague "may contain a bug" into a specific target.
+
+> [!WARNING]
+> Nine failures is a small number and these are small tasks; the ratio could easily be two to five on another day. What is robust is the direction and the mechanism, which match Huang et al., Self-Refine's maths row and CRITIC's "w/o Tool" row: a critic with no new information mostly re-reads a plausible-looking answer and keeps it, and a critic with a concrete external failure in hand fixes it. The one self-critique success in our run was a first attempt that had not defined the function under the requested name at all, which is the kind of error a re-read can catch.
+
+### Reflection in practice
+
+| | Self-critique only (intrinsic) | Reflection on an external signal |
+|---|---|---|
+| Pros | no infrastructure; sometimes catches malformed output, missing items from a checklist, tone and format problems | large, reliable gains wherever a check exists; the critique names the exact failure; the loop converges |
+| Cons | no new information enters; accuracy on reasoning tasks falls as often as it rises; two extra calls per round for nothing | needs a check you must build or already have; a weak check (model-written tests with false positives) stops the loop on wrong answers; cost is attempts times check |
+| When to pick it | style, format and coverage tasks where the model can see what is missing | code against tests, facts against a search or a database, structured output against a schema, anything a person reviews |
+| How to tell it was right | the self-critique delta on a labelled set is positive (it usually is not) | pass rate within k attempts follows $$1-(1-p)^k$$ with a low false-accept rate from the check |
+| Production failure | silent degradation: right answers "corrected" into wrong ones | a check that passes wrong work; a retry loop with no cap that burns budget on an impossible task |
+
+**What to measure before you decide**
+
+| Measurement | How | What it tells you |
+|---|---|---|
+| Per-attempt pass rate *p* | run one attempt per task with the check | whether retries are worth anything (near 0 or near 1: no) |
+| Check precision | run the check on a labelled set of right and wrong answers | the false-accept rate that caps the loop |
+| Self-critique delta | one round of intrinsic review on a hundred answers | almost always zero or negative; stops a "reflection step" being added without a check |
+| Fixes per round | how many failures each extra round repairs | where to cap k (Section 3.6's arithmetic shows most of the gain by k = 3) |
+| Correct-to-wrong rate | how often a passing attempt is changed to a failing one | the damage a weak critic does |
+
+{{FIG:ch3_retry_math|Probability of success within k attempts when a verifier can tell right from wrong, for per-attempt pass rates of 30, 50 and 70 percent. With a verifier, retries raise the success rate quickly (50 percent per attempt reaches 88 percent at three) while the expected cost per correct answer stays at the cost of one attempt divided by the pass rate. Without a verifier there is nothing to retry on.}}
+
+The arithmetic behind the figure is in `ch3_cost.py`. If each attempt passes with probability $$p$$ and a verifier can tell, then within $$k$$ attempts the success probability is $$1-(1-p)^k$$ and the expected number of attempts is $$\frac{1-(1-p)^k}{p}$$. Divide the expected cost by the success probability and the $$k$$ cancels: the cost per correct answer is $$c/p$$ for any budget. That is the economic case for building a verifier before building anything else: once you have one, retries are nearly free per correct answer, and without one every retry is a coin toss that costs money.
+
+> [!TIP] In production
+> Never ship a reflection step without naming its check. "The agent reviews its answer" is not a check. Tests, a compiler, a linter, a schema validator, a query that must execute, a search that must find the claim, a human who must approve: those are checks. Feed the failure back verbatim (the failing assertion, the compiler message, the row that did not exist), cap the attempts at two or three, and log the correct-to-wrong rate as well as the wrong-to-correct rate.
+
+### Discussion
+
+1. **Is self-critique ever worth a call?** For correctness, the evidence says no; for format, tone and checklist coverage, Self-Refine says yes. My view: use it where the critic can *see* the defect in the text itself; the moment the defect is a wrong fact or a wrong step, replace the critic with a tool.
+2. **Model-written tests: external or internal?** They run on a machine but were imagined by the same model. My view: a useful middle; measure their false-accept rate, and prefer human-written or existing tests wherever a codebase has them (Section 3.8's companies all do).
+3. **Should the reflection be kept across tasks, as Reflexion keeps it across trials?** A reflection memory can teach an agent not to repeat a mistake. My view: keep reflections for the current task only by default; promote one to a durable rule only under review, because a wrong rule propagates to every future run (Chapter 2's procedural memory warning).
+4. **How many rounds?** The papers used up to twelve trials; production systems use two or three. My view: cap at the round where the fixes-per-round measurement drops below the cost of a human look, which in most systems is the third.
+
+## 3.6 Search over reasoning: trees, best-of-n and verifiers
+
+Every pattern so far follows one line of reasoning to its end and, at most, retries it. The search family follows several. It proposes more than one next step, scores each, keeps the promising ones and drops the rest. It is the most expensive pattern in the chapter by a wide margin, and on the right kind of problem it is the only one that works.
+
+> [!DEFINITION] Tree of thoughts (ToT)
+> A search over partial solutions. Each node is a **thought**: a coherent chunk of reasoning that moves the problem forward (one equation in a puzzle, one plan for a paragraph). From each kept node the model proposes several next thoughts; a second prompt scores each one (as a value such as "sure, maybe, impossible", or by voting among candidates); a search algorithm (breadth-first with a beam, or depth-first with backtracking) decides which nodes to expand. The answer is read off the best complete path.
+
+{{FIG:ch3_tot|Tree of thoughts: at each level the model proposes several next steps, scores each as sure, maybe or impossible, and only the promising ones are expanded. On the right, the call and token arithmetic for breadth 3 and depth 3 from ch3_cost.py, and the paper's own Game of 24 numbers: chain of thought 4%, best of 100 chains 49%, a tree with breadth 5 74%, at about 5.5 thousand completion tokens per problem.}}
+
+### Tree of Thoughts: the paper
+
+Shunyu Yao again, with Princeton and Google DeepMind colleagues, in May 2023. The argument on the first page is about left-to-right decoding: a model commits to its first few tokens and never looks back, which is fine for fluent text and fatal for problems where the first move decides everything. The authors borrowed "System 1 and System 2" from cognitive psychology and the idea of search from classical AI, and asked whether a model could be made to deliberate.
+
+> [!PAPER] Yao et al. (2023), Tree of Thoughts · Figure 1 · page 2
+> [![Figure 1 of the Tree of Thoughts paper: four schematics from input to output; input-output prompting as one arrow, chain of thought as a line of boxes, self-consistency as several lines ending in a majority vote, and tree of thoughts as a branching tree in which some nodes are shaded green and continued and others shaded red and abandoned](/img/agents/ch3-tot-figure1.png)](/img/agents/ch3-tot-figure1.png)
+>
+> **Context:** arXiv 2305.10601, posted 17 May 2023, published at NeurIPS 2023. Each rectangle is a thought, "a coherent language sequence that serves as an intermediate step toward problem solving".
+>
+> **What it says:** the four pictures are the first three patterns of this chapter plus the new one. Self-consistency (c) already samples several chains but only compares their endings; tree of thoughts (d) compares them at every step and prunes early.
+>
+> **Why it matters:** pruning early is where the saving and the gain both come from. The paper's error analysis found that about 60% of chain-of-thought samples on Game of 24 had already failed after their first step; a tree that scores the first step throws those away before paying for the rest.
+
+> [!PAPER] Yao et al. (2023), Tree of Thoughts · Table 2 and Figure 3 · page 6
+> [![Table 2 of the Tree of Thoughts paper, Game of 24 results with GPT-4: input-output prompting 7.3 percent, chain of thought 4.0 percent, self-consistency with 100 samples 9.0 percent, tree of thoughts with breadth 1 45 percent and breadth 5 74 percent, iterative refinement 27 percent, best of 100 input-output samples 33 percent and best of 100 chains 49 percent; Figure 3 plots success against nodes visited and the step at which samples fail](/img/agents/ch3-tot-table2.png)](/img/agents/ch3-tot-table2.png)
+>
+> **Context:** Game of 24 asks for an arithmetic expression that combines four given numbers into 24. GPT-4 on 100 hard puzzles. A thought is one intermediate equation; the value prompt judges whether the remaining numbers can still reach 24.
+>
+> **What it says:** chain of thought solved 4% and self-consistency over a hundred chains 9%; a tree with breadth 1 solved 45% and breadth 5 solved 74%. Even an oracle that picks the best of 100 independent chains reached only 49%.
+>
+> **Why it matters:** this is the largest gain from a pattern anywhere in this chapter, and the task explains it: the search space is small and structured, every intermediate state can be scored cheaply and reliably, and a wrong first step is unrecoverable. Those three properties are the test for whether a tree will help you.
+
+> [!PAPER] Yao et al. (2023), Tree of Thoughts · Appendix B.3 · page 14
+> [![A paragraph and table from the appendix of the Tree of Thoughts paper on cost: solving a Game of 24 problem with the tree requires 5.5 thousand completion tokens, close to 100 chain-of-thought trials; the cost table lists best of 100 input-output at 0.13 dollars and 33 percent, best of 100 chains at 0.47 dollars and 49 percent, and the tree at 0.74 dollars and 74 percent per case](/img/agents/ch3-tot-cost.png)](/img/agents/ch3-tot-cost.png)
+>
+> **Context:** the authors' own cost accounting, added in the revised version.
+>
+> **What it says:** the tree "requires 5.5k completion tokens, close to 100 CoT trials (6.7k tokens)" and cost $0.74 per puzzle at 2023 GPT-4 prices against $0.47 for a hundred chains; in general it "could require 5-100 times more generated tokens than CoT". Their advice: use it "on tasks requiring deliberate reasoning, on which CoT struggles".
+>
+> **Why it matters:** the cost per correct answer, which the paper does not compute, is $1.00 for the tree ($0.74 at 74%) against $0.96 for a hundred chains ($0.47 at 49%). On this puzzle the tree is about as cheap per solved problem as brute-force sampling and far cheaper than a single chain that almost never succeeds. On a problem a single chain solves 90% of the time, the same tree would be fifty times too expensive.
+
+### LATS: search over actions, with the environment as the judge
+
+Tree of Thoughts searches over reasoning. In October 2023 Andy Zhou and colleagues at the University of Illinois extended the search to actions and observations, and replaced the beam with Monte Carlo tree search.
+
+> [!DEFINITION] Monte Carlo tree search (MCTS)
+> A search algorithm that builds a tree incrementally: select a promising node (balancing nodes that scored well against nodes rarely visited), expand it with new children, estimate each child's value (here with a model-written score plus the environment's feedback), and propagate the values back up the tree. Repeated for a budget of iterations, it concentrates effort on the branches that look best without abandoning the rest.
+
+> [!PAPER] Zhou et al. (2023), LATS · Figure 1 · page 1
+> [![Figure 1 of the LATS paper: an LLM agent sends actions to an environment and receives observations and rewards; a tree search over nodes selects the best node; evaluation and self-reflection feed values back; a memory holds context](/img/agents/ch3-lats-figure1.png)](/img/agents/ch3-lats-figure1.png)
+>
+> **Context:** arXiv 2310.04406, posted 6 October 2023, published at ICML 2024. "Language Agent Tree Search" unifies reasoning (ToT), acting (ReAct) and planning (MCTS), and adds Reflexion-style verbal reflections on failed branches.
+>
+> **What it says:** the tree's nodes are states of a ReAct trajectory (thought, action, observation); the search "leverages an external environment and an MCTS-based search algorithm"; failed branches produce reflections that are stored in memory and shown to later branches.
+>
+> **Why it matters:** the environment is the judge. Where Tree of Thoughts asked the model to score its own partial solutions, LATS can use a real reward (did the code pass, did the shop return the item) wherever one exists, and only falls back to a model-written value where it does not.
+
+> [!PAPER] Zhou et al. (2023), LATS · Table 3 · page 6
+> [![Table 3 of the LATS paper, acting-based prompting on HotpotQA with GPT-3.5: ReAct 0.32, ReAct best of k 0.38, Reflexion 0.51, tree of thoughts with ReAct 0.39, RAP with ReAct 0.54, LATS with ReAct 0.63, LATS with n equals 3 0.58 and n equals 10 0.65, LATS with chain of thought plus ReAct 0.71](/img/agents/ch3-lats-table3.png)](/img/agents/ch3-lats-table3.png)
+>
+> **Context:** 100 HotpotQA questions, GPT-3.5, five children per expansion and up to 50 trajectories per question. The caption of the earlier table and the text admit an **oracle setup**: the environment tells the agent whether its answer is correct, so the comparison is about how well each method uses high-quality feedback, not what it achieves without it.
+>
+> **What it says:** ReAct 0.32, the best of 50 ReAct samples 0.38, Reflexion 0.51, and LATS 0.63 (0.71 when it may use both chain-of-thought and ReAct nodes).
+>
+> **Why it matters:** the gap between "best of 50 samples" (0.38) and "search over 50 trajectories" (0.63) is the value of sharing information between attempts: a tree remembers which branches failed and why, where independent samples start from nothing every time. The oracle caveat is also the warning: those numbers need a judge that is right.
+
+> [!PAPER] Zhou et al. (2023), LATS · Table 10 · page 9
+> [![Table 10 of the LATS paper: HotpotQA accuracy and average number of nodes expanded for tree of thoughts, RAP and LATS at 10, 30 and 50 trajectories; at 50 trajectories tree of thoughts reaches 0.49 with 84 nodes, RAP 0.54 with 71 nodes and LATS 0.61 with 67 nodes](/img/agents/ch3-lats-cost.png)](/img/agents/ch3-lats-cost.png)
+>
+> **Context:** the cost comparison the authors added; each node is at least one model call.
+>
+> **What it says:** at 50 trajectories LATS expanded 66.65 nodes per question on average for 0.61 accuracy, against 84.05 nodes for Tree of Thoughts at 0.49.
+>
+> **Why it matters:** sixty-seven model calls per question. For a question that ReAct answers in five. The accuracy doubled and the cost went up by more than an order of magnitude, which is the trade this whole family offers.
+
+> [!DEFINITION] Test-time compute
+> Model computation spent at inference time to improve one answer, rather than at training time to improve the model: more samples, a longer chain, a tree, more retries. Every pattern in this chapter is a way of spending it. The reasoning-model generation moved part of that spend inside the model; the rest is still yours to arrange.
+
+### Best-of-n with a verifier: search without a tree
+
+The simplest member of the family is also the most used in production. Generate *n* complete answers independently, check each with a **verifier**, and return the first (or the best) that passes.
+
+> [!DEFINITION] Best-of-n
+> Generating n complete answers to the same task, independently and usually in parallel, and returning the one a verifier prefers (or the first that passes). Latency is that of one attempt; tokens are n times one attempt; accuracy is bounded by the verifier's precision.
+
+> [!DEFINITION] Verifier
+> Anything that can score a complete answer without knowing the right answer in advance: a test suite, a compiler, a type checker, a schema validator, a solver that checks a proof, a model prompted to grade (weak), or a person (expensive). Self-consistency is best-of-n with "agreement with the other samples" as the verifier; with a free, reliable verifier the vote is unnecessary.
+
+The economics of best-of-n depend entirely on the verifier. With a free one (tests), the cost is *n* attempts and the latency is one attempt, because they run in parallel; the accuracy is the probability that at least one of *n* passes, which Section 3.5's arithmetic gives as $$1 - (1-p)^n$$. With a model as the verifier, you pay *n* more calls and inherit the verifier's error rate; a verifier that accepts wrong answers 20% of the time caps the whole system at 80% precision however large *n* is. `ch3_cost.py` puts both versions in its table: best-of-5 with a model verifier at 15.8 times the cost of a direct answer, best-of-5 with a free checker at 9.8 times, both at 3.5 to 4.4 times the latency because the samples run together.
+
+{{FIG:ch3_pattern_cost|Cost and latency of seven patterns for one task, relative to a direct answer, from the planning numbers in ch3_cost.py. The tree is the outlier on both axes (51 times the cost, 15 times the latency); best-of-n is cheap in time and expensive in tokens; plan-and-execute buys back latency through parallel steps. None of these numbers says which pattern is right until each is divided by its accuracy.}}
+
+| | Best-of-n with a verifier | Tree search (ToT, LATS) |
+|---|---|---|
+| Pros | trivially parallel: latency of one attempt; no new prompts to write; works with any free checker you already have (tests, validators) | shares information between attempts (pruning, reflections); solves problems a single chain almost never solves; the search budget is a dial |
+| Cons | *n* times the tokens; samples are independent, so a systematic error appears in all of them; a weak verifier caps precision | tens to hundreds of calls per task; sequential levels, so latency grows with depth; needs a scorer for partial states, which most real tasks lack; complex to build and to debug |
+| When to pick it | a cheap reliable verifier exists and single-attempt accuracy is between about 30% and 80% | small structured search spaces with cheap state scoring (puzzles, synthesis, code against tests) where the first steps decide success |
+| How to tell it was right | accuracy within n attempts matches the formula; verifier false-accept rate is low | success on the hard slice rises by tens of points; nodes expanded per solved task is stable |
+| Production failure | the verifier passes a wrong answer and nobody notices for weeks; costs scale with traffic | a run that explores for minutes and returns nothing; a value prompt that confidently prunes the right branch |
+
+**What to measure before you decide**
+
+| Measurement | How | What it tells you |
+|---|---|---|
+| Single-attempt pass rate *p* | run the simplest pattern on the labelled set | whether best-of-n can help (p near 0 or near 1 means no) |
+| Verifier precision and recall | score a labelled set with the verifier alone | the ceiling of any pattern that trusts it |
+| Where chains fail | label the step at which failed chains went wrong | if most failures are at the first step, a tree's early pruning pays; if they are spread out, it does not |
+| State scorability | can a model or a rule tell a promising partial state from a hopeless one? test it on a hundred states | whether a tree can be built at all |
+| Nodes (calls) per solved task | from a prototype run | the cost per correct answer, which decides against the alternatives |
+
+> [!TIP] In production
+> Before building a tree, try best-of-n with the best verifier you have, and before that, try one attempt with that verifier and a retry. The search family is where teams burn budgets on tasks that a loop guard would have fixed. Reserve trees for the slice of tasks where you have *shown* that single chains fail early and partial states can be scored; and when you do build one, log nodes expanded per task as a cost metric from the first day.
+
+### Discussion
+
+1. **Why did trees not take over, given 4% to 74%?** Because few production tasks look like Game of 24: most have no cheap scorer for partial states and no single fatal first step. My view: the pattern is right where it is, in puzzles, synthesis and code against tests, and the production version of "search" is best-of-n with a real verifier.
+2. **Can a model be its own value function?** Tree of Thoughts used one; LATS preferred the environment where it could. My view: a model-written value is a weak critic in the sense of Section 3.5, and it should be trusted exactly as much, which is enough to prune the obviously hopeless and not enough to pick the winner.
+3. **Is reasoning-model "thinking" a tree?** The DeepSeek-R1 chains show the model backtracking and re-evaluating inside one call. My view: it is a learned, serialised search, and it changes the economics (one call, many hidden tokens) but not the question, which is whether the task has early fatal choices worth exploring.
+4. **What is the right search budget?** The paper's advice is "more where chain of thought struggles". My view: set it from the measured step-of-failure distribution and the cost per correct answer, and cap the nodes per task hard; an open-ended search is the most expensive way to time out.
+
+## 3.7 Code as action, and the agentless counterpoint
+
+The previous sections changed how the agent thinks. This one changes what an action *is*. In the ReAct and function-calling formats an action is one tool call with fixed arguments; composing three tools takes three round trips through the model. The code-as-action idea is to let the model write a short program instead, run it in a sandbox, and return the output as the observation. The counterpoint, from the same year, is a system with no agent at all that beat the agents on the hardest public coding benchmark of the time.
+
+> [!DEFINITION] Code as action
+> An action format in which the model emits executable code (usually Python) that calls the available tools as functions, instead of emitting one tool call in JSON or text. The code runs in a sandbox; its standard output and errors come back as the observation. Loops, conditions, variables and error handling become free, and several tool calls collapse into one model turn.
+
+{{FIG:ch3_code_as_action|Code as action against JSON tool calls. Three JSON calls take three round trips, each result passing through the model before the next call; one code action composes the same tools with a loop in a sandbox and returns one line. Below, the Agentless counterpoint: a fixed pipeline of localisation, repair and validation that beat every open-source agent of its time on SWE-bench Lite.}}
+
+### CodeAct: the measurement
+
+Xingyao Wang and colleagues at the University of Illinois and Apple posted "Executable Code Actions Elicit Better LLM Agents" in February 2024.
+
+> [!PAPER] Wang et al. (2024), CodeAct · Abstract · page 1
+> [![Abstract of the CodeAct paper with highlighted phrases: executable Python code to consolidate LLM agents' actions into a unified action space; up to 20 percent higher success rate](/img/agents/ch3-codeact-abstract.png)](/img/agents/ch3-codeact-abstract.png)
+>
+> **Context:** arXiv 2402.01030, posted 1 February 2024, published at ICML 2024. The paper compares three action formats (code, JSON, text) across 17 models on an existing API benchmark and a new multi-turn tool benchmark, M3ToolEval.
+>
+> **What it says:** actions written as JSON or text are "limited by constrained action space ... and restricted flexibility (e.g., inability to compose multiple tools)"; code actions "consolidate LLM agents' actions into a unified action space" and reach "up to 20% higher success rate".
+>
+> **Why it matters:** the claim is specifically about *composition*. On the single-call benchmark (their Table 2) JSON was as good or better for the strongest closed models, because one call is one call in any format. The gain appears when a task needs several tools in sequence.
+
+> [!PAPER] Wang et al. (2024), CodeAct · Figure 1 · page 2
+> [![Figure 1 of the CodeAct paper: at the top, the same task, find the most cost-effective country to buy a phone, solved on the left with text or JSON actions, one lookup per turn with the environment returning each value, and on the right with a single code action that loops over the countries, calls the lookup functions and converts the prices; at the bottom, bar charts of success rate and average number of interaction turns for seven models by action format, with code as action highest in success and lowest in turns for most models](/img/agents/ch3-codeact-figure1.png)](/img/agents/ch3-codeact-figure1.png)
+>
+> **Context:** the paper's overview figure; the bar charts summarise Table 3.
+>
+> **What it says:** the JSON agent needs a turn per lookup and a turn per conversion; the code agent writes a `for` loop over the countries and reads one answer back. Across models, code actions have the highest success rate and the fewest turns.
+>
+> **Why it matters:** fewer turns means fewer model calls, a smaller context and less chance of the repetition and drift failures of Section 3.3. The loop in the code is a loop the agent did not have to run.
+
+> [!PAPER] Wang et al. (2024), CodeAct · Table 3 · page 5
+> [![Table 3 of the CodeAct paper: success rates and average turns on M3ToolEval for open-source and closed-source models under code, JSON and text action formats; gpt-4-1106-preview reaches 74.4 percent success with code against 52.4 with JSON and 53.7 with text, in 5.5 turns against 7.6 and 7.7; claude-2 54.9 against 39.0 and 29.3](/img/agents/ch3-codeact-table3.png)](/img/agents/ch3-codeact-table3.png)
+>
+> **Context:** M3ToolEval, 82 tasks that need several tools; up to ten turns per task.
+>
+> **What it says:** for gpt-4-1106-preview, code actions succeeded on 74.4% of tasks in 5.5 turns on average, against 52.4% in 7.6 turns for JSON and 53.7% in 7.7 for text. For the open-source models of the time the absolute rates were low (under 15%) in every format.
+>
+> **Why it matters:** the pattern helps a capable model most. Also note what the format costs: a sandbox, a time limit, resource limits, and a decision about what the code may import and reach. Code as action moves the safety boundary from "which tools exist" to "what the sandbox allows", which is Chapter 9's problem.
+
+Anthropic's November 2025 post on code execution with MCP (read in Chapter 2) applies the same idea to tool definitions: present the servers as a file tree of code APIs and let the agent write code that imports what it needs, so that intermediate results stay in the sandbox and the token count of the example fell "from 150,000 tokens to 2,000 tokens".
+
+> [!PAPER] Anthropic, "Code execution with MCP: Building more efficient agents" (Engineering blog, November 2025)
+> [![A paragraph from the post: the agent discovers tools by exploring the filesystem, listing the servers directory to find available servers, then reading the specific tool files it needs; this lets the agent load only the definitions it needs for the current task; this reduces the token usage from 150,000 tokens to 2,000 tokens, a time and cost saving of 98.7 percent](/img/agents/ch3-anthropic-codeexec.png)](/img/agents/ch3-anthropic-codeexec.png)
+>
+> **Context:** the post's two complaints about direct tool calling at scale are that "tool definitions overload the context window" and "intermediate tool results consume additional tokens", because "every intermediate result must pass through the model".
+>
+> **What it says:** "agents scale better by writing code to call tools instead": the agent reads only the tool files it needs and the data moves between tools inside the execution environment, not through the model.
+>
+> **Why it matters:** this is CodeAct's composition argument restated as a production cost. A transcript fetched from one system and written to another passes through the model twice in a tool-calling loop and zero times in a code action.
+
+> [!DEFINITION] Sandbox
+> An isolated execution environment (a container, a virtual machine, a restricted interpreter) in which agent-written code runs with limits on time, memory, network and file access. Code as action is only as safe as its sandbox; what the sandbox can reach is the agent's real permission set.
+
+> [!DEFINITION] Agent-computer interface (ACI)
+> The set of commands an agent may run and the format in which their results are shown to it: how a file is viewed, how a search reports matches, what an edit command checks before applying a change. Chapter 2 introduced the term from Anthropic's post; the SWE-agent paper is where it was measured.
+
+### SWE-agent: the interface is the pattern
+
+Two months after CodeAct, John Yang, Carlos Jiménez and colleagues at Princeton (with Shunyu Yao again) posted SWE-agent. Its subject is not the reasoning pattern but the **agent-computer interface**: the commands the model may run and the way their results are shown to it. It is in this section because it is the clearest evidence that, for a code agent, the interface changes the outcome more than the loop does.
+
+> [!PAPER] Yang et al. (2024), SWE-agent · Figure 1 · page 1
+> [![Figure 1 of the SWE-agent paper: an LM agent connected through an agent-computer interface, with LM-friendly commands to navigate the repository, view files, search files and edit lines, and LM-friendly environment feedback, to a computer with a terminal and a filesystem](/img/agents/ch3-sweagent-figure1.png)](/img/agents/ch3-sweagent-figure1.png)
+>
+> **Context:** arXiv 2405.15793, posted 6 May 2024, published at NeurIPS 2024. The task is SWE-bench: given a real GitHub issue and the repository, produce a patch that makes the hidden tests pass.
+>
+> **What it says:** the agent talks to the computer through "LM-friendly commands" (a file viewer that shows a window of lines, search commands that summarise results, an edit command that checks syntax) and receives "LM-friendly environment feedback".
+>
+> **Why it matters:** the model is a new kind of user with its own needs: it cannot scroll, it pays per token it reads, and it cannot see the cursor. Designing for that user is Chapter 2's tool-design principle applied to a whole computer.
+
+> [!PAPER] Yang et al. (2024), SWE-agent · Tables 1 and 3 · page 6
+> [![Tables 1 and 3 of the SWE-agent paper: on the full SWE-bench test set, retrieval-augmented generation resolves 1.31 percent with GPT-4 Turbo and 3.79 with Claude 3 Opus, a shell-only agent 11.00 percent on the Lite split, and SWE-agent 12.47 percent on the full set at 1.59 dollars average and 18.00 percent on Lite; the ablation table shows that removing linting from the edit command drops Lite from 18.0 to 15.0, iterative search drops it to 12.0, a full-file viewer to 12.7, and keeping the full history instead of the last five observations to 15.0](/img/agents/ch3-sweagent-tables.png)](/img/agents/ch3-sweagent-tables.png)
+>
+> **Context:** GPT-4 Turbo and Claude 3 Opus, spring 2024. The second table varies one interface element at a time.
+>
+> **What it says:** SWE-agent resolved 12.47% of the full benchmark (18.00% of the Lite split) against 1.31% for retrieval plus generation and 11.00% for an agent with only a bare shell. In the ablations, every interface simplification cost points: an edit command without a syntax check 15.0 instead of 18.0; a search that lists every match 12.0 instead of 18.0; showing whole files 12.7; keeping the whole history instead of the last five observations 15.0.
+>
+> **Why it matters:** the biggest single lever in the table is a search tool that *summarises* its results (six points), and the second is a file viewer that shows a hundred lines rather than the whole file (five points). Those are tool-return-size decisions from Chapter 2, measured. And "last 5 observations" beating "full history" is Chapter 2's compaction argument with a number on it.
+
+> [!PAPER] Yang et al. (2024), SWE-agent · Section 5 · page 8
+> [![Two paragraphs from the SWE-agent analysis with highlighted phrases: 1,185 of 2,294 trajectories, 51.7 percent, have one or more failed edits; agents succeed quickly and fail slowly](/img/agents/ch3-sweagent-edits.png)](/img/agents/ch3-sweagent-edits.png)
+>
+> **Context:** the behavioural analysis of GPT-4 Turbo trajectories.
+>
+> **What it says:** "out of 2,294 task instances, 1,185 (51.7%) of SWE-agent w/ GPT-4 Turbo trajectories have 1+ failed edits"; an edit eventually succeeds 90.5% of the time, but only 57.2% after one failure. And "agents succeed quickly and fail slowly": successful runs finished at a median of $1.21 and 12 steps, unsuccessful ones at a mean of $2.52 and 21 steps.
+>
+> **Why it matters:** two production rules. A failed action predicts further failure, so the loop should treat the second failed edit as a signal to change approach, not to try again. And long runs are much more likely to be lost than about to succeed, so a step budget set from the distribution of *successful* runs saves money without costing accuracy.
+
+> [!PAPER] Yang et al. (2024), SWE-agent · Figures 7 and 8 · page 8
+> [![Figures 7 and 8 of the SWE-agent paper: a stacked bar chart of which commands are used at each turn of solved trajectories, searching first and then alternating edit and run; and a pie chart of failure modes for unresolved instances: incorrect implementation 39.9 percent, failed to recover from edit 23.4, failed to find edit location 12.9, overly specific implementation 12.1, gave up prematurely 4.8, and smaller slices](/img/agents/ch3-sweagent-figure8.png)](/img/agents/ch3-sweagent-figure8.png)
+>
+> **Context:** the action frequencies of solved runs and the failure taxonomy of unsolved ones, labelled by a model.
+>
+> **What it says:** solved runs search first, then settle into "edit, then execute" cycles. Of the failures, 39.9% were simply the wrong fix, 23.4% a failure to recover from a bad edit, 12.9% not finding where to edit, 12.1% a fix too narrow for the hidden tests.
+>
+> **Why it matters:** compare this with the ReAct failure table of 2022. The categories moved from "hallucination and repetition" to "wrong implementation and unrecovered edits", because the interface removed the first set. Each generation of agents fixes a failure class and reveals the next.
+
+### Agentless: the counterpoint
+
+In July 2024, Chunqiu Steven Xia, Yinlin Deng and colleagues at the University of Illinois asked an uncomfortable question in the title of their paper and answered it with a system that has no agent in it.
+
+> [!PAPER] Xia et al. (2024), Agentless · Abstract · page 1
+> [![Abstract of the Agentless paper with highlighted phrases: do we really have to employ complex autonomous software agents; simplistic three-phase process of localization, repair, and patch validation; highest performance, 32.00 percent and 96 correct fixes, and low cost of 0.70 dollars](/img/agents/ch3-agentless-abstract.png)](/img/agents/ch3-agentless-abstract.png)
+>
+> **Context:** arXiv 2407.01489, posted 1 July 2024 and revised later that year. The paper also audits SWE-bench Lite by hand and finds issues with misleading descriptions or over-specific ground-truth patches, which it removes to make a cleaner subset.
+>
+> **What it says:** "Do we really have to employ complex autonomous software agents?" Agentless uses "a simplistic three-phase process of localization, repair, and patch validation, without letting the LLM decide future actions or operate with complex tools", and reached "the highest performance (32.00%, 96 correct fixes) and low cost ($0.70) compared with all existing open-source software agents".
+>
+> **Why it matters:** "without letting the LLM decide future actions" is the definition of a workflow rather than an agent (Chapter 1). A fixed pipeline, designed by people who knew how issues are fixed, beat the open-source agents of its time on their own benchmark.
+
+> [!PAPER] Xia et al. (2024), Agentless · Figure 1 · page 5
+> [![Figure 1 of the Agentless paper: an issue and a project codebase enter a localisation phase that narrows to the top files, then to classes and functions, then to edit locations; a repair phase generates many candidate patches; a validation phase generates reproduction tests, filters and ranks patches, and submits one](/img/agents/ch3-agentless-figure1.png)](/img/agents/ch3-agentless-figure1.png)
+>
+> **Context:** the overview. Localisation is hierarchical (the repository structure, then a skeleton of each candidate file, then the exact lines); repair samples many patches in a diff format; validation writes a test that reproduces the issue, runs the existing tests, and ranks the surviving patches by majority.
+>
+> **What it says:** each phase is one or a few model calls with a fixed, purpose-built prompt; the model never chooses what to do next.
+>
+> **Why it matters:** look at how much of this is Section 3.6's best-of-n with a verifier (many patches, tests to filter them, a vote to rank them) and how little is a loop. The authors kept the parts of agent behaviour that measurably help (sampling and verification) and removed the part that costs the most (the model deciding each step).
+
+> [!PAPER] Xia et al. (2024), Agentless · Table 1 (excerpt) · page 10
+> [![The lower rows of Table 1 of the Agentless paper, results on SWE-bench Lite: closed systems in the thirties and forties of percent with no cost reported, open-source agents such as SWE-agent with Claude 3.5 Sonnet at 23.00 percent and 1.62 dollars, AutoCodeRover and others, retrieval baselines at 3 percent and below, and Agentless with GPT-4o at 96 issues or 32.00 percent, 0.70 dollars average cost and 78,166 tokens](/img/agents/ch3-agentless-table1.png)](/img/agents/ch3-agentless-table1.png)
+>
+> **Context:** SWE-bench Lite, 300 issues, mid-2024. Closed commercial systems appear above with higher scores and no cost figures; the comparison the paper makes is with open-source agents whose cost can be measured.
+>
+> **What it says:** Agentless with GPT-4o: 96 issues (32.00%) at $0.70 and 78,166 tokens per issue on average. SWE-agent with Claude 3.5 Sonnet: 23.00% at $1.62; several other agents between 18% and 30% at $2.50 to $3.50.
+>
+> **Why it matters:** better and cheaper at once. The paper notes that OpenAI adopted Agentless as the scaffold for reporting the coding performance of GPT-4o and o1, which is as strong an endorsement of a simple pipeline as the field has produced. The leaderboard has moved far since (agents with 2025 models resolve most of the benchmark), but the point about pattern choice has not.
+
+### What this says about pattern choice
+
+Put the three results side by side. SWE-agent showed that the interface matters more than the loop. Agentless showed that, when the task's steps are known, a fixed pipeline with sampling and verification beats a loop that chooses its steps. CodeAct showed that when the model does choose, letting it compose tools in code beats one call per turn. None of the three says "agents are good" or "agents are bad". They say: know your task's structure, give the model the interface a capable user would want, verify everything you can, and let the model decide only where deciding is the hard part.
+
+> [!PAPER] Anthropic, "Raising the bar on SWE-bench Verified with Claude 3.5 Sonnet" (Engineering blog, January 2025)
+> [![A paragraph from the post: the prompt outlines a suggested approach for the model, but is not overly long or too detailed for this task; the model is free to choose how it moves from step to step, rather than having strict and discrete transitions; if you are not token-sensitive, it can help to explicitly encourage the model to produce a long response](/img/agents/ch3-anthropic-swebench.png)](/img/agents/ch3-anthropic-swebench.png)
+>
+> **Context:** the post reports 49% on SWE-bench Verified with "a prompt, a Bash Tool for executing bash commands, and an Edit Tool, for viewing and editing files and directories", and states the design philosophy: "give as much control as possible to the language model itself, and keep the scaffolding minimal".
+>
+> **What it says:** "the model is free to choose how it moves from step to step, rather than having strict and discrete transitions".
+>
+> **Why it matters:** six months after Agentless, the opposite design won with a stronger model, and the post is honest about the price: "many successful runs took hundreds of turns ... and >100k tokens", and because the model cannot see the hidden tests "it often 'thinks' that it has succeeded when the task actually is a failure". The right amount of structure is a function of the model's capability and the task's verifiability, and it moves.
+
+| | Fixed pipeline (Agentless) | Agent loop with a good interface (SWE-agent, minimal scaffolds) | Code as action (CodeAct) |
+|---|---|---|---|
+| Pros | predictable cost and latency; every phase testable alone; sampling and verification built in; cheap to run at scale | adapts to tasks the designers did not foresee; improves as models improve without redesign | fewest turns; composition is free; intermediate data never passes through the model |
+| Cons | only solves tasks that fit the phases; the pipeline encodes the designers' assumptions; must be redesigned when the task changes | long, costly runs; believes it has finished when it has not; the failure taxonomy shifts but does not shrink | a sandbox to build and secure; errors in generated code become a new failure class; harder to audit than discrete calls |
+| When to pick it | a task whose steps are known and stable (migrations, fix-a-flagged-issue, test generation) | open-ended tasks with a capable model and a real check at the end | tasks that compose several tools, or move data between them, per step |
+| How to tell it was right | resolved rate per dollar beats the agent on your issues | resolved rate on the tasks the pipeline cannot express justifies the cost | turns per task and tokens per task fall at equal success |
+
+### Discussion
+
+1. **Pipeline or agent for a coding task?** The 2024 evidence favoured pipelines on cost and the 2025 evidence favoured minimal agents on capability. My view: start with the pipeline for the task shapes you understand (Section 3.8 is full of companies doing exactly that), and run an agent only on the residue, with a budget and a verifier.
+2. **Is code as action safe enough for production?** A sandbox is a real engineering commitment. My view: yes when the tools it composes are read-only or idempotent and the sandbox is isolated; no when a code action can reach a system of record directly. Chapter 9 draws the line.
+3. **How much of SWE-agent's gain was the model and how much the interface?** The ablations hold the model fixed and still move by six points per interface change. My view: the interface is the cheapest lever you have, because you can change it this afternoon and measure it tonight.
+4. **Why do agents "fail slowly"?** They cannot tell they are lost. My view: that is an argument for an external verifier at every milestone and for a step budget set from successful runs, not for a smarter model.
+
+## 3.8 Patterns in production: what large companies chose and learned
+
+The papers were measured on benchmarks. This section reads the engineering write-ups of companies that shipped agents to real users, for the same four questions each time: which pattern did they choose, why, what went wrong, and how did they improve it. Every claim below was checked against the live page at the time of writing; where a page gives no number, none is given here. Where a page could not be screenshotted (it blocks automated browsers), the passage is quoted briefly with a link.
+
+{{FIG:ch3_companies|The patterns described in the production write-ups of this section, one row per system. Fixed pipelines and ReAct loops are both common; plan-and-execute appears where a plan can be reviewed; and nearly every row has an external check (tests, CI, a judge model) or a human gate. The shape of the loop varied from company to company; the presence of a check did not.}}
+
+### Uber: fixed pipelines first, and a loop only where it earns its place
+
+Uber's engineering blog describes three systems that between them cover most of this chapter. Chapter 1 read **Genie**, the on-call copilot: a fixed retrieval pipeline wrapped in a Slack bot, with feedback buttons and an offline judge. In May 2025 the team published what happened next.
+
+> [!PAPER] Uber, "Enhanced Agentic-RAG: What If Chatbots Could Deliver Near-Human Precision?" (Engineering blog, May 2025)
+> [![A paragraph from the post: overcoming these challenges was critical to ensuring Genie could reliably support security and privacy teams without risking inaccurate guidance; the team introduced automated evaluation with generative AI and the agentic RAG framework; the automated evaluation reduced experiment evaluation time from weeks to minutes](/img/agents/ch3-uber-genie-eval.png)](/img/agents/ch3-uber-genie-eval.png)
+>
+> **Context:** the follow-up to the Genie post, for the security and privacy channels where "inaccurate guidance" is costly. The post says that early on "many answers were either incomplete, inaccurate, or failed to retrieve relevant information", that "many experiments yielded only slight accuracy improvements before plateauing", and that "assessing improvements required significant SME bandwidth, often taking weeks".
+>
+> **What it says:** the fix had two parts. The pipeline gained stages (a query optimiser, a source identifier, hybrid retrieval, a post-processor, each an LLM step in a fixed graph) and the team built an automated evaluation with an LLM judge scoring answers from 0 to 5 against a golden set written by subject-matter experts, which "reduced experiment evaluation time from weeks to minutes". The post reports "increasing the percentage of acceptable answers by a relative 27% and reducing incorrect advice by a relative 60%".
+>
+> **Why it matters:** the pattern is still a fixed pipeline; what unblocked progress was the eval. The team could not tell which change helped until the judge made measurement cheap, and then the plateau broke. Chapter 6 returns to this story.
+
+> [!PAPER] Uber, "uReview: Scalable, Trustworthy GenAI for Code Review at Uber" (Engineering blog, August 2025)
+> [![A paragraph from the post: even with high-performing models, single-shot prompting was not enough; unfiltered outputs led to hallucinated issues, duplicate suggestions, and inconsistent quality; the team introduced multi-stage chained prompts, one step to generate comments, another to grade them, and others to filter or consolidate](/img/agents/ch3-uber-ureview.png)](/img/agents/ch3-uber-ureview.png)
+>
+> **Context:** the code-review agent that, the post says, "today analyzes over 90% of the weekly ~65,000 diffs" at Uber.
+>
+> **What it says:** "Even with high-performing models like o4-mini-high and Claude 4 Sonnet, single-shot prompting wasn't enough. Unfiltered outputs led to hallucinated issues, duplicate suggestions, and inconsistent quality." The fix was a fixed multi-stage pipeline: several assistants generate comments in parallel, a second model grades each comment's confidence, duplicates are merged, and only high-confidence comments are posted. The post reports that developers "mark 75% of its comments as useful" and that "over 65% of its posted comments" are addressed, against "only 51% of human-written comments" addressed in the same changeset; it estimates "approximately 1,500 hours saved weekly".
+>
+> **Why it matters:** this is best-of-n with a model verifier (Section 3.6) in production, chosen because precision mattered more than recall: "fewer but more useful comments". The learning the post states is that the architecture and the post-processing mattered more than the prompt.
+
+> [!PAPER] Uber, "FixrLeak: Fixing Java Resource Leaks with GenAI" (Engineering blog, May 2025)
+> [![A one-line paragraph from the post: out of the 102 eligible cases, FixrLeak successfully automated fixes for 93 leaks](/img/agents/ch3-uber-fixrleak.png)](/img/agents/ch3-uber-fixrleak.png)
+>
+> **Context:** a tool that fixes resource leaks flagged by static analysis. The pipeline is fixed and has no loop: the static analyser finds a leak, an abstract-syntax-tree filter drops the cases where the resource escapes the function (which a naive fix would break), one model call writes the fix, and a verification step "verifies that the target binary builds successfully, runs all existing tests to confirm nothing is broken, and can also recheck the code" with the analyser, before a human reviews the pull request.
+>
+> **What it says:** of 124 leaks flagged, 12 in deprecated code were excluded, the filter removed cases it could not fix safely, and "out of the 102 eligible cases, FixrLeak successfully automated fixes for 93 leaks".
+>
+> **Why it matters:** the post's own warning is that "blindly applying fixes can lead to new issues, like use-after-close errors", which is why the filter exists. The pattern is Agentless (Section 3.7) applied to one bug class: localise with a tool, repair with one call, validate with the build and the tests, hand the rest to a person.
+
+### Amazon: a plan the developer reviews
+
+Amazon's account of upgrading its own Java applications with Amazon Q Developer is the clearest production example of plan-and-execute with a human approving the plan.
+
+> [!PAPER] AWS, "Amazon Q Developer just reached a $260 million dollar milestone" (AWS DevOps blog, August 2024)
+> [![A paragraph from the post: Amazon has migrated tens of thousands of production applications from Java 8 or 11 to Java 17 with assistance from Amazon Q Developer; this represents a savings of over 4,500 years of development work for over a thousand developers, and performance improvements worth 260 million dollars in annual cost savings](/img/agents/ch3-amazon-q-java.png)](/img/agents/ch3-amazon-q-java.png)
+>
+> **Context:** the post describes the code-transformation agent: it analyses the application and generates "a step-by-step implementation plan", and "developers can collaborate with the agent to review and iterate on the plan before the agent implements it". The agent then applies the changes, builds and runs the tests, and the developer reviews the result.
+>
+> **What it says:** "Amazon has migrated tens of thousands of production applications from Java 8 or 11 to Java 17", "a savings of over 4,500 years of development work for over a thousand developers", and "performance improvements worth $260 million dollars in annual cost savings".
+>
+> **Why it matters:** the task shape fits the pattern exactly: a known goal, a plan that can be checked by a person who knows the codebase, and a verifier (the build and the tests) at the end. The pattern's weakness, a wrong plan found late, is removed by showing the plan to someone before anything runs. The post does not break down how many applications needed human intervention, so this section does not either.
+
+Amazon's shopping assistant Rufus is a different pattern. The Amazon Science post on its architecture describes a custom model with retrieval over several kinds of source, in which "before generating a response, the LLM first selects information that may be helpful in answering the shopper's questions", and reinforcement learning from customer feedback. The post gives no accuracy or adoption figures, so it appears here only as a note: the "select sources first, then retrieve, then answer" shape is a one-step plan.
+
+### Spotify: a home-made ReAct loop that got lost, and what replaced it
+
+Spotify's three-part series on its background coding agent, internally called Honk, is the most candid pattern write-up in this section, because the team describes a design that failed before the one that worked.
+
+> [!PAPER] Spotify, "1,500+ PRs Later: Spotify's Journey with Our Background Coding Agent (Honk, Part 1)" (Engineering blog, November 2025)
+> [![A paragraph from the post: the impact has been significant, with a steady stream of automated pull requests being merged daily, keeping codebases consistent, up to date and secure; since mid-2024, around half of Spotify's pull requests have been automated by this system](/img/agents/ch3-spotify-honk.png)](/img/agents/ch3-spotify-honk.png)
+>
+> **Context:** the agent runs inside Spotify's fleet-management system, which already applied scripted changes across thousands of repositories; the model replaced the scripts for changes that could not be scripted. Humans review and merge.
+>
+> **What it says:** "more than 1,500 merged AI-generated pull requests"; "since mid-2024, around half of Spotify's pull requests have been automated by this system"; and a "total time saving of 60-90% compared to writing the code by hand" for the migrations it was used on.
+>
+> **Why it matters:** the pattern decision came after the deployment surface: a prompt-driven agent behind the same interface as the old scripts, so that review, merge and rollback did not change. The post lists the costs plainly: "agents can take a long time to produce a result, and their output can be unpredictable", and "we need robust guardrails and sandboxing".
+
+> [!PAPER] Spotify, "Background Coding Agents: Context Engineering (Honk, Part 2)" (Engineering blog, November 2025)
+> [![A paragraph from the post: an alternative approach is to start with a simpler prompt but connect to Model Context Protocol tools that allow the agent to dynamically fetch more context as it works on the problem; while this does make the agent capable of tackling more complex and ambiguous tasks, this also makes it less testable and predictable; the more tools you have, the more dimensions of unpredictability you introduce](/img/agents/ch3-spotify-honk-tools.png)](/img/agents/ch3-spotify-honk-tools.png)
+>
+> **Context:** the part that describes the first design and its failure. The team built its own ReAct-style loop ("10 turns per session, three session retries total") and found that it "tended to get lost when it filled up its context window, forgetting the original task after a few turns", and that "agents are eager to act on your prompt, to a fault". They replaced the loop with an off-the-shelf coding agent given a minimal tool set (a verify command, restricted git, an allow-list of shell commands) and detailed prompts.
+>
+> **What it says:** "the more tools you have, the more dimensions of unpredictability you introduce", and "the agent needs a verifiable goal so it can iterate on a solution as it goes".
+>
+> **Why it matters:** two of this chapter's findings in one paragraph. Context growth undoes a ReAct loop (Section 3.3 and Chapter 2), and reflection needs a check (Section 3.5). The team's fix was not a smarter loop; it was fewer tools and a verifiable goal.
+
+> [!PAPER] Spotify, "Background Coding Agents: Predictable Results Through Strong Feedback Loops (Honk, Part 3)" (Engineering blog, December 2025)
+> [![A paragraph from the post: we have yet to invest in evals for our judge; however, we know from internal metrics that out of thousands of agent sessions, the judge vetoes about a quarter of them; when that happens, the agent is able to course correct half the time; from empirical observations, the most common trigger is the agent going outside the instructions outlined in the prompt](/img/agents/ch3-spotify-honk-judge.png)](/img/agents/ch3-spotify-honk-judge.png)
+>
+> **Context:** the feedback loops: automatically selected verifiers (build, tests, lint, exposed as tools with summarised output), and an LLM judge that compares the diff with the prompt before a pull request is opened, wired in as a stop hook so the agent cannot finish without it.
+>
+> **What it says:** "the judge vetoes about a quarter of them. When that happens, the agent is able to course correct half the time", and "the most common trigger is the agent going outside the instructions outlined in the prompt". The team admits "we have yet to invest in evals for our judge".
+>
+> **Why it matters:** a quarter vetoed, half of those recovered: that is a reflection loop with a judge as the critic, and its numbers are exactly what Section 3.5 would predict for a strong-ish check with one retry. The honest last sentence is the gap to close next: a judge that has not been evaluated is a check of unknown precision.
+
+### DoorDash: guardrails as the critic, and the cost of the critic
+
+> [!PAPER] DoorDash, "Path to high-quality LLM-based Dasher support automation" (Engineering blog, September 2024)
+> [![A paragraph from the post: the guardrail's latency is a notable drawback caused by an end-to-end process that includes generating a response, applying the guardrail, and possibly retrying with a new guardrail check; given the relatively small number of problematic responses, strategically defaulting to human agents can be an effective way to ensure a quality user experience while maintaining a high level of automation; this guardrail system has successfully reduced overall hallucinations by 90 percent and cut down potentially severe compliance issues by 99 percent](/img/agents/ch3-doordash-support.png)](/img/agents/ch3-doordash-support.png)
+>
+> **Context:** a support chatbot for delivery drivers: a fixed retrieval pipeline (summarise the conversation, retrieve similar resolved cases and knowledge-base articles, generate) followed by a two-tier guardrail (a cheap semantic-similarity check, then an LLM evaluator) that can trigger a retry or hand the conversation to a person. Offline, an LLM judge scores five quality dimensions and a regression suite runs on every prompt change.
+>
+> **What it says:** "This guardrail system has successfully reduced overall hallucinations by 90% and cut down potentially severe compliance issues by 99%." The costs are stated too: the guardrail's "latency is a notable drawback", and "initially, we tested a more sophisticated guardrail model but increased response times and heavy usage of model tokens made it prohibitively expensive".
+>
+> **Why it matters:** the critic is external to the generator and it works; and the critic has a price in latency and tokens that forced a cheaper two-tier design. Note the design choice at the end: with few problematic responses, "strategically defaulting to human agents" beat a longer retry loop.
+
+DoorDash's later posts trace the same team moving up the ladder of this chapter. A November 2025 post ("Beyond Single Agents") describes the progression from "deterministic workflows" to a single tool-using agent to multi-agent designs, and names the limit of the single agent plainly: "the primary challenge for a single agent, however, is context pollution. As it performs more steps, its context window fills with intermediate thoughts", and "you can't jump straight to sophisticated, multi-agent collaboration; you must first build a solid foundation." A June 2026 post on the consumer-facing DoorDash Assistant reports that "the largest potential production-failure category is grounding" and that "the fix in each case has been to route the agent's claim through a tool call against the system of record", at a cost of "6-8 LLM calls" and "20-30 seconds end to end" per turn. Those two sentences are Sections 3.3 and 3.5 of this chapter, learned in production.
+
+### LinkedIn: self-correction grounded in the database, then a planner over ReAct
+
+> [!PAPER] LinkedIn, "Practical text-to-SQL for data analytics" (Engineering blog, December 2024)
+> [![A paragraph from the post: finally, we run a set of validators on the output followed by a self-correction agent to fix errors; validators work best when they access new information not available to the query writer; we verify the existence of tables and fields, and execute the EXPLAIN statement on the query to detect syntax and other errors; these errors are fed into a self-correction agent, which is equipped with tools to retrieve additional tables or fields if needed before updating the query](/img/agents/ch3-linkedin-sqlbot.png)](/img/agents/ch3-linkedin-sqlbot.png)
+>
+> **Context:** SQL Bot, an internal assistant that writes queries over LinkedIn's data warehouse. The pipeline retrieves candidate tables, re-ranks them, writes the query with a plan, then validates and corrects.
+>
+> **What it says:** "Validators work best when they access new information not available to the query writer": the system checks that tables and fields exist and runs `EXPLAIN` on the query, and "these errors are fed into a self-correction agent, which is equipped with tools to retrieve additional tables or fields". The post reports that in a survey "~95% rated SQL Bot's query accuracy 'Passes' or above, and ~40% rated the query accuracy 'Very Good' or 'Excellent'", and that a "Fix with AI" button accounted for "80% of our sessions".
+>
+> **Why it matters:** the sentence about validators is the whole of Section 3.5 in twelve words. The database planner, not the model, decides whether the query is valid, and the correction step has tools to fetch what it was missing. The usage number is the quieter finding: the most used feature was the retry with a real error in hand.
+
+> [!PAPER] LinkedIn, "Building the agentic future of recruiting: how we engineered LinkedIn's Hiring Assistant" (Engineering blog, October 2025)
+> [![A short paragraph from the post: in practice, however, ReAct alone is not sufficient for an enterprise-grade agent; relying directly on LLMs to solve complex recruiting problems introduces major challenges](/img/agents/ch3-linkedin-hiring-2025.png)](/img/agents/ch3-linkedin-hiring-2025.png)
+>
+> **Context:** a year after the first Hiring Assistant post described an "agent orchestration layer" with "experiential memory", the engineering team described the architecture it settled on: a supervisor agent over specialised sub-agents, each running a planner that "performs high-level reasoning to produce a structured, task-specific plan" and an executor that "runs the plan step by step, using a ReAct-style loop for tool use and local reasoning".
+>
+> **What it says:** "In practice, however, ReAct alone is not sufficient for an enterprise-grade agent." The challenges listed are "instruction-following reliability", "hallucinations" and "intelligence (test-time compute) vs. latency tradeoffs"; a comparison table in the post says of ReAct that "task completion rate degrades quickly as the problem space grows".
+>
+> **Why it matters:** this is plan-and-execute layered over ReAct (Section 3.4 over Section 3.3), chosen for the reasons those sections give: the plan keeps the task well-scoped and reviewable, the loop handles the local decisions. The post gives no success metrics, so this section gives none.
+
+### Stripe: a state machine of deterministic steps and agent steps
+
+> [!PAPER] Stripe, "Minions: Stripe's one-shot, end-to-end coding agents" (stripe.dev blog, February 2026)
+> [![A paragraph from the post: since CI runs cost tokens, compute and time, we only have at most two rounds of CI; if tests fail after an initial push, we prompt the minion to fix failing tests and push a second time, but are then done; there is a balancing act between speed and completeness, and there are diminishing marginal returns for an LLM to run many rounds of a full CI loop](/img/agents/ch3-stripe-minions.png)](/img/agents/ch3-stripe-minions.png)
+>
+> **Context:** Stripe's background coding agents run from a task description to a reviewed pull request. "Blueprints are workflows defined in code that direct a minion run"; the blueprint "ends up looking like a state machine that intermixes deterministic code nodes and free-flowing agent nodes": git operations, linters and tests as code, the coding itself as an agent. Feedback comes first from fast local lints, then from continuous integration. The first post reports "over a thousand pull requests merged each week" that "contain no human-written code", with human review; the second post (February 2026) puts it at "over 1,300".
+>
+> **What it says:** "Since CI runs cost tokens, compute, and time, we only have at most two rounds of CI", because "there are diminishing marginal returns for an LLM to run many rounds of a full CI loop".
+>
+> **Why it matters:** a reflection loop with the strongest critic available (the real test suite) and a hard cap of two rounds, chosen from cost. The state-machine framing is the practical answer to "pipeline or agent": both, with a line drawn per step. The post also notes that writing deterministic code for "small decisions we can anticipate ... saves tokens (and CI costs) at scale".
+
+### Airbnb: brute force with validation errors fed back
+
+Airbnb's March 2025 post "Accelerating Large-Scale Test Migration with LLMs" (on the Airbnb Tech Blog, which blocks automated screenshots, so it is quoted here) describes migrating "nearly 3.5K React component test files" from one testing framework to another, a task estimated at "1.5 years of engineering time" and finished "in just 6 weeks". The pipeline was fixed per file ("we modeled this flow like a state machine") with a retry loop at each step: "retry steps multiple times until they passed or we reached a limit", using "dynamic prompts for each retry, giving the validation errors and the most recent version of the file to the LLM". The team's stated learnings are that "the most effective route to improve outcomes was simply brute force" (retries, up to "50 to 100" for the hard files, with "most by 10 attempts"), that prompts grew to "between 40,000 to 100,000 tokens, pulling in as many as 50 related files", and that "the main success driver we saw was choosing the right related files ... rather than getting the prompt engineering perfect". The numbers: "we successfully migrated 75% of our target files in just four hours"; a "sample, tune, sweep" loop over four days took it "from 75% to 97%"; the "remaining 3%" were finished by hand "in another week of work". Read against this chapter: a fixed pipeline, reflection on an external signal (the validation errors), a capped retry, and a long tail handed to people.
+
+### Anthropic: the simplest thing, and when to stop adding
+
+> [!PAPER] Anthropic, "Building effective agents" (Research blog, December 2024)
+> [![A paragraph from the post: when building applications with LLMs, we recommend finding the simplest solution possible, and only increasing complexity when needed; this might mean not building agentic systems at all; agentic systems often trade latency and cost for better task performance, and you should consider when this tradeoff makes sense](/img/agents/ch3-anthropic-simplest.png)](/img/agents/ch3-anthropic-simplest.png)
+>
+> **Context:** the post that Chapter 1 used to separate workflows from agents. Its "evaluator-optimizer" workflow is Section 3.5's reflection pattern, and the post states its precondition: it is effective "when we have clear evaluation criteria, and when iterative refinement provides measurable value".
+>
+> **What it says:** "we recommend finding the simplest solution possible, and only increasing complexity when needed", because "agentic systems often trade latency and cost for better task performance, and you should consider when this tradeoff makes sense".
+>
+> **Why it matters:** this is Section 3.9's one rule, stated by a company whose business is selling the models that the complexity would call. Everything in this section is a case of a team finding the level of complexity its measurements demanded, and several of them found it by starting too high.
+
+Anthropic's SWE-bench post (Section 3.7) is the counter-case in the same voice: a minimal scaffold with two tools, the model choosing every step, 49% on SWE-bench Verified, hundreds of turns per hard task, and a model that often "thinks that it has succeeded when the task actually is a failure". Both posts are right; they are about different tasks, different models and different verifiability.
+
+### Google: the plan as a user interface
+
+> [!PAPER] Google, "Try Deep Research and our new experimental model in Gemini, your AI assistant" (The Keyword, December 2024)
+> [![A paragraph from the post: under your supervision, Deep Research does the hard work for you; after you enter your question, it creates a multi-step research plan for you to either revise or approve; once you approve, it begins deeply analyzing relevant information from across the web on your behalf](/img/agents/ch3-google-deepresearch.png)](/img/agents/ch3-google-deepresearch.png)
+>
+> **Context:** the launch post for Deep Research, a feature that researches a question for several minutes and writes a report. The post continues: "Gemini continuously refines its analysis, browsing the web the way you do: searching, finding interesting pieces of information and then starting a new search based on what it's learned", and "repeats this process multiple times".
+>
+> **What it says:** "it creates a multi-step research plan for you to either revise or approve", and only after approval does it start browsing.
+>
+> **Why it matters:** plan-and-execute with the plan shown to the user, then a ReAct-style browse-and-refine loop under it. The plan review step turns the pattern's weakness into a product feature, as Amazon's did for a very different task. The post gives no quality metrics, which is normal for a launch post, so none appear here.
+
+### Klarna: the pattern was fine; the evaluation was not
+
+Klarna's February 2024 press release, "Klarna AI assistant handles two-thirds of customer service chats in its first month", reported that the assistant had "2.3 million conversations", was "doing the equivalent work of 700 full-time agents", cut repeat enquiries by 25% and resolution time from 11 minutes to under 2, and was projected to add "USD 40 million" in profit in 2024. In May 2025, Bloomberg reported (in an article behind a paywall; the quotes here are as reported by Fortune and other outlets) that the company was again hiring people for customer service, with its chief executive saying that "as cost unfortunately seems to have been a too predominant evaluation factor when organizing this, what you end up having is lower quality", and that "really investing in the quality of the human support is the way of the future for us". Klarna's spokesperson summarised the new position as "AI solves the easy stuff; our experts handle the moments that matter".
+
+No engineering details of the assistant's pattern were published, so this section says nothing about its loop. What it does say is about the measurement: a system optimised and reported on cost and volume, with quality measured only later, was partly reversed on quality. Every "what to measure" table in this chapter has accuracy in the first row for that reason.
+
+### The table
+
+| Company, system | Pattern | Why | What went wrong, or the stated limit | How they improved |
+|---|---|---|---|---|
+| Uber, Genie (security and privacy) | fixed retrieval pipeline with LLM stages | precision mattered; no training data needed | answers incomplete or wrong; experiments plateaued; evals took SMEs weeks | an LLM judge against an SME golden set made evaluation take minutes; +27% relative acceptable answers, -60% incorrect advice |
+| Uber, uReview | generate several, grade with a second model, filter, post | single-shot output hallucinated and duplicated | too many low-value comments | confidence grading; 75% of comments marked useful, 65% addressed |
+| Uber, FixrLeak | fixed pipeline: analyser, AST filter, one fix call, build and tests, human review | one bug class with a known shape | naive fixes create new bugs (use after close) | filter unsafe cases before the model; 93 of 102 eligible leaks fixed |
+| Amazon, Q Developer Java upgrades | plan-and-execute with human plan review | known goal; developers know their code | not stated | plan review before execution; build and tests after |
+| Spotify, Honk | home-made ReAct loop, then an off-the-shelf agent with minimal tools and verifiers, plus an LLM judge | changes scripts could not make | the loop got lost as context filled; agents act "to a fault"; judge unevaluated | fewer tools, a verifiable goal, judge as a stop hook; judge vetoes a quarter, half recover |
+| DoorDash, Dasher support | fixed retrieval pipeline with a two-tier guardrail and human fallback | high volume, compliance risk | guardrail latency; a stronger guardrail too expensive | cheap check first, model check second, humans for the rest; -90% hallucinations, -99% severe compliance issues |
+| LinkedIn, SQL Bot | pipeline with validators (EXPLAIN) and a tool-equipped self-correction agent | queries must run | not stated as failures | validators with information the writer lacked; ~95% rated passing |
+| LinkedIn, Hiring Assistant | planner over a ReAct executor, under a supervisor | "ReAct alone is not sufficient" | instruction following, hallucination, latency against test-time compute | structured plans to scope tasks; executor handles local steps |
+| Stripe, Minions | state machine of deterministic nodes and agent nodes; CI as the critic, two rounds | CI costs tokens, compute and time | diminishing returns on CI rounds | lints locally first; cap at two CI rounds; deterministic code for small decisions |
+| Airbnb, test migration | fixed per-file pipeline with validation errors fed back; capped retries | 3,500 files, known transformation | a long tail the automation could not fix | brute-force retries, better related-file selection; 75% in four hours, 97% in four days, rest by hand |
+| Anthropic, SWE-bench scaffold | minimal ReAct-style agent with two tools | a strong model; let it choose | hundreds of turns; believes it succeeded when it failed | not stated beyond prompt guidance; the verifier problem remains |
+| Google, Deep Research | plan shown to the user, then a browse-and-refine loop | the plan is a product feature | not stated | user revises or approves the plan |
+| Klarna, customer assistant | not published | cost and volume | quality, measured late | hiring people back for the hard cases |
+
+Three things hold across the table. Almost every system has an **external check** (tests, CI, a database planner, a judge model, a human gate), and the ones that report learning the most learned it from the check. The **loop shape** was chosen by the task's structure: fixed pipelines where the steps were known (migrations, one bug class, a support flow), a plan where a person could review it, a free loop only where the model's judgement was the point. And where a team reports a failure, it is one of this chapter's named ones: context growth, acting without a verifiable goal, a critic too expensive or unevaluated, cost measured before quality.
+
+### Discussion
+
+1. **Why do so many production systems look like pipelines?** Because the tasks that get automated first are the ones whose steps are known, and a known pipeline is cheaper to run, test and explain. My view: this is correct engineering, not a failure of ambition; the agent earns its place on the residue.
+2. **What did the companies measure that the papers did not?** Cost per task, latency, review burden, and the share of work left for people. My view: copy their tables, not the papers' tables, when you report your own system.
+3. **Is a judge model an external check?** Spotify uses one and admits it is unevaluated; Uber built an eval for its judge first. My view: a judge is external in the sense that matters (it sees the diff and the prompt, not the agent's reasoning) and weak until its precision is measured; Chapter 6 is about making it strong.
+4. **What does the Klarna story prove?** Less than either side claims; the pattern was never published. My view: it proves that the metric you optimise is the system you get, and that quality must be measured from the first day, by someone other than the model.
+
+## 3.9 Choosing a pattern
+
+The chapter closes with the decision. Six properties of the task, measured on a labelled set, decide which additions pay for themselves.
+
+{{FIG:ch3_decision|A decision ladder for choosing a reasoning pattern. Start with one call, or a fixed pipeline if the steps are known; add chain of thought when multi-step reasoning fails, a tool loop when facts or state are missing, a plan when steps are many and latency or tokens too high, reflection when an external check exists, and search only when early choices decide success and partial states can be scored. At every arrow, measure accuracy, cost per correct answer and latency again.}}
+
+| Task property | How to measure it | Pattern it argues for |
+|---|---|---|
+| Verifiability: can an answer be checked without knowing it? | list the checks available (tests, schema, database, search, human) and their precision | with a strong check: reflection and best-of-n; without one: keep the loop short and put a person at the end |
+| Step count: how many tool calls does a solved task need? | the distribution from traces or a prototype | one to three: direct or act-only; four to ten: ReAct with guards; more, or with independent steps: plan-and-execute |
+| Knowledge: are the facts in the model? | the direct-answer baseline on the labelled set | high: chain of thought only; low: tools, and measure that tools do not hurt the easy cases (ReWOO's TriviaQA) |
+| Latency budget | the product's p95 requirement against the pattern's sequential depth | tight: direct, best-of-n (parallel) or a plan with parallel steps; loose: loops and trees are allowed |
+| Cost of a wrong answer | what happens downstream: a human review, a refund, a wrong migration | high: spend on verification and search; low: the cheapest pattern that meets the accuracy bar |
+| Structure of failures | the step at which failed runs went wrong | early and fatal: search; late and recoverable: reflection; repetition: a loop guard |
+
+The number that combines them is the one defined in Section 3.1, and `ch3_cost.py` computes it for all seven patterns under planning numbers.
+
+[![Terminal output of ch3_cost.py parts one and two: a table of seven patterns with calls, input and output tokens, latency and cost at two prices, direct answer 1 call and 2.6 seconds, chain of thought 1 call and 9 seconds, ReAct with five tool steps 6 calls, 15,750 input tokens and 32.5 seconds, plan-and-execute 7 calls and 16.1 seconds, tree of thoughts 36 calls, 62,100 input tokens and 40.2 seconds, best of five with a model verifier 10 calls and best of five with a free checker 5 calls; then the cost per correct answer table with measured accuracies for direct, chain of thought and ReAct and assumed accuracies for the rest](/img/agents/ch3_cost-run.png)](/img/agents/ch3_cost-run.png)
+
+Read the second table of that output with care. The three accuracies marked "mea" are our measured ones from Section 3.3 (the plain loop, not the guarded one); the rest are assumptions, there to show the arithmetic. Under those numbers chain of thought costs three cents per correct answer and the plain ReAct loop twelve, because half its attempts were wasted; a plan-and-execute design assumed to reach 80% would cost under five, and a tree assumed to reach 90% would cost twenty-eight. Change the accuracies to yours and the ranking will change; the formula will not.
+
+> [!DEFINITION] Decision ladder
+> The order in which to add complexity to an agent: one call or a fixed pipeline, then a scratchpad, then a tool loop with guards, then a plan, then reflection on an external check, then search. Each rung is added only when the labelled set shows a failure the rung removes, and each rung is kept only if accuracy, cost per correct answer and latency are re-measured after it.
+
+The one-rule summary of the chapter: **add complexity only when a measured failure demands it, and re-measure after every addition.** Every pattern here removes a specific class of failure and adds a specific cost. A scratchpad removes forgotten intermediate steps and costs output tokens. A tool loop removes missing facts and costs calls on a growing context, plus the repetition failure that a guard removes for free. A plan removes quadratic re-reading and sequential latency and costs late discovery of a bad plan. Reflection removes the failures a check can see and costs attempts; without a check it removes nothing. Search removes fatal first steps and costs ten to a hundred times the tokens. The companies in Section 3.8 that did well chose by this rule, several of them after first choosing by fashion.
+
+### Discussion
+
+1. **Where on the ladder should a new team start?** Lower than it wants to. My view: a fixed pipeline with a verifier at the end, on the slice of the task you understand, and an eval set before any loop.
+2. **When is it right to skip rungs?** When the task's structure is obvious: code against tests goes straight to reflection with the test suite as the critic; a puzzle goes straight to search. My view: skipping is fine if the measurement that would have justified each skipped rung is still taken.
+3. **How do reasoning models change the ladder?** They fold the scratchpad and some reflection into one call. My view: they move the first rung's accuracy up and its cost up with it; the rest of the ladder (tools, plans, checks, search) is unchanged, and the check matters more, not less, because the reasoning is hidden.
+4. **What is the most common mistake?** Adding a retry without a check, in my experience, followed closely by adding a tree because a demo looked impressive. My view: the "self-critique delta" and "verifier precision" measurements in this chapter's tables are cheap, and they prevent both.
+
+## Exercises
+
+1. Your agent answers questions over an internal wiki with a ReAct loop and a step budget of ten. Traces show that 30% of failed runs hit the budget. Design the three measurements that would tell you whether the cause is repetition, unhelpful tool misses or genuinely long tasks, and name the fix for each.
+2. A team wants to add "the model reviews its answer before replying" to a customer-facing agent. Using Huang et al., Self-Refine's Table 1 and CRITIC's "w/o Tool" row, write the one-paragraph argument for why this step needs an external check, and list three checks available in a typical support system.
+3. Re-run the arithmetic of `ch3_cost.py` for your own task: your prompt size, your observation size, your provider's prices and your measured accuracies. At what step count does plan-and-execute become cheaper than ReAct, and what accuracy would a tree need to be worth its cost per correct answer?
+4. Take the Airbnb migration and the Amazon Java upgrade. Both are plan-first pipelines with a verifier. Write down what is different about where the human sits (before execution, or after), and argue which placement you would choose for a migration where the plan is cheap to check and the result is expensive to check, and for the reverse.
+5. Design a best-of-5 with a verifier for a code-generation step, where the verifier is a model-written test suite. Estimate the false-accept rate you would need to measure, explain how Reflexion's MBPP result could happen in your system, and propose the measurement that would catch it in the first week.
+
+## Key takeaways
+
+- A **reasoning pattern** is the shape of the loop: how many calls, what each sees, what ends it. The same model and tools scored 0%, 33%, 50% and 100% on the same twelve questions under four shapes in our own experiment.
+- **Chain of thought** is a scratchpad that buys accuracy on multi-step problems for output tokens; **self-consistency** votes over several chains and helps only where answers are exactly comparable. Reasoning models absorbed the pattern into training: you now buy effort and cannot read the chain.
+- The chain is **not evidence**: Turpin et al. showed it rationalises biased answers without mentioning the bias, and Huang et al. showed that models asked to correct themselves without external feedback get worse. Verification must come from outside the text.
+- **ReAct** interleaves thought, action and observation; it grounds the model (0% hallucination in the paper's study) and fails by repetition and by unhelpful tool misses. Both failures live in the loop and the tools, and a five-line guard fixed ours.
+- **Plan-and-execute** writes the plan once, executes with small contexts and in parallel, and answers once: linear rather than quadratic tokens, latency equal to the graph's depth, and a wrong plan discovered late. Show the plan to a person when you can.
+- **Reflection** works in proportion to its critic. Tests, compilers, search results, database planners and people are strong critics; the model re-reading itself is weak. In our run, self-critique fixed one failure in nine and the tests fixed six.
+- **Search** (trees, best-of-n with a verifier) turns 4% into 74% on puzzles with early fatal choices and cheap state scoring, at ten to a hundred times the tokens; in production it is almost always best-of-n with a real verifier.
+- **Code as action** collapses several tool calls into one turn; a good **agent-computer interface** moves results more than the loop does; and **Agentless** showed that a fixed pipeline with sampling and verification can beat the agents on their own benchmark.
+- The companies that shipped agents chose their loop shape by the task's structure and almost all of them added an external check or a human gate; the failures they report are this chapter's named ones.
+- The one rule: **add complexity only when a measured failure demands it**, and re-measure accuracy, cost per correct answer and latency after every addition.
+
+## References
+
+**Papers**
+
+1. Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten Bosma, Brian Ichter, Fei Xia, Ed H. Chi, Quoc V. Le, Denny Zhou. [*Chain-of-Thought Prompting Elicits Reasoning in Large Language Models*](https://arxiv.org/abs/2201.11903). NeurIPS 2022 (arXiv January 2022).
+2. Xuezhi Wang, Jason Wei, Dale Schuurmans, Quoc Le, Ed H. Chi, Sharan Narang, Aakanksha Chowdhery, Denny Zhou. [*Self-Consistency Improves Chain of Thought Reasoning in Language Models*](https://arxiv.org/abs/2203.11171). ICLR 2023 (arXiv March 2022).
+3. Takeshi Kojima, Shixiang Shane Gu, Machel Reid, Yutaka Matsuo, Yusuke Iwasawa. [*Large Language Models are Zero-Shot Reasoners*](https://arxiv.org/abs/2205.11916). NeurIPS 2022 (arXiv May 2022).
+4. OpenAI. [*OpenAI o1 System Card*](https://arxiv.org/abs/2412.16720). arXiv December 2024.
+5. DeepSeek-AI. [*DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning*](https://arxiv.org/abs/2501.12948). arXiv January 2025 (version 1; a revised version appeared in Nature, 2025).
+6. Miles Turpin, Julian Michael, Ethan Perez, Samuel R. Bowman. [*Language Models Don't Always Say What They Think: Unfaithful Explanations in Chain-of-Thought Prompting*](https://arxiv.org/abs/2305.04388). NeurIPS 2023 (arXiv May 2023).
+7. Jie Huang, Xinyun Chen, Swaroop Mishra, Huaixiu Steven Zheng, Adams Wei Yu, Xinying Song, Denny Zhou. [*Large Language Models Cannot Self-Correct Reasoning Yet*](https://arxiv.org/abs/2310.01798). ICLR 2024 (arXiv October 2023).
+8. Shunyu Yao, Jeffrey Zhao, Dian Yu, Nan Du, Izhak Shafran, Karthik Narasimhan, Yuan Cao. [*ReAct: Synergizing Reasoning and Acting in Language Models*](https://arxiv.org/abs/2210.03629). ICLR 2023 (arXiv October 2022).
+9. Lei Wang, Wanyu Xu, Yihuai Lan, Zhiqiang Hu, Yunshi Lan, Roy Ka-Wei Lee, Ee-Peng Lim. [*Plan-and-Solve Prompting: Improving Zero-Shot Chain-of-Thought Reasoning by Large Language Models*](https://arxiv.org/abs/2305.04091). ACL 2023 (arXiv May 2023).
+10. Binfeng Xu, Zhiyuan Peng, Bowen Lei, Subhabrata Mukherjee, Yuchen Liu, Dongkuan Xu. [*ReWOO: Decoupling Reasoning from Observations for Efficient Augmented Language Models*](https://arxiv.org/abs/2305.18323). arXiv May 2023.
+11. Sehoon Kim, Suhong Moon, Ryan Tabrizi, Nicholas Lee, Michael W. Mahoney, Kurt Keutzer, Amir Gholami. [*An LLM Compiler for Parallel Function Calling*](https://arxiv.org/abs/2312.04511). ICML 2024 (arXiv December 2023).
+12. Noah Shinn, Federico Cassano, Edward Berman, Ashwin Gopinath, Karthik Narasimhan, Shunyu Yao. [*Reflexion: Language Agents with Verbal Reinforcement Learning*](https://arxiv.org/abs/2303.11366). NeurIPS 2023 (arXiv March 2023).
+13. Aman Madaan, Niket Tandon, Prakhar Gupta, Skyler Hallinan, Luyu Gao, Sarah Wiegreffe, Uri Alon, Nouha Dziri, Shrimai Prabhumoye, Yiming Yang, Shashank Gupta, Bodhisattwa Prasad Majumder, Katherine Hermann, Sean Welleck, Amir Yazdanbakhsh, Peter Clark. [*Self-Refine: Iterative Refinement with Self-Feedback*](https://arxiv.org/abs/2303.17651). NeurIPS 2023 (arXiv March 2023).
+14. Zhibin Gou, Zhihong Shao, Yeyun Gong, Yelong Shen, Yujiu Yang, Nan Duan, Weizhu Chen. [*CRITIC: Large Language Models Can Self-Correct with Tool-Interactive Critiquing*](https://arxiv.org/abs/2305.11738). ICLR 2024 (arXiv May 2023).
+15. Shunyu Yao, Dian Yu, Jeffrey Zhao, Izhak Shafran, Thomas L. Griffiths, Yuan Cao, Karthik Narasimhan. [*Tree of Thoughts: Deliberate Problem Solving with Large Language Models*](https://arxiv.org/abs/2305.10601). NeurIPS 2023 (arXiv May 2023).
+16. Andy Zhou, Kai Yan, Michal Shlapentokh-Rothman, Haohan Wang, Yu-Xiong Wang. [*Language Agent Tree Search Unifies Reasoning, Acting, and Planning in Language Models*](https://arxiv.org/abs/2310.04406). ICML 2024 (arXiv October 2023).
+17. Xingyao Wang, Yangyi Chen, Lifan Yuan, Yizhe Zhang, Yunzhu Li, Hao Peng, Heng Ji. [*Executable Code Actions Elicit Better LLM Agents*](https://arxiv.org/abs/2402.01030). ICML 2024 (arXiv February 2024).
+18. John Yang, Carlos E. Jimenez, Alexander Wettig, Kilian Lieret, Shunyu Yao, Karthik Narasimhan, Ofir Press. [*SWE-agent: Agent-Computer Interfaces Enable Automated Software Engineering*](https://arxiv.org/abs/2405.15793). NeurIPS 2024 (arXiv May 2024).
+19. Chunqiu Steven Xia, Yinlin Deng, Soren Dunn, Lingming Zhang. [*Agentless: Demystifying LLM-based Software Engineering Agents*](https://arxiv.org/abs/2407.01489). arXiv July 2024.
+
+**Engineering blogs and docs**
+
+20. Anthropic. [*Building effective agents*](https://www.anthropic.com/research/building-effective-agents). Research blog, 19 December 2024.
+21. Anthropic. [*Raising the bar on SWE-bench Verified with Claude 3.5 Sonnet*](https://www.anthropic.com/engineering/swe-bench-sonnet). Engineering blog, 6 January 2025.
+22. Anthropic. [*Code execution with MCP: Building more efficient agents*](https://www.anthropic.com/engineering/code-execution-with-mcp). Engineering blog, 4 November 2025.
+23. Google (Dave Citron). [*Try Deep Research and our new experimental model in Gemini, your AI assistant*](https://blog.google/products/gemini/google-gemini-deep-research/). The Keyword, 11 December 2024.
+24. Uber. [*Enhanced Agentic-RAG: What If Chatbots Could Deliver Near-Human Precision?*](https://www.uber.com/us/en/blog/enhanced-agentic-rag/). Engineering blog, May 2025.
+25. Uber. [*uReview: Scalable, Trustworthy GenAI for Code Review at Uber*](https://www.uber.com/us/en/blog/ureview/). Engineering blog, 12 August 2025.
+26. Uber. [*FixrLeak: Fixing Java Resource Leaks with GenAI*](https://www.uber.com/us/en/blog/fixrleak-fixing-java-resource-leaks-with-genai/). Engineering blog, May 2025.
+27. AWS (Aytul Arisoy Cholkar). [*Amazon Q Developer just reached a $260 million dollar milestone*](https://aws.amazon.com/blogs/devops/amazon-q-developer-just-reached-a-260-million-dollar-milestone). AWS DevOps blog, 1 August 2024.
+28. Amazon Science (Trishul Chilimbi). [*The technology behind Amazon's GenAI-powered shopping assistant, Rufus*](https://www.amazon.science/blog/the-technology-behind-amazons-genai-powered-shopping-assistant-rufus). Amazon Science blog, 4 October 2024.
+29. Spotify (Max Charas, Marc Bruggmann). [*1,500+ PRs Later: Spotify's Journey with Our Background Coding Agent (Honk, Part 1)*](https://engineering.atspotify.com/2025/11/spotifys-background-coding-agent-part-1). Engineering blog, 6 November 2025.
+30. Spotify. [*Background Coding Agents: Context Engineering (Honk, Part 2)*](https://engineering.atspotify.com/2025/11/context-engineering-background-coding-agents-part-2). Engineering blog, 24 November 2025.
+31. Spotify. [*Background Coding Agents: Predictable Results Through Strong Feedback Loops (Honk, Part 3)*](https://engineering.atspotify.com/2025/12/feedback-loops-background-coding-agents-part-3). Engineering blog, 9 December 2025.
+32. DoorDash. [*Path to high-quality LLM-based Dasher support automation*](https://careersatdoordash.com/blog/large-language-modules-based-dasher-support-automation/). Engineering blog, 17 September 2024.
+33. DoorDash. [*Beyond Single Agents: How DoorDash is building a collaborative AI ecosystem*](https://careersatdoordash.com/blog/beyond-single-agents-doordash-building-collaborative-ai-ecosystem/). Engineering blog, 11 November 2025.
+34. DoorDash. [*Building DoorDash Assistant: An engineering overview*](https://careersatdoordash.com/blog/building-doordash-assistant-an-engineering-overview/). Engineering blog, 11 June 2026.
+35. LinkedIn (Albert Chen and colleagues). [*Practical text-to-SQL for data analytics*](https://www.linkedin.com/blog/engineering/ai/practical-text-to-sql-for-data-analytics). Engineering blog, 9 December 2024.
+36. LinkedIn (Aarathi Vidyasagar). [*Under the hood: the tech behind the first agent from LinkedIn, Hiring Assistant*](https://www.linkedin.com/blog/engineering/generative-ai/the-tech-behind-the-first-agent-from-linkedin-hiring-assistant). Engineering blog, 29 October 2024; and LinkedIn (Xiaoyang Gu, Xie Lu, Daniel Hewlett). [*Building the agentic future of recruiting: how we engineered LinkedIn's Hiring Assistant*](https://www.linkedin.com/blog/engineering/ai/how-we-engineered-linkedins-hiring-assistant). Engineering blog, 21 October 2025.
+37. Stripe (Alistair Gray). [*Minions: Stripe's one-shot, end-to-end coding agents*](https://stripe.dev/blog/minions-stripes-one-shot-end-to-end-coding-agents) and [*Part 2*](https://stripe.dev/blog/minions-stripes-one-shot-end-to-end-coding-agents-part-2). stripe.dev blog, 9 and 19 February 2026.
+38. Airbnb (Charles Covey-Brandt). [*Accelerating Large-Scale Test Migration with LLMs*](https://medium.com/airbnb-engineering/accelerating-large-scale-test-migration-with-llms-9565c208023b). Airbnb Tech Blog, March 2025.
+39. Klarna. [*Klarna AI assistant handles two-thirds of customer service chats in its first month*](https://www.klarna.com/international/press/klarna-ai-assistant-handles-two-thirds-of-customer-service-chats-in-its-first-month/). Press release, 27 February 2024; and Irina Ivanova, [*Klarna plans to hire humans again, as new landmark survey reveals most AI projects fail to deliver*](https://fortune.com/2025/05/09/klarna-ai-humans-return-on-investment/), Fortune, 9 May 2025, reporting the Bloomberg interview of 8 May 2025.
+
+**Code for this chapter**
+
+40. [`code/agents/ch3_react.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/agents/ch3_react.py): twelve two-hop questions under four conditions (direct, chain of thought, ReAct, ReAct with a loop guard and a better tool) against gpt-5-mini, with token usage from the API; results in `results/ch3_react.json`, `results/ch3_react_stdout.txt` and `results/ch3_react_trace_stdout.txt`.
+41. [`code/agents/ch3_reflexion.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/agents/ch3_reflexion.py): ten coding tasks with hidden tests, five samples each; every failed first attempt continued by self-critique alone and by feeding the failing test back; results in `results/ch3_reflexion.json`.
+42. [`code/agents/ch3_cost.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/agents/ch3_cost.py): the cost and latency arithmetic of seven patterns, the cost-per-correct-answer formula, the verifier-and-retries formula and the ReAct-against-plan token growth; results in `results/ch3_cost.json`.
+43. [`code/agents/figs_ch3.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/agents/figs_ch3.py) and [`code/agents/shots_ch3.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/agents/shots_ch3.py): the figures (with an automatic text-overlap check) and the paper excerpts.
+
+## Next
+
+→ [Chapter 4: Workflow patterns](./04-workflow-patterns.md)
+
+This chapter kept one agent and changed how it thinks. Chapter 4 keeps the thinking and changes the plumbing around it: the workflow patterns in which code, not the model, decides the path. Prompt chaining, routing, parallel fan-out and fan-in, orchestrator and workers, and evaluator and optimiser are all ways of arranging several model calls so that each one is small, checkable and cheap, and several of this chapter's production systems (Uber's review pipeline, Stripe's state machine, Airbnb's migration) are workflows with an agent inside one node. The chapter builds a planner-plus-responders case study end to end and asks, for each pattern, the questions this chapter asked: what it costs, when it is right, and how to tell from a trace that it is working.
