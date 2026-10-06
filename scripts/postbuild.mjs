@@ -40,7 +40,7 @@ const crumbs = (items) => ({
 // ---------------------------------------------------------------- page definitions
 const pages = []
 const papers = manifest.papers ?? []
-const nav = `<nav><a href="${BASE}">Home</a> · <a href="${BASE}writings/">Writings</a> · <a href="${BASE}books/">Books</a> · <a href="${BASE}papers/">Research papers</a> · <a href="${BASE}videos/">Videos</a> · <a href="${BASE}projects/">Projects</a> · <a href="${BASE}about/">About</a></nav>`
+const nav = `<nav><a href="${BASE}">Home</a> · <a href="${BASE}writings/">Writings</a> · <a href="${BASE}books/">Books</a> · <a href="${BASE}papers/">Research papers</a> · <a href="${BASE}videos/">Videos</a> · <a href="${BASE}map/">Topic map</a> · <a href="${BASE}projects/">Projects</a> · <a href="${BASE}about/">About</a></nav>`
 const list = (items) => `<ul>${items.map(([href, title, desc]) => `<li><a href="${href}">${esc(title)}</a>${desc ? `<p>${esc(desc)}</p>` : ''}</li>`).join('')}</ul>`
 
 pages.push({
@@ -75,6 +75,14 @@ pages.push({
     hasPart: projects.map((p) => ({ '@type': 'SoftwareSourceCode', name: p.name, description: p.description, programmingLanguage: p.tech, author: { '@id': person['@id'] } })),
   }, crumbs([['Home', ''], ['Projects', 'projects']])],
   body: `<h1>Projects</h1>${projects.map((p) => `<article><h2>${esc(p.name)}</h2><p><strong>${esc(p.tagline)}</strong></p><p>${esc(p.description)}</p><ul>${p.highlights.map((h) => `<li>${esc(h)}</li>`).join('')}</ul><p>${esc(p.tech.join(', '))}</p></article>`).join('')}`,
+})
+const topicGraph = JSON.parse(fs.readFileSync(path.join(ROOT, 'src/data/graph.json'), 'utf8'))
+pages.push({
+  route: 'map', title: `Topic map · ${site.name}`,
+  description: 'Every important topic on this site as one connected map: attention, BERT, the Vision Transformer, LLM inference, RAG, agents and GPUs. Click a topic to read about it.',
+  image: ogImage('site'), type: 'website',
+  ld: [{ '@type': 'CollectionPage', name: 'Topic map', url: url('map') }, crumbs([['Home', ''], ['Topic map', 'map']])],
+  body: `<h1>Topic map</h1>${Object.entries(topicGraph.groups).map(([k, g]) => `<h2>${esc(g.label)}</h2>${list(topicGraph.nodes.filter((n) => n.group === k).map((n) => [`${BASE}${n.route}/`, n.label, n.blurb]))}`).join('')}`,
 })
 pages.push({
   route: 'about', title: `About ${site.name}`,

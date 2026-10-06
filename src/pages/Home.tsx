@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { projects, site } from '../data/site'
 import { books, papers, videos, writings } from '../lib/content'
 import { PaperCard } from '../components/PaperBits'
+import topicGraph from '../data/graph.json'
 import { useTitle } from '../lib/hooks'
 import { BookCard, ProjectCard, VideoCard, WritingCard } from '../components/Cards'
 import { GitHub, Mail, X, YouTube } from '../components/icons'
@@ -15,6 +16,7 @@ export default function Home() {
     { to: '/papers', count: papers.length, label: 'Research papers', desc: 'Landmark papers explained section by section, with code.' },
     { to: '/projects', count: projects.length, label: 'Projects', desc: 'Tools and pipelines I build, like an explainer-video studio.' },
     { to: '/videos', count: videos.length, label: 'Videos', desc: 'Animated explainers, each with a written companion.' },
+    { to: '/map', count: topicGraph.nodes.length, label: 'Topic map', desc: 'Every important idea on the site, as one clickable graph.' },
   ]
 
   return (

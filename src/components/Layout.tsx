@@ -47,6 +47,7 @@ export default function Layout() {
             <NavLink to="/books">Books</NavLink>
             <NavLink to="/papers">Papers</NavLink>
             <NavLink to="/videos">Videos</NavLink>
+            <NavLink to="/map">Map</NavLink>
             <NavLink to="/projects">Projects</NavLink>
             <NavLink to="/about">About</NavLink>
           </nav>
@@ -84,6 +85,7 @@ export default function Layout() {
               <Link to="/books">Books ({books.length})</Link>
               <Link to="/papers">Research papers ({papers.length})</Link>
               <Link to="/videos">Videos ({videos.length})</Link>
+              <Link to="/map">Topic map</Link>
               <Link to="/projects">Projects</Link>
             </div>
             <div>
