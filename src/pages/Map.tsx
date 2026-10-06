@@ -5,7 +5,7 @@ import { useTitle } from '../lib/hooks'
 
 type Node = { id: string; label: string; group: keyof typeof graph.groups; route: string; blurb: string }
 type Pos = { x: number; y: number }
-const W = 960, H = 720
+const W = 960, H = 760
 
 /** A small force-directed layout: springs on edges, repulsion between every pair, a pull to the centre.
  *  Deterministic (seeded by group and index), so the map looks the same on every visit. */
@@ -39,13 +39,13 @@ function layout(nodes: Node[], edges: string[][]): Record<string, Pos> {
       const p = pos[n.id]
       p.vx += (W / 2 - p.x) * 0.004; p.vy += (H / 2 - p.y) * 0.006
       p.x += p.vx * 0.5 * (0.3 + t); p.y += p.vy * 0.5 * (0.3 + t); p.vx *= 0.6; p.vy *= 0.6
-      const r = 14 + 3 * (deg[n.id] ?? 1)
+      const r = 10 + 2 * (deg[n.id] ?? 1)
       p.x = Math.min(W - 70 - r, Math.max(70 + r, p.x)); p.y = Math.min(H - 40 - r, Math.max(40 + r, p.y))
     }
   }
   // push apart nodes whose label boxes overlap (labels sit under the dot, up to two lines)
   const box = (n: Node) => {
-    const r = 14 + 3 * (deg[n.id] ?? 1), words = n.label.split(' ')
+    const r = 10 + 2 * (deg[n.id] ?? 1), words = n.label.split(' ')
     const longest = words.length > 3 ? Math.max(words.slice(0, Math.ceil(words.length / 2)).join(' ').length, words.slice(Math.ceil(words.length / 2)).join(' ').length) : n.label.length
     return { w: Math.max(2 * r, longest * 7.4) + 10, top: r, bottom: r + 18 + (words.length > 3 ? 15 : 0) + 6 }
   }
@@ -60,7 +60,7 @@ function layout(nodes: Node[], edges: string[][]): Record<string, Pos> {
         else { const s = Math.sign(pa.y - pb.y) || 1; pa.y += s * oy / 2; pb.y -= s * oy / 2 }
       }
     }
-    for (const n of nodes) { const p = pos[n.id], b = box(n); p.x = Math.min(W - b.w / 2 - 6, Math.max(b.w / 2 + 6, p.x)); p.y = Math.min(H - b.bottom - 4, Math.max(b.top + 8, p.y)) }
+    for (const n of nodes) { const p = pos[n.id], b = box(n); p.x = Math.min(W - b.w / 2 - 6, Math.max(b.w / 2 + 6, p.x)); p.y = Math.min(H - b.bottom - 16, Math.max(b.top + 8, p.y)) }
   }
   return pos
 }
@@ -99,7 +99,7 @@ export default function TopicMap() {
             return <line key={a + b} className={`map-edge${on ? ' on' : ''}${dim ? ' dim' : ''}`} x1={pos[a].x} y1={pos[a].y} x2={pos[b].x} y2={pos[b].y} />
           })}
           {nodes.map((n) => {
-            const p = pos[n.id], r = 12 + 2.5 * (deg[n.id] ?? 1)
+            const p = pos[n.id], r = 8 + 1.8 * (deg[n.id] ?? 1)
             const dim = sel ? !near.has(n.id) : false
             const words = n.label.split(' ')
             const lines = words.length > 3 ? [words.slice(0, Math.ceil(words.length / 2)).join(' '), words.slice(Math.ceil(words.length / 2)).join(' ')] : [n.label]
@@ -108,7 +108,7 @@ export default function TopicMap() {
                  onMouseEnter={() => setActive(n.id)} onFocus={() => setActive(n.id)}
                  onClick={(e) => { e.preventDefault(); if (pinned === n.id || window.matchMedia('(hover: hover)').matches) navigate(`/${n.route}`); else setPinned(n.id) }}
                  tabIndex={0} role="link" aria-label={`${n.label}: ${n.blurb}`}>
-                <circle r={r + 6} className="map-halo" style={{ fill: color(n) }} />
+                <circle r={r + 5} className="map-halo" style={{ fill: color(n) }} />
                 <circle r={r} style={{ fill: color(n) }} />
                 {lines.map((l, i) => <rect key={'b' + i} className="map-label-bg" x={-(l.length * 7.3 + 12) / 2} y={r + 5 + i * 16} width={l.length * 7.3 + 12} height={16} rx={5} />)}
                 {lines.map((l, i) => <text key={i} y={r + 17 + i * 16} textAnchor="middle" className="map-label">{l}</text>)}

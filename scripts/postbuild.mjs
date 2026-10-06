@@ -82,7 +82,7 @@ pages.push({
   description: 'Every important topic on this site as one connected map: attention, BERT, the Vision Transformer, LLM inference, RAG, agents and GPUs. Click a topic to read about it.',
   image: ogImage('site'), type: 'website',
   ld: [{ '@type': 'CollectionPage', name: 'Topic map', url: url('map') }, crumbs([['Home', ''], ['Topic map', 'map']])],
-  body: `<h1>Topic map</h1>${Object.entries(topicGraph.groups).map(([k, g]) => `<h2>${esc(g.label)}</h2>${list(topicGraph.nodes.filter((n) => n.group === k).map((n) => [`${BASE}${n.route}/`, n.label, n.blurb]))}`).join('')}`,
+  body: `<h1>Topic map</h1>${Object.entries(topicGraph.groups).map(([k, g]) => `<h2>${esc(g.label)}</h2>${list(topicGraph.nodes.filter((n) => n.group === k).map((n) => [`${BASE}${n.route.replace(/#.*/, '')}/${n.route.includes('#') ? '#' + n.route.split('#')[1] : ''}`, n.label, n.blurb]))}`).join('')}`,
 })
 pages.push({
   route: 'about', title: `About ${site.name}`,

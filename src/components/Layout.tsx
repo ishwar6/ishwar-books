@@ -9,8 +9,15 @@ import { Dim, GitHub, Mail, Moon, Sun, X, YouTube } from './icons'
 function ScrollToTop() {
   const { pathname, hash } = useLocation()
   useEffect(() => {
-    if (hash) document.getElementById(decodeURIComponent(hash.slice(1)))?.scrollIntoView()
-    else window.scrollTo(0, 0)
+    if (!hash) { window.scrollTo(0, 0); return }
+    const id = decodeURIComponent(hash.slice(1))
+    let tries = 0
+    const tick = () => {
+      const el = document.getElementById(id)
+      if (el) el.scrollIntoView()                       // page content is fetched, so the heading may appear a moment later
+      else if (tries++ < 60) setTimeout(tick, 50)
+    }
+    tick()
   }, [pathname, hash])
   return null
 }
