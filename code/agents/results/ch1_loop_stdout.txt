@@ -1,0 +1,9 @@
+TASK  ALERT: checkout-api error rate 12% (threshold 1%). Investigate and propose a fix.
+[1] THOUGHT  An alert needs context first. Check recent errors for the service.
+[1] ACTION   search_logs({"service": "checkout-api", "minutes": 15})
+[1] OBSERVE  {"errors": 212, "top": "ConnectionPool exhausted (db-primary)", "first_seen": "14:02", "deploy": "v2.31 at 13:58"}
+[2] THOUGHT  212 errors, pool exhaustion, started 4 min after deploy v2.31. Likely the deploy.
+[2] ACTION   open_ticket({"title": "checkout-api: pool exhausted after v2.31", "body": "Roll back v2.31 (errors 14:02, deploy 13:58)."})
+[2] OBSERVE  {"ticket": "OPS-4821", "title": "checkout-api: pool exhausted after v2.31"}
+[3] THOUGHT  Ticket filed. Report back to the on-call engineer.
+[3] FINAL    Opened OPS-4821 proposing a rollback of v2.31.

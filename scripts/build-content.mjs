@@ -183,7 +183,7 @@ const el = (tag, cls, children) => ({ type: 'pp', data: { hName: tag, hPropertie
 function shapePaperBox(node, title) {
   const [name, ...where] = title.split(' · ').map((t) => t.trim())
   node.children[0] = el('div', ['pp-head'], [
-    el('span', ['pp-kicker'], [{ type: 'text', value: 'From the paper' }]),
+    el('span', ['pp-kicker'], [{ type: 'text', value: /blog|docs|documentation|guide \(|report/i.test(title) ? 'From the source' : 'From the paper' }]),
     el('span', ['pp-name'], [{ type: 'text', value: name }]),
     ...(where.length ? [el('span', ['pp-where'], where.map((w) => el('span', ['pp-pill'], [{ type: 'text', value: w }])))] : []),
   ])
