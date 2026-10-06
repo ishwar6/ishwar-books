@@ -462,7 +462,8 @@ a.project-card:hover { transform: translateY(-2px); }
 .map-node .map-halo { opacity: 0; transition: opacity 0.15s; }
 .map-node:hover .map-halo, .map-node.sel .map-halo, .map-node:focus-visible .map-halo { opacity: 0.28; }
 .map-node circle { stroke: var(--surface); stroke-width: 2; }
-.map-label { font-size: 12.5px; font-weight: 600; fill: var(--text); paint-order: stroke; stroke: var(--surface); stroke-width: 4px; stroke-linejoin: round; pointer-events: none; }
+.map-label { font-size: 13px; font-weight: 600; fill: var(--text-strong); pointer-events: none; }
+.map-label-bg { fill: var(--surface); opacity: 0.88; pointer-events: none; }
 .map-panel { position: absolute; right: 18px; top: 18px; width: 260px; padding: 14px 16px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); box-shadow: var(--shadow); pointer-events: none; opacity: 0; transition: opacity 0.15s; }
 .map-panel.show { opacity: 1; pointer-events: auto; }
 .map-panel h3 { margin: 8px 0 6px; font-size: 17px; color: var(--text-strong); }

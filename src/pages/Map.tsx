@@ -110,7 +110,8 @@ export default function TopicMap() {
                  tabIndex={0} role="link" aria-label={`${n.label}: ${n.blurb}`}>
                 <circle r={r + 6} className="map-halo" style={{ fill: color(n) }} />
                 <circle r={r} style={{ fill: color(n) }} />
-                {lines.map((l, i) => <text key={i} y={r + 16 + i * 15} textAnchor="middle" className="map-label">{l}</text>)}
+                {lines.map((l, i) => <rect key={'b' + i} className="map-label-bg" x={-(l.length * 7.3 + 12) / 2} y={r + 5 + i * 16} width={l.length * 7.3 + 12} height={16} rx={5} />)}
+                {lines.map((l, i) => <text key={i} y={r + 17 + i * 16} textAnchor="middle" className="map-label">{l}</text>)}
               </g>
             )
           })}
