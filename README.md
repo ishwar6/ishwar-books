@@ -26,6 +26,7 @@ tags: [rag]
 order: 1        # chapters: explicit order (default: sorted by path, numerically)
 part: Foundations  # chapters: override the part name taken from the folder
 draft: true     # skipped in the production build
+hidden: true    # books: kept in the repo but not built or listed
 cover: ./cover.png   # writings: your own cover image (optional)
 motif: graph    # writings: style of the generated cover when there is no image: graph | code | grid | waves
 accent: "#7c9cff"  # writings: colour of the generated cover

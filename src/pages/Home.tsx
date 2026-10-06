@@ -60,14 +60,6 @@ export default function Home() {
         </section>
       )}
 
-      <section className="section">
-        <div className="section-head">
-          <h2>Books</h2>
-          <Link to="/books" className="more-link">All books →</Link>
-        </div>
-        <div className="book-grid">{books.map((b) => <BookCard key={b.slug} book={b} />)}</div>
-      </section>
-
       {papers.length > 0 && (
         <section className="section paper-theme">
           <div className="section-head">
@@ -84,6 +76,14 @@ export default function Home() {
           <Link to="/writings" className="more-link">All writings →</Link>
         </div>
         <div className="writing-grid">{writings.slice(0, 3).map((w) => <WritingCard key={w.route} post={w} />)}</div>
+      </section>
+
+      <section className="section">
+        <div className="section-head">
+          <h2>Books</h2>
+          <Link to="/books" className="more-link">All books →</Link>
+        </div>
+        <div className="book-grid">{books.map((b) => <BookCard key={b.slug} book={b} />)}</div>
       </section>
 
       <section className="section">

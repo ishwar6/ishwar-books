@@ -95,6 +95,7 @@ for (const dir of bookDirs) {
   const bookSlug = slugOf(dir.name)
   const indexFile = path.join(bookRoot, 'index.md')
   const index = fs.existsSync(indexFile) ? matter(fs.readFileSync(indexFile, 'utf8')) : { data: {}, content: '' }
+  if (index.data.hidden) continue   // `hidden: true` in a book's index.md keeps it in the repo but off the site
   const book = { slug: bookSlug, data: index.data, chapters: [] }
   books.push(book)
   pages.push({ file: indexFile, collection: 'book-index', slug: bookSlug, book: bookSlug, route: `books/${bookSlug}`, data: index.data, body: index.content })
