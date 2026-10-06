@@ -60,6 +60,35 @@ Let us take the title apart, one piece at a time.
 
 {{FIG:p1_timeline|Two lines of research meet. In vision, AlexNet (2012) and ResNet (2015) made convolutional networks the standard. In language, the Transformer (2017) and BERT (2018) replaced older designs and introduced the pre-train-then-fine-tune recipe. ViT (2020) takes the language design, unchanged, to pictures.}}
 
+<details>
+<summary>History: the five milestones on this timeline (optional reading)</summary>
+
+If you want the back-story behind each dot on the line, read on. If not, skip to the next section; nothing below is needed for the paper.
+
+**2012: AlexNet.** Alex Krizhevsky, Ilya Sutskever and Geoffrey Hinton (University of Toronto) entered a deep convolutional network in the ImageNet contest and won by a large margin: a top-5 error of 15.3%, against 26.2% for the runner-up, which used hand-made features. Three choices made it work: the **ReLU** activation, which is simply $$f(x) = \max(0, x)$$ and trains much faster than the smooth curves used before; training on two GPUs; and a trick called dropout to fight overfitting. The result convinced the field that learning features from data beats designing them by hand, and it started the deep-learning era in computer vision.
+
+**2015: ResNet.** Kaiming He, Xiangyu Zhang, Shaoqing Ren and Jian Sun (Microsoft Research Asia) found that very deep networks were *harder* to train than shallow ones, even on the training data. Their fix was the **residual connection**: instead of making a block of layers learn a new output $$H(x)$$, make it learn only the change, so the block computes
+
+$$
+y = F(x) + x
+$$
+
+where $$x$$ is the block's input, $$F(x)$$ is what the layers compute, and the "$$+\,x$$" is a shortcut that passes the input straight through. If a block has nothing useful to add, it can learn $$F(x) \approx 0$$ and do no harm. This let them train 152-layer networks, win ImageNet 2015 with 3.57% top-5 error, and it is why ViT has a "+" after every block too (Part 2, Equations 2 and 3). The ResNets in this paper are direct descendants.
+
+**2017: the Transformer.** Ashish Vaswani and seven colleagues at Google published *Attention Is All You Need*, a network for translating sentences that used no recurrence and no convolution, only **attention**: every word computes how much to look at every other word,
+
+$$
+\text{Attention}(Q, K, V) = \operatorname{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right) V
+$$
+
+where $$Q$$, $$K$$ and $$V$$ are three versions of the word vectors (queries, keys and values), $$QK^\top$$ scores every pair of words, $$\sqrt{d_k}$$ keeps the scores from growing too large, and softmax turns each row into weights that add up to 1. Because every word can reach every other word in one step, the design trains fast on GPUs and TPUs, and it scales: bigger models kept getting better. ViT uses this encoder with almost no change.
+
+**2018: BERT.** Jacob Devlin, Ming-Wei Chang, Kenton Lee and Kristina Toutanova (Google) took the Transformer encoder, hid 15% of the words in billions of sentences, and trained the model to guess the hidden words from both sides (the **masked language model**). The pre-trained model was then **fine-tuned**, with one small new layer, for eleven different language tasks, and set a new best result on all of them. Two things carry over to ViT directly: the recipe (pre-train once on a huge dataset, fine-tune cheaply per task) and the special `[CLS]` token whose output vector stands for the whole input. ViT's `[class]` token is the same idea, and its model sizes (Base and Large) are copied from BERT. The [BERT breakdown](/papers/bert/) on this site reads that paper in full.
+
+**2020: ViT.** Twelve researchers at Google Research (Brain Team), led by Alexey Dosovitskiy and Neil Houlsby, asked what happens if the two lines meet: cut a picture into 16×16 patches, treat each patch as a word, and feed them to the BERT-style encoder. The answer, as the rest of this part explains, is that it loses on 1.3 million pictures and wins on 300 million. That finding, "large scale training trumps inductive bias", is the paper's thesis, and it made the Transformer the common design for text and images alike.
+
+</details>
+
 The title's analogy is worth drawing out, because the whole paper rests on it. A language model reads a sentence as a sequence of word tokens, each turned into a vector of numbers. ViT reads a picture as a sequence of patch tokens, each turned into a vector of numbers of the same size. After that step, the Transformer cannot tell whether it is reading a sentence or a photo.
 
 {{FIG:p1_analogy|The analogy of the title. Left: a sentence becomes six word tokens, and each token becomes a vector of 768 numbers. Right: a picture is cut into nine patches, each patch becomes a token, and each token becomes a vector of 768 numbers. The same Transformer reads both.}}
