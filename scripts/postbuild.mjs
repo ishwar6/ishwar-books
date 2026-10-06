@@ -44,7 +44,7 @@ const nav = `<nav><a href="${BASE}">Home</a> · <a href="${BASE}writings/">Writi
 const list = (items) => `<ul>${items.map(([href, title, desc]) => `<li><a href="${href}">${esc(title)}</a>${desc ? `<p>${esc(desc)}</p>` : ''}</li>`).join('')}</ul>`
 
 pages.push({
-  route: '', title: `${site.name}: LLM inference, RAG and GPU programming, from first principles`, description: site.description,
+  route: '', title: `${site.name}: LLM inference, RAG and GPUs, from first principles`, description: site.description,
   image: ogImage('site'), type: 'website', ld: [website, person],
   body: `<h1>${esc(site.name)}</h1><p>${esc(site.tagline)}</p>${site.bio.map((p) => `<p>${esc(p)}</p>`).join('')}
     <h2>Writings</h2>${list(manifest.writings.map((w) => [`${BASE}${w.route}/`, w.title, w.description]))}
@@ -208,19 +208,39 @@ for (const b of manifest.books) {
 }
 
 // ---------------------------------------------------------------- head + body injection
+// Search engines show about 155 to 160 characters of a description and about 60 to 70 of a title,
+// so the tags get a clipped copy (cut at a word) while the page text and JSON-LD keep the full versions.
+const clip = (s, n) => {
+  if (!s || s.length <= n) return s ?? ''
+  const cut = s.slice(0, n - 1)
+  const end = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('; '), cut.lastIndexOf(', '), cut.lastIndexOf(' '))
+  return cut.slice(0, end > n * 0.6 ? end : cut.length).replace(/[,;:\s]+$/, '') + (cut.slice(0, end).endsWith('.') ? '' : '…')
+}
+const clipTitle = (t) => {
+  if (t.length <= 72) return t
+  const i = t.lastIndexOf(' · ')
+  const [main, tail] = i > 0 ? [t.slice(0, i), t.slice(i)] : [t, '']
+  const room = 68 - tail.length
+  if (main.length <= room) return t
+  const colon = main.lastIndexOf(': ', room)
+  return (colon > room * 0.5 ? main.slice(0, colon) : clip(main, room)) + tail
+}
+
 function render(pg, { noindex = false } = {}) {
   const canonical = url(pg.route)
+  const title = clipTitle(pg.title), description = clip(pg.description, 160)
   const meta = [
-    `<title>${esc(pg.title)}</title>`,
-    `<meta name="description" content="${esc(pg.description)}" />`,
+    `<title>${esc(title)}</title>`,
+    `<meta name="description" content="${esc(description)}" />`,
+    '<meta name="theme-color" content="#0d0e16" />',
     `<link rel="canonical" href="${canonical}" />`,
     `<meta name="author" content="${esc(site.name)}" />`,
     noindex ? '<meta name="robots" content="noindex" />' : '<meta name="robots" content="index, follow, max-image-preview:large" />',
     pg.tags?.length ? `<meta name="keywords" content="${esc(pg.tags.join(', '))}" />` : '',
     `<meta property="og:site_name" content="${esc(site.name)}" />`,
     `<meta property="og:type" content="${pg.type === 'book' ? 'book' : pg.type}" />`,
-    `<meta property="og:title" content="${esc(pg.title)}" />`,
-    `<meta property="og:description" content="${esc(pg.description)}" />`,
+    `<meta property="og:title" content="${esc(title)}" />`,
+    `<meta property="og:description" content="${esc(description)}" />`,
     `<meta property="og:url" content="${canonical}" />`,
     `<meta property="og:image" content="${pg.image}" />`,
     '<meta property="og:image:width" content="1200" />',
@@ -233,8 +253,8 @@ function render(pg, { noindex = false } = {}) {
     ...(pg.type === 'video.other' ? (pg.tags ?? []).map((t) => `<meta property="video:tag" content="${esc(t)}" />`) : []),
     '<meta name="twitter:card" content="summary_large_image" />',
     `<meta name="twitter:creator" content="@${site.links.x.split('/').pop()}" />`,
-    `<meta name="twitter:title" content="${esc(pg.title)}" />`,
-    `<meta name="twitter:description" content="${esc(pg.description)}" />`,
+    `<meta name="twitter:title" content="${esc(title)}" />`,
+    `<meta name="twitter:description" content="${esc(description)}" />`,
     `<meta name="twitter:image" content="${pg.image}" />`,
     `<link rel="alternate" type="application/rss+xml" title="${esc(site.name)}: writings" href="${ORIGIN}${BASE}rss.xml" />`,
     `<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@graph': pg.ld }).replace(/</g, '\\u003c')}</script>`,

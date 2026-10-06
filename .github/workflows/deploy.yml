@@ -42,3 +42,10 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Tell IndexNow search engines about the pages
+        run: node scripts/indexnow.mjs
+        continue-on-error: true
