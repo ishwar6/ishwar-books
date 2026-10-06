@@ -950,46 +950,15 @@ python vit_part2_attn.py      # the tiny Eq. 5 to 8 example, writes results/part
 2. Google Research. [vision_transformer](https://github.com/google-research/vision_transformer): the official code and pre-trained checkpoints.
 3. Hugging Face model cards [google/vit-base-patch16-224](https://huggingface.co/google/vit-base-patch16-224) (fine-tuned on ImageNet) and [google/vit-base-patch16-224-in21k](https://huggingface.co/google/vit-base-patch16-224-in21k) (pre-trained only), the checkpoints used in this part.
 
-**Papers the ViT paper cites in this part**
+**Papers the ViT paper cites in this part (the five that matter most here)**
 
 4. A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez, Ł. Kaiser, I. Polosukhin. [*Attention Is All You Need*](https://arxiv.org/abs/1706.03762) (the Transformer). NeurIPS 2017.
 5. J. Devlin, M.-W. Chang, K. Lee, K. Toutanova. [*BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding*](https://arxiv.org/abs/1810.04805). NAACL 2019.
-6. A. Radford, K. Narasimhan, T. Salimans, I. Sutskever. [*Improving Language Understanding by Generative Pre-Training*](https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf) (GPT). OpenAI, 2018.
-7. A. Radford, J. Wu, R. Child, D. Luan, D. Amodei, I. Sutskever. [*Language Models are Unsupervised Multitask Learners*](https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf) (GPT-2). OpenAI, 2019.
-8. T. B. Brown et al. [*Language Models are Few-Shot Learners*](https://arxiv.org/abs/2005.14165) (GPT-3). NeurIPS 2020.
-9. N. Parmar, A. Vaswani, J. Uszkoreit, Ł. Kaiser, N. Shazeer, A. Ku, D. Tran. [*Image Transformer*](https://arxiv.org/abs/1802.05751) (local self-attention). ICML 2018.
-10. H. Hu, Z. Zhang, Z. Xie, S. Lin. [*Local Relation Networks for Image Recognition*](https://arxiv.org/abs/1904.11491). ICCV 2019.
-11. P. Ramachandran, N. Parmar, A. Vaswani, I. Bello, A. Levskaya, J. Shlens. [*Stand-Alone Self-Attention in Vision Models*](https://arxiv.org/abs/1906.05909). NeurIPS 2019.
-12. H. Zhao, J. Jia, V. Koltun. [*Exploring Self-attention for Image Recognition*](https://arxiv.org/abs/2004.13621). CVPR 2020.
-13. R. Child, S. Gray, A. Radford, I. Sutskever. [*Generating Long Sequences with Sparse Transformers*](https://arxiv.org/abs/1904.10509). arXiv 2019.
-14. D. Weissenborn, O. Täckström, J. Uszkoreit. [*Scaling Autoregressive Video Models*](https://arxiv.org/abs/1906.02634) (attention in blocks). ICLR 2020.
-15. J. Ho, N. Kalchbrenner, D. Weissenborn, T. Salimans. [*Axial Attention in Multidimensional Transformers*](https://arxiv.org/abs/1912.12180). arXiv 2019.
-16. H. Wang, Y. Zhu, B. Green, H. Adam, A. Yuille, L.-C. Chen. [*Axial-DeepLab: Stand-Alone Axial-Attention for Panoptic Segmentation*](https://arxiv.org/abs/2003.07853). ECCV 2020.
-17. J.-B. Cordonnier, A. Loukas, M. Jaggi. [*On the Relationship between Self-Attention and Convolutional Layers*](https://arxiv.org/abs/1911.03584) (the 2×2 patch model). ICLR 2020.
-18. I. Bello, B. Zoph, A. Vaswani, J. Shlens, Q. V. Le. [*Attention Augmented Convolutional Networks*](https://arxiv.org/abs/1904.09925). ICCV 2019.
-19. H. Hu, J. Gu, Z. Zhang, J. Dai, Y. Wei. [*Relation Networks for Object Detection*](https://arxiv.org/abs/1711.11575). CVPR 2018.
-20. N. Carion, F. Massa, G. Synnaeve, N. Usunier, A. Kirillov, S. Zagoruyko. [*End-to-End Object Detection with Transformers*](https://arxiv.org/abs/2005.12872) (DETR). ECCV 2020.
-21. X. Wang, R. Girshick, A. Gupta, K. He. [*Non-local Neural Networks*](https://arxiv.org/abs/1711.07971). CVPR 2018.
-22. C. Sun, A. Myers, C. Vondrick, K. Murphy, C. Schmid. [*VideoBERT: A Joint Model for Video and Language Representation Learning*](https://arxiv.org/abs/1904.01766). ICCV 2019.
-23. B. Wu et al. [*Visual Transformers: Token-based Image Representation and Processing for Computer Vision*](https://arxiv.org/abs/2006.03677). arXiv 2020.
-24. F. Locatello et al. [*Object-Centric Learning with Slot Attention*](https://arxiv.org/abs/2006.15055). NeurIPS 2020.
-25. Y.-C. Chen et al. [*UNITER: UNiversal Image-TExt Representation Learning*](https://arxiv.org/abs/1909.11740). ECCV 2020.
-26. J. Lu, D. Batra, D. Parikh, S. Lee. [*ViLBERT: Pretraining Task-Agnostic Visiolinguistic Representations for Vision-and-Language Tasks*](https://arxiv.org/abs/1908.02265). NeurIPS 2019.
-27. L. H. Li, M. Yatskar, D. Yin, C.-J. Hsieh, K.-W. Chang. [*VisualBERT: A Simple and Performant Baseline for Vision and Language*](https://arxiv.org/abs/1908.03557). arXiv 2019.
-28. M. Chen, A. Radford, R. Child, J. Wu, H. Jun, D. Luan, I. Sutskever. [*Generative Pretraining From Pixels*](https://proceedings.mlr.press/v119/chen20s.html) (iGPT). ICML 2020.
-29. D. Mahajan et al. [*Exploring the Limits of Weakly Supervised Pretraining*](https://arxiv.org/abs/1805.00932). ECCV 2018.
-30. H. Touvron, A. Vedaldi, M. Douze, H. Jégou. [*Fixing the train-test resolution discrepancy*](https://arxiv.org/abs/1906.06423) (FixRes). NeurIPS 2019.
-31. Q. Xie, M.-T. Luong, E. Hovy, Q. V. Le. [*Self-training with Noisy Student improves ImageNet classification*](https://arxiv.org/abs/1911.04252). CVPR 2020.
-32. C. Sun, A. Shrivastava, S. Singh, A. Gupta. [*Revisiting Unreasonable Effectiveness of Data in Deep Learning Era*](https://arxiv.org/abs/1707.02968) (JFT-300M). ICCV 2017.
-33. A. Kolesnikov, L. Beyer, X. Zhai, J. Puigcerver, J. Yung, S. Gelly, N. Houlsby. [*Big Transfer (BiT): General Visual Representation Learning*](https://arxiv.org/abs/1912.11370). ECCV 2020.
-34. J. Djolonga et al. [*On Robustness and Transferability of Convolutional Neural Networks*](https://arxiv.org/abs/2007.08558). CVPR 2021.
-35. Q. Wang, B. Li, T. Xiao, J. Zhu, C. Li, D. F. Wong, L. S. Chao. [*Learning Deep Transformer Models for Machine Translation*](https://arxiv.org/abs/1906.01787) (pre-norm). ACL 2019.
-36. A. Baevski, M. Auli. [*Adaptive Input Representations for Neural Language Modeling*](https://arxiv.org/abs/1809.10853) (pre-norm). ICLR 2019.
-37. D. Hendrycks, K. Gimpel. [*Gaussian Error Linear Units (GELUs)*](https://arxiv.org/abs/1606.08415). arXiv 2016.
-38. Y. LeCun, B. Boser, J. S. Denker, D. Henderson, R. E. Howard, W. Hubbard, L. D. Jackel. [*Backpropagation Applied to Handwritten Zip Code Recognition*](https://doi.org/10.1162/neco.1989.1.4.541) (the CNN cited for feature maps). Neural Computation 1(4), 1989.
-39. K. He, X. Zhang, S. Ren, J. Sun. [*Deep Residual Learning for Image Recognition*](https://arxiv.org/abs/1512.03385) (ResNet). CVPR 2016.
+6. N. Parmar, A. Vaswani, J. Uszkoreit, Ł. Kaiser, N. Shazeer, A. Ku, D. Tran. [*Image Transformer*](https://arxiv.org/abs/1802.05751) (local self-attention). ICML 2018.
+7. J.-B. Cordonnier, A. Loukas, M. Jaggi. [*On the Relationship between Self-Attention and Convolutional Layers*](https://arxiv.org/abs/1911.03584) (the 2×2 patch model). ICLR 2020.
+8. A. Kolesnikov, L. Beyer, X. Zhai, J. Puigcerver, J. Yung, S. Gelly, N. Houlsby. [*Big Transfer (BiT): General Visual Representation Learning*](https://arxiv.org/abs/1912.11370). ECCV 2020.
 
 **Other sources used in this part**
 
-40. J. L. Ba, J. R. Kiros, G. E. Hinton. [*Layer Normalization*](https://arxiv.org/abs/1607.06450). arXiv 2016.
-41. Code for this part: [`vit_part2_math.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/vit/vit_part2_math.py) and [`vit_part2_attn.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/vit/vit_part2_attn.py); figures by [`figs_part2.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/vit/figs_part2.py), paper excerpts by [`shots_part2.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/vit/shots_part2.py).
+9. J. L. Ba, J. R. Kiros, G. E. Hinton. [*Layer Normalization*](https://arxiv.org/abs/1607.06450). arXiv 2016.
+10. Code for this part: [`vit_part2_math.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/vit/vit_part2_math.py) and [`vit_part2_attn.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/vit/vit_part2_attn.py); figures by [`figs_part2.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/vit/figs_part2.py), paper excerpts by [`shots_part2.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/vit/shots_part2.py).
