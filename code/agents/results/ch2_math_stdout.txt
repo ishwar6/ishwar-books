@@ -1,0 +1,25 @@
+== 1. What one turn of the loop sends to the model (planning numbers, step 10 of a run) ==
+  system instructions              1,500 tokens    8.8%
+  tool definitions (20 x 150)      3,000 tokens   17.5%
+  retrieved memory                 1,000 tokens    5.8%
+  history so far (step 10)        10,800 tokens   63.2%
+  current observation                800 tokens    4.7%
+  total                           17,100 tokens
+
+== 2. A 30-step run: fixed 5,500 tokens per step, history grows by 1,200 tokens per step ==
+step  no compaction  compaction
+   1          5,500       5,500
+   5         10,300      10,300
+  10         16,300      16,300
+  11         17,500       8,500
+  20         28,300      19,300
+  21         29,500       8,500
+  30         40,300      19,300
+input tokens over the run:   687,000 without compaction,   387,000 with (every 10 steps, 600-token summary)
+output tokens over the run: 12,000 in both cases
+cost per run at the EXAMPLE price ($3 / M in, $15 / M out): $2.241 without, $1.341 with compaction (44% fewer input tokens, 40% cheaper)
+largest context in the run: 40,300 tokens without compaction, 19,300 with
+
+== 3. One 25,000-token tool result at step 5, re-sent on every later step of the 30-step run ==
+  extra input tokens: 650,000 (that is 0.9x the whole uncompacted run), extra cost $1.95 per run at the example price
+  the same result trimmed to 800 tokens by the tool: 20,800 extra tokens

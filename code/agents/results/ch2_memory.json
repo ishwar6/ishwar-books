@@ -1,0 +1,54 @@
+{
+ "rows": [
+  {
+   "label": "without compaction",
+   "sizes": [
+    79,
+    165,
+    192,
+    224,
+    246,
+    296,
+    321,
+    361,
+    390,
+    434,
+    463,
+    489
+   ],
+   "total": 3660
+  },
+  {
+   "label": "with compaction",
+   "sizes": [
+    79,
+    165,
+    192,
+    164,
+    187,
+    237,
+    261,
+    246,
+    276,
+    320,
+    349,
+    296
+   ],
+   "total": 2772
+  }
+ ],
+ "final_context": "SYSTEM: You schedule meetings. Tools: find_free_slots, create_event, send_email.\nMEMORY preference meetings: never before 10:00; prefers mornings\nMEMORY event design review: EVT-1187 Wed 10:00-10:45 room 4B\nPLAN: goal: 45-min review, Priya + Tom, next week | candidates: Mon 10, Wed 10, Thu 10, Fri 10 (>= 10:00, morning) | room: 4B | done: event created | problem: Tom out Monday | candidates: Wed 10, Fri 10 | done: moved to Wed\nSUMMARY: Set up a 45 minute design review with Priya and Tom next week. find_free_slots -> 14 shared slots: Mon 10:00, Mon 11:00, Mon 14:00, Tue 09:00, Tue 10:30,. Tue 09:00 and Thu 09:30 are too early. find_rooms -> Room 4B free Mon 10:00-11:00 (capacity 6, screen). Room 4B works. create_event -> ok: event id EVT-1187, Mon 10:00-10:45, attendees priya@, tom@, room 4B, t. Event created. send_email -> ok: 2 invitations sent (priya@, tom@). Tom is out Monday. find_free_slots -> remaining shared morning slots not before 10:00: Wed 10:00, Thu 10:00, .\nTOOL: update_event -> ok: EVT-1187 moved to Wed 10:00-10:45, room 4B; updated invitations sent.\nASSISTANT: Done. The design review is Wed 10:00-10:45 in 4B; both attendees have the updated invitation.",
+ "store": {
+  "preference meetings": "never before 10:00; prefers mornings",
+  "event design review": "EVT-1187 Wed 10:00-10:45 room 4B"
+ },
+ "scratch": [
+  "goal: 45-min review, Priya + Tom, next week",
+  "candidates: Mon 10, Wed 10, Thu 10, Fri 10 (>= 10:00, morning)",
+  "room: 4B",
+  "done: event created",
+  "problem: Tom out Monday",
+  "candidates: Wed 10, Fri 10",
+  "done: moved to Wed"
+ ]
+}

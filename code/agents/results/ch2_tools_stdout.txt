@@ -1,0 +1,56 @@
+== 1. One function-calling round trip (the model is a stub) ==
+REQUEST  system + tools: [{"name": "calendar_find_free_slots", "description": "Find meeting slots when ALL given
+         attendees are free. Use be...", "input_schema": "{...}"}, {"name": "calendar_create_event", "description":
+         "Create one calendar event and invite the attendees. Idempote...", "input_schema": "{...}"}]
+         full schema of calendar_find_free_slots:
+{
+ "type": "object",
+ "properties": {
+  "attendee_emails": {
+   "type": "array",
+   "items": {
+    "type": "string",
+    "format": "email"
+   },
+   "description": "Email addresses of everyone who must attend."
+  },
+  "duration_minutes": {
+   "type": "integer",
+   "minimum": 15,
+   "maximum": 480
+  },
+  "window_start": {
+   "type": "string",
+   "format": "date",
+   "description": "First day to consider, YYYY-MM-DD."
+  },
+  "window_end": {
+   "type": "string",
+   "format": "date",
+   "description": "Last day to consider, YYYY-MM-DD."
+  },
+  "earliest_hour": {
+   "type": "integer",
+   "minimum": 0,
+   "maximum": 23,
+   "default": 9,
+   "description": "Do not return slots that start before this hour (24h clock)."
+  }
+ },
+ "required": [
+  "attendee_emails",
+  "duration_minutes",
+  "window_start",
+  "window_end"
+ ]
+}
+REQUEST  user: {"role": "user", "content": "Find 45 minutes for Priya and Tom next week, nothing before 10am."}
+REPLY    assistant (stop_reason=tool_use): {"role": "assistant", "content": [{"type": "tool_use", "id": "call_01",
+         "name": "calendar_find_free_slots", "input": {"attendee_emails": ["priya@example.com", "tom@example.com"],
+         "duration_minutes": 45, "window_start": "2026-10-12", "window_end": "2026-10-16", "earliest_hour": 10}}]}
+REQUEST  tool_result (sent back as the next user turn): {"role": "user", "content": [{"type": "tool_result",
+         "tool_use_id": "call_01", "content": "{\"slots\": [\"2026-10-12T10:00\", \"2026-10-13T10:30\",
+         \"2026-10-14T10:00\"], \"time_zone\": \"Europe/London\"}"}]}
+REPLY    assistant (stop_reason=end_turn): {"role": "assistant", "content": [{"type": "text", "text": "Three slots fit
+         (none before 10:00): 2026-10-12T10:00, 2026-10-13T10:30, 2026-10-14T10:00. Shall I book the first?"}]}
+

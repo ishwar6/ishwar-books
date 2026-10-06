@@ -1,0 +1,147 @@
+{
+ "tools": [
+  {
+   "name": "calendar_find_free_slots",
+   "description": "Find meeting slots when ALL given attendees are free. Use before creating an event. Returns at most 10 slots, each as an ISO start time, in the attendees' time zone. Returns an empty list (not an error) if nobody is free.",
+   "input_schema": {
+    "type": "object",
+    "properties": {
+     "attendee_emails": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "email"
+      },
+      "description": "Email addresses of everyone who must attend."
+     },
+     "duration_minutes": {
+      "type": "integer",
+      "minimum": 15,
+      "maximum": 480
+     },
+     "window_start": {
+      "type": "string",
+      "format": "date",
+      "description": "First day to consider, YYYY-MM-DD."
+     },
+     "window_end": {
+      "type": "string",
+      "format": "date",
+      "description": "Last day to consider, YYYY-MM-DD."
+     },
+     "earliest_hour": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 23,
+      "default": 9,
+      "description": "Do not return slots that start before this hour (24h clock)."
+     }
+    },
+    "required": [
+     "attendee_emails",
+     "duration_minutes",
+     "window_start",
+     "window_end"
+    ]
+   }
+  },
+  {
+   "name": "calendar_create_event",
+   "description": "Create one calendar event and invite the attendees. Idempotent: calling twice with the same idempotency_key returns the same event. Returns the event id.",
+   "input_schema": {
+    "type": "object",
+    "properties": {
+     "title": {
+      "type": "string"
+     },
+     "start": {
+      "type": "string",
+      "format": "date-time"
+     },
+     "duration_minutes": {
+      "type": "integer"
+     },
+     "attendee_emails": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "idempotency_key": {
+      "type": "string"
+     }
+    },
+    "required": [
+     "title",
+     "start",
+     "duration_minutes",
+     "attendee_emails",
+     "idempotency_key"
+    ]
+   }
+  }
+ ],
+ "round_trip": [
+  {
+   "role": "user",
+   "content": "Find 45 minutes for Priya and Tom next week, nothing before 10am."
+  },
+  {
+   "role": "assistant",
+   "content": [
+    {
+     "type": "tool_use",
+     "id": "call_01",
+     "name": "calendar_find_free_slots",
+     "input": {
+      "attendee_emails": [
+       "priya@example.com",
+       "tom@example.com"
+      ],
+      "duration_minutes": 45,
+      "window_start": "2026-10-12",
+      "window_end": "2026-10-16",
+      "earliest_hour": 10
+     }
+    }
+   ]
+  },
+  {
+   "role": "user",
+   "content": [
+    {
+     "type": "tool_result",
+     "tool_use_id": "call_01",
+     "content": "{\"slots\": [\"2026-10-12T10:00\", \"2026-10-13T10:30\", \"2026-10-14T10:00\"], \"time_zone\": \"Europe/London\"}"
+    }
+   ]
+  },
+  {
+   "role": "assistant",
+   "content": [
+    {
+     "type": "text",
+     "text": "Three slots fit (none before 10:00): 2026-10-12T10:00, 2026-10-13T10:30, 2026-10-14T10:00. Shall I book the first?"
+    }
+   ]
+  }
+ ],
+ "accuracy": {
+  "wrapper set": 0.3,
+  "clear set": 1.0
+ },
+ "bad": {
+  "get_calendar": "GET /calendar",
+  "post_calendar_event": "POST /calendar/events",
+  "get_crm_record": "GET /crm/records/{id}",
+  "post_mail": "POST /mail",
+  "get_search": "GET /search?q="
+ },
+ "good": {
+  "calendar_find_free_slots": "Find meeting slots when all attendees are free; use before booking. Words: free, slot, availability, when can.",
+  "calendar_create_event": "Create a calendar event and invite attendees; book, schedule, set up a meeting at a known time.",
+  "crm_get_customer_context": "Everything about one customer: account, plan, recent tickets, notes. Use for who is, status of, history of a customer.",
+  "email_send": "Send an email or an invitation message to people. Words: email, mail, message, notify, invite.",
+  "docs_search": "Search internal documents and policies by keyword; find the doc, the policy, the guide about a topic."
+ }
+}

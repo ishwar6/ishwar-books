@@ -1,0 +1,24 @@
+== 2. Tool selection by the stub on 10 labelled requests: endpoint wrappers versus described tools ==
+  [wrapper set] ok  When are Priya and Tom both free for 45 minutes next -> get_calendar
+  [wrapper set] BAD Book the design review for Wednesday at 10 with the  -> get_calendar
+  [wrapper set] BAD What is the status of customer Acme and their recent -> get_calendar
+  [wrapper set] BAD Email the team that the review moved to Wednesday.   -> get_calendar
+  [wrapper set] BAD Find the policy doc on expense limits.               -> get_calendar
+  [wrapper set] ok  Which slots is the whole team free on Friday?        -> get_calendar
+  [wrapper set] BAD Schedule a 30 minute call with Sam at 14:00 tomorrow -> get_calendar
+  [wrapper set] BAD Who is the account owner for Globex and what plan ar -> get_calendar
+  [wrapper set] ok  Notify Priya by mail about the room change.          -> post_mail
+  [wrapper set] BAD Where is the onboarding guide?                       -> get_calendar
+  wrapper set: 3/10 correct
+  [clear set] ok  When are Priya and Tom both free for 45 minutes next -> calendar_find_free_slots
+  [clear set] ok  Book the design review for Wednesday at 10 with the  -> calendar_create_event
+  [clear set] ok  What is the status of customer Acme and their recent -> crm_get_customer_context
+  [clear set] ok  Email the team that the review moved to Wednesday.   -> email_send
+  [clear set] ok  Find the policy doc on expense limits.               -> docs_search
+  [clear set] ok  Which slots is the whole team free on Friday?        -> calendar_find_free_slots
+  [clear set] ok  Schedule a 30 minute call with Sam at 14:00 tomorrow -> calendar_create_event
+  [clear set] ok  Who is the account owner for Globex and what plan ar -> crm_get_customer_context
+  [clear set] ok  Notify Priya by mail about the room change.          -> email_send
+  [clear set] ok  Where is the onboarding guide?                       -> docs_search
+  clear set: 10/10 correct
+selection accuracy: wrappers 30%, clear 100% (a stub, not a model: it shows the mechanism, not a benchmark)

@@ -1,0 +1,46 @@
+== without compaction: context size per step (approximate tokens, 4 chars per token) ==
+  step  1:   79 tokens,  1 messages in history
+  step  2:  165 tokens,  2 messages in history
+  step  3:  192 tokens,  3 messages in history
+  step  4:  224 tokens,  4 messages in history
+  step  5:  246 tokens,  5 messages in history
+  step  6:  296 tokens,  6 messages in history
+  step  7:  321 tokens,  7 messages in history
+  step  8:  361 tokens,  8 messages in history
+  step  9:  390 tokens,  9 messages in history
+  step 10:  434 tokens, 10 messages in history
+  step 11:  463 tokens, 11 messages in history
+  step 12:  489 tokens, 12 messages in history
+  total over 12 steps: 3,660 tokens; largest 489
+
+== with compaction: context size per step (approximate tokens, 4 chars per token) ==
+  step  1:   79 tokens,  1 messages in history
+  step  2:  165 tokens,  2 messages in history
+  step  3:  192 tokens,  3 messages in history
+  step  4:  164 tokens,  3 messages in history
+  step  5:  187 tokens,  4 messages in history
+  step  6:  237 tokens,  5 messages in history
+  step  7:  261 tokens,  6 messages in history
+  step  8:  246 tokens,  3 messages in history
+  step  9:  276 tokens,  4 messages in history
+  step 10:  320 tokens,  5 messages in history
+  step 11:  349 tokens,  6 messages in history
+  step 12:  296 tokens,  3 messages in history
+  total over 12 steps: 2,772 tokens; largest 349
+
+== what the compacted agent sees at step 12 ==
+SYSTEM: You schedule meetings. Tools: find_free_slots, create_event, send_email.
+MEMORY preference meetings: never before 10:00; prefers mornings
+MEMORY event design review: EVT-1187 Wed 10:00-10:45 room 4B
+PLAN: goal: 45-min review, Priya + Tom, next week | candidates: Mon 10, Wed 10, Thu 10, Fri 10 (>= 10:00, morning) |
+    room: 4B | done: event created | problem: Tom out Monday | candidates: Wed 10, Fri 10 | done: moved to Wed
+SUMMARY: Set up a 45 minute design review with Priya and Tom next week. find_free_slots -> 14 shared slots: Mon 10:00,
+    Mon 11:00, Mon 14:00, Tue 09:00, Tue 10:30,. Tue 09:00 and Thu 09:30 are too early. find_rooms -> Room 4B free Mon
+    10:00-11:00 (capacity 6, screen). Room 4B works. create_event -> ok: event id EVT-1187, Mon 10:00-10:45, attendees
+    priya@, tom@, room 4B, t. Event created. send_email -> ok: 2 invitations sent (priya@, tom@). Tom is out Monday.
+    find_free_slots -> remaining shared morning slots not before 10:00: Wed 10:00, Thu 10:00, .
+TOOL: update_event -> ok: EVT-1187 moved to Wed 10:00-10:45, room 4B; updated invitations sent.
+ASSISTANT: Done. The design review is Wed 10:00-10:45 in 4B; both attendees have the updated invitation.
+
+recall("meetings") after compaction -> {'preference meetings': 'never before 10:00; prefers mornings'}
+the user turn that stated the 10:00 rule was summarised away at step 4; the rule survives in the long-term store.
