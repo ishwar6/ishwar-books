@@ -92,6 +92,7 @@ export default function TopicMap() {
       </div>
 
       <div className="map-wrap">
+        <div className="map-canvas">
         <svg className="map-svg" viewBox={`0 0 ${W} ${H}`} role="img" aria-label="A graph of the site's topics, grouped by colour and joined by lines" onMouseLeave={() => setActive(null)}>
           {edges.map(([a, b]) => {
             const on = sel ? a === sel || b === sel : false
@@ -101,8 +102,6 @@ export default function TopicMap() {
           {nodes.map((n) => {
             const p = pos[n.id], r = 8 + 1.8 * (deg[n.id] ?? 1)
             const dim = sel ? !near.has(n.id) : false
-            const words = n.label.split(' ')
-            const lines = words.length > 3 ? [words.slice(0, Math.ceil(words.length / 2)).join(' '), words.slice(Math.ceil(words.length / 2)).join(' ')] : [n.label]
             return (
               <g key={n.id} className={`map-node${dim ? ' dim' : ''}${sel === n.id ? ' sel' : ''}`} transform={`translate(${p.x},${p.y})`}
                  onMouseEnter={() => setActive(n.id)} onFocus={() => setActive(n.id)}
@@ -110,12 +109,22 @@ export default function TopicMap() {
                  tabIndex={0} role="link" aria-label={`${n.label}: ${n.blurb}`}>
                 <circle r={r + 5} className="map-halo" style={{ fill: color(n) }} />
                 <circle r={r} style={{ fill: color(n) }} />
-                {lines.map((l, i) => <rect key={'b' + i} className="map-label-bg" x={-(l.length * 7.3 + 12) / 2} y={r + 5 + i * 16} width={l.length * 7.3 + 12} height={16} rx={5} />)}
-                {lines.map((l, i) => <text key={i} y={r + 17 + i * 16} textAnchor="middle" className="map-label">{l}</text>)}
               </g>
             )
           })}
         </svg>
+        <div className="map-labels" aria-hidden="true" onMouseLeave={() => setActive(null)}>
+          {nodes.map((n) => {
+            const p = pos[n.id], r = 8 + 1.8 * (deg[n.id] ?? 1)
+            const dim = sel ? !near.has(n.id) : false
+            return (
+              <span key={n.id} className={`map-tag${dim ? ' dim' : ''}`} style={{ left: `${(p.x / W) * 100}%`, top: `${((p.y + r + 4) / H) * 100}%` }}
+                    onMouseEnter={() => setActive(n.id)}
+                    onClick={() => { if (pinned === n.id || window.matchMedia('(hover: hover)').matches) navigate(`/${n.route}`); else setPinned(n.id) }}>{n.label}</span>
+            )
+          })}
+        </div>
+        </div>
         <aside className={`map-panel${selNode ? ' show' : ''}`} aria-live="polite">
           {selNode ? (
             <>
