@@ -1,0 +1,9 @@
+== The cascade check (two cheap samples agree) as a verifier, from results/ch4_router.json ==
+p = P(cheap right) = 17/24 = 71%
+r = P(agree | right) = 16/17 = 94%   (right answers the check let through)
+f = P(agree | wrong) = 3/7 = 43%   (the false-accept rate: wrong answers the check let through)
+precision = P(right | agree) = 16/19 = 84%;  Bayes: p r / (p r + (1-p) f) = 84%
+  accepted but wrong: 'What is the sum of all two-digit numbers divisible by 7?'  both cheap samples said '748', gold 728
+  accepted but wrong: 'What is the sum of the digits of 2 to the power 20?'  both cheap samples said '7', gold 31
+  accepted but wrong: 'If today is Wednesday, what day of the week will it be 100 d'  both cheap samples said 'Saturday', gold friday
+reading: agreement between two samples of the same model is a weak verifier: when the model is confidently wrong, it is wrong twice.

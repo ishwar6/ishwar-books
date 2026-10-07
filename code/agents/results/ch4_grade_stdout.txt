@@ -1,0 +1,22 @@
+== Grader self-test: typed comparison on adversarial strings ==
+reply                              gold      expected  got    why
+'84'                               84        True      True   plain match
+'184'                              84        False     False  gold is a substring of a wrong number
+'13'                               3         False     False  gold digit inside a wrong number
+'It is not 84; the answer is 74.'  84        False     False  two numbers: refuse to guess
+'The answer is 84.'                84        True      True   leading phrase and full stop
+'84.0'                             84        True      True   numeric, not string, comparison
+'1,200'                            1200      True      True   thousands separator
+'1,200 g'                          1200      True      True   trailing unit
+'14.2'                             14.20     True      True   money written with one decimal
+'14.25'                            14.20     False     False  money off by 5p
+'-6'                               6         False     False  sign matters
+'6 trailing zeros'                 6         True      True   number with a unit phrase
+'2496 (48 x 52)'                   2496      False     False  working shown: three numbers, refuse
+'14:05'                            14:05     True      True   time
+'2:05 pm'                          14:05     False     False  time in another format is not accepted
+'Saturday'                         saturday  True      True   case
+'Saturday or Sunday'               saturday  False     False  hedged answer
+'lisbon.'                          lisbon    True      True   punctuation
+'Lisbon, Portugal'                 lisbon    False     False  extra entity
+19/19 cases behave as specified

@@ -1,0 +1,27 @@
+{
+ "T1:4ea980e5691e": {
+  "ticket": "T1",
+  "reply": "Hello \u2014 I\u2019m sorry your order ORD-48213 arrived with a cracked screen. We\u2019ll help resolve this. Please reply with a photo of the damage and your preferred option (replacement or refund), and we\u2019ll guide you through the next steps. Thank you for letting us know.",
+  "at": "00:28:15"
+ },
+ "T2:4d411b2254cf": {
+  "ticket": "T2",
+  "reply": "Hello \u2014 thank you for contacting Northwind Home about order ORD-10988. We\u2019ve passed your refund request for the extra GBP 39.99 along for approval. We\u2019ll update you as soon as we have news. If you have any other questions in the meantime, please let us know.",
+  "at": "00:28:17"
+ },
+ "T6:9435f5ec138a": {
+  "ticket": "T6",
+  "reply": "Gracias por avisarnos. Lamentamos que su pedido ORD-33310 haya llegado da\u00f1ado. Por favor, env\u00edenos fotos del art\u00edculo y del embalaje para que podamos ayudarle con la mejor soluci\u00f3n posible. Quedamos a la espera de su respuesta.",
+  "at": "00:28:27"
+ },
+ "T3:316756a47a9d": {
+  "ticket": "T3",
+  "reply": "Hello \u2014 thank you for contacting Northwind Home about order ORD-77120. I\u2019m sorry your tracking hasn\u2019t updated. I\u2019ll investigate this delivery issue and update you as soon as I have more information. If you\u2019d like, I can also arrange a replacement or refund once we confirm the parcel\u2019s status. Please let me know how you\u2019d prefer to proceed.",
+  "at": "00:28:27"
+ },
+ "T5:57a25423b92d": {
+  "ticket": "T5",
+  "reply": "Dear Customer, thank you for contacting Northwind Home about order ORD-61234. We\u2019re sorry your sofa arrived with a torn seam. Your refund request for GBP 649 has been passed for approval. We will be in touch with any updates and next steps. If you have photos or further details to share, please reply to this message. Thank you for your patience.",
+  "at": "00:28:27"
+ }
+}

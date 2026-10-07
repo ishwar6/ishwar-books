@@ -1,0 +1,44 @@
+== A. Voting: 10 word problems, 5 samples each (gpt-5-mini, reasoning_effort=minimal) ==
+  gold   5.80  samples ['3.2', '6.15', '3.25', '5.2', '5.6']  vote@1 N  vote@3 N  vote@5 N
+  gold  14:05  samples ['12:05', '12:25', '12:05', '12:05', '12:25']  vote@1 N  vote@3 N  vote@5 N
+  gold    119  samples ['120', '80', '80', '80', '120']  vote@1 N  vote@3 N  vote@5 N
+  gold     40  samples ['40', '40', '40', '40', '40']  vote@1 y  vote@3 y  vote@5 y
+  gold     80  samples ['80', '120', '80', '80', '80']  vote@1 y  vote@3 y  vote@5 y
+  gold     60  samples ['80', '80', '84', '80', '80']  vote@1 N  vote@3 N  vote@5 N
+  gold   14.4  samples ['14.4', '14.4', '14.4', '14.4', '14.4']  vote@1 y  vote@3 y  vote@5 y
+  gold   2496  samples ['2450', '2448', '2460', '2450', '2460']  vote@1 N  vote@3 N  vote@5 N
+  gold   1200  samples ['1200', '1200', '1200', '1200', '1200']  vote@1 y  vote@3 y  vote@5 y
+  gold    728  samples ['770', '665', '693', '693', '630']  vote@1 N  vote@3 N  vote@5 N
+
+  n  accuracy   cost $  x n=1  mean agreement
+  1       40%   0.0004   1.0x            100%
+  3       40%   0.0011   3.0x             67%
+  5       40%   0.0019   5.0x             68%
+reading: a plurality vote helps only where the right answer is the most frequent one among the samples; 0 problem(s) had five identical wrong answers, which no vote can fix.
+
+== B. Best-of-n with a verifier: 10 Game-of-24 puzzles, 5 samples each ==
+  [1, 2, 3, 4]   verified .....  best@1 N  best@3 N  best@5 N  e.g. '(4*(3+1))*2'
+  [6, 6, 6, 6]   verified .....  best@1 N  best@3 N  best@5 N  e.g. '(6/(6-6/6))*6'
+  [3, 5, 7, 9]   verified .....  best@1 N  best@3 N  best@5 N  e.g. '(7-3)*(9+5)'
+  [2, 2, 2, 3]   verified y.yyy  best@1 y  best@3 y  best@5 y  e.g. '(3*(2+2))*2'
+  [2, 3, 4, 6]   verified .....  best@1 N  best@3 N  best@5 N  e.g. '(6/(3-2))*4*2'
+  [2, 4, 6, 8]   verified .....  best@1 N  best@3 N  best@5 N  e.g. '(8/(2-6/4))'
+  [4, 7, 8, 8]   verified .....  best@1 N  best@3 N  best@5 N  e.g. '(7-4/8)*8'
+  [1, 3, 4, 6]   verified ..y.y  best@1 N  best@3 y  best@5 y  e.g. '(6/(1-3/4))*4'
+  [3, 3, 8, 8]   verified .....  best@1 N  best@3 N  best@5 N  e.g. '(8/(3-8/3))*3'
+  [1, 5, 5, 5]   verified .yy.y  best@1 N  best@3 y  best@5 y  e.g. '(5-1/5)*5+5'
+
+  n  solved   cost $  x n=1  (per-sample pass rate p = 18%; 1-(1-p)^n predicts 45% at n=3 and 63% at n=5)
+  1     10%   0.0005   1.0x
+  3     30%   0.0015   3.0x
+  5     30%   0.0026   5.0x
+reading: with a free verifier, n samples cost n times the tokens and the latency of one; the gain follows 1-(1-p)^n only if the samples are independent.
+
+== C. Wall-clock latency of 5 samples: one after another against 5 threads (three puzzles) ==
+  [4, 7, 8, 8]   sequential   4.6 s   concurrent   0.9 s   speedup  4.8x
+  [1, 3, 4, 6]   sequential   4.8 s   concurrent   1.1 s   speedup  4.4x
+  [3, 3, 8, 8]   sequential   4.4 s   concurrent   1.0 s   speedup  4.4x
+mean: sequential 4.6 s, concurrent 1.0 s, speedup 4.5x; the token bill is the same in both cases.
+
+total spend: $0.0060 (130 calls, 7,680 input + 2,018 output tokens, 0 hidden reasoning tokens)
+stub used: no, every answer came from the API

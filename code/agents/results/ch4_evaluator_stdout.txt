@@ -1,0 +1,38 @@
+== Evaluator-optimiser on 8 paragraphs, five checkable constraints, up to 4 rounds (gpt-5-mini, reasoning_effort=minimal) ==
+constraints: 55-75 words; exactly 4 sentences; no sentence over 20 words; three required keywords; ten banned words
+
+  para 1 programmatic rounds 2  checker trail: C1 -> pass                         final passes C1-C5: yes  held-out facts kept: yes
+  para 1 judge        rounds 1  checker trail: C1                                 final passes C1-C5: NO  held-out facts kept: yes
+  para 2 programmatic rounds 1  checker trail: pass                               final passes C1-C5: yes  held-out facts kept: yes
+  para 2 judge        rounds 1  checker trail: pass                               final passes C1-C5: yes  held-out facts kept: yes
+  para 3 programmatic rounds 2  checker trail: C1 -> pass                         final passes C1-C5: yes  held-out facts kept: yes
+  para 3 judge        rounds 4  checker trail: C1 -> pass -> pass -> pass         final passes C1-C5: yes  held-out facts kept: yes
+  para 4 programmatic rounds 2  checker trail: C1 -> pass                         final passes C1-C5: yes  held-out facts kept: yes
+  para 4 judge        rounds 4  checker trail: C1 -> pass -> pass -> pass         final passes C1-C5: yes  held-out facts kept: yes
+  para 5 programmatic rounds 2  checker trail: C1 -> pass                         final passes C1-C5: yes  held-out facts kept: yes
+  para 5 judge        rounds 4  checker trail: pass -> pass -> pass -> pass       final passes C1-C5: yes  held-out facts kept: NO
+  para 6 programmatic rounds 4  checker trail: C3 -> C3 -> C1 -> C3               final passes C1-C5: NO  held-out facts kept: yes
+  para 6 judge        rounds 4  checker trail: pass -> pass -> pass -> pass       final passes C1-C5: yes  held-out facts kept: yes
+  para 7 programmatic rounds 1  checker trail: pass                               final passes C1-C5: yes  held-out facts kept: yes
+  para 7 judge        rounds 4  checker trail: C3 -> C1 -> pass -> pass           final passes C1-C5: yes  held-out facts kept: yes
+  para 8 programmatic rounds 1  checker trail: pass                               final passes C1-C5: yes  held-out facts kept: yes
+  para 8 judge        rounds 3  checker trail: pass -> pass -> pass               final passes C1-C5: yes  held-out facts kept: yes
+
+-- the judge against the programmatic checker, over all 40 drafts --
+overall verdict agreement 40%; judge passed a failing draft (false pass) 2 times; judge failed a passing draft (false fail) 22 times
+constraint   agreement  checker fails  judge fails
+C1                 32%            22%          75%
+C2                 90%             0%          10%
+C3                 62%            10%          42%
+C4                 90%             0%          10%
+C5                 80%             0%          20%
+
+-- summary (cost from the API usage fields) --
+critic        first draft ok  stopped on pass  truly passes  mean rounds  rounds 1/2/3/4   gen $  critic $  $/round held-out ok  both
+programmatic            3/8              7/8           7/8          1.88         3/4/0/1  0.0032    0.0000   0.0002        8/8    7/8 
+judge                   4/8              4/8           7/8          3.12         2/0/1/5  0.0064    0.0062   0.0005        7/8    6/8 
+held-out facts present in the SOURCE paragraphs (sanity check of the held-out regexes): 8/8
+reading: "stopped on pass" is what the loop believed; "truly passes" is what the programmatic checker says. Judge errors cut both ways: false passes stop too early, false fails burn rounds.
+
+total spend: $0.0193 (80 calls, 21,988 input + 6,889 output tokens, 0 hidden reasoning tokens)
+stub used: no, every answer came from the API

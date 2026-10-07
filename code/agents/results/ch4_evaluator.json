@@ -1,0 +1,1054 @@
+{
+ "model": "gpt-5-mini",
+ "stub": false,
+ "max_rounds": 4,
+ "summary": {
+  "programmatic": {
+   "arm": "programmatic",
+   "rounds_total": 15,
+   "mean_rounds": 1.875,
+   "rounds_hist": {
+    "1": 3,
+    "2": 4,
+    "3": 0,
+    "4": 1
+   },
+   "stopped_on_pass": 7,
+   "truly_passes": 7,
+   "n": 8,
+   "gen_cost_usd": 0.0031625000000000004,
+   "critic_cost_usd": 0.0,
+   "cost_per_round_usd": 0.00021083333333333335,
+   "first_draft_passes": 3,
+   "heldout_ok": 8,
+   "pass_and_heldout": 7
+  },
+  "judge": {
+   "arm": "judge",
+   "rounds_total": 25,
+   "mean_rounds": 3.125,
+   "rounds_hist": {
+    "1": 2,
+    "2": 0,
+    "3": 1,
+    "4": 5
+   },
+   "stopped_on_pass": 4,
+   "truly_passes": 7,
+   "n": 8,
+   "gen_cost_usd": 0.00642525,
+   "critic_cost_usd": 0.00619625,
+   "cost_per_round_usd": 0.00050486,
+   "first_draft_passes": 4,
+   "heldout_ok": 7,
+   "pass_and_heldout": 6
+  }
+ },
+ "judge_vs_checker": {
+  "drafts": 40,
+  "agreement": 0.4,
+  "false_pass": 2,
+  "false_fail": 22,
+  "per_constraint": {
+   "C1": {
+    "agree": 0.325,
+    "checker_fail_rate": 0.225,
+    "judge_fail_rate": 0.75
+   },
+   "C2": {
+    "agree": 0.9,
+    "checker_fail_rate": 0.0,
+    "judge_fail_rate": 0.1
+   },
+   "C3": {
+    "agree": 0.625,
+    "checker_fail_rate": 0.1,
+    "judge_fail_rate": 0.425
+   },
+   "C4": {
+    "agree": 0.9,
+    "checker_fail_rate": 0.0,
+    "judge_fail_rate": 0.1
+   },
+   "C5": {
+    "agree": 0.8,
+    "checker_fail_rate": 0.0,
+    "judge_fail_rate": 0.2
+   }
+  }
+ },
+ "results": {
+  "programmatic": [
+   {
+    "arm": "programmatic",
+    "rounds": [
+     {
+      "round": 1,
+      "text": "Our new onboarding flow is a significant improvement over the old one. The previous design confused many users and included unnecessary elements. We expect the new approach to increase completion rates for sign-up and activation. We will measure outcomes carefully over the coming weeks to confirm the change delivers the intended impact.",
+      "checker_fails": [
+       "C1: 52 words (need 55 to 75)"
+      ],
+      "judge_fails": [
+       "C2",
+       "C3",
+       "C4",
+       "C5"
+      ],
+      "judge_notes": "Paragraph has 60 words, within 55\u201375.",
+      "use_gen": {
+       "input": 193,
+       "output": 66,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 186,
+       "output": 36,
+       "reasoning": 0
+      }
+     },
+     {
+      "round": 2,
+      "text": "Our new onboarding flow is a significant improvement over the old one and simplifies the process for users. The previous design confused many users and included several unnecessary elements that hindered progress. We expect the new approach to increase completion rates for sign-up and activation across platforms. Over the coming weeks we will measure outcomes carefully to confirm the change delivers the intended impact.",
+      "checker_fails": [],
+      "judge_fails": [
+       "C1",
+       "C3"
+      ],
+      "judge_notes": "None of the forbidden words appear.",
+      "use_gen": {
+       "input": 298,
+       "output": 79,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 199,
+       "output": 95,
+       "reasoning": 0
+      }
+     }
+    ],
+    "n_rounds": 2,
+    "stopped_on_pass": true,
+    "truly_passes": true,
+    "heldout_ok": true,
+    "source_heldout_ok": true
+   },
+   {
+    "arm": "programmatic",
+    "rounds": [
+     {
+      "round": 1,
+      "text": "The migration of the payments service to the new cluster has been planned carefully over many months. We will move traffic in controlled stages to reduce risk. The rollout begins with internal traffic, then a small percentage of customers, and finally all users. A rollback plan will be in place at each stage if problems occur.",
+      "checker_fails": [],
+      "judge_fails": [
+       "C1",
+       "C3"
+      ],
+      "judge_notes": "",
+      "use_gen": {
+       "input": 179,
+       "output": 71,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 190,
+       "output": 161,
+       "reasoning": 0
+      }
+     }
+    ],
+    "n_rounds": 1,
+    "stopped_on_pass": true,
+    "truly_passes": true,
+    "heldout_ok": true,
+    "source_heldout_ok": true
+   },
+   {
+    "arm": "programmatic",
+    "rounds": [
+     {
+      "round": 1,
+      "text": "Customer support tickets about delivery delays increased by forty percent last quarter. Investigation showed most of the rise came from two regions where a courier changed its depot structure. The issue stemmed from routing changes rather than failures by our teams. Communication to customers could have been clearer and timelier to reduce confusion.",
+      "checker_fails": [
+       "C1: 53 words (need 55 to 75)"
+      ],
+      "judge_fails": [],
+      "judge_notes": "Paragraph meets all length, sentence, word, inclusion, and exclusion requirements.",
+      "use_gen": {
+       "input": 176,
+       "output": 68,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 187,
+       "output": 53,
+       "reasoning": 0
+      }
+     },
+     {
+      "round": 2,
+      "text": "Customer support tickets about delivery delays increased by forty percent last quarter across our service areas. Investigation showed most of the rise came from two regions where a courier changed its depot structure unexpectedly. The issue stemmed from routing changes rather than failures by our teams or partners. Improved customer communication and clearer timelines could have reduced confusion and complaints.",
+      "checker_fails": [],
+      "judge_fails": [],
+      "judge_notes": "The paragraph meets all constraints: word count, sentence count, sentence length, required words present, and banned words absent.",
+      "use_gen": {
+       "input": 283,
+       "output": 74,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 193,
+       "output": 80,
+       "reasoning": 0
+      }
+     }
+    ],
+    "n_rounds": 2,
+    "stopped_on_pass": true,
+    "truly_passes": true,
+    "heldout_ok": true,
+    "source_heldout_ok": true
+   },
+   {
+    "arm": "programmatic",
+    "rounds": [
+     {
+      "round": 1,
+      "text": "The quarterly security review found three medium-severity issues and no high-severity ones. The team has already fixed two of the issues. The third issue is scheduled for the next sprint. We will also remind everyone that dependency updates must occur monthly, not annually.",
+      "checker_fails": [
+       "C1: 43 words (need 55 to 75)"
+      ],
+      "judge_fails": [
+       "C1"
+      ],
+      "judge_notes": "",
+      "use_gen": {
+       "input": 175,
+       "output": 61,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 180,
+       "output": 140,
+       "reasoning": 0
+      }
+     },
+     {
+      "round": 2,
+      "text": "The quarterly security review found three medium-severity issues and no high-severity ones, which is an encouraging improvement over last year. The team has already fixed two of the issues and documented the remediation steps. The third issue is scheduled for the next sprint and will receive priority attention. We will remind everyone that dependency updates must occur monthly rather than yearly to reduce risk.",
+      "checker_fails": [],
+      "judge_fails": [],
+      "judge_notes": "",
+      "use_gen": {
+       "input": 275,
+       "output": 82,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 201,
+       "output": 128,
+       "reasoning": 0
+      }
+     }
+    ],
+    "n_rounds": 2,
+    "stopped_on_pass": true,
+    "truly_passes": true,
+    "heldout_ok": true,
+    "source_heldout_ok": true
+   },
+   {
+    "arm": "programmatic",
+    "rounds": [
+     {
+      "round": 1,
+      "text": "Our data warehouse cost increased significantly this year due to inefficient queries. Several teams run large queries hourly that scan whole tables unnecessarily. The solution is partly technical, including partition filters and stricter query limits. It is also educational, because many people writing queries do not understand partitions or their impact on cost.",
+      "checker_fails": [
+       "C1: 53 words (need 55 to 75)"
+      ],
+      "judge_fails": [
+       "C1",
+       "C5"
+      ],
+      "judge_notes": "Paragraph has 47 words, which is fewer than 55.",
+      "use_gen": {
+       "input": 174,
+       "output": 69,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 188,
+       "output": 69,
+       "reasoning": 0
+      }
+     },
+     {
+      "round": 2,
+      "text": "Our data warehouse cost increased significantly this year due to many inefficient queries. Several teams run large queries hourly that scan whole tables when they need only recent data. The solution is partly technical, including partition filters, stricter query limits, and monitoring. It is also educational, because many people writing queries do not understand partitions or their impact on cost.",
+      "checker_fails": [],
+      "judge_fails": [
+       "C1",
+       "C2",
+       "C3"
+      ],
+      "judge_notes": "Avoided all forbidden words.",
+      "use_gen": {
+       "input": 282,
+       "output": 78,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 197,
+       "output": 131,
+       "reasoning": 0
+      }
+     }
+    ],
+    "n_rounds": 2,
+    "stopped_on_pass": true,
+    "truly_passes": true,
+    "heldout_ok": true,
+    "source_heldout_ok": true
+   },
+   {
+    "arm": "programmatic",
+    "rounds": [
+     {
+      "round": 1,
+      "text": "The mobile app crash rate has doubled since the last release. Log data points to the new image caching library as the likely cause. That library appears memory hungry on older devices, causing failures during heavy use. Our plan is to roll back the library this week and work with the vendor on a fix before reintroducing it.",
+      "checker_fails": [
+       "C3: sentence(s) of [21] words (limit 20)"
+      ],
+      "judge_fails": [
+       "C1",
+       "C3",
+       "C4",
+       "C5"
+      ],
+      "judge_notes": "Exactly four sentences present.",
+      "use_gen": {
+       "input": 182,
+       "output": 74,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 193,
+       "output": 56,
+       "reasoning": 0
+      }
+     },
+     {
+      "round": 2,
+      "text": "The mobile app crash rate has doubled since the last release. Log data point to the new image caching library as the likely cause. That library is memory hungry on older devices and triggers failures. We will roll back the library this week, work with the vendor on a fix, then reintroduce it after testing on low-end devices.",
+      "checker_fails": [
+       "C3: sentence(s) of [23] words (limit 20)"
+      ],
+      "judge_fails": [
+       "C1",
+       "C3"
+      ],
+      "judge_notes": "Does not contain any prohibited words.",
+      "use_gen": {
+       "input": 297,
+       "output": 76,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 195,
+       "output": 121,
+       "reasoning": 0
+      }
+     },
+     {
+      "round": 3,
+      "text": "The mobile app crash rate has doubled since the last release. Log data point to the new image caching library as the likely cause. That library is memory hungry on older devices and causes failures. We will roll back the library this week, then work with the vendor and test before reintroducing it.",
+      "checker_fails": [
+       "C1: 53 words (need 55 to 75)"
+      ],
+      "judge_fails": [
+       "C1",
+       "C5"
+      ],
+      "judge_notes": "The paragraph includes the banned word 'very'?",
+      "use_gen": {
+       "input": 414,
+       "output": 69,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 188,
+       "output": 85,
+       "reasoning": 0
+      }
+     },
+     {
+      "round": 4,
+      "text": "The mobile app crash rate has doubled since the last release. Log data point to the new image caching library as the likely cause. That library is memory hungry on older devices and causes frequent failures during typical use. We will roll back the library this week, work with the vendor on a fix, and reintroduce it after targeted testing on affected devices.",
+      "checker_fails": [
+       "C3: sentence(s) of [24] words (limit 20)"
+      ],
+      "judge_fails": [
+       "C1",
+       "C3"
+      ],
+      "judge_notes": "Paragraph has  Fifty two words? actually count is  Fifty? and sentences 4; two sentences exceed 20 words causing C3 fail.",
+      "use_gen": {
+       "input": 522,
+       "output": 80,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 199,
+       "output": 85,
+       "reasoning": 0
+      }
+     }
+    ],
+    "n_rounds": 4,
+    "stopped_on_pass": false,
+    "truly_passes": false,
+    "heldout_ok": true,
+    "source_heldout_ok": true
+   },
+   {
+    "arm": "programmatic",
+    "rounds": [
+     {
+      "round": 1,
+      "text": "Hiring for the platform team has been slow this year, with roles open for an average of five months. The reasons include a competitive market and a long interview process with six stages. Current job descriptions are written for the people we already have, not for the people we need. We will cut the process to four stages and rewrite the descriptions to attract better candidates.",
+      "checker_fails": [],
+      "judge_fails": [
+       "C1"
+      ],
+      "judge_notes": "Paragraph has 52 words, which is below the 55-75 required.",
+      "use_gen": {
+       "input": 180,
+       "output": 81,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 200,
+       "output": 72,
+       "reasoning": 0
+      }
+     }
+    ],
+    "n_rounds": 1,
+    "stopped_on_pass": true,
+    "truly_passes": true,
+    "heldout_ok": true,
+    "source_heldout_ok": true
+   },
+   {
+    "arm": "programmatic",
+    "rounds": [
+     {
+      "round": 1,
+      "text": "The incident on Tuesday was caused by a configuration change that was meant for staging but applied to production. The environments share similar names and the deployment tool did not ask for confirmation. We will rename the environments and add a confirmation step to prevent future mistakes. We will also use the audit log to alert on production changes made outside the change window.",
+      "checker_fails": [],
+      "judge_fails": [
+       "C1"
+      ],
+      "judge_notes": "Paragraph has 48 words (outside 55\u201375); other constraints satisfied.",
+      "use_gen": {
+       "input": 180,
+       "output": 77,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 196,
+       "output": 72,
+       "reasoning": 0
+      }
+     }
+    ],
+    "n_rounds": 1,
+    "stopped_on_pass": true,
+    "truly_passes": true,
+    "heldout_ok": true,
+    "source_heldout_ok": true
+   }
+  ],
+  "judge": [
+   {
+    "arm": "judge",
+    "rounds": [
+     {
+      "round": 1,
+      "text": "Our new onboarding flow is a significant improvement over the old one. The previous design confused many users and contained unnecessary elements. We expect the cleaner approach to increase completion rates for sign-up and early engagement. We will measure outcomes carefully over the coming weeks to confirm the change meets our goals.",
+      "checker_fails": [
+       "C1: 52 words (need 55 to 75)"
+      ],
+      "judge_fails": [],
+      "judge_notes": "None of the forbidden words are present.",
+      "use_gen": {
+       "input": 193,
+       "output": 66,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 186,
+       "output": 118,
+       "reasoning": 0
+      }
+     }
+    ],
+    "n_rounds": 1,
+    "stopped_on_pass": true,
+    "truly_passes": false,
+    "heldout_ok": true,
+    "source_heldout_ok": true
+   },
+   {
+    "arm": "judge",
+    "rounds": [
+     {
+      "round": 1,
+      "text": "The migration of the payments service to the new cluster has been planned for months. It will move a large portion of traffic in controlled stages. We will begin with internal traffic, then a small percentage of customers, and finally all customers. A rollback plan will be in place at each stage if an issue occurs.",
+      "checker_fails": [],
+      "judge_fails": [],
+      "judge_notes": "All constraints met: 66 words, four sentences, no sentence over 20 words, contains required words and omits forbidden ones.",
+      "use_gen": {
+       "input": 179,
+       "output": 71,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 190,
+       "output": 83,
+       "reasoning": 0
+      }
+     }
+    ],
+    "n_rounds": 1,
+    "stopped_on_pass": true,
+    "truly_passes": true,
+    "heldout_ok": true,
+    "source_heldout_ok": true
+   },
+   {
+    "arm": "judge",
+    "rounds": [
+     {
+      "round": 1,
+      "text": "Customer support tickets about delivery delays increased about forty percent last quarter. Investigation showed most of the rise came from two regions. In both areas a courier changed its depot structure, affecting routing for many shipments. The primary issue was external operational change, although our customer communication could have been clearer.",
+      "checker_fails": [
+       "C1: 51 words (need 55 to 75)"
+      ],
+      "judge_fails": [
+       "C1",
+       "C2",
+       "C3",
+       "C4",
+       "C5"
+      ],
+      "judge_notes": "Paragraph has 44 words, which is fewer than required 55-75.",
+      "use_gen": {
+       "input": 176,
+       "output": 66,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 185,
+       "output": 40,
+       "reasoning": 0
+      }
+     },
+     {
+      "round": 2,
+      "text": "Customer support tickets about delivery delays increased by about forty percent last quarter. Our investigation showed most of the rise originated in two regions with depot restructuring. In both regions a courier altered its depot structure, which affected routing and caused longer transit times. We concluded the primary issue was external operational change, and our customer communication could have been clearer.",
+      "checker_fails": [],
+      "judge_fails": [
+       "C3"
+      ],
+      "judge_notes": "Paragraph has 64 words and four sentences; one sentence exceeds 20 words (the last sentence is too long).",
+      "use_gen": {
+       "input": 406,
+       "output": 76,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 195,
+       "output": 80,
+       "reasoning": 0
+      }
+     },
+     {
+      "round": 3,
+      "text": "Customer support tickets about delivery delays increased by about forty percent last quarter. Our investigation showed most of the rise originated in two regions with depot restructuring. In both regions a courier altered its depot structure, which affected routing and caused longer transit times for many shipments. We found the primary issue was external operational change.",
+      "checker_fails": [],
+      "judge_fails": [
+       "C1"
+      ],
+      "judge_notes": "",
+      "use_gen": {
+       "input": 541,
+       "output": 70,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 189,
+       "output": 127,
+       "reasoning": 0
+      }
+     },
+     {
+      "round": 4,
+      "text": "Customer support tickets about delivery delays increased by about forty percent last quarter. Our investigation showed most of the rise originated in two regions after depot restructuring. In both areas a courier altered its depot layout, which affected routing and caused longer transit times for many shipments. We determined the primary issue was external operational change and we must improve customer communication promptly.",
+      "checker_fails": [],
+      "judge_fails": [
+       "C1"
+      ],
+      "judge_notes": "None of the prohibited words appear.",
+      "use_gen": {
+       "input": 648,
+       "output": 77,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 196,
+       "output": 115,
+       "reasoning": 0
+      }
+     }
+    ],
+    "n_rounds": 4,
+    "stopped_on_pass": false,
+    "truly_passes": true,
+    "heldout_ok": true,
+    "source_heldout_ok": true
+   },
+   {
+    "arm": "judge",
+    "rounds": [
+     {
+      "round": 1,
+      "text": "The quarterly security review found three medium-severity issues and no high-severity ones. This outcome is an improvement compared with last year. The team has fixed two issues, and the third is scheduled for the next sprint. We also want to remind everyone that dependency updates must occur monthly rather than annually.",
+      "checker_fails": [
+       "C1: 51 words (need 55 to 75)"
+      ],
+      "judge_fails": [
+       "C1"
+      ],
+      "judge_notes": "None of the forbidden words appear.",
+      "use_gen": {
+       "input": 175,
+       "output": 69,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 188,
+       "output": 117,
+       "reasoning": 0
+      }
+     },
+     {
+      "round": 2,
+      "text": "The quarterly security review found three medium-severity issues and no high-severity ones. This outcome shows clear improvement compared with last year. The team has fixed two issues already, and the third is scheduled for the next sprint. We also want to remind everyone that dependency updates must occur monthly rather than annually to reduce risk.",
+      "checker_fails": [],
+      "judge_fails": [
+       "C1"
+      ],
+      "judge_notes": "Paragraph has 42 words, which is outside the required 55\u201375 range; it has four sentences, none exceed 20 words, includes required words, and excludes prohibited words.",
+      "use_gen": {
+       "input": 287,
+       "output": 73,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 192,
+       "output": 93,
+       "reasoning": 0
+      }
+     },
+     {
+      "round": 3,
+      "text": "The quarterly security review found three medium-severity issues and no high-severity ones. This outcome shows clear improvement compared with last year and supports planned risk reduction. The team fixed two issues already, and the third is scheduled for the next sprint to close the loop. We also want to remind everyone that dependency updates must occur monthly rather than annually to maintain safer systems.",
+      "checker_fails": [],
+      "judge_fails": [
+       "C3"
+      ],
+      "judge_notes": "None of the prohibited words appear.",
+      "use_gen": {
+       "input": 433,
+       "output": 82,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 201,
+       "output": 135,
+       "reasoning": 0
+      }
+     },
+     {
+      "round": 4,
+      "text": "The quarterly security review found three medium-severity issues and no high-severity ones. This outcome shows clear improvement compared with last year and supports our planned risk reduction efforts. The team fixed two issues already, and the third is scheduled for the next sprint to close the loop. We also want to remind everyone that dependency updates must occur monthly rather than annually to better protect our systems.",
+      "checker_fails": [],
+      "judge_fails": [],
+      "judge_notes": "Paragraph has 59 words.",
+      "use_gen": {
+       "input": 558,
+       "output": 85,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 204,
+       "output": 43,
+       "reasoning": 0
+      }
+     }
+    ],
+    "n_rounds": 4,
+    "stopped_on_pass": true,
+    "truly_passes": true,
+    "heldout_ok": true,
+    "source_heldout_ok": true
+   },
+   {
+    "arm": "judge",
+    "rounds": [
+     {
+      "round": 1,
+      "text": "Our data warehouse costs have increased significantly this year due to frequent large queries. Several teams run hourly scans that read whole tables instead of one day of data. The fix is both technical and educational, involving partition filters and query limits. We will train query authors on partition importance and enforce limits to reduce cost and improve performance.",
+      "checker_fails": [],
+      "judge_fails": [
+       "C1"
+      ],
+      "judge_notes": "Does not contain any prohibited words.",
+      "use_gen": {
+       "input": 174,
+       "output": 73,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 192,
+       "output": 89,
+       "reasoning": 0
+      }
+     },
+     {
+      "round": 2,
+      "text": "Our data warehouse costs have risen sharply this year because teams run large queries frequently. Many queries scan whole tables when they only need a single day of data. The solution is technical and educational, combining partition filters, query limits, and clearer guidance. We will train query authors, enforce limits, and monitor usage to lower cost while maintaining reliable analytics.",
+      "checker_fails": [],
+      "judge_fails": [
+       "C1",
+       "C3"
+      ],
+      "judge_notes": "Contains none of the prohibited words.",
+      "use_gen": {
+       "input": 290,
+       "output": 78,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 197,
+       "output": 131,
+       "reasoning": 0
+      }
+     },
+     {
+      "round": 3,
+      "text": "Our data warehouse costs have climbed this year as teams run large queries frequently. Many queries scan whole tables when they only need a single day of data, wasting resources. The solution has technical and educational parts, including partition filters, query limits, and clearer guidance for authors. We will train query writers, enforce limits, and monitor usage to lower cost while preserving reliable analytics.",
+      "checker_fails": [],
+      "judge_fails": [
+       "C1",
+       "C3"
+      ],
+      "judge_notes": "Paragraph has 50 words, outside 55\u201375 range.",
+      "use_gen": {
+       "input": 430,
+       "output": 83,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 202,
+       "output": 50,
+       "reasoning": 0
+      }
+     },
+     {
+      "round": 4,
+      "text": "Our data warehouse cost increases this year stem from teams running large queries too often. Many queries scan whole tables when they only need a single day of data, wasting compute and storage. The solution is both technical and educational, including partition filters, query limits, and clearer documentation for query authors. We will train teams, enforce limits, and monitor usage to lower cost and improve analytics reliability.",
+      "checker_fails": [],
+      "judge_fails": [
+       "C1"
+      ],
+      "judge_notes": "Does not contain any prohibited words.",
+      "use_gen": {
+       "input": 587,
+       "output": 86,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 205,
+       "output": 91,
+       "reasoning": 0
+      }
+     }
+    ],
+    "n_rounds": 4,
+    "stopped_on_pass": false,
+    "truly_passes": true,
+    "heldout_ok": false,
+    "source_heldout_ok": true
+   },
+   {
+    "arm": "judge",
+    "rounds": [
+     {
+      "round": 1,
+      "text": "The mobile app crash rate has doubled since the last release and logs implicate the new image caching library. That library consumes excessive memory on older devices and triggers OOM failures. Our plan is to roll back the library this week to stabilize production. After rollback, we will work with the vendor on a fix and test thoroughly on low-end devices before rolling forward.",
+      "checker_fails": [],
+      "judge_fails": [
+       "C1",
+       "C3"
+      ],
+      "judge_notes": "",
+      "use_gen": {
+       "input": 182,
+       "output": 81,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 200,
+       "output": 163,
+       "reasoning": 0
+      }
+     },
+     {
+      "round": 2,
+      "text": "The mobile app crash rate doubled since the last release, and logs implicate the new image caching library. That library consumes excessive memory on older devices and triggers OOM failures during heavy use. Our immediate plan is to roll back the library this week to stabilize production. After rollback, we will work with the vendor on a fix and test on low-end devices before rolling forward.",
+      "checker_fails": [],
+      "judge_fails": [
+       "C1",
+       "C5"
+      ],
+      "judge_notes": "Paragraph has 46 words (outside 55\u201375) and includes banned word 'incredibly' is not present but 'very/really...' none appear; however 'immediately' vs banned? Actually banned words present: none; correction: primary failure is word count, and all sentences \u226420 words.",
+      "use_gen": {
+       "input": 313,
+       "output": 84,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 203,
+       "output": 119,
+       "reasoning": 0
+      }
+     },
+     {
+      "round": 3,
+      "text": "The mobile app crash rate has doubled since the last release and logs point to the new image caching library. That library consumes excessive memory on older devices and triggers out of memory failures under load. We will roll back the library this week to stabilize production and stop further crashes. After rollback, we will work with the vendor on a fix and test thoroughly on low-end devices.",
+      "checker_fails": [],
+      "judge_fails": [
+       "C1",
+       "C3"
+      ],
+      "judge_notes": "None of the forbidden words appear in the paragraph.",
+      "use_gen": {
+       "input": 571,
+       "output": 83,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 202,
+       "output": 130,
+       "reasoning": 0
+      }
+     },
+     {
+      "round": 4,
+      "text": "The mobile app crash rate has doubled since the last release and logs point to the new image caching library. That library consumes excessive memory on older devices and triggers out of memory failures under load. We will roll back the library this week to stabilize production and halt further crashes. After rollback, we will collaborate with the vendor on a fix and test on low-end devices before rolling forward.",
+      "checker_fails": [],
+      "judge_fails": [
+       "C1",
+       "C3"
+      ],
+      "judge_notes": "Does not contain any prohibited words.",
+      "use_gen": {
+       "input": 722,
+       "output": 85,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 204,
+       "output": 123,
+       "reasoning": 0
+      }
+     }
+    ],
+    "n_rounds": 4,
+    "stopped_on_pass": false,
+    "truly_passes": true,
+    "heldout_ok": true,
+    "source_heldout_ok": true
+   },
+   {
+    "arm": "judge",
+    "rounds": [
+     {
+      "round": 1,
+      "text": "Hiring for the platform team has been slow this year. Roles have stayed open for an average of five months. The causes include a competitive market, a long interview process with six stages, and job descriptions aimed at current staff instead of new hires. We will shorten the process to four stages and rewrite the descriptions to attract the candidates we need.",
+      "checker_fails": [
+       "C3: sentence(s) of [24] words (limit 20)"
+      ],
+      "judge_fails": [
+       "C1",
+       "C5"
+      ],
+      "judge_notes": "Paragraph has 56 words? Actually contains 'very' or banned? It contains none of banned words; word count is 56 so meets C1 but sentence lengths: wait compute: actual word count is  Fifty-six? Re-evaluate: It contains banned word 'incredibly'? No. However 'really' etc not present. Sentence count is four. Longest sentence has 23 words? The third sentence may exceed 20. Therefore C1 fails due to word count or C3 fail? Correct: total words = 56 so C1 pass. Third sentence word count = 23 >20 so C3 fail. No banned words so C5 pass. Final: C1 pass, C2 pass, C3 fail, C4 pass, C5 pass.",
+      "use_gen": {
+       "input": 180,
+       "output": 77,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 196,
+       "output": 214,
+       "reasoning": 0
+      }
+     },
+     {
+      "round": 2,
+      "text": "Hiring for the platform team has been slow this year. Roles have stayed open for an average of five months. Causes include a competitive market and a long interview process with six stages. We will shorten the process to four stages and rewrite the job descriptions to attract the candidates we need.",
+      "checker_fails": [
+       "C1: 52 words (need 55 to 75)"
+      ],
+      "judge_fails": [
+       "C1"
+      ],
+      "judge_notes": "Paragraph has 47 words (needs 55\u201375); meets four sentences; each sentence \u226420 words; contains required words; avoids forbidden words.",
+      "use_gen": {
+       "input": 621,
+       "output": 65,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 184,
+       "output": 86,
+       "reasoning": 0
+      }
+     },
+     {
+      "round": 3,
+      "text": "Hiring for the platform team has been slow this year and needs attention. Roles have stayed open for an average of five months across teams. Causes include a competitive market and a long interview process with six stages that delays decisions. We will shorten the process to four stages and rewrite the job descriptions to attract the diverse candidates we need.",
+      "checker_fails": [],
+      "judge_fails": [
+       "C1",
+       "C3"
+      ],
+      "judge_notes": "One sentence has 24 words: 'Roles have stayed open for an average of five months across teams.'",
+      "use_gen": {
+       "input": 752,
+       "output": 74,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 193,
+       "output": 96,
+       "reasoning": 0
+      }
+     },
+     {
+      "round": 4,
+      "text": "Hiring for the platform team has been slow this year and requires action. Roles have stayed open for an average of five months. The causes include a competitive market and a long interview process with six stages that delays hiring. We will shorten the process to four stages and rewrite the job descriptions to attract the candidates we need.",
+      "checker_fails": [],
+      "judge_fails": [
+       "C1"
+      ],
+      "judge_notes": "Paragraph has 54 words, outside 55\u201375 range.",
+      "use_gen": {
+       "input": 916,
+       "output": 72,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 191,
+       "output": 50,
+       "reasoning": 0
+      }
+     }
+    ],
+    "n_rounds": 4,
+    "stopped_on_pass": false,
+    "truly_passes": true,
+    "heldout_ok": true,
+    "source_heldout_ok": true
+   },
+   {
+    "arm": "judge",
+    "rounds": [
+     {
+      "round": 1,
+      "text": "The incident on Tuesday was caused by a configuration change applied to production instead of staging. The environments had similar names and the deployment tool did not ask for confirmation. We will rename the environments to make them distinct and add a confirmation step to the deployment workflow. We will also use the audit log to alert on production changes made outside the approved change window.",
+      "checker_fails": [],
+      "judge_fails": [
+       "C1"
+      ],
+      "judge_notes": "Paragraph has 54 words, which is just below the 55\u201375 range.",
+      "use_gen": {
+       "input": 180,
+       "output": 79,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 198,
+       "output": 73,
+       "reasoning": 0
+      }
+     },
+     {
+      "round": 2,
+      "text": "The incident on Tuesday was caused by a configuration change applied to production instead of staging. The environments had similar names and the deployment tool did not ask for confirmation. We will rename the environments to make them distinct and add a confirmation step to the deployment workflow. We will also use the audit log to alert on any production changes made outside the approved change window.",
+      "checker_fails": [],
+      "judge_fails": [
+       "C1",
+       "C2",
+       "C3",
+       "C4",
+       "C5"
+      ],
+      "judge_notes": "Paragraph has 56 words? Wait recount indicates 56 words actually within 55-75.",
+      "use_gen": {
+       "input": 312,
+       "output": 80,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 199,
+       "output": 37,
+       "reasoning": 0
+      }
+     },
+     {
+      "round": 3,
+      "text": "The incident on Tuesday occurred when a configuration change meant for staging was applied to production. The environments used similar names and the deployment tool did not ask for confirmation. We will rename environments to make them distinct and add a confirmation step to the deployment workflow. We will also use the audit log to alert on production changes made outside the approved change window.",
+      "checker_fails": [],
+      "judge_fails": [],
+      "judge_notes": "Paragraph meets all constraints: 66 words, four sentences, no sentence over 20 words, includes required words, and avoids forbidden words.",
+      "use_gen": {
+       "input": 571,
+       "output": 78,
+       "reasoning": 0
+      },
+      "use_judge": {
+       "input": 197,
+       "output": 84,
+       "reasoning": 0
+      }
+     }
+    ],
+    "n_rounds": 3,
+    "stopped_on_pass": true,
+    "truly_passes": true,
+    "heldout_ok": true,
+    "source_heldout_ok": true
+   }
+  ]
+ },
+ "usage": {
+  "input": 21988,
+  "output": 6889,
+  "reasoning": 0,
+  "calls": 80
+ }
+}

@@ -1,0 +1,52 @@
+== Routing: 24 questions, cheap = gpt-5-mini (minimal effort), strong = the same model at medium effort ==
+conditions: always-cheap | always-strong | cascade (two cheap samples agree -> accept, else strong) | classifier router (cheap call: easy/hard)
+
+ # tier   gold       cheap          ok  strong         ok  agree route
+ 1 easy   lisbon     lisbon         y   lisbon         y   yes   easy 
+ 2 easy   negative   negative       y   negative       y   yes   easy 
+ 3 easy   dolphin    dolphin        y   dolphin        y   yes   easy 
+ 4 easy   366        366            y   366            y   yes   easy 
+ 5 easy   yrassecen  y r a s s e c  N   yrassecen      y   no    easy 
+ 6 easy   36         36             y   36             y   yes   easy 
+ 7 easy   portuguese portuguese     y   portuguese     y   yes   easy 
+ 8 easy   criteria   criteria       y   criteria       y   yes   easy 
+ 9 medium 14.20      7.55           N   14.2           y   no    easy 
+10 medium 119        45             N   119            y   no    easy 
+11 medium 80         80             y   80             y   no    easy 
+12 medium 60         60             y   60             y   yes   easy 
+13 medium 40         40             y   40             y   yes   easy 
+14 medium 2496       2450           N   2496           y   no    easy 
+15 medium 14.4       14.4           y   14.4           y   yes   hard 
+16 medium 728        748            N   728            y   yes   easy 
+17 hard   6          6              y   6              y   yes   easy 
+18 hard   31         7              N   31             y   yes   easy 
+19 hard   48         48             y   48             y   yes   easy 
+20 hard   1          1              y   1              y   yes   easy 
+21 hard   saturday   saturday       y   saturday       y   yes   easy 
+22 hard   friday     saturday       N   friday         y   yes   easy 
+23 hard   2520       2520           y   2520           y   yes   easy 
+24 hard   7.5        7.5            y   7.5            y   yes   easy 
+
+-- summary (cost from the API usage fields; hidden reasoning tokens are billed as output) --
+condition              acc calls   in tok  out tok $ per 1k q $ per 1k correct  x cheap
+always-cheap       17/24 71%    24    1,194      260      0.034            0.048     1.0x
+always-strong      24/24 100%    24    1,194    2,174      0.194            0.194     5.7x
+cascade            21/24 88%    53    2,655    1,081      0.118            0.135     3.5x
+classifier router  17/24 71%    48    3,468      628      0.088            0.125     2.6x
+oracle router      24/24 100%    24    1,194      958      0.092            0.092     2.7x
+cascade escalated 5/24 questions (21%); router sent 1/24 to strong
+
+-- router decision against the designed tier (rows: tier; columns: where the router sent it) --
+tier      -> cheap  -> strong
+easy             8          0
+medium           7          1
+hard             8          0
+
+-- router decision against the oracle (rows: did the cheap model get it right?; columns: where the router sent it) --
+truth             -> cheap  -> strong
+cheap suffices          16          1
+needs strong             7          0
+reading: 7 question(s) that needed the strong model were sent to the cheap one (lost accuracy); 1 that the cheap model could answer were sent to the strong one (wasted cost). recall on hard = 0%, false escalation = 6%
+
+total spend: $0.0073 (96 calls, 5,856 input + 2,928 output tokens, 1,920 hidden reasoning tokens)
+stub used: no, every answer came from the API

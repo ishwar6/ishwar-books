@@ -1,0 +1,17 @@
+{
+ "ticket_id": "T2",
+ "text": "I was charged twice for ORD-10988, please refund the extra GBP 39.99.",
+ "trace_id": "3d1d9574",
+ "node": "done",
+ "route": "support",
+ "facts": {
+  "issue_type": "billing",
+  "order_id": "ORD-10988",
+  "refund_amount_gbp": 39.99
+ },
+ "reply": "Hello \u2014 thank you for contacting Northwind Home about order ORD-10988. We\u2019ve passed your refund request for the extra GBP 39.99 along for approval. We\u2019ll update you as soon as we have news. If you have any other questions in the meantime, please let us know.",
+ "approved": null,
+ "calls": 2,
+ "tokens": 340,
+ "notes": []
+}

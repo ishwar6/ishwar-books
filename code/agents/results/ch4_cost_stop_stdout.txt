@@ -1,0 +1,32 @@
+== 5. Evaluator-optimiser: rounds, cost per accepted answer, and the precision of the stop ==
+one round (generate + evaluate) costs $0.0162 at frontier prices; p = chance a round passes a RELIABLE critic; k = max rounds
+    p   k  P(pass by k)  E[rounds]  E[cost]  $/accepted
+  0.3   1           30%       1.00   0.0162      0.0540
+  0.3   2           51%       1.70   0.0275      0.0540
+  0.3   3           66%       2.19   0.0355      0.0540
+  0.3   4           76%       2.53   0.0410      0.0540
+  0.5   1           50%       1.00   0.0162      0.0324
+  0.5   2           75%       1.50   0.0243      0.0324
+  0.5   3           88%       1.75   0.0284      0.0324
+  0.5   4           94%       1.88   0.0304      0.0324
+  0.7   1           70%       1.00   0.0162      0.0231
+  0.7   2           91%       1.30   0.0211      0.0231
+  0.7   3           97%       1.39   0.0225      0.0231
+  0.7   4           99%       1.42   0.0230      0.0231
+reading: as in Chapter 3, the k cancels: cost per accepted answer is one round divided by p. Most of the gain arrives by the third round.
+
+ASSUMES: rounds are independent with the same pass chance p, each round costs the same, and the critic is PERFECT. A feedback-driven
+round usually has a higher p than the first (the feedback helps), so treat these as a floor on the benefit, not a forecast.
+
+an IMPERFECT critic. Let p = P(draft is good), r = P(critic accepts | good) and f = P(critic accepts | bad), the false-accept rate.
+By Bayes, the share of ACCEPTED drafts that are good (the precision of the stop) is  p r / (p r + (1 - p) f).
+The false-accept rate is NOT one minus precision: precision also depends on how many drafts were good to begin with.
+ p good     r     f  P(accept)  precision of the stop
+    0.9  1.00  0.20        92%                  97.8%
+    0.5  1.00  0.20        60%                  83.3%
+    0.3  1.00  0.20        44%                  68.2%
+    0.5  0.90  0.10        50%                  90.0%
+    0.5  0.70  0.05        38%                  93.3%
+    0.3  0.90  0.30        48%                  56.3%
+reading: with 90% good drafts, a critic that accepts 20% of bad ones still stops on a good draft 97.8% of the time; with 30% good drafts
+the same critic gives 68%. The harder the task, the more the critic's false-accept rate matters. ASSUMES r and f do not depend on the round.

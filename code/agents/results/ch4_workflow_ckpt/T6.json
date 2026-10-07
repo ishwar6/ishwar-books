@@ -1,0 +1,17 @@
+{
+ "ticket_id": "T6",
+ "text": "Mi pedido 33310 llego roto.",
+ "trace_id": "1cd69466",
+ "node": "done",
+ "route": "support",
+ "facts": {
+  "issue_type": "damaged_or_faulty",
+  "order_id": "ORD-33310",
+  "refund_amount_gbp": null
+ },
+ "reply": "Gracias por avisarnos. Lamentamos que su pedido ORD-33310 haya llegado da\u00f1ado. Por favor, env\u00edenos fotos del art\u00edculo y del embalaje para que podamos ayudarle con la mejor soluci\u00f3n posible. Quedamos a la espera de su respuesta.",
+ "approved": null,
+ "calls": 3,
+ "tokens": 369,
+ "notes": []
+}

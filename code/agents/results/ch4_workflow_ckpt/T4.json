@@ -1,0 +1,15 @@
+{
+ "ticket_id": "T4",
+ "text": "Do you ship to the Isle of Man?",
+ "trace_id": "6bf61420",
+ "node": "done",
+ "route": "faq",
+ "facts": null,
+ "reply": null,
+ "approved": null,
+ "calls": 1,
+ "tokens": 66,
+ "notes": [
+  "sent to the FAQ answerer (out of scope for this demo)"
+ ]
+}

@@ -1,0 +1,17 @@
+{
+ "ticket_id": "T5",
+ "text": "The sofa from order 61234 has a torn seam. I want my money back, GBP 649.",
+ "trace_id": "4350ee38",
+ "node": "done",
+ "route": "support",
+ "facts": {
+  "issue_type": "damaged_or_faulty",
+  "order_id": "ORD-61234",
+  "refund_amount_gbp": 649.0
+ },
+ "reply": "Dear Customer, thank you for contacting Northwind Home about order ORD-61234. We\u2019re sorry your sofa arrived with a torn seam. Your refund request for GBP 649 has been passed for approval. We will be in touch with any updates and next steps. If you have photos or further details to share, please reply to this message. Thank you for your patience.",
+ "approved": true,
+ "calls": 2,
+ "tokens": 355,
+ "notes": []
+}

@@ -1,0 +1,17 @@
+{
+ "ticket_id": "T3",
+ "text": "Where is my parcel? Tracking has not moved in 6 days. Order 77120.",
+ "trace_id": "03b93be2",
+ "node": "done",
+ "route": "support",
+ "facts": {
+  "issue_type": "delivery",
+  "order_id": "ORD-77120",
+  "refund_amount_gbp": null
+ },
+ "reply": "Hello \u2014 thank you for contacting Northwind Home about order ORD-77120. I\u2019m sorry your tracking hasn\u2019t updated. I\u2019ll investigate this delivery issue and update you as soon as I have more information. If you\u2019d like, I can also arrange a replacement or refund once we confirm the parcel\u2019s status. Please let me know how you\u2019d prefer to proceed.",
+ "approved": null,
+ "calls": 2,
+ "tokens": 335,
+ "notes": []
+}

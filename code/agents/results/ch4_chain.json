@@ -1,0 +1,3258 @@
+{
+ "checker_flags": {
+  "P1": 71,
+  "P5": 56,
+  "P3": 46,
+  "P2": 11
+ },
+ "model": "gpt-5-mini",
+ "stub": false,
+ "summary": {
+  "ungated": {
+   "condition": "ungated",
+   "success": 19,
+   "gold_ok": 19,
+   "policy_ok": 20,
+   "n": 20,
+   "faults": {
+    "step1": 1,
+    "step2": 0,
+    "step3": 16
+   },
+   "calls": 60,
+   "retries": 0,
+   "tokens": {
+    "input": 14099,
+    "output": 3769,
+    "reasoning": 0
+   },
+   "cost_usd": 0.01106275,
+   "cost_per_success": 0.00058225,
+   "checker_agreement": 0.15
+  },
+  "gated": {
+   "condition": "gated",
+   "success": 19,
+   "gold_ok": 19,
+   "policy_ok": 20,
+   "n": 20,
+   "faults": {
+    "step1": 1,
+    "step2": 0,
+    "step3": 18
+   },
+   "calls": 60,
+   "retries": 0,
+   "tokens": {
+    "input": 14195,
+    "output": 3431,
+    "reasoning": 0
+   },
+   "cost_usd": 0.01041075,
+   "cost_per_success": 0.0005479342105263158,
+   "checker_agreement": 0.05
+  },
+  "loose-ungated": {
+   "condition": "loose-ungated",
+   "success": 12,
+   "gold_ok": 12,
+   "policy_ok": 20,
+   "n": 20,
+   "faults": {
+    "step1": 20,
+    "step2": 0,
+    "step3": 0
+   },
+   "calls": 60,
+   "retries": 0,
+   "tokens": {
+    "input": 11504,
+    "output": 2865,
+    "reasoning": 0
+   },
+   "cost_usd": 0.008605999999999999,
+   "cost_per_success": 0.0007171666666666666,
+   "checker_agreement": 0.4
+  },
+  "loose-gated": {
+   "condition": "loose-gated",
+   "success": 16,
+   "gold_ok": 16,
+   "policy_ok": 19,
+   "n": 20,
+   "faults": {
+    "step1": 4,
+    "step2": 0,
+    "step3": 15
+   },
+   "calls": 78,
+   "retries": 20,
+   "tokens": {
+    "input": 13207,
+    "output": 3443,
+    "reasoning": 0
+   },
+   "cost_usd": 0.010187749999999999,
+   "cost_per_success": 0.0006367343749999999,
+   "checker_agreement": 0.15789473684210525
+  }
+ },
+ "results": {
+  "ungated": [
+   {
+    "ticket": "Hi, order #48213 arrived with the screen cracked. I need a replacement before Friday, it's a gift.",
+    "gold_type": "damaged_or_faulty",
+    "gold_oid": "ORD-48213",
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "replacement_offer",
+    "reply": "I\u2019m sorry your item arrived with a cracked screen. We can arrange a replacement for order ORD-48213. Please confirm whether you\u2019d like a replacement sent or prefer to discuss alternative options, and provide any photos of the damage if possible. I\u2019ll help get this sorted\u2014please let me know how you\u2019d like to proceed and if you need anything else.",
+    "use": [
+     {
+      "input": 139,
+      "output": 69,
+      "reasoning": 0
+     },
+     {
+      "input": 267,
+      "output": 91,
+      "reasoning": 0
+     },
+     {
+      "input": 339,
+      "output": 24,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "I was charged twice for ORD-10988. Please fix this.",
+    "gold_type": "billing",
+    "gold_oid": "ORD-10988",
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P3",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "billing_review",
+    "reply": "I\u2019m sorry about the duplicate charge on order ORD-10988. I will review the billing details and work to correct this issue for you. Please let me know if you have any additional information or questions, and I\u2019ll continue to assist.",
+    "use": [
+     {
+      "input": 130,
+      "output": 58,
+      "reasoning": 0
+     },
+     {
+      "input": 256,
+      "output": 67,
+      "reasoning": 0
+     },
+     {
+      "input": 296,
+      "output": 27,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "Where is my parcel? Tracking hasn't moved in 6 days. Order 77120.",
+    "gold_type": "delivery",
+    "gold_oid": "ORD-77120",
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P3",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "tracking_update",
+    "reply": "I\u2019m sorry your parcel hasn\u2019t moved. I\u2019ve noted your order ORD-77120 and will contact the carrier to get an update on the shipment status. I\u2019ll share what I learn and help next steps if needed. Please let me know if there\u2019s anything else I can check for you.",
+    "use": [
+     {
+      "input": 134,
+      "output": 50,
+      "reasoning": 0
+     },
+     {
+      "input": 260,
+      "output": 78,
+      "reasoning": 0
+     },
+     {
+      "input": 320,
+      "output": 31,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "I can't log in, the password reset email never arrives. No order, just my account (j.okafor@example.com).",
+    "gold_type": "account",
+    "gold_oid": null,
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "account_help",
+    "reply": "Sorry you're having trouble logging in. I can help reset access for j.okafor@example.com \u2014 please check your spam/junk folder and confirm if you used any alternate email addresses. If you still don't see the password reset email, reply and I\u2019ll guide you through additional steps to regain access. Let me know if you need anything else.",
+    "use": [
+     {
+      "input": 142,
+      "output": 58,
+      "reasoning": 0
+     },
+     {
+      "input": 256,
+      "output": 87,
+      "reasoning": 0
+     },
+     {
+      "input": 316,
+      "output": 27,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "Do you ship to the Isle of Man?",
+    "gold_type": "other",
+    "gold_oid": null,
+    "first_fault": "step1",
+    "success": false,
+    "notes": [
+     "extracted 'delivery'/None, gold 'other'/None",
+     "category 'tracking_update', expected 'general_info'"
+    ],
+    "policy_ok": true,
+    "gold_ok": false,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "tracking_update",
+    "reply": "Thanks for reaching out. We do ship to many UK regions, but shipping to the Isle of Man can vary by product due to carrier restrictions. Please tell me the items you\u2019d like and your postcode, and I\u2019ll check eligibility and available shipping options. Let me know if you need anything else.",
+    "use": [
+     {
+      "input": 125,
+      "output": 50,
+      "reasoning": 0
+     },
+     {
+      "input": 248,
+      "output": 78,
+      "reasoning": 0
+     },
+     {
+      "input": 299,
+      "output": 27,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "ORD 55501: the box was soaked through and the contents are ruined.",
+    "gold_type": "damaged_or_faulty",
+    "gold_oid": "ORD-55501",
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "replacement_offer",
+    "reply": "We're sorry your order ORD-55501 arrived damaged. We can arrange a replacement or discuss other options \u2014 please let us know which you prefer and any photos of the damage if available. We're here to help with the next steps and any questions you have.",
+    "use": [
+     {
+      "input": 132,
+      "output": 63,
+      "reasoning": 0
+     },
+     {
+      "input": 261,
+      "output": 69,
+      "reasoning": 0
+     },
+     {
+      "input": 300,
+      "output": 27,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "The invoice for order no. 30377 shows VAT at 25% but I'm in the UK, it should be 20%.",
+    "gold_type": "billing",
+    "gold_oid": "ORD-30377",
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P3",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "billing_review",
+    "reply": "Thanks for flagging this VAT issue. I\u2019ve noted that invoice for order ORD-30377 shows 25% VAT instead of 20%; I will escalate this to our billing team for review and correction. I\u2019ll update you with what they find. Please let me know if you\u2019d like any other details investigated.",
+    "use": [
+     {
+      "input": 143,
+      "output": 60,
+      "reasoning": 0
+     },
+     {
+      "input": 258,
+      "output": 82,
+      "reasoning": 0
+     },
+     {
+      "input": 316,
+      "output": 27,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "URGENT: order 90001 is a cake stand for a wedding tomorrow and the courier app just says 'delayed'.",
+    "gold_type": "delivery",
+    "gold_oid": "ORD-90001",
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P3",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "tracking_update",
+    "reply": "I'm sorry your wedding cake stand (order ORD-90001) is delayed. I'll check the current shipping status and work with the carrier to find the fastest possible solution. Could you confirm the event address and any special delivery instructions? Please let me know if you'd like alternative options and I can assist further.",
+    "use": [
+     {
+      "input": 142,
+      "output": 68,
+      "reasoning": 0
+     },
+     {
+      "input": 266,
+      "output": 79,
+      "reasoning": 0
+     },
+     {
+      "input": 312,
+      "output": 27,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "My subscription renewed and took \u00a312 from my card but I cancelled it last month. Account name m.rossi.",
+    "gold_type": "billing",
+    "gold_oid": null,
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P2",
+     "P3",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "billing_review",
+    "reply": "I\u2019m sorry you were charged after cancelling. I\u2019ll review your account (m.rossi) and the subscription charge. Could you confirm any confirmation email or cancellation reference you received? I\u2019ll investigate and update you. Please let me know if there\u2019s anything else I can check.",
+    "use": [
+     {
+      "input": 140,
+      "output": 60,
+      "reasoning": 0
+     },
+     {
+      "input": 261,
+      "output": 75,
+      "reasoning": 0
+     },
+     {
+      "input": 315,
+      "output": 35,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "Delivered to the wrong address (order 61234). Maybe the neighbour at number 14 has it?",
+    "gold_type": "delivery",
+    "gold_oid": "ORD-61234",
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=None but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": null,
+    "checker_violations": null,
+    "checker_agrees": false,
+    "category": "tracking_update",
+    "reply": "Sorry about the delivery issue with order ORD-61234. I\u2019ll check the delivery details and contact the carrier to locate the package and confirm where it was left. Please let me know if you can check with the neighbor at number 14 or provide any additional info. I\u2019m here to help with anything else.",
+    "use": [
+     {
+      "input": 137,
+      "output": 64,
+      "reasoning": 0
+     },
+     {
+      "input": 262,
+      "output": 81,
+      "reasoning": 0
+     },
+     {
+      "input": 316,
+      "output": 401,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "The kettle (ORD-20045) stopped working after two weeks and there were sparks from the base.",
+    "gold_type": "damaged_or_faulty",
+    "gold_oid": "ORD-20045",
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P3",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "replacement_offer",
+    "reply": "I\u2019m sorry to hear your kettle malfunctioned and produced sparks. We can arrange a replacement for order ORD-20045. Please confirm whether you\u2019d like a replacement sent or prefer another solution, and share any photos of the damage if possible. Let me know if you need anything else.",
+    "use": [
+     {
+      "input": 137,
+      "output": 61,
+      "reasoning": 0
+     },
+     {
+      "input": 259,
+      "output": 76,
+      "reasoning": 0
+     },
+     {
+      "input": 308,
+      "output": 31,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "Please delete my account and all my data. Thanks.",
+    "gold_type": "account",
+    "gold_oid": null,
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P3",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "account_help",
+    "reply": "Thanks for contacting us. We can help with deleting your account and personal data. To proceed, please confirm the email address associated with the account and any additional details you\u2019d like removed. Once we have that, we\u2019ll guide you through the next steps. Let me know if you need assistance with anything else.",
+    "use": [
+     {
+      "input": 127,
+      "output": 50,
+      "reasoning": 0
+     },
+     {
+      "input": 248,
+      "output": 80,
+      "reasoning": 0
+     },
+     {
+      "input": 301,
+      "output": 31,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "I'd like to change the delivery address for order 88800 before it ships.",
+    "gold_type": "delivery",
+    "gold_oid": "ORD-88800",
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "tracking_update",
+    "reply": "Thanks for contacting us. I\u2019ve noted your request to change the delivery address for order ORD-88800. Please reply with the new address and any special delivery instructions, and we\u2019ll review the request with our shipping team. Let me know if you need anything else.",
+    "use": [
+     {
+      "input": 132,
+      "output": 59,
+      "reasoning": 0
+     },
+     {
+      "input": 257,
+      "output": 72,
+      "reasoning": 0
+     },
+     {
+      "input": 302,
+      "output": 27,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "Charged \u00a349.99 but the site said \u00a339.99 for order 12345.",
+    "gold_type": "billing",
+    "gold_oid": "ORD-12345",
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P3"
+    ],
+    "checker_agrees": false,
+    "category": "billing_review",
+    "reply": "I\u2019m sorry for the discrepancy with order ORD-12345. I\u2019ve escalated this charge difference to our billing team for review and will update you when they respond. If you have any more details or questions about the order, please let me know and I\u2019ll pass them along. How else can I help?",
+    "use": [
+     {
+      "input": 136,
+      "output": 52,
+      "reasoning": 0
+     },
+     {
+      "input": 268,
+      "output": 81,
+      "reasoning": 0
+     },
+     {
+      "input": 325,
+      "output": 27,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "Can I get the manual for the X200 I bought last year? No order number to hand, sorry.",
+    "gold_type": "other",
+    "gold_oid": null,
+    "first_fault": null,
+    "success": true,
+    "notes": [],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": true,
+    "checker_violations": [],
+    "checker_agrees": true,
+    "category": "general_info",
+    "reply": "Thanks for reaching out. I can help with the X200 manual \u2014 could you confirm the exact model variant or provide any details from the device (serial number or purchase date)? If you prefer, I can send the standard X200 user manual and setup guide. Let me know which option you\u2019d like or if you need anything else.",
+    "use": [
+     {
+      "input": 138,
+      "output": 57,
+      "reasoning": 0
+     },
+     {
+      "input": 255,
+      "output": 85,
+      "reasoning": 0
+     },
+     {
+      "input": 313,
+      "output": 20,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "Mi pedido 33310 llego roto, la tapa esta partida.",
+    "gold_type": "damaged_or_faulty",
+    "gold_oid": "ORD-33310",
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "replacement_offer",
+    "reply": "Sorry to hear your order ORD-33310 arrived damaged with a broken lid. We can arrange a replacement or a return for inspection. Please let us know which you prefer and any photos of the damage if available. Happy to help further with this.",
+    "use": [
+     {
+      "input": 130,
+      "output": 59,
+      "reasoning": 0
+     },
+     {
+      "input": 257,
+      "output": 68,
+      "reasoning": 0
+     },
+     {
+      "input": 292,
+      "output": 27,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "I sent back order ORD-70707 three weeks ago and still no money back on my card.",
+    "gold_type": "billing",
+    "gold_oid": "ORD-70707",
+    "first_fault": null,
+    "success": true,
+    "notes": [],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": true,
+    "checker_violations": [],
+    "checker_agrees": true,
+    "category": "billing_review",
+    "reply": "I\u2019m sorry for the delay with your refund for order ORD-70707. I\u2019ll review the return and refund status for that order and update you with what I find. Please let me know if there\u2019s any additional information you\u2019d like me to check. I\u2019m happy to help further.",
+    "use": [
+     {
+      "input": 136,
+      "output": 63,
+      "reasoning": 0
+     },
+     {
+      "input": 261,
+      "output": 77,
+      "reasoning": 0
+     },
+     {
+      "input": 320,
+      "output": 20,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "Two orders: 11111 arrived fine but 22222 has not turned up at all.",
+    "gold_type": "delivery",
+    "gold_oid": "ORD-22222",
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P3",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "tracking_update",
+    "reply": "Sorry your second order ORD-22222 hasn\u2019t arrived while ORD-11111 did. I\u2019ll check the shipment status and provide an update on where ORD-22222 is and next steps. Please let me know if the delivery address or any contact details changed. Happy to help further.",
+    "use": [
+     {
+      "input": 135,
+      "output": 61,
+      "reasoning": 0
+     },
+     {
+      "input": 259,
+      "output": 76,
+      "reasoning": 0
+     },
+     {
+      "input": 308,
+      "output": 27,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "Your courier left my parcel (order 50505) in the rain and the printer inside will not turn on.",
+    "gold_type": "damaged_or_faulty",
+    "gold_oid": "ORD-50505",
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "replacement_offer",
+    "reply": "I\u2019m sorry the printer in order ORD-50505 arrived damaged and won\u2019t power on. We can arrange a replacement or inspect the unit\u2014please let me know which you prefer and any photos or details you can provide. I\u2019m here to help with next steps if you need anything else.",
+    "use": [
+     {
+      "input": 139,
+      "output": 70,
+      "reasoning": 0
+     },
+     {
+      "input": 268,
+      "output": 77,
+      "reasoning": 0
+     },
+     {
+      "input": 323,
+      "output": 158,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "How do I change the email address on my account?",
+    "gold_type": "account",
+    "gold_oid": null,
+    "first_fault": null,
+    "success": true,
+    "notes": [],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": true,
+    "checker_violations": [],
+    "checker_agrees": true,
+    "category": "account_help",
+    "reply": "You can change your account email in Settings > Account Information. Enter the new email, confirm it when we send a verification message, and save changes. If you don\u2019t see the verification email, check spam folders or let us know and we\u2019ll help. Would you like step-by-step guidance or screenshots?",
+    "use": [
+     {
+      "input": 127,
+      "output": 40,
+      "reasoning": 0
+     },
+     {
+      "input": 249,
+      "output": 79,
+      "reasoning": 0
+     },
+     {
+      "input": 301,
+      "output": 18,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   }
+  ],
+  "gated": [
+   {
+    "ticket": "Hi, order #48213 arrived with the screen cracked. I need a replacement before Friday, it's a gift.",
+    "gold_type": "damaged_or_faulty",
+    "gold_oid": "ORD-48213",
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P3",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "replacement_offer",
+    "reply": "I'm very sorry your order ORD-48213 arrived with a cracked screen. We can arrange a replacement for you. Please confirm if you'd like a replacement sent and whether you prefer the same model or a different option. If you have photos of the damage, please attach them to help us process this. Let me know if you need anything else.",
+    "use": [
+     {
+      "input": 139,
+      "output": 57,
+      "reasoning": 0
+     },
+     {
+      "input": 267,
+      "output": 87,
+      "reasoning": 0
+     },
+     {
+      "input": 321,
+      "output": 27,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "I was charged twice for ORD-10988. Please fix this.",
+    "gold_type": "billing",
+    "gold_oid": "ORD-10988",
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P3"
+    ],
+    "checker_agrees": false,
+    "category": "billing_review",
+    "reply": "Sorry for the double charge on your order ORD-10988. I\u2019ve flagged this for our billing team to review and correct. I\u2019ll follow up with any updates. Please let me know if you need anything else or have more details to share.",
+    "use": [
+     {
+      "input": 130,
+      "output": 59,
+      "reasoning": 0
+     },
+     {
+      "input": 257,
+      "output": 68,
+      "reasoning": 0
+     },
+     {
+      "input": 298,
+      "output": 27,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "Where is my parcel? Tracking hasn't moved in 6 days. Order 77120.",
+    "gold_type": "delivery",
+    "gold_oid": "ORD-77120",
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P3",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "tracking_update",
+    "reply": "Thanks for contacting us about order ORD-77120. I\u2019m sorry the tracking hasn\u2019t updated \u2014 I\u2019ll check the shipment status and current location for you. I\u2019ll follow up with what I find and next steps. Please let me know if you need anything else in the meantime.",
+    "use": [
+     {
+      "input": 134,
+      "output": 63,
+      "reasoning": 0
+     },
+     {
+      "input": 261,
+      "output": 75,
+      "reasoning": 0
+     },
+     {
+      "input": 318,
+      "output": 31,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "I can't log in, the password reset email never arrives. No order, just my account (j.okafor@example.com).",
+    "gold_type": "account",
+    "gold_oid": null,
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1"
+    ],
+    "checker_agrees": false,
+    "category": "account_help",
+    "reply": "Sorry you\u2019re having trouble logging in. I\u2019ve checked and the reset email to j.okafor@example.com may be blocked or delayed\u2014please check spam/junk and any email filters. Try requesting a reset again or use a different browser/device. If you still don\u2019t receive it, reply and I\u2019ll investigate further and help regain access. Is there anything else I can assist with?",
+    "use": [
+     {
+      "input": 142,
+      "output": 59,
+      "reasoning": 0
+     },
+     {
+      "input": 257,
+      "output": 96,
+      "reasoning": 0
+     },
+     {
+      "input": 334,
+      "output": 23,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "Do you ship to the Isle of Man?",
+    "gold_type": "other",
+    "gold_oid": null,
+    "first_fault": "step1",
+    "success": false,
+    "notes": [
+     "extracted 'delivery'/None, gold 'other'/None",
+     "category 'tracking_update', expected 'general_info'"
+    ],
+    "policy_ok": true,
+    "gold_ok": false,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "tracking_update",
+    "reply": "Thanks for checking. Yes, we do ship to the Isle of Man. Shipping options and rates may vary based on the items and delivery address\u2014please provide your postcode or the items you\u2019re interested in if you\u2019d like a specific quote. Let me know if I can help with anything else.",
+    "use": [
+     {
+      "input": 125,
+      "output": 51,
+      "reasoning": 0
+     },
+     {
+      "input": 249,
+      "output": 77,
+      "reasoning": 0
+     },
+     {
+      "input": 301,
+      "output": 27,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "ORD 55501: the box was soaked through and the contents are ruined.",
+    "gold_type": "damaged_or_faulty",
+    "gold_oid": "ORD-55501",
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "replacement_offer",
+    "reply": "I'm very sorry the box and contents arrived ruined. We can arrange a replacement for order ORD-55501. Please confirm whether you'd like the same items resent or a different selection, and share any photos if available to help us process this. Let me know if you need anything else.",
+    "use": [
+     {
+      "input": 132,
+      "output": 56,
+      "reasoning": 0
+     },
+     {
+      "input": 254,
+      "output": 75,
+      "reasoning": 0
+     },
+     {
+      "input": 296,
+      "output": 24,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "The invoice for order no. 30377 shows VAT at 25% but I'm in the UK, it should be 20%.",
+    "gold_type": "billing",
+    "gold_oid": "ORD-30377",
+    "first_fault": null,
+    "success": true,
+    "notes": [],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": true,
+    "checker_violations": [],
+    "checker_agrees": true,
+    "category": "billing_review",
+    "reply": "Thanks for letting us know about the VAT discrepancy on order ORD-30377. I\u2019ll review the invoice and VAT calculation for that order and update you with what we find. Please let me know if you can share any additional billing documents or the VAT registration details for the UK address. Happy to help further.",
+    "use": [
+     {
+      "input": 143,
+      "output": 54,
+      "reasoning": 0
+     },
+     {
+      "input": 264,
+      "output": 80,
+      "reasoning": 0
+     },
+     {
+      "input": 314,
+      "output": 20,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "URGENT: order 90001 is a cake stand for a wedding tomorrow and the courier app just says 'delayed'.",
+    "gold_type": "delivery",
+    "gold_oid": "ORD-90001",
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P3",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "tracking_update",
+    "reply": "I\u2019m sorry the cake stand for order ORD-90001 is delayed \u2014 I understand this is urgent with your event tomorrow. I\u2019ll contact the carrier to get an updated status and escalation for you. I\u2019ll report back with what I learn. Please let me know if there\u2019s any change or additional info you can share.",
+    "use": [
+     {
+      "input": 142,
+      "output": 69,
+      "reasoning": 0
+     },
+     {
+      "input": 267,
+      "output": 83,
+      "reasoning": 0
+     },
+     {
+      "input": 332,
+      "output": 27,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "My subscription renewed and took \u00a312 from my card but I cancelled it last month. Account name m.rossi.",
+    "gold_type": "billing",
+    "gold_oid": null,
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P3"
+    ],
+    "checker_agrees": false,
+    "category": "billing_review",
+    "reply": "I\u2019m sorry you were charged after cancelling, Mr./Ms. m.rossi. I\u2019ll review your billing for that subscription charge of \u00a312 and update you with what I find. Please let me know any additional details you can share. I\u2019m here to help with this.",
+    "use": [
+     {
+      "input": 140,
+      "output": 60,
+      "reasoning": 0
+     },
+     {
+      "input": 261,
+      "output": 75,
+      "reasoning": 0
+     },
+     {
+      "input": 315,
+      "output": 142,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "Delivered to the wrong address (order 61234). Maybe the neighbour at number 14 has it?",
+    "gold_type": "delivery",
+    "gold_oid": "ORD-61234",
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P3",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "tracking_update",
+    "reply": "I\u2019m sorry your order was delivered to the wrong address. I\u2019ve noted order ORD-61234 and will investigate the delivery location and carrier records to locate your package. Could you confirm whether you\u2019ve checked with neighbor at number 14 and any safe places around your property? Let me know and I\u2019ll continue assisting you.",
+    "use": [
+     {
+      "input": 137,
+      "output": 60,
+      "reasoning": 0
+     },
+     {
+      "input": 258,
+      "output": 83,
+      "reasoning": 0
+     },
+     {
+      "input": 320,
+      "output": 27,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "The kettle (ORD-20045) stopped working after two weeks and there were sparks from the base.",
+    "gold_type": "damaged_or_faulty",
+    "gold_oid": "ORD-20045",
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "replacement_offer",
+    "reply": "I\u2019m sorry to hear your kettle stopped working and produced sparks \u2014 that sounds unsafe. We can arrange a replacement for order ORD-20045. Please confirm if you\u2019d like a replacement and whether you still have the original packaging. Let me know if you need anything else and I\u2019ll help.",
+    "use": [
+     {
+      "input": 137,
+      "output": 61,
+      "reasoning": 0
+     },
+     {
+      "input": 259,
+      "output": 77,
+      "reasoning": 0
+     },
+     {
+      "input": 315,
+      "output": 27,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "Please delete my account and all my data. Thanks.",
+    "gold_type": "account",
+    "gold_oid": null,
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P3",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "account_help",
+    "reply": "We can help delete your account and all personal data. Please confirm the email address tied to the account and that you authorize permanent deletion. Once we have that, we\u2019ll proceed with the deletion process. If you have any questions or need a copy of your data before we delete it, please let us know \u2014 we\u2019re here to help.",
+    "use": [
+     {
+      "input": 127,
+      "output": 50,
+      "reasoning": 0
+     },
+     {
+      "input": 248,
+      "output": 86,
+      "reasoning": 0
+     },
+     {
+      "input": 310,
+      "output": 31,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "I'd like to change the delivery address for order 88800 before it ships.",
+    "gold_type": "delivery",
+    "gold_oid": "ORD-88800",
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P3",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "tracking_update",
+    "reply": "Thanks for contacting us about changing the delivery address for order ORD-88800. I\u2019ve noted your request and will pass it to the fulfillment team for review. Please confirm the new address details you want us to use, and I\u2019ll include them in the update. Let me know if you need anything else.",
+    "use": [
+     {
+      "input": 132,
+      "output": 59,
+      "reasoning": 0
+     },
+     {
+      "input": 257,
+      "output": 80,
+      "reasoning": 0
+     },
+     {
+      "input": 310,
+      "output": 27,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "Charged \u00a349.99 but the site said \u00a339.99 for order 12345.",
+    "gold_type": "billing",
+    "gold_oid": "ORD-12345",
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P3"
+    ],
+    "checker_agrees": false,
+    "category": "billing_review",
+    "reply": "I\u2019m sorry for the discrepancy on order ORD-12345. I\u2019ll review the charge and the pricing shown on the site for this order and update you with what I find. Please let me know if you have any screenshots or additional details to help the review. I\u2019m happy to assist further.",
+    "use": [
+     {
+      "input": 136,
+      "output": 65,
+      "reasoning": 0
+     },
+     {
+      "input": 269,
+      "output": 78,
+      "reasoning": 0
+     },
+     {
+      "input": 323,
+      "output": 24,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "Can I get the manual for the X200 I bought last year? No order number to hand, sorry.",
+    "gold_type": "other",
+    "gold_oid": null,
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "general_info",
+    "reply": "Thanks for reaching out. I can help with the X200 manual \u2014 please confirm the exact model number and any specific sections you need (setup, troubleshooting, specs). If you have photos of the product label, that can help identify the correct manual. Let me know and I\u2019ll provide the appropriate documentation. If you need anything else, I\u2019m happy to assist.",
+    "use": [
+     {
+      "input": 138,
+      "output": 57,
+      "reasoning": 0
+     },
+     {
+      "input": 255,
+      "output": 91,
+      "reasoning": 0
+     },
+     {
+      "input": 322,
+      "output": 27,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "Mi pedido 33310 llego roto, la tapa esta partida.",
+    "gold_type": "damaged_or_faulty",
+    "gold_oid": "ORD-33310",
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "replacement_offer",
+    "reply": "Sorry to hear your order ORD-33310 arrived damaged with a broken lid. We can arrange a replacement or another solution\u2014please tell us if you prefer a replacement, exchange, or different option and any photos you can share. We\u2019ll proceed once we have your preference. Let me know if you need anything else.",
+    "use": [
+     {
+      "input": 130,
+      "output": 61,
+      "reasoning": 0
+     },
+     {
+      "input": 267,
+      "output": 82,
+      "reasoning": 0
+     },
+     {
+      "input": 321,
+      "output": 27,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "I sent back order ORD-70707 three weeks ago and still no money back on my card.",
+    "gold_type": "billing",
+    "gold_oid": "ORD-70707",
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P3"
+    ],
+    "checker_agrees": false,
+    "category": "billing_review",
+    "reply": "I\u2019m sorry for the delay with your returned order ORD-70707. I\u2019ll review the payment records and escalations for this return and update you on the next steps. Please let me know if there\u2019s any additional information about the return. I\u2019m here to help further.",
+    "use": [
+     {
+      "input": 136,
+      "output": 63,
+      "reasoning": 0
+     },
+     {
+      "input": 261,
+      "output": 74,
+      "reasoning": 0
+     },
+     {
+      "input": 314,
+      "output": 27,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "Two orders: 11111 arrived fine but 22222 has not turned up at all.",
+    "gold_type": "delivery",
+    "gold_oid": "ORD-22222",
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P3",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "tracking_update",
+    "reply": "Thanks for letting us know about order ORD-22222. I\u2019m sorry it hasn\u2019t arrived while ORD-11111 did. I\u2019ll check the delivery status and carrier notes for ORD-22222 and update you with what I find. Please tell me if the shipping address or any delivery instructions changed. Let me know if you need anything else.",
+    "use": [
+     {
+      "input": 135,
+      "output": 49,
+      "reasoning": 0
+     },
+     {
+      "input": 259,
+      "output": 88,
+      "reasoning": 0
+     },
+     {
+      "input": 323,
+      "output": 27,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "Your courier left my parcel (order 50505) in the rain and the printer inside will not turn on.",
+    "gold_type": "damaged_or_faulty",
+    "gold_oid": "ORD-50505",
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "replacement_offer",
+    "reply": "Sorry to hear your printer from order ORD-50505 arrived damaged and won\u2019t power on. We can arrange a replacement unit or discuss next steps. Please confirm if you\u2019d like a replacement and share any photos of the damage if available. Let me know if you need anything else.",
+    "use": [
+     {
+      "input": 139,
+      "output": 68,
+      "reasoning": 0
+     },
+     {
+      "input": 266,
+      "output": 75,
+      "reasoning": 0
+     },
+     {
+      "input": 314,
+      "output": 27,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "How do I change the email address on my account?",
+    "gold_type": "account",
+    "gold_oid": null,
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "account_help",
+    "reply": "You can change your account email from the Account Settings page: sign in, go to Profile or Account Settings, enter your new email, and save changes. You may need to confirm the new email via a verification link we send. If you\u2019d like, tell me which step you\u2019re stuck on and I\u2019ll help further.",
+    "use": [
+     {
+      "input": 127,
+      "output": 51,
+      "reasoning": 0
+     },
+     {
+      "input": 249,
+      "output": 83,
+      "reasoning": 0
+     },
+     {
+      "input": 308,
+      "output": 27,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   }
+  ],
+  "loose-ungated": [
+   {
+    "ticket": "Hi, order #48213 arrived with the screen cracked. I need a replacement before Friday, it's a gift.",
+    "gold_type": "damaged_or_faulty",
+    "gold_oid": "ORD-48213",
+    "first_fault": "step1",
+    "success": false,
+    "notes": [
+     "extracted 'Damaged item / cracked screen'/'48213', gold 'damaged_or_faulty'/'ORD-48213'",
+     "P2: the order id ORD-48213 is not quoted"
+    ],
+    "policy_ok": true,
+    "gold_ok": false,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P2",
+     "P3",
+     "P5"
+    ],
+    "checker_agrees": true,
+    "category": "replacement_offer",
+    "reply": "I\u2019m sorry the item arrived damaged. We can arrange a replacement for order 48213. Please confirm whether you\u2019d like a replacement or prefer another option, and let me know if you can provide a photo of the damage. I\u2019m happy to help further with this.",
+    "use": [
+     {
+      "input": 52,
+      "output": 50,
+      "reasoning": 0
+     },
+     {
+      "input": 249,
+      "output": 73,
+      "reasoning": 0
+     },
+     {
+      "input": 298,
+      "output": 30,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "I was charged twice for ORD-10988. Please fix this.",
+    "gold_type": "billing",
+    "gold_oid": "ORD-10988",
+    "first_fault": "step1",
+    "success": true,
+    "notes": [
+     "extracted 'double charge / billing error'/'ORD-10988', gold 'billing'/'ORD-10988'"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P3"
+    ],
+    "checker_agrees": false,
+    "category": "billing_review",
+    "reply": "Sorry for the trouble \u2014 I see a billing issue for order ORD-10988. I\u2019ll review the charges and investigate what caused the double charge. I\u2019ll update you with the findings and next steps. Please let me know if you have any additional details to share or other questions.",
+    "use": [
+     {
+      "input": 43,
+      "output": 42,
+      "reasoning": 0
+     },
+     {
+      "input": 240,
+      "output": 75,
+      "reasoning": 0
+     },
+     {
+      "input": 291,
+      "output": 27,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "Where is my parcel? Tracking hasn't moved in 6 days. Order 77120.",
+    "gold_type": "delivery",
+    "gold_oid": "ORD-77120",
+    "first_fault": "step1",
+    "success": true,
+    "notes": [
+     "extracted 'Where is my parcel / tracking not updated'/'77120', gold 'delivery'/'ORD-77120'"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P3",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "tracking_update",
+    "reply": "Thanks for reaching out. I\u2019ve checked your order (ORD-77120) and I\u2019m looking into the parcel\u2019s tracking status. I\u2019ll update you with what I find and next steps. Please let me know if there\u2019s any other detail I should know or if you\u2019d like help with delivery preferences.",
+    "use": [
+     {
+      "input": 47,
+      "output": 43,
+      "reasoning": 0
+     },
+     {
+      "input": 241,
+      "output": 80,
+      "reasoning": 0
+     },
+     {
+      "input": 306,
+      "output": 27,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "I can't log in, the password reset email never arrives. No order, just my account (j.okafor@example.com).",
+    "gold_type": "account",
+    "gold_oid": null,
+    "first_fault": "step1",
+    "success": true,
+    "notes": [
+     "extracted 'Login issue / Password reset email not received'/None, gold 'account'/None"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "account_help",
+    "reply": "I\u2019m sorry you\u2019re having trouble receiving the password reset email. Please check your spam/junk and any filters, then try requesting the reset again. If that doesn\u2019t work, tell me the email address on the account and any error messages you see, and I\u2019ll help investigate further. Let me know if you need anything else.",
+    "use": [
+     {
+      "input": 55,
+      "output": 41,
+      "reasoning": 0
+     },
+     {
+      "input": 239,
+      "output": 85,
+      "reasoning": 0
+     },
+     {
+      "input": 303,
+      "output": 27,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "Do you ship to the Isle of Man?",
+    "gold_type": "other",
+    "gold_oid": null,
+    "first_fault": "step1",
+    "success": false,
+    "notes": [
+     "extracted 'Shipping inquiry'/None, gold 'other'/None",
+     "category 'tracking_update', expected 'general_info'"
+    ],
+    "policy_ok": true,
+    "gold_ok": false,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1"
+    ],
+    "checker_agrees": false,
+    "category": "tracking_update",
+    "reply": "Thanks for contacting us about your shipping inquiry. I don\u2019t see an order number\u2014could you provide it so I can look up the shipment status? If you prefer, share any tracking details you already have. I\u2019m happy to help further.",
+    "use": [
+     {
+      "input": 38,
+      "output": 35,
+      "reasoning": 0
+     },
+     {
+      "input": 233,
+      "output": 67,
+      "reasoning": 0
+     },
+     {
+      "input": 275,
+      "output": 23,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "ORD 55501: the box was soaked through and the contents are ruined.",
+    "gold_type": "damaged_or_faulty",
+    "gold_oid": "ORD-55501",
+    "first_fault": "step1",
+    "success": false,
+    "notes": [
+     "extracted 'Damaged goods / Water damage'/'ORD 55501', gold 'damaged_or_faulty'/'ORD-55501'",
+     "P2: the order id ORD-55501 is not quoted"
+    ],
+    "policy_ok": true,
+    "gold_ok": false,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P2",
+     "P3",
+     "P5"
+    ],
+    "checker_agrees": true,
+    "category": "replacement_offer",
+    "reply": "I\u2019m sorry your item arrived damaged. Please accept our apologies. Could you send a photo of the damage and confirm the order number (I have ORD 55501)? Once we have the image we\u2019ll arrange a replacement. Let me know if you need help submitting the photo or have other concerns.",
+    "use": [
+     {
+      "input": 45,
+      "output": 43,
+      "reasoning": 0
+     },
+     {
+      "input": 241,
+      "output": 78,
+      "reasoning": 0
+     },
+     {
+      "input": 292,
+      "output": 32,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "The invoice for order no. 30377 shows VAT at 25% but I'm in the UK, it should be 20%.",
+    "gold_type": "billing",
+    "gold_oid": "ORD-30377",
+    "first_fault": "step1",
+    "success": false,
+    "notes": [
+     "extracted 'Incorrect VAT rate on invoice'/'30377', gold 'billing'/'ORD-30377'",
+     "P2: the order id ORD-30377 is not quoted"
+    ],
+    "policy_ok": true,
+    "gold_ok": false,
+    "checker_ok": false,
+    "checker_violations": [
+     "P2",
+     "P3",
+     "P5"
+    ],
+    "checker_agrees": true,
+    "category": "billing_review",
+    "reply": "Thank you for letting us know about the VAT rate on invoice for order 30377. We\u2019ll review the invoice and correct any discrepancies. If you can share a copy of the invoice or specific line items, that will help. Please tell us if you need anything else.",
+    "use": [
+     {
+      "input": 56,
+      "output": 40,
+      "reasoning": 0
+     },
+     {
+      "input": 238,
+      "output": 73,
+      "reasoning": 0
+     },
+     {
+      "input": 281,
+      "output": 27,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "URGENT: order 90001 is a cake stand for a wedding tomorrow and the courier app just says 'delayed'.",
+    "gold_type": "delivery",
+    "gold_oid": "ORD-90001",
+    "first_fault": "step1",
+    "success": false,
+    "notes": [
+     "extracted 'delivery delay'/'90001', gold 'delivery'/'ORD-90001'",
+     "P2: the order id ORD-90001 is not quoted"
+    ],
+    "policy_ok": true,
+    "gold_ok": false,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P2",
+     "P3",
+     "P5"
+    ],
+    "checker_agrees": true,
+    "category": "tracking_update",
+    "reply": "Sorry for the delay with your order 90001. I\u2019ll check the delivery status and update you with current tracking information. Please let me know if you need any specific details or changes to the delivery\u2014I'm happy to help further.",
+    "use": [
+     {
+      "input": 55,
+      "output": 37,
+      "reasoning": 0
+     },
+     {
+      "input": 235,
+      "output": 65,
+      "reasoning": 0
+     },
+     {
+      "input": 272,
+      "output": 32,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "My subscription renewed and took \u00a312 from my card but I cancelled it last month. Account name m.rossi.",
+    "gold_type": "billing",
+    "gold_oid": null,
+    "first_fault": "step1",
+    "success": true,
+    "notes": [
+     "extracted 'Unauthorized charge / subscription renewal after cancellation'/None, gold 'billing'/None"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P3",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "billing_review",
+    "reply": "I\u2019m sorry to hear about the unauthorized charge. I\u2019ve flagged this for our billing team to review and will investigate what caused the subscription renewal. I\u2019ll update you once we have more information. Please let me know if you have any additional details to share or other questions I can help with.",
+    "use": [
+     {
+      "input": 53,
+      "output": 40,
+      "reasoning": 0
+     },
+     {
+      "input": 238,
+      "output": 77,
+      "reasoning": 0
+     },
+     {
+      "input": 291,
+      "output": 31,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "Delivered to the wrong address (order 61234). Maybe the neighbour at number 14 has it?",
+    "gold_type": "delivery",
+    "gold_oid": "ORD-61234",
+    "first_fault": "step1",
+    "success": false,
+    "notes": [
+     "extracted 'Delivered to wrong address'/'61234', gold 'delivery'/'ORD-61234'",
+     "P2: the order id ORD-61234 is not quoted"
+    ],
+    "policy_ok": true,
+    "gold_ok": false,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P2",
+     "P3",
+     "P5"
+    ],
+    "checker_agrees": true,
+    "category": "tracking_update",
+    "reply": "I\u2019m sorry your package was delivered to the wrong address. I see order ID 61234; I\u2019ll escalate this to our delivery team so they can investigate and locate the package. Please let me know if you have any additional details about the delivery location. I\u2019m happy to help further.",
+    "use": [
+     {
+      "input": 50,
+      "output": 39,
+      "reasoning": 0
+     },
+     {
+      "input": 237,
+      "output": 77,
+      "reasoning": 0
+     },
+     {
+      "input": 290,
+      "output": 32,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "The kettle (ORD-20045) stopped working after two weeks and there were sparks from the base.",
+    "gold_type": "damaged_or_faulty",
+    "gold_oid": "ORD-20045",
+    "first_fault": "step1",
+    "success": true,
+    "notes": [
+     "extracted 'product malfunction / electrical hazard'/'ORD-20045', gold 'damaged_or_faulty'/'ORD-20045'"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P3",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "replacement_offer",
+    "reply": "I'm sorry to hear your product is malfunctioning and may be an electrical hazard. We take this seriously. Please stop using the item and let us arrange a replacement for order ORD-20045. If you can, describe the issue or attach photos so we can help faster. Let me know if you need any other assistance.",
+    "use": [
+     {
+      "input": 50,
+      "output": 42,
+      "reasoning": 0
+     },
+     {
+      "input": 240,
+      "output": 83,
+      "reasoning": 0
+     },
+     {
+      "input": 290,
+      "output": 27,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "Please delete my account and all my data. Thanks.",
+    "gold_type": "account",
+    "gold_oid": null,
+    "first_fault": "step1",
+    "success": true,
+    "notes": [
+     "extracted 'Account deletion / Data removal'/None, gold 'account'/None"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P3",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "account_help",
+    "reply": "We can help with deleting your account and removing your data. Please confirm the email address associated with the account and any details you\u2019d like retained or removed. Once we have that, we\u2019ll proceed with the request. Let us know if you need anything else.",
+    "use": [
+     {
+      "input": 40,
+      "output": 38,
+      "reasoning": 0
+     },
+     {
+      "input": 236,
+      "output": 70,
+      "reasoning": 0
+     },
+     {
+      "input": 279,
+      "output": 29,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "I'd like to change the delivery address for order 88800 before it ships.",
+    "gold_type": "delivery",
+    "gold_oid": "ORD-88800",
+    "first_fault": "step1",
+    "success": false,
+    "notes": [
+     "extracted 'Change delivery address'/'88800', gold 'delivery'/'ORD-88800'",
+     "P2: the order id ORD-88800 is not quoted"
+    ],
+    "policy_ok": true,
+    "gold_ok": false,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P2",
+     "P3",
+     "P5"
+    ],
+    "checker_agrees": true,
+    "category": "tracking_update",
+    "reply": "We can help with changing your delivery address for order 88800. Please confirm the new shipping address and any phone number updates. We\u2019ll check the order status and advise on next steps. Let us know if you\u2019d like us to proceed or have other questions.",
+    "use": [
+     {
+      "input": 45,
+      "output": 39,
+      "reasoning": 0
+     },
+     {
+      "input": 237,
+      "output": 71,
+      "reasoning": 0
+     },
+     {
+      "input": 281,
+      "output": 30,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "Charged \u00a349.99 but the site said \u00a339.99 for order 12345.",
+    "gold_type": "billing",
+    "gold_oid": "ORD-12345",
+    "first_fault": "step1",
+    "success": true,
+    "notes": [
+     "extracted 'Billing/Overcharge'/'12345', gold 'billing'/'ORD-12345'"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P3"
+    ],
+    "checker_agrees": false,
+    "category": "billing_review",
+    "reply": "I\u2019m sorry to hear about the billing concern. I\u2019ve flagged your order ORD-12345 for review and will have our billing team investigate the charges on your behalf. If you can share any specific charge details or screenshots, that would help. Please let me know if you need anything else.",
+    "use": [
+     {
+      "input": 49,
+      "output": 39,
+      "reasoning": 0
+     },
+     {
+      "input": 237,
+      "output": 77,
+      "reasoning": 0
+     },
+     {
+      "input": 287,
+      "output": 24,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "Can I get the manual for the X200 I bought last year? No order number to hand, sorry.",
+    "gold_type": "other",
+    "gold_oid": null,
+    "first_fault": "step1",
+    "success": true,
+    "notes": [
+     "extracted 'Request for manual / documentation'/None, gold 'other'/None"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P3",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "general_info",
+    "reply": "Thanks for reaching out. I can share the manual or documentation you need\u2014please tell me which product or feature you\u2019re asking about, and any specific topics to include. I\u2019ll provide the appropriate materials. Let me know if you need anything else.",
+    "use": [
+     {
+      "input": 51,
+      "output": 38,
+      "reasoning": 0
+     },
+     {
+      "input": 236,
+      "output": 68,
+      "reasoning": 0
+     },
+     {
+      "input": 279,
+      "output": 31,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "Mi pedido 33310 llego roto, la tapa esta partida.",
+    "gold_type": "damaged_or_faulty",
+    "gold_oid": "ORD-33310",
+    "first_fault": "step1",
+    "success": true,
+    "notes": [
+     "extracted 'Producto da\u00f1ado / roto'/'33310', gold 'damaged_or_faulty'/'ORD-33310'"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1"
+    ],
+    "checker_agrees": false,
+    "category": "replacement_offer",
+    "reply": "Lamento que haya recibido el producto da\u00f1ado. Podemos ofrecer un reemplazo o una soluci\u00f3n alternativa. Su n\u00famero de pedido es ORD-33310. Ind\u00edquenos qu\u00e9 prefiere y si puede enviar una foto del da\u00f1o para agilizar el proceso. Estoy aqu\u00ed para ayudar con cualquier otra duda.",
+    "use": [
+     {
+      "input": 43,
+      "output": 40,
+      "reasoning": 0
+     },
+     {
+      "input": 242,
+      "output": 78,
+      "reasoning": 0
+     },
+     {
+      "input": 316,
+      "output": 23,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "I sent back order ORD-70707 three weeks ago and still no money back on my card.",
+    "gold_type": "billing",
+    "gold_oid": "ORD-70707",
+    "first_fault": "step1",
+    "success": true,
+    "notes": [
+     "extracted 'refund_not_received'/'ORD-70707', gold 'billing'/'ORD-70707'"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": true,
+    "checker_violations": [],
+    "checker_agrees": true,
+    "category": "billing_review",
+    "reply": "I\u2019m sorry you haven\u2019t received your refund for order ORD-70707. I\u2019ll review the payment and refund status for that order and update you with what I find. Please let me know if there\u2019s any additional information to check. I\u2019m here to help with anything else.",
+    "use": [
+     {
+      "input": 49,
+      "output": 40,
+      "reasoning": 0
+     },
+     {
+      "input": 238,
+      "output": 75,
+      "reasoning": 0
+     },
+     {
+      "input": 295,
+      "output": 20,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "Two orders: 11111 arrived fine but 22222 has not turned up at all.",
+    "gold_type": "delivery",
+    "gold_oid": "ORD-22222",
+    "first_fault": "step1",
+    "success": false,
+    "notes": [
+     "extracted 'missing delivery'/None, gold 'delivery'/'ORD-22222'",
+     "P2: the order id ORD-22222 is not quoted"
+    ],
+    "policy_ok": true,
+    "gold_ok": false,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P2",
+     "P3",
+     "P5"
+    ],
+    "checker_agrees": true,
+    "category": "tracking_update",
+    "reply": "Sorry to hear your delivery hasn't arrived. I see order IDs 11111 and 22222 \u2014 I'll check their status and update you with tracking information. Please let me know if there's any other detail you'd like us to consider.",
+    "use": [
+     {
+      "input": 48,
+      "output": 46,
+      "reasoning": 0
+     },
+     {
+      "input": 239,
+      "output": 64,
+      "reasoning": 0
+     },
+     {
+      "input": 273,
+      "output": 32,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "Your courier left my parcel (order 50505) in the rain and the printer inside will not turn on.",
+    "gold_type": "damaged_or_faulty",
+    "gold_oid": "ORD-50505",
+    "first_fault": "step1",
+    "success": true,
+    "notes": [
+     "extracted 'Damaged/Not working item (electronics) due to courier mishandling'/'50505', gold 'damaged_or_faulty'/'ORD-50505'"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1"
+    ],
+    "checker_agrees": false,
+    "category": "replacement_offer",
+    "reply": "I\u2019m sorry your item arrived damaged. Please provide any photos of the damage and your order number (ORD-50505) so we can arrange a replacement. Let me know if you need help with the photo upload or any other details.",
+    "use": [
+     {
+      "input": 52,
+      "output": 50,
+      "reasoning": 0
+     },
+     {
+      "input": 248,
+      "output": 66,
+      "reasoning": 0
+     },
+     {
+      "input": 284,
+      "output": 33,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   },
+   {
+    "ticket": "How do I change the email address on my account?",
+    "gold_type": "account",
+    "gold_oid": null,
+    "first_fault": "step1",
+    "success": true,
+    "notes": [
+     "extracted 'Account help - change email'/None, gold 'account'/None"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P3",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "account_help",
+    "reply": "Thanks for reaching out. I can help change the email on your account\u2014please reply with the current email on file and the new email you'd like to use, and any verification details requested during sign-in. I'll guide you through the steps. Let me know if you need anything else.",
+    "use": [
+     {
+      "input": 40,
+      "output": 38,
+      "reasoning": 0
+     },
+     {
+      "input": 236,
+      "output": 75,
+      "reasoning": 0
+     },
+     {
+      "input": 280,
+      "output": 31,
+      "reasoning": 0
+     }
+    ],
+    "retries": 0
+   }
+  ],
+  "loose-gated": [
+   {
+    "ticket": "Hi, order #48213 arrived with the screen cracked. I need a replacement before Friday, it's a gift.",
+    "gold_type": "damaged_or_faulty",
+    "gold_oid": "ORD-48213",
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "replacement_offer",
+    "reply": "I\u2019m sorry the item arrived damaged. We can arrange a replacement for order ORD-48213. Please confirm whether you\u2019d like us to proceed and share any photos of the damage if available. I\u2019m here to help with the next steps.",
+    "use": [
+     {
+      "input": 52,
+      "output": 49,
+      "reasoning": 0
+     },
+     {
+      "input": 143,
+      "output": 32,
+      "reasoning": 0
+     },
+     {
+      "input": 240,
+      "output": 67,
+      "reasoning": 0
+     },
+     {
+      "input": 283,
+      "output": 24,
+      "reasoning": 0
+     }
+    ],
+    "retries": 1
+   },
+   {
+    "ticket": "I was charged twice for ORD-10988. Please fix this.",
+    "gold_type": "billing",
+    "gold_oid": "ORD-10988",
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P3"
+    ],
+    "checker_agrees": false,
+    "category": "billing_review",
+    "reply": "Thanks for reaching out about billing for order ORD-10988. I\u2019ll review the charges and billing details for this order and follow up with what I find. If you have any specific questions or documents to share about the charge, please let me know and I\u2019ll include them in the review. How else can I help?",
+    "use": [
+     {
+      "input": 43,
+      "output": 42,
+      "reasoning": 0
+     },
+     {
+      "input": 93,
+      "output": 38,
+      "reasoning": 0
+     },
+     {
+      "input": 236,
+      "output": 83,
+      "reasoning": 0
+     },
+     {
+      "input": 292,
+      "output": 24,
+      "reasoning": 0
+     }
+    ],
+    "retries": 1
+   },
+   {
+    "ticket": "Where is my parcel? Tracking hasn't moved in 6 days. Order 77120.",
+    "gold_type": "delivery",
+    "gold_oid": "ORD-77120",
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P3",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "tracking_update",
+    "reply": "Thanks for reaching out about your delivery for order ORD-77120. I\u2019ll check the current status and provide an update on its location and next steps. Please let me know if there are any delivery instructions or changes we should be aware of. Happy to help further.",
+    "use": [
+     {
+      "input": 47,
+      "output": 43,
+      "reasoning": 0
+     },
+     {
+      "input": 132,
+      "output": 28,
+      "reasoning": 0
+     },
+     {
+      "input": 236,
+      "output": 72,
+      "reasoning": 0
+     },
+     {
+      "input": 278,
+      "output": 27,
+      "reasoning": 0
+     }
+    ],
+    "retries": 1
+   },
+   {
+    "ticket": "I can't log in, the password reset email never arrives. No order, just my account (j.okafor@example.com).",
+    "gold_type": "account",
+    "gold_oid": null,
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P3",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "account_help",
+    "reply": "Sorry for the trouble accessing your account. Please tell me the email or username associated with the account and describe the issue (login error, password reset, locked account). I\u2019ll check what steps we can take to restore access. Let me know any error messages you see or recent changes to your account so I can help further.",
+    "use": [
+     {
+      "input": 55,
+      "output": 38,
+      "reasoning": 0
+     },
+     {
+      "input": 119,
+      "output": 25,
+      "reasoning": 0
+     },
+     {
+      "input": 232,
+      "output": 83,
+      "reasoning": 0
+     },
+     {
+      "input": 285,
+      "output": 29,
+      "reasoning": 0
+     }
+    ],
+    "retries": 1
+   },
+   {
+    "ticket": "Do you ship to the Isle of Man?",
+    "gold_type": "other",
+    "gold_oid": null,
+    "first_fault": "step1",
+    "success": false,
+    "notes": [
+     "extracted 'delivery'/None, gold 'other'/None",
+     "category 'tracking_update', expected 'general_info'"
+    ],
+    "policy_ok": true,
+    "gold_ok": false,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "tracking_update",
+    "reply": "Thanks for reaching out about your delivery. I don\u2019t see an order number\u2014could you please provide it so I can check the shipment status and tracking details for you? I\u2019m happy to help with anything else you need.",
+    "use": [
+     {
+      "input": 38,
+      "output": 35,
+      "reasoning": 0
+     },
+     {
+      "input": 99,
+      "output": 25,
+      "reasoning": 0
+     },
+     {
+      "input": 232,
+      "output": 63,
+      "reasoning": 0
+     },
+     {
+      "input": 270,
+      "output": 24,
+      "reasoning": 0
+     }
+    ],
+    "retries": 1
+   },
+   {
+    "ticket": "ORD 55501: the box was soaked through and the contents are ruined.",
+    "gold_type": "damaged_or_faulty",
+    "gold_oid": "ORD-55501",
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "replacement_offer",
+    "reply": "I\u2019m sorry your item arrived damaged. We can arrange a replacement for order ORD-55501. Please reply with photos of the damage and any preferred delivery details so we can proceed. Let me know if you need anything else.",
+    "use": [
+     {
+      "input": 45,
+      "output": 46,
+      "reasoning": 0
+     },
+     {
+      "input": 133,
+      "output": 32,
+      "reasoning": 0
+     },
+     {
+      "input": 240,
+      "output": 64,
+      "reasoning": 0
+     },
+     {
+      "input": 274,
+      "output": 24,
+      "reasoning": 0
+     }
+    ],
+    "retries": 1
+   },
+   {
+    "ticket": "The invoice for order no. 30377 shows VAT at 25% but I'm in the UK, it should be 20%.",
+    "gold_type": "billing",
+    "gold_oid": "ORD-30377",
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P3"
+    ],
+    "checker_agrees": false,
+    "category": "billing_review",
+    "reply": "Thanks for contacting us about your billing concern for order ORD-30377. I\u2019ve reviewed your case and will investigate the charge details and any discrepancies. I\u2019ll follow up with what I find and next steps. Please let me know if there\u2019s any additional information you\u2019d like us to consider.",
+    "use": [
+     {
+      "input": 56,
+      "output": 40,
+      "reasoning": 0
+     },
+     {
+      "input": 124,
+      "output": 38,
+      "reasoning": 0
+     },
+     {
+      "input": 236,
+      "output": 77,
+      "reasoning": 0
+     },
+     {
+      "input": 292,
+      "output": 27,
+      "reasoning": 0
+     }
+    ],
+    "retries": 1
+   },
+   {
+    "ticket": "URGENT: order 90001 is a cake stand for a wedding tomorrow and the courier app just says 'delayed'.",
+    "gold_type": "delivery",
+    "gold_oid": "ORD-90001",
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1"
+    ],
+    "checker_agrees": false,
+    "category": "tracking_update",
+    "reply": "I\u2019m sorry your delivery hasn\u2019t arrived yet. I\u2019ve noted your order ORD-90001 and will check the shipment status and carrier details for you. Would you like me to send updates here or to your email? Please let me know if there\u2019s anything else I can do to help.",
+    "use": [
+     {
+      "input": 55,
+      "output": 44,
+      "reasoning": 0
+     },
+     {
+      "input": 141,
+      "output": 28,
+      "reasoning": 0
+     },
+     {
+      "input": 236,
+      "output": 77,
+      "reasoning": 0
+     },
+     {
+      "input": 292,
+      "output": 23,
+      "reasoning": 0
+     }
+    ],
+    "retries": 1
+   },
+   {
+    "ticket": "My subscription renewed and took \u00a312 from my card but I cancelled it last month. Account name m.rossi.",
+    "gold_type": "billing",
+    "gold_oid": null,
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P3",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "billing_review",
+    "reply": "Thanks for reaching out about your billing concern. I\u2019ll review your account charges and get back with what I find. If you can share any relevant screenshots or details about the charge, that will help. Please let me know if there\u2019s anything else I can check for you.",
+    "use": [
+     {
+      "input": 53,
+      "output": 43,
+      "reasoning": 0
+     },
+     {
+      "input": 124,
+      "output": 34,
+      "reasoning": 0
+     },
+     {
+      "input": 232,
+      "output": 73,
+      "reasoning": 0
+     },
+     {
+      "input": 278,
+      "output": 31,
+      "reasoning": 0
+     }
+    ],
+    "retries": 1
+   },
+   {
+    "ticket": "Delivered to the wrong address (order 61234). Maybe the neighbour at number 14 has it?",
+    "gold_type": "delivery",
+    "gold_oid": "ORD-61234",
+    "first_fault": "step1",
+    "success": false,
+    "notes": [
+     "extracted 'delivery'/None, gold 'delivery'/'ORD-61234'",
+     "P2: the order id ORD-61234 is not quoted"
+    ],
+    "policy_ok": true,
+    "gold_ok": false,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P3",
+     "P5"
+    ],
+    "checker_agrees": true,
+    "category": "tracking_update",
+    "reply": "Thanks for reaching out about your delivery \u2014 I\u2019m sorry for the inconvenience. I don\u2019t see an order ID on file; could you please provide your order number or shipping address so I can look up the status? I\u2019ll check the latest tracking information and update you. Let me know if you have any other details to share.",
+    "use": [
+     {
+      "input": 50,
+      "output": 40,
+      "reasoning": 0
+     },
+     {
+      "input": 118,
+      "output": 34,
+      "reasoning": 0
+     },
+     {
+      "input": 232,
+      "output": 84,
+      "reasoning": 0
+     },
+     {
+      "input": 295,
+      "output": 29,
+      "reasoning": 0
+     }
+    ],
+    "retries": 1
+   },
+   {
+    "ticket": "The kettle (ORD-20045) stopped working after two weeks and there were sparks from the base.",
+    "gold_type": "damaged_or_faulty",
+    "gold_oid": "ORD-20045",
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P2",
+     "P3",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "replacement_offer",
+    "reply": "I\u2019m sorry your item arrived damaged (order ORD-20045). We can arrange a replacement for you. Please confirm you\u2019d like a replacement and let me know if you\u2019d prefer any specific handling or pickup details. I\u2019m happy to help further.",
+    "use": [
+     {
+      "input": 50,
+      "output": 42,
+      "reasoning": 0
+     },
+     {
+      "input": 114,
+      "output": 32,
+      "reasoning": 0
+     },
+     {
+      "input": 240,
+      "output": 69,
+      "reasoning": 0
+     },
+     {
+      "input": 288,
+      "output": 30,
+      "reasoning": 0
+     }
+    ],
+    "retries": 1
+   },
+   {
+    "ticket": "Please delete my account and all my data. Thanks.",
+    "gold_type": "account",
+    "gold_oid": null,
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P3",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "account_help",
+    "reply": "I\u2019m sorry you\u2019re having trouble with your account. Please tell me what\u2019s happening (login, password reset, email change, or something else) and any error messages you see. I\u2019ll guide you through the next steps and help get this resolved. Let me know if you need anything else.",
+    "use": [
+     {
+      "input": 40,
+      "output": 41,
+      "reasoning": 0
+     },
+     {
+      "input": 107,
+      "output": 34,
+      "reasoning": 0
+     },
+     {
+      "input": 232,
+      "output": 78,
+      "reasoning": 0
+     },
+     {
+      "input": 289,
+      "output": 31,
+      "reasoning": 0
+     }
+    ],
+    "retries": 1
+   },
+   {
+    "ticket": "I'd like to change the delivery address for order 88800 before it ships.",
+    "gold_type": "delivery",
+    "gold_oid": "ORD-88800",
+    "first_fault": "step1",
+    "success": false,
+    "notes": [
+     "extracted 'delivery'/None, gold 'delivery'/'ORD-88800'",
+     "P2: the order id ORD-88800 is not quoted"
+    ],
+    "policy_ok": true,
+    "gold_ok": false,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P3",
+     "P5"
+    ],
+    "checker_agrees": true,
+    "category": "tracking_update",
+    "reply": "I\u2019m sorry your delivery hasn\u2019t arrived. I\u2019ll check the shipment status and update you with what I find. Could you confirm the delivery address or any tracking number you have? I\u2019m here to help with anything else.",
+    "use": [
+     {
+      "input": 45,
+      "output": 38,
+      "reasoning": 0
+     },
+     {
+      "input": 125,
+      "output": 34,
+      "reasoning": 0
+     },
+     {
+      "input": 232,
+      "output": 63,
+      "reasoning": 0
+     },
+     {
+      "input": 274,
+      "output": 29,
+      "reasoning": 0
+     }
+    ],
+    "retries": 1
+   },
+   {
+    "ticket": "Charged \u00a349.99 but the site said \u00a339.99 for order 12345.",
+    "gold_type": "billing",
+    "gold_oid": "ORD-12345",
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1"
+    ],
+    "checker_agrees": false,
+    "category": "billing_review",
+    "reply": "Thanks for reaching out about your billing concern regarding order ORD-12345. I\u2019ve flagged this to our billing team for review and they will investigate the charges on that order. If you can share any specific charge details or screenshots, please include them. Let me know if you need anything else and I\u2019ll help coordinate further.",
+    "use": [
+     {
+      "input": 49,
+      "output": 39,
+      "reasoning": 0
+     },
+     {
+      "input": 130,
+      "output": 28,
+      "reasoning": 0
+     },
+     {
+      "input": 236,
+      "output": 83,
+      "reasoning": 0
+     },
+     {
+      "input": 292,
+      "output": 99,
+      "reasoning": 0
+     }
+    ],
+    "retries": 1
+   },
+   {
+    "ticket": "Can I get the manual for the X200 I bought last year? No order number to hand, sorry.",
+    "gold_type": "other",
+    "gold_oid": null,
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "general_info",
+    "reply": "Thanks for reaching out. I\u2019m here to help with your question \u2014 could you please provide a few more details about the issue or what you\u2019d like assistance with? If it\u2019s about an order, including the order ID would be helpful. Let me know and I\u2019ll assist further. Please tell me if you need anything else.",
+    "use": [
+     {
+      "input": 51,
+      "output": 37,
+      "reasoning": 0
+     },
+     {
+      "input": 114,
+      "output": 25,
+      "reasoning": 0
+     },
+     {
+      "input": 232,
+      "output": 84,
+      "reasoning": 0
+     },
+     {
+      "input": 298,
+      "output": 27,
+      "reasoning": 0
+     }
+    ],
+    "retries": 1
+   },
+   {
+    "ticket": "Mi pedido 33310 llego roto, la tapa esta partida.",
+    "gold_type": "damaged_or_faulty",
+    "gold_oid": "ORD-33310",
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P2",
+     "P3",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "replacement_offer",
+    "reply": "I\u2019m sorry your item arrived damaged (order ORD-33310). We can arrange a replacement; please reply with a photo of the damage and any details about the issue so we can proceed. Let me know if you need help with anything else.",
+    "use": [
+     {
+      "input": 43,
+      "output": 40,
+      "reasoning": 0
+     },
+     {
+      "input": 125,
+      "output": 32,
+      "reasoning": 0
+     },
+     {
+      "input": 240,
+      "output": 68,
+      "reasoning": 0
+     },
+     {
+      "input": 278,
+      "output": 30,
+      "reasoning": 0
+     }
+    ],
+    "retries": 1
+   },
+   {
+    "ticket": "I sent back order ORD-70707 three weeks ago and still no money back on my card.",
+    "gold_type": "billing",
+    "gold_oid": "ORD-70707",
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1"
+    ],
+    "checker_agrees": false,
+    "category": "billing_review",
+    "reply": "Thanks for reaching out about your billing concern for order ORD-70707. I\u2019ve escalated this to our billing team for review and they will investigate the charge. If you can provide any additional details or documents, please share them and I\u2019ll include them with the case. Let me know if you need anything else.",
+    "use": [
+     {
+      "input": 49,
+      "output": 40,
+      "reasoning": 0
+     },
+     {
+      "input": 97,
+      "output": 38,
+      "reasoning": 0
+     },
+     {
+      "input": 236,
+      "output": 82,
+      "reasoning": 0
+     },
+     {
+      "input": 291,
+      "output": 23,
+      "reasoning": 0
+     }
+    ],
+    "retries": 1
+   },
+   {
+    "ticket": "Two orders: 11111 arrived fine but 22222 has not turned up at all.",
+    "gold_type": "delivery",
+    "gold_oid": "ORD-22222",
+    "first_fault": "step1",
+    "success": false,
+    "notes": [
+     "gate 1 stopped the chain"
+    ],
+    "use": [
+     {
+      "input": 48,
+      "output": 44,
+      "reasoning": 0
+     },
+     {
+      "input": 108,
+      "output": 36,
+      "reasoning": 0
+     }
+    ],
+    "retries": 1
+   },
+   {
+    "ticket": "Your courier left my parcel (order 50505) in the rain and the printer inside will not turn on.",
+    "gold_type": "damaged_or_faulty",
+    "gold_oid": "ORD-50505",
+    "first_fault": "step3",
+    "success": true,
+    "notes": [
+     "checker said ok=False but the mechanical check says ok=True"
+    ],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": false,
+    "checker_violations": [
+     "P1",
+     "P2",
+     "P3",
+     "P5"
+    ],
+    "checker_agrees": false,
+    "category": "replacement_offer",
+    "reply": "I\u2019m sorry your item arrived damaged. We can arrange a replacement for order ORD-50505. Please tell us a photo of the damage and any preferred delivery details so we can proceed. Let me know if you need anything else.",
+    "use": [
+     {
+      "input": 52,
+      "output": 41,
+      "reasoning": 0
+     },
+     {
+      "input": 135,
+      "output": 32,
+      "reasoning": 0
+     },
+     {
+      "input": 240,
+      "output": 65,
+      "reasoning": 0
+     },
+     {
+      "input": 275,
+      "output": 30,
+      "reasoning": 0
+     }
+    ],
+    "retries": 1
+   },
+   {
+    "ticket": "How do I change the email address on my account?",
+    "gold_type": "account",
+    "gold_oid": null,
+    "first_fault": null,
+    "success": true,
+    "notes": [],
+    "policy_ok": true,
+    "gold_ok": true,
+    "checker_ok": true,
+    "checker_violations": [],
+    "checker_agrees": true,
+    "category": "account_help",
+    "reply": "Thanks for reaching out about your account. Could you tell us the email or username linked to the account and describe the issue (login, password reset, profile update, etc.)? Once we have that, we\u2019ll guide you through the next steps. Let us know if you need anything else.",
+    "use": [
+     {
+      "input": 40,
+      "output": 38,
+      "reasoning": 0
+     },
+     {
+      "input": 90,
+      "output": 25,
+      "reasoning": 0
+     },
+     {
+      "input": 232,
+      "output": 77,
+      "reasoning": 0
+     },
+     {
+      "input": 279,
+      "output": 20,
+      "reasoning": 0
+     }
+    ],
+    "retries": 1
+   }
+  ]
+ },
+ "usage": {
+  "input": 53005,
+  "output": 13508,
+  "reasoning": 0,
+  "calls": 258
+ }
+}

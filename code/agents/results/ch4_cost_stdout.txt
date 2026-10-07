@@ -1,0 +1,102 @@
+== 1. A chain of n steps: P(success) = r^n, and what a gate with one retry buys ==
+r = per-step reliability (the step returns a usable, correct output). A gate detects a share d of bad outputs and retries once:
+r' = r + (1 - r) * d * r. Undetected bad outputs (share (1 - r)(1 - d)) flow downstream and the chain fails.
+ASSUMES: steps fail independently; one bad step ruins the result (no later step repairs it); the retry succeeds with the same r as
+the first attempt (a feedback-driven retry may do better or worse); the gate never rejects a good output.
+    r  gate d    n=1    n=2    n=3    n=5    n=8   n=10   expected calls at n=5
+ 0.90     0.0    90%    81%    73%    59%    43%    35%   5.00
+ 0.90     0.8    97%    94%    92%    87%    80%    75%   5.40
+ 0.95     0.0    95%    90%    86%    77%    66%    60%   5.00
+ 0.95     0.8    99%    98%    96%    94%    91%    89%   5.20
+ 0.99     0.0    99%    98%    97%    95%    92%    90%   5.00
+ 0.99     0.8   100%   100%    99%    99%    98%    98%   5.04
+reading: five steps at 90% each succeed 59% of the time; a gate that catches 80% of bad outputs and retries once lifts that to 87% for 8% more calls.
+the gate works only on failures it can see (a missing key, a bad enum, a failed regex); a plausible wrong value passes every schema check.
+
+== 2. Routing: cost and accuracy against the share of hard inputs and the router's error rates ==
+one call: cheap $0.0010, strong $0.0090, router $0.0004; accuracies (illustrative): {'cheap_easy': 0.95, 'cheap_hard': 0.55, 'strong_easy': 0.97, 'strong_hard': 0.9}
+ASSUMES: the router's two error rates do not depend on the input; accuracy of each model on each kind of input is fixed;
+one call per question; the accuracies are illustrative, not measured (our measured router is in ch4_router.py).
+hard share recall on hard false escal.  accuracy   cost $ vs all-strong vs all-cheap acc
+       10%           100%           0%     94.5%   0.0022          24%           91.0%
+       10%            90%          10%     94.3%   0.0028          31%           91.0%
+       10%            70%          20%     93.8%   0.0034          37%           91.0%
+       10%            50%          50%     93.7%   0.0054          60%           91.0%
+       30%           100%           0%     93.5%   0.0038          42%           83.0%
+       30%            90%          10%     92.6%   0.0041          45%           83.0%
+       30%            70%          20%     90.6%   0.0042          46%           83.0%
+       30%            50%          50%     88.9%   0.0054          60%           83.0%
+       50%           100%           0%     92.5%   0.0054          60%           75.0%
+       50%            90%          10%     90.8%   0.0054          60%           75.0%
+       50%            70%          20%     87.5%   0.0050          55%           75.0%
+       50%            50%          50%     84.2%   0.0054          60%           75.0%
+reading: a perfect router (recall 100%, false escalation 0%) costs the strong price only on the hard share; every point of recall lost on hard
+inputs costs accuracy, every point of false escalation costs money. The confusion matrix of the router IS its cost model.
+
+== 3. Parallelisation: sectioning and voting ==
+  1 sections: sequential  16.0 s, parallel 16.0 s (1.0x), cost 0.0180 either way
+  2 sections: sequential  24.0 s, parallel 16.0 s (1.5x), cost 0.0270 either way
+  4 sections: sequential  40.0 s, parallel 16.0 s (2.5x), cost 0.0450 either way
+  8 sections: sequential  72.0 s, parallel 16.0 s (4.5x), cost 0.0810 either way
+  latency of a fan-out is the slowest branch plus the aggregation; cost is the sum of the branches. Sectioning buys time, never tokens.
+  plurality voting (the most frequent answer wins; ties broken at random). ASSUMES independent samples, a constant chance p of the
+  right answer, and wrong answers spread evenly over m distinct values. m = 1 is the binary case.
+      p  m wrong    n=1    n=3    n=5    n=7   n=11
+    0.4        1    40%    35%    32%    29%    25%
+    0.4        2    40%    42%    45%    47%    50%
+    0.4        5    40%    47%    58%    64%    76%
+    0.6        1    60%    65%    68%    71%    75%
+    0.6        2    60%    70%    77%    83%    90%
+    0.8        2    80%    91%    96%    98%   100%
+  reading: a right answer given 40% of the time LOSES a binary vote but WINS a plurality against two wrong answers at 30% each,
+  and wins more often the more scattered the wrong answers are. Voting needs the right answer to be the most frequent one, not a majority.
+  CORRELATED errors: if with probability rho all n samples copy one shared draw (the same misreading of the problem), accuracy is
+  rho * p + (1 - rho) * plurality(p, n, m). With p = 0.4, m = 2, n = 5:
+    rho = 0.0: 45%
+    rho = 0.3: 43%
+    rho = 0.6: 42%
+    rho = 0.9: 40%
+  Cost is n times one sample; latency is one sample if the calls run concurrently.
+
+== 4. Orchestrator-workers against one agent doing k subtasks in sequence ==
+  k=2: single agent   5,850 in /   900 out tokens,  24.0 s, $0.0311   orchestrator   7,400 in / 1,250 out, 25.0 s, $0.0410   (4 calls)
+  k=4: single agent  12,000 in / 1,500 out tokens,  40.0 s, $0.0585   orchestrator  11,800 in / 1,850 out, 25.0 s, $0.0631   (6 calls)
+  k=8: single agent  29,700 in / 2,700 out tokens,  72.0 s, $0.1296   orchestrator  20,600 in / 3,050 out, 25.0 s, $0.1076   (10 calls)
+  ASSUMES: the single agent replays its whole growing history each step (no compaction, no prompt caching, which would cut its
+  input cost); workers get a fixed brief, run one call each, and run concurrently; the orchestrator does not re-plan.
+  reading: with fresh worker contexts the orchestrator is not more expensive in tokens than a loop that re-reads its history, and it is faster
+  by the width of the fan-out. The multiplier that Anthropic reports (about 15x the tokens of a chat) comes from workers that each run a full
+  tool-using loop of their own, not from the orchestration itself. Cost follows the sum of the workers; latency follows the slowest.
+
+== 5. Evaluator-optimiser: rounds, cost per accepted answer, and the precision of the stop ==
+one round (generate + evaluate) costs $0.0162 at frontier prices; p = chance a round passes a RELIABLE critic; k = max rounds
+    p   k  P(pass by k)  E[rounds]  E[cost]  $/accepted
+  0.3   1           30%       1.00   0.0162      0.0540
+  0.3   2           51%       1.70   0.0275      0.0540
+  0.3   3           66%       2.19   0.0355      0.0540
+  0.3   4           76%       2.53   0.0410      0.0540
+  0.5   1           50%       1.00   0.0162      0.0324
+  0.5   2           75%       1.50   0.0243      0.0324
+  0.5   3           88%       1.75   0.0284      0.0324
+  0.5   4           94%       1.88   0.0304      0.0324
+  0.7   1           70%       1.00   0.0162      0.0231
+  0.7   2           91%       1.30   0.0211      0.0231
+  0.7   3           97%       1.39   0.0225      0.0231
+  0.7   4           99%       1.42   0.0230      0.0231
+reading: as in Chapter 3, the k cancels: cost per accepted answer is one round divided by p. Most of the gain arrives by the third round.
+
+ASSUMES: rounds are independent with the same pass chance p, each round costs the same, and the critic is PERFECT. A feedback-driven
+round usually has a higher p than the first (the feedback helps), so treat these as a floor on the benefit, not a forecast.
+
+an IMPERFECT critic. Let p = P(draft is good), r = P(critic accepts | good) and f = P(critic accepts | bad), the false-accept rate.
+By Bayes, the share of ACCEPTED drafts that are good (the precision of the stop) is  p r / (p r + (1 - p) f).
+The false-accept rate is NOT one minus precision: precision also depends on how many drafts were good to begin with.
+ p good     r     f  P(accept)  precision of the stop
+    0.9  1.00  0.20        92%                  97.8%
+    0.5  1.00  0.20        60%                  83.3%
+    0.3  1.00  0.20        44%                  68.2%
+    0.5  0.90  0.10        50%                  90.0%
+    0.5  0.70  0.05        38%                  93.3%
+    0.3  0.90  0.30        48%                  56.3%
+reading: with 90% good drafts, a critic that accepts 20% of bad ones still stops on a good draft 97.8% of the time; with 30% good drafts
+the same critic gives 68%. The harder the task, the more the critic's false-accept rate matters. ASSUMES r and f do not depend on the round.

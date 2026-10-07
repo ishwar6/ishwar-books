@@ -1,0 +1,110 @@
+== A three-step prompt chain over 20 tickets, with and without gates (gpt-5-mini, reasoning_effort=minimal) ==
+steps: 1 extract facts (JSON) -> 2 choose category and draft the reply (JSON) -> 3 check the reply against the policy (JSON)
+gated: a schema and policy check after every step, one retry with the error shown. ungated: whatever came back flows on.
+loose: the same chain with a first-draft step-1 prompt that does not spell out the keys, the allowed values or the order-id format.
+
+-- ungated --
+ # gold type          gold id   ok  first fault calls notes
+ 1 damaged_or_faulty  ORD-48213 yes step3           3 checker said ok=False but the mechanical check says ok=True
+ 2 billing            ORD-10988 yes step3           3 checker said ok=False but the mechanical check says ok=True
+ 3 delivery           ORD-77120 yes step3           3 checker said ok=False but the mechanical check says ok=True
+ 4 account            None      yes step3           3 checker said ok=False but the mechanical check says ok=True
+ 5 other              None      NO  step1           3 extracted 'delivery'/None, gold 'other'/None; category 'tracking_update', expected 'general_inf
+ 6 damaged_or_faulty  ORD-55501 yes step3           3 checker said ok=False but the mechanical check says ok=True
+ 7 billing            ORD-30377 yes step3           3 checker said ok=False but the mechanical check says ok=True
+ 8 delivery           ORD-90001 yes step3           3 checker said ok=False but the mechanical check says ok=True
+ 9 billing            None      yes step3           3 checker said ok=False but the mechanical check says ok=True
+10 delivery           ORD-61234 yes step3           3 checker said ok=None but the mechanical check says ok=True
+11 damaged_or_faulty  ORD-20045 yes step3           3 checker said ok=False but the mechanical check says ok=True
+12 account            None      yes step3           3 checker said ok=False but the mechanical check says ok=True
+13 delivery           ORD-88800 yes step3           3 checker said ok=False but the mechanical check says ok=True
+14 billing            ORD-12345 yes step3           3 checker said ok=False but the mechanical check says ok=True
+15 other              None      yes None            3 
+16 damaged_or_faulty  ORD-33310 yes step3           3 checker said ok=False but the mechanical check says ok=True
+17 billing            ORD-70707 yes None            3 
+18 delivery           ORD-22222 yes step3           3 checker said ok=False but the mechanical check says ok=True
+19 damaged_or_faulty  ORD-50505 yes step3           3 checker said ok=False but the mechanical check says ok=True
+20 account            None      yes None            3 
+
+-- gated --
+ # gold type          gold id   ok  first fault calls notes
+ 1 damaged_or_faulty  ORD-48213 yes step3           3 checker said ok=False but the mechanical check says ok=True
+ 2 billing            ORD-10988 yes step3           3 checker said ok=False but the mechanical check says ok=True
+ 3 delivery           ORD-77120 yes step3           3 checker said ok=False but the mechanical check says ok=True
+ 4 account            None      yes step3           3 checker said ok=False but the mechanical check says ok=True
+ 5 other              None      NO  step1           3 extracted 'delivery'/None, gold 'other'/None; category 'tracking_update', expected 'general_inf
+ 6 damaged_or_faulty  ORD-55501 yes step3           3 checker said ok=False but the mechanical check says ok=True
+ 7 billing            ORD-30377 yes None            3 
+ 8 delivery           ORD-90001 yes step3           3 checker said ok=False but the mechanical check says ok=True
+ 9 billing            None      yes step3           3 checker said ok=False but the mechanical check says ok=True
+10 delivery           ORD-61234 yes step3           3 checker said ok=False but the mechanical check says ok=True
+11 damaged_or_faulty  ORD-20045 yes step3           3 checker said ok=False but the mechanical check says ok=True
+12 account            None      yes step3           3 checker said ok=False but the mechanical check says ok=True
+13 delivery           ORD-88800 yes step3           3 checker said ok=False but the mechanical check says ok=True
+14 billing            ORD-12345 yes step3           3 checker said ok=False but the mechanical check says ok=True
+15 other              None      yes step3           3 checker said ok=False but the mechanical check says ok=True
+16 damaged_or_faulty  ORD-33310 yes step3           3 checker said ok=False but the mechanical check says ok=True
+17 billing            ORD-70707 yes step3           3 checker said ok=False but the mechanical check says ok=True
+18 delivery           ORD-22222 yes step3           3 checker said ok=False but the mechanical check says ok=True
+19 damaged_or_faulty  ORD-50505 yes step3           3 checker said ok=False but the mechanical check says ok=True
+20 account            None      yes step3           3 checker said ok=False but the mechanical check says ok=True
+
+-- loose-ungated --
+ # gold type          gold id   ok  first fault calls notes
+ 1 damaged_or_faulty  ORD-48213 NO  step1           3 extracted 'Damaged item / cracked screen'/'48213', gold 'damaged_or_faulty'/'ORD-48213'; P2: th
+ 2 billing            ORD-10988 yes step1           3 extracted 'double charge / billing error'/'ORD-10988', gold 'billing'/'ORD-10988'
+ 3 delivery           ORD-77120 yes step1           3 extracted 'Where is my parcel / tracking not updated'/'77120', gold 'delivery'/'ORD-77120'
+ 4 account            None      yes step1           3 extracted 'Login issue / Password reset email not received'/None, gold 'account'/None
+ 5 other              None      NO  step1           3 extracted 'Shipping inquiry'/None, gold 'other'/None; category 'tracking_update', expected 'gen
+ 6 damaged_or_faulty  ORD-55501 NO  step1           3 extracted 'Damaged goods / Water damage'/'ORD 55501', gold 'damaged_or_faulty'/'ORD-55501'; P2:
+ 7 billing            ORD-30377 NO  step1           3 extracted 'Incorrect VAT rate on invoice'/'30377', gold 'billing'/'ORD-30377'; P2: the order id
+ 8 delivery           ORD-90001 NO  step1           3 extracted 'delivery delay'/'90001', gold 'delivery'/'ORD-90001'; P2: the order id ORD-90001 is 
+ 9 billing            None      yes step1           3 extracted 'Unauthorized charge / subscription renewal after cancellation'/None, gold 'billing'/
+10 delivery           ORD-61234 NO  step1           3 extracted 'Delivered to wrong address'/'61234', gold 'delivery'/'ORD-61234'; P2: the order id O
+11 damaged_or_faulty  ORD-20045 yes step1           3 extracted 'product malfunction / electrical hazard'/'ORD-20045', gold 'damaged_or_faulty'/'ORD-
+12 account            None      yes step1           3 extracted 'Account deletion / Data removal'/None, gold 'account'/None
+13 delivery           ORD-88800 NO  step1           3 extracted 'Change delivery address'/'88800', gold 'delivery'/'ORD-88800'; P2: the order id ORD-
+14 billing            ORD-12345 yes step1           3 extracted 'Billing/Overcharge'/'12345', gold 'billing'/'ORD-12345'
+15 other              None      yes step1           3 extracted 'Request for manual / documentation'/None, gold 'other'/None
+16 damaged_or_faulty  ORD-33310 yes step1           3 extracted 'Producto dañado / roto'/'33310', gold 'damaged_or_faulty'/'ORD-33310'
+17 billing            ORD-70707 yes step1           3 extracted 'refund_not_received'/'ORD-70707', gold 'billing'/'ORD-70707'
+18 delivery           ORD-22222 NO  step1           3 extracted 'missing delivery'/None, gold 'delivery'/'ORD-22222'; P2: the order id ORD-22222 is n
+19 damaged_or_faulty  ORD-50505 yes step1           3 extracted 'Damaged/Not working item (electronics) due to courier mishandling'/'50505', gold 'da
+20 account            None      yes step1           3 extracted 'Account help - change email'/None, gold 'account'/None
+
+-- loose-gated --
+ # gold type          gold id   ok  first fault calls notes
+ 1 damaged_or_faulty  ORD-48213 yes step3           4 checker said ok=False but the mechanical check says ok=True
+ 2 billing            ORD-10988 yes step3           4 checker said ok=False but the mechanical check says ok=True
+ 3 delivery           ORD-77120 yes step3           4 checker said ok=False but the mechanical check says ok=True
+ 4 account            None      yes step3           4 checker said ok=False but the mechanical check says ok=True
+ 5 other              None      NO  step1           4 extracted 'delivery'/None, gold 'other'/None; category 'tracking_update', expected 'general_inf
+ 6 damaged_or_faulty  ORD-55501 yes step3           4 checker said ok=False but the mechanical check says ok=True
+ 7 billing            ORD-30377 yes step3           4 checker said ok=False but the mechanical check says ok=True
+ 8 delivery           ORD-90001 yes step3           4 checker said ok=False but the mechanical check says ok=True
+ 9 billing            None      yes step3           4 checker said ok=False but the mechanical check says ok=True
+10 delivery           ORD-61234 NO  step1           4 extracted 'delivery'/None, gold 'delivery'/'ORD-61234'; P2: the order id ORD-61234 is not quote
+11 damaged_or_faulty  ORD-20045 yes step3           4 checker said ok=False but the mechanical check says ok=True
+12 account            None      yes step3           4 checker said ok=False but the mechanical check says ok=True
+13 delivery           ORD-88800 NO  step1           4 extracted 'delivery'/None, gold 'delivery'/'ORD-88800'; P2: the order id ORD-88800 is not quote
+14 billing            ORD-12345 yes step3           4 checker said ok=False but the mechanical check says ok=True
+15 other              None      yes step3           4 checker said ok=False but the mechanical check says ok=True
+16 damaged_or_faulty  ORD-33310 yes step3           4 checker said ok=False but the mechanical check says ok=True
+17 billing            ORD-70707 yes step3           4 checker said ok=False but the mechanical check says ok=True
+18 delivery           ORD-22222 NO  step1           2 gate 1 stopped the chain
+19 damaged_or_faulty  ORD-50505 yes step3           4 checker said ok=False but the mechanical check says ok=True
+20 account            None      yes None            4 
+
+-- summary (tokens and cost from the API usage fields; price per million: $0.25 input, $2.0 output) --
+condition      success  gold ok policy ok  fault@1  fault@2  fault@3  calls  retries   in tok  out tok   cost $  $/success  checker agrees
+ungated          19/20    19/20     20/20        1        0       16     60        0   14,099    3,769   0.0111     0.0006            15%
+gated            19/20    19/20     20/20        1        0       18     60        0   14,195    3,431   0.0104     0.0005             5%
+loose-ungated    12/20    12/20     20/20       20        0        0     60        0   11,504    2,865   0.0086     0.0007            40%
+loose-gated      16/20    16/20     19/20        4        0       15     78       20   13,207    3,443   0.0102     0.0006            16%
+success = gold ok AND policy ok. "gold ok" (right category, the GOLD order id quoted) uses labels no gate sees; "policy ok"
+(word limit, no timing promises, no refund talk outside billing) is the part gate 2 also checks, so it is not independent of the feedback.
+policy ids the step-3 model checker flagged, all four conditions together: {'P1': 71, 'P2': 11, 'P3': 46, 'P5': 56}
+(the mechanical check covers P1 to P4; P5, politeness and offering help, is judgement only)
+
+total spend: $0.0403 (258 calls, 53,005 input + 13,508 output tokens, 0 hidden reasoning tokens)
+stub used: no, every answer came from the API

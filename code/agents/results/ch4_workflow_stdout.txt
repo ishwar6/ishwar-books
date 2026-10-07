@@ -1,0 +1,52 @@
+== A composed workflow for Northwind Home support (gpt-5-mini, minimal effort): router -> gated chain -> policy -> approval -> send ==
+budgets per ticket: 6 model calls, 8000 tokens; refunds over GBP 50 need a person
+
+-- first run (a crash is injected in T3 after the draft is checkpointed) --
+  [300d9f0b] T1 route     -> support (rule)                      0 tok      0 ms
+  [300d9f0b] T1 extract   ok damaged_or_faulty ORD-48213       145 tok   1407 ms
+  [300d9f0b] T1 draft     ok (45 words)                        173 tok   1710 ms
+  [300d9f0b] T1 review    policy ok                              0 tok      0 ms
+  [300d9f0b] T1 send      sent                                   0 tok      0 ms
+  [3d1d9574] T2 route     -> support (rule)                      0 tok      0 ms
+  [3d1d9574] T2 extract   ok billing ORD-10988                 149 tok   1109 ms
+  [3d1d9574] T2 draft     ok (46 words)                        191 tok   1386 ms
+  [3d1d9574] T2 review    policy ok                              0 tok      0 ms
+  [3d1d9574] T2 send      sent                                   0 tok      0 ms
+  [03b93be2] T3 route     -> support (rule)                      0 tok      0 ms
+  [03b93be2] T3 extract   ok delivery ORD-77120                145 tok   1083 ms
+  [03b93be2] T3 draft     ok (58 words)                        190 tok   1481 ms
+  !! T3: process killed after checkpointing, before running review
+  [6bf61420] T4 route     -> faq (model)                        66 tok    859 ms
+  [6bf61420] T4 faq       handed to the FAQ workflow             0 tok      0 ms
+  [4350ee38] T5 route     -> support (rule)                      0 tok      0 ms
+  [4350ee38] T5 extract   ok damaged_or_faulty ORD-61234       143 tok   1174 ms
+  [4350ee38] T5 draft     ok (61 words)                        212 tok   1388 ms
+  [4350ee38] T5 review    refund GBP 649.00 > 50: PAUSE          0 tok      0 ms
+  [1cd69466] T6 route     -> support (model)                    66 tok    803 ms
+  [1cd69466] T6 extract   ok damaged_or_faulty ORD-33310       139 tok   1368 ms
+  [1cd69466] T6 draft     ok (36 words)                        164 tok   1360 ms
+  [1cd69466] T6 review    policy ok                              0 tok      0 ms
+  [1cd69466] T6 send      sent                                   0 tok      1 ms
+
+-- resume: load every checkpoint that is not finished and continue from its saved node --
+  T3: resuming at node "review" (calls so far 2; extract and draft are NOT re-run)
+  [03b93be2] T3 review    policy ok                              0 tok      0 ms
+  [03b93be2] T3 send      sent                                   0 tok      0 ms
+
+-- a person approves the paused refund, and the run continues from the checkpoint --
+  T5: approved by a person
+  [4350ee38] T5 review    policy ok (approved)                   0 tok      0 ms
+  [4350ee38] T5 send      sent                                   0 tok      0 ms
+
+-- replaying "send" for T1 to show idempotency --
+  [300d9f0b] T1 send      already sent (idempotency key seen)     0 tok      0 ms
+
+ticket  route    final node   calls  tokens  facts
+T1      support  done             2     318  damaged_or_faulty ORD-48213 
+T2      support  done             2     340  billing ORD-10988 refund 39.99
+T3      support  done             2     335  delivery ORD-77120 
+T4      faq      done             1      66  - - 
+T5      support  done             2     355  damaged_or_faulty ORD-61234 refund 649.0
+T6      support  done             3     369  damaged_or_faulty ORD-33310 
+outbox: 5 replies sent for 5 finished support tickets; trace: 29 spans in results/ch4_workflow_trace.jsonl
+total spend: $0.0015 (12 calls); stub used: no

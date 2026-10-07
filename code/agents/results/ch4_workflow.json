@@ -1,0 +1,372 @@
+{
+ "states": [
+  {
+   "ticket_id": "T1",
+   "text": "Order #48213 arrived with the screen cracked. Please send a replacement.",
+   "trace_id": "300d9f0b",
+   "node": "done",
+   "route": "support",
+   "facts": {
+    "issue_type": "damaged_or_faulty",
+    "order_id": "ORD-48213",
+    "refund_amount_gbp": null
+   },
+   "reply": "Hello \u2014 I\u2019m sorry your order ORD-48213 arrived with a cracked screen. We\u2019ll help resolve this. Please reply with a photo of the damage and your preferred option (replacement or refund), and we\u2019ll guide you through the next steps. Thank you for letting us know.",
+   "approved": null,
+   "calls": 2,
+   "tokens": 318,
+   "notes": []
+  },
+  {
+   "ticket_id": "T2",
+   "text": "I was charged twice for ORD-10988, please refund the extra GBP 39.99.",
+   "trace_id": "3d1d9574",
+   "node": "done",
+   "route": "support",
+   "facts": {
+    "issue_type": "billing",
+    "order_id": "ORD-10988",
+    "refund_amount_gbp": 39.99
+   },
+   "reply": "Hello \u2014 thank you for contacting Northwind Home about order ORD-10988. We\u2019ve passed your refund request for the extra GBP 39.99 along for approval. We\u2019ll update you as soon as we have news. If you have any other questions in the meantime, please let us know.",
+   "approved": null,
+   "calls": 2,
+   "tokens": 340,
+   "notes": []
+  },
+  {
+   "ticket_id": "T3",
+   "text": "Where is my parcel? Tracking has not moved in 6 days. Order 77120.",
+   "trace_id": "03b93be2",
+   "node": "done",
+   "route": "support",
+   "facts": {
+    "issue_type": "delivery",
+    "order_id": "ORD-77120",
+    "refund_amount_gbp": null
+   },
+   "reply": "Hello \u2014 thank you for contacting Northwind Home about order ORD-77120. I\u2019m sorry your tracking hasn\u2019t updated. I\u2019ll investigate this delivery issue and update you as soon as I have more information. If you\u2019d like, I can also arrange a replacement or refund once we confirm the parcel\u2019s status. Please let me know how you\u2019d prefer to proceed.",
+   "approved": null,
+   "calls": 2,
+   "tokens": 335,
+   "notes": []
+  },
+  {
+   "ticket_id": "T4",
+   "text": "Do you ship to the Isle of Man?",
+   "trace_id": "6bf61420",
+   "node": "done",
+   "route": "faq",
+   "facts": null,
+   "reply": null,
+   "approved": null,
+   "calls": 1,
+   "tokens": 66,
+   "notes": [
+    "sent to the FAQ answerer (out of scope for this demo)"
+   ]
+  },
+  {
+   "ticket_id": "T5",
+   "text": "The sofa from order 61234 has a torn seam. I want my money back, GBP 649.",
+   "trace_id": "4350ee38",
+   "node": "done",
+   "route": "support",
+   "facts": {
+    "issue_type": "damaged_or_faulty",
+    "order_id": "ORD-61234",
+    "refund_amount_gbp": 649.0
+   },
+   "reply": "Dear Customer, thank you for contacting Northwind Home about order ORD-61234. We\u2019re sorry your sofa arrived with a torn seam. Your refund request for GBP 649 has been passed for approval. We will be in touch with any updates and next steps. If you have photos or further details to share, please reply to this message. Thank you for your patience.",
+   "approved": true,
+   "calls": 2,
+   "tokens": 355,
+   "notes": []
+  },
+  {
+   "ticket_id": "T6",
+   "text": "Mi pedido 33310 llego roto.",
+   "trace_id": "1cd69466",
+   "node": "done",
+   "route": "support",
+   "facts": {
+    "issue_type": "damaged_or_faulty",
+    "order_id": "ORD-33310",
+    "refund_amount_gbp": null
+   },
+   "reply": "Gracias por avisarnos. Lamentamos que su pedido ORD-33310 haya llegado da\u00f1ado. Por favor, env\u00edenos fotos del art\u00edculo y del embalaje para que podamos ayudarle con la mejor soluci\u00f3n posible. Quedamos a la espera de su respuesta.",
+   "approved": null,
+   "calls": 3,
+   "tokens": 369,
+   "notes": []
+  }
+ ],
+ "spans": [
+  {
+   "trace_id": "300d9f0b",
+   "ticket": "T1",
+   "node": "route",
+   "outcome": "-> support (rule)",
+   "ms": 0,
+   "tokens": 0
+  },
+  {
+   "trace_id": "300d9f0b",
+   "ticket": "T1",
+   "node": "extract",
+   "outcome": "ok damaged_or_faulty ORD-48213",
+   "ms": 1407,
+   "tokens": 145
+  },
+  {
+   "trace_id": "300d9f0b",
+   "ticket": "T1",
+   "node": "draft",
+   "outcome": "ok (45 words)",
+   "ms": 1710,
+   "tokens": 173
+  },
+  {
+   "trace_id": "300d9f0b",
+   "ticket": "T1",
+   "node": "review",
+   "outcome": "policy ok",
+   "ms": 0,
+   "tokens": 0
+  },
+  {
+   "trace_id": "300d9f0b",
+   "ticket": "T1",
+   "node": "send",
+   "outcome": "sent",
+   "ms": 0,
+   "tokens": 0
+  },
+  {
+   "trace_id": "3d1d9574",
+   "ticket": "T2",
+   "node": "route",
+   "outcome": "-> support (rule)",
+   "ms": 0,
+   "tokens": 0
+  },
+  {
+   "trace_id": "3d1d9574",
+   "ticket": "T2",
+   "node": "extract",
+   "outcome": "ok billing ORD-10988",
+   "ms": 1109,
+   "tokens": 149
+  },
+  {
+   "trace_id": "3d1d9574",
+   "ticket": "T2",
+   "node": "draft",
+   "outcome": "ok (46 words)",
+   "ms": 1386,
+   "tokens": 191
+  },
+  {
+   "trace_id": "3d1d9574",
+   "ticket": "T2",
+   "node": "review",
+   "outcome": "policy ok",
+   "ms": 0,
+   "tokens": 0
+  },
+  {
+   "trace_id": "3d1d9574",
+   "ticket": "T2",
+   "node": "send",
+   "outcome": "sent",
+   "ms": 0,
+   "tokens": 0
+  },
+  {
+   "trace_id": "03b93be2",
+   "ticket": "T3",
+   "node": "route",
+   "outcome": "-> support (rule)",
+   "ms": 0,
+   "tokens": 0
+  },
+  {
+   "trace_id": "03b93be2",
+   "ticket": "T3",
+   "node": "extract",
+   "outcome": "ok delivery ORD-77120",
+   "ms": 1083,
+   "tokens": 145
+  },
+  {
+   "trace_id": "03b93be2",
+   "ticket": "T3",
+   "node": "draft",
+   "outcome": "ok (58 words)",
+   "ms": 1481,
+   "tokens": 190
+  },
+  {
+   "trace_id": "6bf61420",
+   "ticket": "T4",
+   "node": "route",
+   "outcome": "-> faq (model)",
+   "ms": 859,
+   "tokens": 66
+  },
+  {
+   "trace_id": "6bf61420",
+   "ticket": "T4",
+   "node": "faq",
+   "outcome": "handed to the FAQ workflow",
+   "ms": 0,
+   "tokens": 0
+  },
+  {
+   "trace_id": "4350ee38",
+   "ticket": "T5",
+   "node": "route",
+   "outcome": "-> support (rule)",
+   "ms": 0,
+   "tokens": 0
+  },
+  {
+   "trace_id": "4350ee38",
+   "ticket": "T5",
+   "node": "extract",
+   "outcome": "ok damaged_or_faulty ORD-61234",
+   "ms": 1174,
+   "tokens": 143
+  },
+  {
+   "trace_id": "4350ee38",
+   "ticket": "T5",
+   "node": "draft",
+   "outcome": "ok (61 words)",
+   "ms": 1388,
+   "tokens": 212
+  },
+  {
+   "trace_id": "4350ee38",
+   "ticket": "T5",
+   "node": "review",
+   "outcome": "refund GBP 649.00 > 50: PAUSE",
+   "ms": 0,
+   "tokens": 0
+  },
+  {
+   "trace_id": "1cd69466",
+   "ticket": "T6",
+   "node": "route",
+   "outcome": "-> support (model)",
+   "ms": 803,
+   "tokens": 66
+  },
+  {
+   "trace_id": "1cd69466",
+   "ticket": "T6",
+   "node": "extract",
+   "outcome": "ok damaged_or_faulty ORD-33310",
+   "ms": 1368,
+   "tokens": 139
+  },
+  {
+   "trace_id": "1cd69466",
+   "ticket": "T6",
+   "node": "draft",
+   "outcome": "ok (36 words)",
+   "ms": 1360,
+   "tokens": 164
+  },
+  {
+   "trace_id": "1cd69466",
+   "ticket": "T6",
+   "node": "review",
+   "outcome": "policy ok",
+   "ms": 0,
+   "tokens": 0
+  },
+  {
+   "trace_id": "1cd69466",
+   "ticket": "T6",
+   "node": "send",
+   "outcome": "sent",
+   "ms": 1,
+   "tokens": 0
+  },
+  {
+   "trace_id": "03b93be2",
+   "ticket": "T3",
+   "node": "review",
+   "outcome": "policy ok",
+   "ms": 0,
+   "tokens": 0
+  },
+  {
+   "trace_id": "03b93be2",
+   "ticket": "T3",
+   "node": "send",
+   "outcome": "sent",
+   "ms": 0,
+   "tokens": 0
+  },
+  {
+   "trace_id": "4350ee38",
+   "ticket": "T5",
+   "node": "review",
+   "outcome": "policy ok (approved)",
+   "ms": 0,
+   "tokens": 0
+  },
+  {
+   "trace_id": "4350ee38",
+   "ticket": "T5",
+   "node": "send",
+   "outcome": "sent",
+   "ms": 0,
+   "tokens": 0
+  },
+  {
+   "trace_id": "300d9f0b",
+   "ticket": "T1",
+   "node": "send",
+   "outcome": "already sent (idempotency key seen)",
+   "ms": 0,
+   "tokens": 0
+  }
+ ],
+ "outbox": {
+  "T1:4ea980e5691e": {
+   "ticket": "T1",
+   "reply": "Hello \u2014 I\u2019m sorry your order ORD-48213 arrived with a cracked screen. We\u2019ll help resolve this. Please reply with a photo of the damage and your preferred option (replacement or refund), and we\u2019ll guide you through the next steps. Thank you for letting us know.",
+   "at": "00:28:15"
+  },
+  "T2:4d411b2254cf": {
+   "ticket": "T2",
+   "reply": "Hello \u2014 thank you for contacting Northwind Home about order ORD-10988. We\u2019ve passed your refund request for the extra GBP 39.99 along for approval. We\u2019ll update you as soon as we have news. If you have any other questions in the meantime, please let us know.",
+   "at": "00:28:17"
+  },
+  "T6:9435f5ec138a": {
+   "ticket": "T6",
+   "reply": "Gracias por avisarnos. Lamentamos que su pedido ORD-33310 haya llegado da\u00f1ado. Por favor, env\u00edenos fotos del art\u00edculo y del embalaje para que podamos ayudarle con la mejor soluci\u00f3n posible. Quedamos a la espera de su respuesta.",
+   "at": "00:28:27"
+  },
+  "T3:316756a47a9d": {
+   "ticket": "T3",
+   "reply": "Hello \u2014 thank you for contacting Northwind Home about order ORD-77120. I\u2019m sorry your tracking hasn\u2019t updated. I\u2019ll investigate this delivery issue and update you as soon as I have more information. If you\u2019d like, I can also arrange a replacement or refund once we confirm the parcel\u2019s status. Please let me know how you\u2019d prefer to proceed.",
+   "at": "00:28:27"
+  },
+  "T5:57a25423b92d": {
+   "ticket": "T5",
+   "reply": "Dear Customer, thank you for contacting Northwind Home about order ORD-61234. We\u2019re sorry your sofa arrived with a torn seam. Your refund request for GBP 649 has been passed for approval. We will be in touch with any updates and next steps. If you have photos or further details to share, please reply to this message. Thank you for your patience.",
+   "at": "00:28:27"
+  }
+ },
+ "usage": {
+  "input": 1177,
+  "output": 606,
+  "reasoning": 0,
+  "calls": 12
+ },
+ "stub": false
+}

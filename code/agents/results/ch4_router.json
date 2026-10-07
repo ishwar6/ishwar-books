@@ -1,0 +1,902 @@
+{
+ "model": "gpt-5-mini",
+ "cheap_effort": "minimal",
+ "strong_effort": "medium",
+ "stub": false,
+ "summary": [
+  {
+   "condition": "always-cheap",
+   "correct": 17,
+   "n": 24,
+   "acc": 0.7083333333333334,
+   "calls": 24,
+   "tokens": {
+    "input": 1194,
+    "output": 260,
+    "reasoning": 0
+   },
+   "cost_usd": 0.0008185,
+   "cost_per_correct": 4.814705882352941e-05
+  },
+  {
+   "condition": "always-strong",
+   "correct": 24,
+   "n": 24,
+   "acc": 1.0,
+   "calls": 24,
+   "tokens": {
+    "input": 1194,
+    "output": 2174,
+    "reasoning": 1920
+   },
+   "cost_usd": 0.0046465000000000005,
+   "cost_per_correct": 0.00019360416666666669
+  },
+  {
+   "condition": "cascade",
+   "correct": 21,
+   "n": 24,
+   "acc": 0.875,
+   "calls": 53,
+   "tokens": {
+    "input": 2655,
+    "output": 1081,
+    "reasoning": 512
+   },
+   "cost_usd": 0.0028257499999999997,
+   "cost_per_correct": 0.0001345595238095238
+  },
+  {
+   "condition": "classifier router",
+   "correct": 17,
+   "n": 24,
+   "acc": 0.7083333333333334,
+   "calls": 48,
+   "tokens": {
+    "input": 3468,
+    "output": 628,
+    "reasoning": 128
+   },
+   "cost_usd": 0.002123,
+   "cost_per_correct": 0.00012488235294117646
+  },
+  {
+   "condition": "oracle router",
+   "correct": 24,
+   "n": 24,
+   "acc": 1.0,
+   "calls": 24,
+   "tokens": {
+    "input": 1194,
+    "output": 958,
+    "reasoning": 704
+   },
+   "cost_usd": 0.0022145,
+   "cost_per_correct": 9.227083333333332e-05
+  }
+ ],
+ "rows": [
+  {
+   "q": "What is the capital of Portugal?",
+   "gold": "lisbon",
+   "tier": "easy",
+   "cheap": "Lisbon",
+   "cheap2": "Lisbon",
+   "strong": "Lisbon",
+   "route": "easy",
+   "agree": true,
+   "cheap_ok": true,
+   "cheap2_ok": true,
+   "strong_ok": true,
+   "u_cheap": {
+    "input": 38,
+    "output": 11,
+    "reasoning": 0
+   },
+   "u_cheap2": {
+    "input": 38,
+    "output": 11,
+    "reasoning": 0
+   },
+   "u_strong": {
+    "input": 38,
+    "output": 75,
+    "reasoning": 64
+   },
+   "u_router": {
+    "input": 83,
+    "output": 10,
+    "reasoning": 0
+   }
+  },
+  {
+   "q": "Is the sentiment of this review positive or negative? \"The battery died in a week and support never replied.\"",
+   "gold": "negative",
+   "tier": "easy",
+   "cheap": "negative",
+   "cheap2": "negative",
+   "strong": "negative",
+   "route": "easy",
+   "agree": true,
+   "cheap_ok": true,
+   "cheap2_ok": true,
+   "strong_ok": true,
+   "u_cheap": {
+    "input": 53,
+    "output": 10,
+    "reasoning": 0
+   },
+   "u_cheap2": {
+    "input": 53,
+    "output": 10,
+    "reasoning": 0
+   },
+   "u_strong": {
+    "input": 53,
+    "output": 74,
+    "reasoning": 64
+   },
+   "u_router": {
+    "input": 98,
+    "output": 10,
+    "reasoning": 0
+   }
+  },
+  {
+   "q": "Which of these is a mammal: trout, sparrow, dolphin, gecko?",
+   "gold": "dolphin",
+   "tier": "easy",
+   "cheap": "dolphin",
+   "cheap2": "dolphin",
+   "strong": "dolphin",
+   "route": "easy",
+   "agree": true,
+   "cheap_ok": true,
+   "cheap2_ok": true,
+   "strong_ok": true,
+   "u_cheap": {
+    "input": 49,
+    "output": 12,
+    "reasoning": 0
+   },
+   "u_cheap2": {
+    "input": 49,
+    "output": 12,
+    "reasoning": 0
+   },
+   "u_strong": {
+    "input": 49,
+    "output": 76,
+    "reasoning": 64
+   },
+   "u_router": {
+    "input": 94,
+    "output": 10,
+    "reasoning": 0
+   }
+  },
+  {
+   "q": "How many days are there in a leap year?",
+   "gold": "366",
+   "tier": "easy",
+   "cheap": "366",
+   "cheap2": "366",
+   "strong": "366",
+   "route": "easy",
+   "agree": true,
+   "cheap_ok": true,
+   "cheap2_ok": true,
+   "strong_ok": true,
+   "u_cheap": {
+    "input": 41,
+    "output": 10,
+    "reasoning": 0
+   },
+   "u_cheap2": {
+    "input": 41,
+    "output": 10,
+    "reasoning": 0
+   },
+   "u_strong": {
+    "input": 41,
+    "output": 10,
+    "reasoning": 0
+   },
+   "u_router": {
+    "input": 86,
+    "output": 10,
+    "reasoning": 0
+   }
+  },
+  {
+   "q": "Spell the word \"necessary\" backwards.",
+   "gold": "yrassecen",
+   "tier": "easy",
+   "cheap": "y r a s s e c e n",
+   "cheap2": "yrassecen",
+   "strong": "yrassecen",
+   "route": "easy",
+   "agree": false,
+   "cheap_ok": false,
+   "cheap2_ok": true,
+   "strong_ok": true,
+   "u_cheap": {
+    "input": 39,
+    "output": 18,
+    "reasoning": 0
+   },
+   "u_cheap2": {
+    "input": 39,
+    "output": 12,
+    "reasoning": 0
+   },
+   "u_strong": {
+    "input": 39,
+    "output": 76,
+    "reasoning": 64
+   },
+   "u_router": {
+    "input": 84,
+    "output": 10,
+    "reasoning": 0
+   }
+  },
+  {
+   "q": "What is 15% of 240?",
+   "gold": "36",
+   "tier": "easy",
+   "cheap": "36",
+   "cheap2": "36",
+   "strong": "36",
+   "route": "easy",
+   "agree": true,
+   "cheap_ok": true,
+   "cheap2_ok": true,
+   "strong_ok": true,
+   "u_cheap": {
+    "input": 40,
+    "output": 10,
+    "reasoning": 0
+   },
+   "u_cheap2": {
+    "input": 40,
+    "output": 10,
+    "reasoning": 0
+   },
+   "u_strong": {
+    "input": 40,
+    "output": 10,
+    "reasoning": 0
+   },
+   "u_router": {
+    "input": 85,
+    "output": 10,
+    "reasoning": 0
+   }
+  },
+  {
+   "q": "Which language is this sentence in: \"Onde fica a esta\u00e7\u00e3o de comboios?\"",
+   "gold": "portuguese",
+   "tier": "easy",
+   "cheap": "Portuguese",
+   "cheap2": "Portuguese",
+   "strong": "Portuguese",
+   "route": "easy",
+   "agree": true,
+   "cheap_ok": true,
+   "cheap2_ok": true,
+   "strong_ok": true,
+   "u_cheap": {
+    "input": 47,
+    "output": 11,
+    "reasoning": 0
+   },
+   "u_cheap2": {
+    "input": 47,
+    "output": 11,
+    "reasoning": 0
+   },
+   "u_strong": {
+    "input": 47,
+    "output": 75,
+    "reasoning": 64
+   },
+   "u_router": {
+    "input": 92,
+    "output": 10,
+    "reasoning": 0
+   }
+  },
+  {
+   "q": "What is the plural of \"criterion\"?",
+   "gold": "criteria",
+   "tier": "easy",
+   "cheap": "criteria",
+   "cheap2": "criteria",
+   "strong": "criteria",
+   "route": "easy",
+   "agree": true,
+   "cheap_ok": true,
+   "cheap2_ok": true,
+   "strong_ok": true,
+   "u_cheap": {
+    "input": 39,
+    "output": 10,
+    "reasoning": 0
+   },
+   "u_cheap2": {
+    "input": 39,
+    "output": 10,
+    "reasoning": 0
+   },
+   "u_strong": {
+    "input": 39,
+    "output": 10,
+    "reasoning": 0
+   },
+   "u_router": {
+    "input": 84,
+    "output": 10,
+    "reasoning": 0
+   }
+  },
+  {
+   "q": "A shop sells 3 pens for 2.40 and notebooks at 1.75 each. Dana buys 9 pens and 4 notebooks. What is the total cost?",
+   "gold": "14.20",
+   "tier": "medium",
+   "cheap": "7.55",
+   "cheap2": "9.60",
+   "strong": "14.20",
+   "route": "easy",
+   "agree": false,
+   "cheap_ok": false,
+   "cheap2_ok": false,
+   "strong_ok": true,
+   "u_cheap": {
+    "input": 67,
+    "output": 12,
+    "reasoning": 0
+   },
+   "u_cheap2": {
+    "input": 67,
+    "output": 12,
+    "reasoning": 0
+   },
+   "u_strong": {
+    "input": 67,
+    "output": 140,
+    "reasoning": 128
+   },
+   "u_router": {
+    "input": 112,
+    "output": 10,
+    "reasoning": 0
+   }
+  },
+  {
+   "q": "A rectangle is 3 longer than twice its width and its perimeter is 48. What is its area?",
+   "gold": "119",
+   "tier": "medium",
+   "cheap": "45",
+   "cheap2": "72",
+   "strong": "119",
+   "route": "easy",
+   "agree": false,
+   "cheap_ok": false,
+   "cheap2_ok": false,
+   "strong_ok": true,
+   "u_cheap": {
+    "input": 53,
+    "output": 10,
+    "reasoning": 0
+   },
+   "u_cheap2": {
+    "input": 53,
+    "output": 10,
+    "reasoning": 0
+   },
+   "u_strong": {
+    "input": 53,
+    "output": 138,
+    "reasoning": 128
+   },
+   "u_router": {
+    "input": 98,
+    "output": 10,
+    "reasoning": 0
+   }
+  },
+  {
+   "q": "Prices rose 20% and then fell 25%. A jacket now costs 72. What was the original price?",
+   "gold": "80",
+   "tier": "medium",
+   "cheap": "80",
+   "cheap2": "120",
+   "strong": "80",
+   "route": "easy",
+   "agree": false,
+   "cheap_ok": true,
+   "cheap2_ok": false,
+   "strong_ok": true,
+   "u_cheap": {
+    "input": 55,
+    "output": 10,
+    "reasoning": 0
+   },
+   "u_cheap2": {
+    "input": 55,
+    "output": 10,
+    "reasoning": 0
+   },
+   "u_strong": {
+    "input": 55,
+    "output": 74,
+    "reasoning": 64
+   },
+   "u_router": {
+    "input": 100,
+    "output": 10,
+    "reasoning": 0
+   }
+  },
+  {
+   "q": "Three friends split a bill of 138: Ana pays twice what Ben pays and Cy pays 18 more than Ben. How much does Ana pay?",
+   "gold": "60",
+   "tier": "medium",
+   "cheap": "60",
+   "cheap2": "60",
+   "strong": "60",
+   "route": "easy",
+   "agree": true,
+   "cheap_ok": true,
+   "cheap2_ok": true,
+   "strong_ok": true,
+   "u_cheap": {
+    "input": 61,
+    "output": 10,
+    "reasoning": 0
+   },
+   "u_cheap2": {
+    "input": 61,
+    "output": 10,
+    "reasoning": 0
+   },
+   "u_strong": {
+    "input": 61,
+    "output": 74,
+    "reasoning": 64
+   },
+   "u_router": {
+    "input": 106,
+    "output": 10,
+    "reasoning": 0
+   }
+  },
+  {
+   "q": "A tank holds 350 litres and starts with 70. A pipe adds 12 litres a minute while a drain removes 5. After how many minutes is it full?",
+   "gold": "40",
+   "tier": "medium",
+   "cheap": "40",
+   "cheap2": "40",
+   "strong": "40",
+   "route": "easy",
+   "agree": true,
+   "cheap_ok": true,
+   "cheap2_ok": true,
+   "strong_ok": true,
+   "u_cheap": {
+    "input": 66,
+    "output": 10,
+    "reasoning": 0
+   },
+   "u_cheap2": {
+    "input": 66,
+    "output": 10,
+    "reasoning": 0
+   },
+   "u_strong": {
+    "input": 66,
+    "output": 74,
+    "reasoning": 64
+   },
+   "u_router": {
+    "input": 111,
+    "output": 10,
+    "reasoning": 0
+   }
+  },
+  {
+   "q": "The sum of three consecutive even numbers is 150. What is the product of the smallest and the largest?",
+   "gold": "2496",
+   "tier": "medium",
+   "cheap": "2450",
+   "cheap2": "2414",
+   "strong": "2496",
+   "route": "easy",
+   "agree": false,
+   "cheap_ok": false,
+   "cheap2_ok": false,
+   "strong_ok": true,
+   "u_cheap": {
+    "input": 53,
+    "output": 11,
+    "reasoning": 0
+   },
+   "u_cheap2": {
+    "input": 53,
+    "output": 11,
+    "reasoning": 0
+   },
+   "u_strong": {
+    "input": 53,
+    "output": 139,
+    "reasoning": 128
+   },
+   "u_router": {
+    "input": 98,
+    "output": 10,
+    "reasoning": 0
+   }
+  },
+  {
+   "q": "A cyclist rides 36 km at 12 km/h and returns at 18 km/h. What is the average speed for the whole trip in km/h?",
+   "gold": "14.4",
+   "tier": "medium",
+   "cheap": "14.4",
+   "cheap2": "14.4",
+   "strong": "14.4",
+   "route": "hard",
+   "agree": true,
+   "cheap_ok": true,
+   "cheap2_ok": true,
+   "strong_ok": true,
+   "u_cheap": {
+    "input": 63,
+    "output": 12,
+    "reasoning": 0
+   },
+   "u_cheap2": {
+    "input": 63,
+    "output": 12,
+    "reasoning": 0
+   },
+   "u_strong": {
+    "input": 63,
+    "output": 140,
+    "reasoning": 128
+   },
+   "u_router": {
+    "input": 108,
+    "output": 10,
+    "reasoning": 0
+   }
+  },
+  {
+   "q": "What is the sum of all two-digit numbers divisible by 7?",
+   "gold": "728",
+   "tier": "medium",
+   "cheap": "748",
+   "cheap2": "748",
+   "strong": "728",
+   "route": "easy",
+   "agree": true,
+   "cheap_ok": false,
+   "cheap2_ok": false,
+   "strong_ok": true,
+   "u_cheap": {
+    "input": 45,
+    "output": 10,
+    "reasoning": 0
+   },
+   "u_cheap2": {
+    "input": 45,
+    "output": 10,
+    "reasoning": 0
+   },
+   "u_strong": {
+    "input": 45,
+    "output": 202,
+    "reasoning": 192
+   },
+   "u_router": {
+    "input": 90,
+    "output": 10,
+    "reasoning": 0
+   }
+  },
+  {
+   "q": "How many trailing zeros does 25 factorial have?",
+   "gold": "6",
+   "tier": "hard",
+   "cheap": "6",
+   "cheap2": "6",
+   "strong": "6",
+   "route": "easy",
+   "agree": true,
+   "cheap_ok": true,
+   "cheap2_ok": true,
+   "strong_ok": true,
+   "u_cheap": {
+    "input": 41,
+    "output": 10,
+    "reasoning": 0
+   },
+   "u_cheap2": {
+    "input": 41,
+    "output": 10,
+    "reasoning": 0
+   },
+   "u_strong": {
+    "input": 41,
+    "output": 74,
+    "reasoning": 64
+   },
+   "u_router": {
+    "input": 86,
+    "output": 10,
+    "reasoning": 0
+   }
+  },
+  {
+   "q": "What is the sum of the digits of 2 to the power 20?",
+   "gold": "31",
+   "tier": "hard",
+   "cheap": "7",
+   "cheap2": "7",
+   "strong": "31",
+   "route": "easy",
+   "agree": true,
+   "cheap_ok": false,
+   "cheap2_ok": false,
+   "strong_ok": true,
+   "u_cheap": {
+    "input": 47,
+    "output": 10,
+    "reasoning": 0
+   },
+   "u_cheap2": {
+    "input": 47,
+    "output": 10,
+    "reasoning": 0
+   },
+   "u_strong": {
+    "input": 47,
+    "output": 74,
+    "reasoning": 64
+   },
+   "u_router": {
+    "input": 92,
+    "output": 10,
+    "reasoning": 0
+   }
+  },
+  {
+   "q": "In how many ways can 5 people sit in a row if two particular people must sit next to each other?",
+   "gold": "48",
+   "tier": "hard",
+   "cheap": "48",
+   "cheap2": "48",
+   "strong": "48",
+   "route": "easy",
+   "agree": true,
+   "cheap_ok": true,
+   "cheap2_ok": true,
+   "strong_ok": true,
+   "u_cheap": {
+    "input": 54,
+    "output": 10,
+    "reasoning": 0
+   },
+   "u_cheap2": {
+    "input": 54,
+    "output": 10,
+    "reasoning": 0
+   },
+   "u_strong": {
+    "input": 54,
+    "output": 138,
+    "reasoning": 128
+   },
+   "u_router": {
+    "input": 99,
+    "output": 10,
+    "reasoning": 0
+   }
+  },
+  {
+   "q": "What is the remainder when 7 to the power 100 is divided by 5?",
+   "gold": "1",
+   "tier": "hard",
+   "cheap": "1",
+   "cheap2": "1",
+   "strong": "1",
+   "route": "easy",
+   "agree": true,
+   "cheap_ok": true,
+   "cheap2_ok": true,
+   "strong_ok": true,
+   "u_cheap": {
+    "input": 49,
+    "output": 10,
+    "reasoning": 0
+   },
+   "u_cheap2": {
+    "input": 49,
+    "output": 10,
+    "reasoning": 0
+   },
+   "u_strong": {
+    "input": 49,
+    "output": 138,
+    "reasoning": 128
+   },
+   "u_router": {
+    "input": 94,
+    "output": 10,
+    "reasoning": 0
+   }
+  },
+  {
+   "q": "What day of the week was 1 January 2000?",
+   "gold": "saturday",
+   "tier": "hard",
+   "cheap": "Saturday",
+   "cheap2": "Saturday",
+   "strong": "Saturday",
+   "route": "easy",
+   "agree": true,
+   "cheap_ok": true,
+   "cheap2_ok": true,
+   "strong_ok": true,
+   "u_cheap": {
+    "input": 44,
+    "output": 10,
+    "reasoning": 0
+   },
+   "u_cheap2": {
+    "input": 44,
+    "output": 10,
+    "reasoning": 0
+   },
+   "u_strong": {
+    "input": 44,
+    "output": 74,
+    "reasoning": 64
+   },
+   "u_router": {
+    "input": 89,
+    "output": 10,
+    "reasoning": 0
+   }
+  },
+  {
+   "q": "If today is Wednesday, what day of the week will it be 100 days from now?",
+   "gold": "friday",
+   "tier": "hard",
+   "cheap": "Saturday",
+   "cheap2": "Saturday",
+   "strong": "Friday",
+   "route": "easy",
+   "agree": true,
+   "cheap_ok": false,
+   "cheap2_ok": false,
+   "strong_ok": true,
+   "u_cheap": {
+    "input": 50,
+    "output": 10,
+    "reasoning": 0
+   },
+   "u_cheap2": {
+    "input": 50,
+    "output": 10,
+    "reasoning": 0
+   },
+   "u_strong": {
+    "input": 50,
+    "output": 10,
+    "reasoning": 0
+   },
+   "u_router": {
+    "input": 95,
+    "output": 10,
+    "reasoning": 0
+   }
+  },
+  {
+   "q": "What is the smallest positive integer divisible by every integer from 1 to 10?",
+   "gold": "2520",
+   "tier": "hard",
+   "cheap": "2520",
+   "cheap2": "2520",
+   "strong": "2520",
+   "route": "easy",
+   "agree": true,
+   "cheap_ok": true,
+   "cheap2_ok": true,
+   "strong_ok": true,
+   "u_cheap": {
+    "input": 48,
+    "output": 11,
+    "reasoning": 0
+   },
+   "u_cheap2": {
+    "input": 48,
+    "output": 11,
+    "reasoning": 0
+   },
+   "u_strong": {
+    "input": 48,
+    "output": 75,
+    "reasoning": 64
+   },
+   "u_router": {
+    "input": 93,
+    "output": 10,
+    "reasoning": 0
+   }
+  },
+  {
+   "q": "A clock shows 3:15. What is the angle in degrees between the hour and minute hands?",
+   "gold": "7.5",
+   "tier": "hard",
+   "cheap": "7.5",
+   "cheap2": "7.5",
+   "strong": "7.5",
+   "route": "easy",
+   "agree": true,
+   "cheap_ok": true,
+   "cheap2_ok": true,
+   "strong_ok": true,
+   "u_cheap": {
+    "input": 52,
+    "output": 12,
+    "reasoning": 0
+   },
+   "u_cheap2": {
+    "input": 52,
+    "output": 12,
+    "reasoning": 0
+   },
+   "u_strong": {
+    "input": 52,
+    "output": 204,
+    "reasoning": 192
+   },
+   "u_router": {
+    "input": 97,
+    "output": 10,
+    "reasoning": 0
+   }
+  }
+ ],
+ "by_tier": {
+  "easy": {
+   "easy": 8,
+   "hard": 0
+  },
+  "medium": {
+   "easy": 7,
+   "hard": 1
+  },
+  "hard": {
+   "easy": 8,
+   "hard": 0
+  }
+ },
+ "oracle": {
+  "cheap suffices": {
+   "easy": 16,
+   "hard": 1
+  },
+  "needs strong": {
+   "easy": 7,
+   "hard": 0
+  }
+ },
+ "usage": {
+  "input": 5856,
+  "output": 2928,
+  "reasoning": 1920,
+  "calls": 96
+ }
+}

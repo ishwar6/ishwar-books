@@ -1,0 +1,17 @@
+{
+ "ticket_id": "T1",
+ "text": "Order #48213 arrived with the screen cracked. Please send a replacement.",
+ "trace_id": "300d9f0b",
+ "node": "done",
+ "route": "support",
+ "facts": {
+  "issue_type": "damaged_or_faulty",
+  "order_id": "ORD-48213",
+  "refund_amount_gbp": null
+ },
+ "reply": "Hello \u2014 I\u2019m sorry your order ORD-48213 arrived with a cracked screen. We\u2019ll help resolve this. Please reply with a photo of the damage and your preferred option (replacement or refund), and we\u2019ll guide you through the next steps. Thank you for letting us know.",
+ "approved": null,
+ "calls": 2,
+ "tokens": 318,
+ "notes": []
+}
