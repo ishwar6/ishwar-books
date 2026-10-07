@@ -1,3 +1,6 @@
+---
+description: "What an agent is and when not to build one: the perceive-reason-act loop, levels of autonomy, reliability arithmetic, and what three companies learned."
+---
 # Chapter 1 · What an agent is, and when not to build one
 
 > **Goal:** by the end of this chapter you can say precisely what makes a system an *agent* rather than a model or a workflow, draw the loop that every agent runs, place any design on the spectrum from script to multi-agent system, do the arithmetic that tells you how many steps an agent can afford, and decide, for a given task, whether an agent is the right answer at all. You will also know where the idea came from and what three companies learned by running agents in production.

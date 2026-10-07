@@ -1,3 +1,6 @@
+---
+description: "The five building blocks of an agent: model, tools, instructions, memory and state, how to design tools a model can call, and context engineering."
+---
 # Chapter 2 · The building blocks: model, tools, instructions, memory and state
 
 > **Goal:** by the end of this chapter you can take the loop of Chapter 1 apart into its five blocks, say what each one is responsible for and what breaks when it is weak, choose a model for an agent with a measurement rather than a feeling, design a tool a model will actually call correctly, write instructions that behave like architecture rather than like a wish list, give an agent the right kind of memory for the right length of time, keep its state so that a run can be resumed, and decide, token by token, what belongs in the context window. Every choice comes with its trade-offs, a way to test whether it was right, and what tends to go wrong in production.

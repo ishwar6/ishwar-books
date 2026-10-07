@@ -223,7 +223,10 @@ const clipTitle = (t) => {
   const room = 68 - tail.length
   if (main.length <= room) return t
   const colon = main.lastIndexOf(': ', room)
-  return (colon > room * 0.5 ? main.slice(0, colon) : clip(main, room)) + tail
+  if (colon > room * 0.5) return main.slice(0, colon) + tail
+  const comma = main.lastIndexOf(', ', room)                 // drop a trailing clause rather than ending in an ellipsis
+  if (comma > room * 0.5) return main.slice(0, comma) + tail
+  return clip(main, room) + tail
 }
 
 function render(pg, { noindex = false } = {}) {

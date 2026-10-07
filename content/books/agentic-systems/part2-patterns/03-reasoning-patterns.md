@@ -1,3 +1,6 @@
+---
+description: "Reasoning patterns for one agent: chain of thought, ReAct, plan-and-execute, reflection with an external check, tree search and code as action."
+---
 # Chapter 3 · Reasoning patterns: how one agent thinks, acts and corrects itself
 
 > **Goal:** by the end of this chapter you can name the six shapes a single agent's loop can take (think only, act only, interleave, plan first, reflect, search), say what each one costs in calls, tokens and seconds, read the papers that introduced them closely enough to know what was measured and what was not, recognise each pattern in the production write-ups of large companies, and choose a pattern for your own task with a measurement rather than a fashion. You will also have run three small experiments of your own, against a real model, that show the patterns working and failing.
