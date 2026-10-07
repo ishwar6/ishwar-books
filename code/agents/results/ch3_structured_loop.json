@@ -1,0 +1,570 @@
+{
+ "model": "gpt-5-mini",
+ "max_steps": 8,
+ "max_tokens": 20000,
+ "demo": {
+  "question": "Which Northwind Freight depot has the most trucks, and how many more trucks does it have than the Leeds depot?",
+  "answer": "The Rotterdam depot; it has 79 more trucks than the Leeds depot.",
+  "evidence": [
+   "Rotterdam depot",
+   "Leeds depot"
+  ],
+  "ok": true,
+  "status": "answered",
+  "steps": 7,
+  "tool_calls": 7,
+  "tokens": 4352,
+  "events": [
+   {
+    "step": 1,
+    "kind": "model",
+    "tool_calls": 1,
+    "text": "",
+    "tokens": 403
+   },
+   {
+    "step": 1,
+    "kind": "tool",
+    "tool": "lookup_entry",
+    "args": {
+     "name": "Northwind Freight depots"
+    },
+    "ok": true,
+    "result": "Fictional logistics company founded in 2011 in Rotterdam. Chief executive: Mira Takacs. Depots: Rotterdam, Gdansk, Porto, Leeds. Related entries: Rotterdam depot, Gdansk depot, Porto depot, Leeds depo",
+    "note": null
+   },
+   {
+    "step": 2,
+    "kind": "model",
+    "tool_calls": 1,
+    "text": "",
+    "tokens": 897
+   },
+   {
+    "step": 2,
+    "kind": "tool",
+    "tool": "lookup_entry",
+    "args": {
+     "name": "Rotterdam depot"
+    },
+    "ok": true,
+    "result": "Northwind Freight depot opened 2011. Vehicles: 120 trucks. Manager: Joris Vos. Related entries: Joris Vos.",
+    "note": null
+   },
+   {
+    "step": 3,
+    "kind": "model",
+    "tool_calls": 1,
+    "text": "",
+    "tokens": 1460
+   },
+   {
+    "step": 3,
+    "kind": "tool",
+    "tool": "lookup_entry",
+    "args": {
+     "name": "Gdansk depot"
+    },
+    "ok": true,
+    "result": "Northwind Freight depot opened 2014. Vehicles: 85 trucks. Manager: Ola Nowak. Related entries: Ola Nowak.",
+    "note": null
+   },
+   {
+    "step": 4,
+    "kind": "model",
+    "tool_calls": 1,
+    "text": "",
+    "tokens": 2091
+   },
+   {
+    "step": 4,
+    "kind": "tool",
+    "tool": "lookup_entry",
+    "args": {
+     "name": "Porto depot"
+    },
+    "ok": true,
+    "result": "Northwind Freight depot opened 2017. Vehicles: 64 trucks. Manager: Ines Carvalho.",
+    "note": null
+   },
+   {
+    "step": 5,
+    "kind": "model",
+    "tool_calls": 1,
+    "text": "",
+    "tokens": 2783
+   },
+   {
+    "step": 5,
+    "kind": "tool",
+    "tool": "lookup_entry",
+    "args": {
+     "name": "Leeds depot"
+    },
+    "ok": true,
+    "result": "Northwind Freight depot opened 2020. Vehicles: 41 trucks. Manager: Sam Hartley.",
+    "note": null
+   },
+   {
+    "step": 6,
+    "kind": "model",
+    "tool_calls": 1,
+    "text": "",
+    "tokens": 3536
+   },
+   {
+    "step": 6,
+    "kind": "tool",
+    "tool": "calculate",
+    "args": {
+     "expression": "120 - 41"
+    },
+    "ok": true,
+    "result": "79",
+    "note": null
+   },
+   {
+    "step": 7,
+    "kind": "model",
+    "tool_calls": 1,
+    "text": "",
+    "tokens": 4352
+   },
+   {
+    "step": 7,
+    "kind": "tool",
+    "tool": "final_answer",
+    "args": {
+     "answer": "The Rotterdam depot; it has 79 more trucks than the Leeds depot.",
+     "evidence": [
+      "Rotterdam depot",
+      "Leeds depot"
+     ]
+    },
+    "ok": true,
+    "result": "answer recorded",
+    "note": null
+   },
+   {
+    "step": 7,
+    "kind": "end",
+    "status": "answered",
+    "answer": "The Rotterdam depot; it has 79 more trucks than the Leeds depot."
+   }
+  ],
+  "tool_errors": 0
+ },
+ "rows": [
+  {
+   "rep": 0,
+   "i": 0,
+   "answer": "84 years",
+   "ok": true,
+   "status": "answered",
+   "steps": 4,
+   "tool_calls": 4,
+   "tool_errors": 0,
+   "tokens": 1978
+  },
+  {
+   "rep": 0,
+   "i": 1,
+   "answer": "2954 m",
+   "ok": true,
+   "status": "answered",
+   "steps": 4,
+   "tool_calls": 4,
+   "tool_errors": 0,
+   "tokens": 1905
+  },
+  {
+   "rep": 0,
+   "i": 2,
+   "answer": "12 years",
+   "ok": true,
+   "status": "answered",
+   "steps": 4,
+   "tool_calls": 4,
+   "tool_errors": 0,
+   "tokens": 1927
+  },
+  {
+   "rep": 0,
+   "i": 3,
+   "answer": "5 centuries",
+   "ok": true,
+   "status": "answered",
+   "steps": 7,
+   "tool_calls": 7,
+   "tool_errors": 1,
+   "tokens": 3947
+  },
+  {
+   "rep": 0,
+   "i": 4,
+   "answer": "3550 km",
+   "ok": true,
+   "status": "answered",
+   "steps": 3,
+   "tool_calls": 4,
+   "tool_errors": 0,
+   "tokens": 1498
+  },
+  {
+   "rep": 0,
+   "i": 5,
+   "answer": "5.1 million",
+   "ok": true,
+   "status": "answered",
+   "steps": 3,
+   "tool_calls": 5,
+   "tool_errors": 0,
+   "tokens": 1578
+  },
+  {
+   "rep": 0,
+   "i": 6,
+   "answer": "Chief executive: Mira Takacs. Founded in: Rotterdam.",
+   "ok": true,
+   "status": "answered",
+   "steps": 2,
+   "tool_calls": 3,
+   "tool_errors": 0,
+   "tokens": 1045
+  },
+  {
+   "rep": 0,
+   "i": 7,
+   "answer": "205 trucks",
+   "ok": true,
+   "status": "answered",
+   "steps": 4,
+   "tool_calls": 4,
+   "tool_errors": 0,
+   "tokens": 1965
+  },
+  {
+   "rep": 0,
+   "i": 8,
+   "answer": "She previously worked for Harbour Rail, which was founded in 2004.",
+   "ok": true,
+   "status": "answered",
+   "steps": 5,
+   "tool_calls": 5,
+   "tool_errors": 0,
+   "tokens": 2831
+  },
+  {
+   "rep": 0,
+   "i": 9,
+   "answer": "3 years",
+   "ok": true,
+   "status": "answered",
+   "steps": 3,
+   "tool_calls": 4,
+   "tool_errors": 0,
+   "tokens": 1517
+  },
+  {
+   "rep": 0,
+   "i": 10,
+   "answer": "Utrecht",
+   "ok": true,
+   "status": "answered",
+   "steps": 4,
+   "tool_calls": 4,
+   "tool_errors": 0,
+   "tokens": 1948
+  },
+  {
+   "rep": 0,
+   "i": 11,
+   "answer": "Harbour Rail had 48 locomotives and was acquired 17 years after its founding.",
+   "ok": true,
+   "status": "answered",
+   "steps": 4,
+   "tool_calls": 4,
+   "tool_errors": 0,
+   "tokens": 2041
+  },
+  {
+   "rep": 1,
+   "i": 0,
+   "answer": "84 years",
+   "ok": true,
+   "status": "answered",
+   "steps": 4,
+   "tool_calls": 4,
+   "tool_errors": 0,
+   "tokens": 1978
+  },
+  {
+   "rep": 1,
+   "i": 1,
+   "answer": "Mount Everest is 2,954 metres taller than Mount Kilimanjaro.",
+   "ok": true,
+   "status": "answered",
+   "steps": 3,
+   "tool_calls": 4,
+   "tool_errors": 0,
+   "tokens": 1513
+  },
+  {
+   "rep": 1,
+   "i": 2,
+   "answer": "12 years",
+   "ok": true,
+   "status": "answered",
+   "steps": 4,
+   "tool_calls": 4,
+   "tool_errors": 0,
+   "tokens": 1927
+  },
+  {
+   "rep": 1,
+   "i": 3,
+   "answer": "5 centuries",
+   "ok": true,
+   "status": "answered",
+   "steps": 6,
+   "tool_calls": 6,
+   "tool_errors": 0,
+   "tokens": 3238
+  },
+  {
+   "rep": 1,
+   "i": 4,
+   "answer": "The Amazon is 3,550 km longer than the Danube.",
+   "ok": true,
+   "status": "answered",
+   "steps": 3,
+   "tool_calls": 4,
+   "tool_errors": 0,
+   "tokens": 1508
+  },
+  {
+   "rep": 1,
+   "i": 5,
+   "answer": "5.1 million",
+   "ok": true,
+   "status": "answered",
+   "steps": 4,
+   "tool_calls": 4,
+   "tool_errors": 0,
+   "tokens": 1916
+  },
+  {
+   "rep": 1,
+   "i": 6,
+   "answer": "Chief executive: Mira Takacs. Founded in: Rotterdam.",
+   "ok": true,
+   "status": "answered",
+   "steps": 2,
+   "tool_calls": 2,
+   "tool_errors": 0,
+   "tokens": 903
+  },
+  {
+   "rep": 1,
+   "i": 7,
+   "answer": "205 trucks",
+   "ok": true,
+   "status": "answered",
+   "steps": 4,
+   "tool_calls": 4,
+   "tool_errors": 0,
+   "tokens": 1965
+  },
+  {
+   "rep": 1,
+   "i": 8,
+   "answer": "She previously worked for Harbour Rail, which was founded in 2004.",
+   "ok": true,
+   "status": "answered",
+   "steps": 5,
+   "tool_calls": 5,
+   "tool_errors": 0,
+   "tokens": 2837
+  },
+  {
+   "rep": 1,
+   "i": 9,
+   "answer": "3 years",
+   "ok": true,
+   "status": "answered",
+   "steps": 4,
+   "tool_calls": 4,
+   "tool_errors": 0,
+   "tokens": 1926
+  },
+  {
+   "rep": 1,
+   "i": 10,
+   "answer": "Utrecht",
+   "ok": true,
+   "status": "answered",
+   "steps": 4,
+   "tool_calls": 4,
+   "tool_errors": 0,
+   "tokens": 1948
+  },
+  {
+   "rep": 1,
+   "i": 11,
+   "answer": "Harbour Rail had 48 locomotives and was acquired 17 years after its founding.",
+   "ok": true,
+   "status": "answered",
+   "steps": 3,
+   "tool_calls": 3,
+   "tool_errors": 0,
+   "tokens": 1422
+  },
+  {
+   "rep": 2,
+   "i": 0,
+   "answer": "84 years",
+   "ok": true,
+   "status": "answered",
+   "steps": 4,
+   "tool_calls": 4,
+   "tool_errors": 0,
+   "tokens": 1978
+  },
+  {
+   "rep": 2,
+   "i": 1,
+   "answer": "2,953 m",
+   "ok": false,
+   "status": "answered",
+   "steps": 2,
+   "tool_calls": 4,
+   "tool_errors": 0,
+   "tokens": 1003
+  },
+  {
+   "rep": 2,
+   "i": 2,
+   "answer": "12 years",
+   "ok": true,
+   "status": "answered",
+   "steps": 4,
+   "tool_calls": 4,
+   "tool_errors": 0,
+   "tokens": 1927
+  },
+  {
+   "rep": 2,
+   "i": 3,
+   "answer": "5 centuries",
+   "ok": true,
+   "status": "answered",
+   "steps": 6,
+   "tool_calls": 6,
+   "tool_errors": 0,
+   "tokens": 3238
+  },
+  {
+   "rep": 2,
+   "i": 4,
+   "answer": "3,550 km",
+   "ok": true,
+   "status": "answered",
+   "steps": 4,
+   "tool_calls": 4,
+   "tool_errors": 0,
+   "tokens": 1901
+  },
+  {
+   "rep": 2,
+   "i": 5,
+   "answer": "5.1 million",
+   "ok": true,
+   "status": "answered",
+   "steps": 4,
+   "tool_calls": 4,
+   "tool_errors": 0,
+   "tokens": 1916
+  },
+  {
+   "rep": 2,
+   "i": 6,
+   "answer": "Chief executive: Mira Takacs; Founded in: Rotterdam (2011).",
+   "ok": false,
+   "status": "answered",
+   "steps": 3,
+   "tool_calls": 4,
+   "tool_errors": 0,
+   "tokens": 1683
+  },
+  {
+   "rep": 2,
+   "i": 7,
+   "answer": "205 trucks",
+   "ok": true,
+   "status": "answered",
+   "steps": 4,
+   "tool_calls": 4,
+   "tool_errors": 0,
+   "tokens": 1965
+  },
+  {
+   "rep": 2,
+   "i": 8,
+   "answer": "She worked for Harbour Rail, founded in 2004.",
+   "ok": true,
+   "status": "answered",
+   "steps": 6,
+   "tool_calls": 6,
+   "tool_errors": 0,
+   "tokens": 3554
+  },
+  {
+   "rep": 2,
+   "i": 9,
+   "answer": "3 years",
+   "ok": true,
+   "status": "answered",
+   "steps": 4,
+   "tool_calls": 4,
+   "tool_errors": 0,
+   "tokens": 1926
+  },
+  {
+   "rep": 2,
+   "i": 10,
+   "answer": "Utrecht",
+   "ok": true,
+   "status": "answered",
+   "steps": 4,
+   "tool_calls": 4,
+   "tool_errors": 0,
+   "tokens": 1943
+  },
+  {
+   "rep": 2,
+   "i": 11,
+   "answer": "Harbour Rail had 48 locomotives and was acquired 17 years after its founding.",
+   "ok": true,
+   "status": "answered",
+   "steps": 4,
+   "tool_calls": 4,
+   "tool_errors": 0,
+   "tokens": 2041
+  }
+ ],
+ "n_ok": 34,
+ "n": 36,
+ "acc_public": 0.9444444444444444,
+ "acc_private": 0.9444444444444444,
+ "statuses": {
+  "answered": 36
+ },
+ "usage": {
+  "input": 72572,
+  "output": 4116,
+  "calls": 149
+ },
+ "cost_usd": 0.026375,
+ "repeats": 3,
+ "acc": 0.9444444444444444
+}

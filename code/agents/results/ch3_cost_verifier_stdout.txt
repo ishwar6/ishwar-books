@@ -1,0 +1,31 @@
+
+== 5. P(correct | accepted) = p*r / (p*r + (1-p)*f) ==
+p = P(candidate correct), r = P(accept | correct), f = P(accept | wrong). The false-accept rate f is NOT 1 - precision.
+    p     r     f  P(correct | accepted)
+ 0.90  1.00  0.20                 97.8%
+ 0.90  1.00  0.05                 99.4%
+ 0.90  0.90  0.20                 97.6%
+ 0.70  1.00  0.20                 92.1%
+ 0.70  1.00  0.05                 97.9%
+ 0.70  0.90  0.20                 91.3%
+ 0.50  1.00  0.20                 83.3%
+ 0.50  1.00  0.05                 95.2%
+ 0.50  0.90  0.20                 81.8%
+ 0.30  1.00  0.20                 68.2%
+ 0.30  1.00  0.05                 89.6%
+ 0.30  0.90  0.20                 65.9%
+worked example: p=0.9, r=1, f=0.2 gives 0.9 / (0.9 + 0.02) = 97.8%. At p=0.3 the same verifier gives 68.2%: an acceptance
+means less on hard tasks, where most candidates are wrong.
+
+best-of-n, return the first accepted candidate (candidates independent, the same p, r, f for each):
+    p   n  P(return correct)  P(return wrong)  P(nothing)  precision
+ 0.30   1              30.0%            14.0%       56.0%      68.2%
+ 0.30   3              56.2%            26.2%       17.6%      68.2%
+ 0.30   5              64.4%            30.1%        5.5%      68.2%
+ 0.30  10              68.0%            31.7%        0.3%      68.2%
+ 0.70   1              70.0%             6.0%       24.0%      92.1%
+ 0.70   3              90.8%             7.8%        1.4%      92.1%
+ 0.70   5              92.0%             7.9%        0.1%      92.1%
+ 0.70  10              92.1%             7.9%        0.0%      92.1%
+reading: more candidates raise the chance of returning SOMETHING, not the precision of what is returned. Correlated errors (the
+same wrong answer in many samples) and picking the top-scored candidate instead of the first accepted both make this worse.

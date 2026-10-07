@@ -1,0 +1,36 @@
+== A structured-tool loop: native tool calls, schema-checked arguments, explicit state, budgets, a trace (gpt-5-mini) ==
+-- error paths, exercised directly: each becomes a tool result the model can read; nothing crashes the loop --
+  lookup_entry {"name": ""}                           -> invalid arguments: args.name is shorter than 2 characters
+  lookup_entry {"name": "Porto depot", "year": 2017}  -> invalid arguments: args.year is not allowed
+  calculate    {"expression": "120 trucks - 41"}      -> invalid arguments: args.expression does not match ^[0-9.+\-*/() ]+$
+  calculate    {"expression": "1/0"}                  -> the tool failed: ValueError: division by zero
+  lookup_entry {name: Porto}                          -> arguments are not valid JSON (Expecting property name enclosed in doubl...
+  delete_depot {"name": "Leeds depot"}                -> unknown tool 'delete_depot'; the tools are lookup_entry, calculate, fin...
+
+-- the Northwind question --
+   Which Northwind Freight depot has the most trucks, and how many more trucks does it have than the Leeds depot?
+step 1  model -> 1 tool call(s)   (tokens so far 403)
+        lookup_entry {"name": "Northwind Freight depots"}         ok  Fictional logistics company founded in 2011 in Rotter...
+step 2  model -> 1 tool call(s)   (tokens so far 897)
+        lookup_entry {"name": "Rotterdam depot"}                  ok  Northwind Freight depot opened 2011. Vehicles: 120 tr...
+step 3  model -> 1 tool call(s)   (tokens so far 1,460)
+        lookup_entry {"name": "Gdansk depot"}                     ok  Northwind Freight depot opened 2014. Vehicles: 85 tru...
+step 4  model -> 1 tool call(s)   (tokens so far 2,091)
+        lookup_entry {"name": "Porto depot"}                      ok  Northwind Freight depot opened 2017. Vehicles: 64 tru...
+step 5  model -> 1 tool call(s)   (tokens so far 2,783)
+        lookup_entry {"name": "Leeds depot"}                      ok  Northwind Freight depot opened 2020. Vehicles: 41 tru...
+step 6  model -> 1 tool call(s)   (tokens so far 3,536)
+        calculate    {"expression": "120 - 41"}                   ok  79
+step 7  model -> 1 tool call(s)   (tokens so far 4,352)
+        final_answer {"answer": "The Rotterdam depot; it has 7... ok  answer recorded
+status: answered after 7 model calls, 7 tool calls (0 errors), 4,352 tokens; budgets 8 calls, 20,000 tokens
+final_answer: 'The Rotterdam depot; it has 79 more trucks than the Leeds depot.'
+   evidence ['Rotterdam depot', 'Leeds depot']; typed grader: correct
+
+-- the same loop on the twelve questions of ch3_react.py, 3 repeats, the same typed exact grader --
+correct 34/36 (94%); public 94%, private 94%; end status {'answered': 36}
+mean model calls per run 3.9; mean tokens per run 2,009; tool errors 1
+  wrong: q2 repeat 3: '2,953 m'
+  wrong: q7 repeat 3: 'Chief executive: Mira Takacs; Founded in: Rotterdam (2011).'
+total spend this run: $0.0264 (149 calls, 72,572 input + 4,116 output tokens)
+one JSON line per event: results/ch3_structured_trace.jsonl

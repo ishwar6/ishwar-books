@@ -1,0 +1,13 @@
+
+== 4. ReAct input tokens against step count ==
+ASSUMES: the loop replays the FULL growing history on every call (quadratic); plan-and-execute executors see a bounded context
+(linear). Two common changes: prompt caching bills the repeated prefix at a discount (CACHE_RATE below, an assumption: providers
+differ), and compaction keeps only the last WINDOW steps in full. Columns: billed-equivalent input tokens.
+CACHE_RATE = 0.1 (cached tokens cost 10% of normal input), WINDOW = 3 steps
+ steps  ReAct full  + caching  + compaction  plan-exec  ratio full/plan
+     2       5,850      2,745         5,850      5,210             1.1x
+     5      15,750      4,950        14,400      8,150             1.9x
+    10      41,250      9,525        28,650     13,050             3.2x
+    20     126,000     22,050        57,150     22,850             5.5x
+reading: the quadratic growth is a property of full replay, not of ReAct itself; caching changes the bill (not the context size or
+the attention cost), and compaction changes both at the price of forgetting detail.

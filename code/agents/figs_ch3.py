@@ -125,12 +125,36 @@ def pattern_space():
                     b += [line(xx, cy + 7, x2, cy + 30, 'edge' if on else 'edge-dim'), circ(x2, cy + 36, 6, 'node on' if on else 'node')]
             b += [text(cx + 108, cy - 2, 'score,', 't-muted', 'end'), text(cx + 108, cy + 15, 'keep best', 't-muted', 'end')]
     y = y0 + 2 * (fh + 14) + 8
-    b += para(380, y, ['each shape adds something to the one before (a scratchpad, tools, a loop, a plan, a critic, a tree),',
-                       'and each addition costs calls, tokens and seconds. This chapter asks when each one pays for itself.'], 't-muted', 'middle')
+    b += para(380, y, ['the shapes are not a sequence: a real agent combines them (a plan over a loop, a check after it).',
+                       'Each one costs calls, tokens and seconds; this chapter asks when each one pays for itself.'], 't-muted', 'middle')
     return svg(760, y + 28, 'Six shapes of the agent loop with the same model and tools: think only (chain of thought), act only, interleave (ReAct), plan first, reflect (try, check, critique, retry) and search (branch, score, prune).', b)
 
 
 F['ch3_pattern_space'] = pattern_space()
+
+
+# ---------------------------------------------------------------- 1b. the design dimensions: composable choices, not a ladder
+def dimensions():
+    rows = [('reasoning in one call', ['direct answer', 'chain of thought', 'reasoning model', 'vote over samples'], {2}),
+            ('control across calls', ['one call', 'fixed pipeline', 'loop (ReAct)', 'plan, execute'], {2}),
+            ('action format', ['text, parsed', 'JSON tool call', 'code in sandbox', 'no tools'], {1}),
+            ('verification', ['none', 'self-review', 'external check', 'best-of-n, search'], {2}),
+            ('context', ['full replay', 'compaction', 'bounded per step', 'prompt caching'], {0})]
+    b = [text(380, 22, 'Five design dimensions: each agent picks one or more options per row', 't-title', 'middle')]
+    y = 42
+    for name, opts, on in rows:
+        b += [box(16, y, 184, 40, 'box-ghost', 8), text(108, y + 25, name, 't-note', 'middle')]
+        for j, o in enumerate(opts):
+            x = 214 + j * 134
+            b += [box(x, y + 4, 128, 32, 'box-on' if j in on else 'box', 6), text(x + 64, y + 24.5, o, 't-tick', 'middle')]
+        y += 50
+    b += para(380, y + 12, ['highlighted: the structured loop of Section 3.3 (reasoning model, loop, JSON tool calls,',
+                            'a typed final check, full replay). CodeAct changes only row 3; plan-and-execute rows 2 and 5;',
+                            'best-of-n row 4. The rows are independent, so the patterns of this chapter combine.'], 't-muted', 'middle')
+    return svg(760, y + 68, 'Five design dimensions of a single agent: reasoning inside one call, control across calls, action representation, verification and selection, and context management. A pattern is a choice in one or more rows, and choices in different rows combine.', b)
+
+
+F['ch3_dimensions'] = dimensions()
 
 
 # ---------------------------------------------------------------- 2. chain of thought and self-consistency
@@ -146,19 +170,20 @@ def cot():
     b += [arrow(656, 75, 682, 75)]
     b += block(682, 50, 58, 50, 'answer', cls='box-on')
     b += para(575, 130, ['one call, hundreds of output tokens;', 'each intermediate result is written', 'and read back before the next step'], 't-muted', 'middle')
-    b += [line(30, 200, 730, 200, 'edge-dim'), text(380, 224, 'self-consistency: sample several chains, take the majority answer', 't-title', 'middle')]
+    b += [line(30, 200, 730, 200, 'edge-dim'), text(380, 224, 'self-consistency: sample several chains, return the most frequent answer', 't-title', 'middle')]
     y = 248
     b += block(40, y, 100, 40, 'question', cls='box')
     answers = ['9', '9', '27', '9', '12']
+    b.append(f'<path class="edge" d="M140,{y + 20} L168,{y + 20} L168,{y - 6} L{196 + 4 * 90 + 33},{y - 6}"/>')
     for k, a in enumerate(answers):
         xx = 196 + k * 90
-        b += [arrow(140, y + 20, xx, y + 20), box(xx, y + 4, 66, 32, 'box-2', 6), text(xx + 33, y + 24, f'chain {k + 1}', 't-tick', 'middle')]
+        b += [arrow(xx + 33, y - 6, xx + 33, y + 4), box(xx, y + 4, 66, 32, 'box-2', 6), text(xx + 33, y + 24, f'chain {k + 1}', 't-tick', 'middle')]
         b += [arrow(xx + 33, y + 36, xx + 33, y + 56), text(xx + 33, y + 72, a, 't-strong' if a == '9' else 't-tick', 'middle')]
     b += [box(656, y - 2, 84, 44, 'box-on', 8), text(698, y + 16, 'vote', 't-tick', 'middle'), text(698, y + 32, '9 (3 of 5)', 't-tick', 'middle')]
-    b += para(380, y + 102, ['five chains cost five times the tokens of one. The paper reports +17.9 points on GSM8K for',
-                             'PaLM-540B with 40 samples. It helps when answers can be compared exactly (a number, a label);',
-                             'it cannot help when every chain makes the same mistake.'], 't-muted', 'middle')
-    return svg(760, y + 142, 'Standard prompting against chain of thought (the model writes its intermediate steps before the answer, at the price of more output tokens), and self-consistency (several sampled chains and a majority vote over their answers).', b)
+    b += para(380, y + 102, ['the vote is a plurality: 9 wins with 3 of 5, and would still win with 2 of 5 if the wrong answers',
+                             'disagree. Five chains cost five times the tokens of one. It helps when answers can be compared',
+                             'exactly; it cannot help when the chains share the same mistake (correlated errors).'], 't-muted', 'middle')
+    return svg(760, y + 142, 'Standard prompting against chain of thought (the model writes its intermediate steps before the answer, at the price of more output tokens), and self-consistency (several sampled chains and a plurality vote over their final answers).', b)
 
 
 F['ch3_cot'] = cot()
@@ -216,23 +241,26 @@ F['ch3_react_loop'] = react_loop()
 # ---------------------------------------------------------------- 5. our own results: direct, CoT, ReAct, ReAct+
 def react_results():
     S = R['summary']
-    conds = [('direct answer', 'direct'), ('chain of thought', 'cot'), ('ReAct, plain loop', 'react'), ('ReAct + guard + better tool', 'react+')]
-    b = [text(380, 22, f'Twelve two-hop questions, {R["model"]} (ch3_react.py)', 't-title', 'middle')]
-    b.append(text(160, 52, 'accuracy, all 12 questions', 't-note', 'middle'))
-    b.append(text(560, 52, 'cost per correct answer, US cents', 't-note', 'middle'))
-    items = [(n, S[k]['acc'] * 100) for n, k in conds]
-    b += hbars(30, 66, items, 150, row_h=30, cls='s1', label_w=210, fmt=lambda v: f'{v:.0f}%', vmax=100)
-    cpc = [('', (S[k]['cost_per_correct'] or 0) * 100) for n, k in conds]
-    b += hbars(420, 66, cpc, 190, row_h=30, cls='s3', label_w=16, fmt=lambda v: (f'{v:.2f}c' if v else 'none correct'), vmax=max(v for _, v in cpc) * 1.15)
-    y = 66 + 4 * 30 + 16
-    rows = [f'{n}: {S[k]["calls"]} calls, {S[k]["input_tokens"]:,} in + {S[k]["output_tokens"]:,} out tokens, ${S[k]["cost_usd"]:.4f}' for n, k in conds]
-    b += para(30, y, rows, 't-muted')
-    y += 17 * len(rows) + 8
-    b += para(30, y, ['public questions (world facts plus arithmetic): a scratchpad helps; private questions (a fictional',
-                      'company): only acting helps. The plain loop lost half the questions to one failure, repeating an',
-                      'action it had already run; a loop guard and a tool that lists related entries fixed it. Twelve',
-                      'sampled questions: the ordering is stable across runs; the exact percentages move a little.'], 't-muted')
-    return svg(760, y + 17 * 4 + 10, 'Our own run of four conditions on twelve two-hop questions with gpt-5-mini: accuracy on the left, cost per correct answer on the right, and the token and call counts underneath. Direct answering got none right; chain of thought helped only where the facts were in the model; the plain ReAct loop was undone by repeated actions; a loop guard and a tool that lists related entries fixed it.', b)
+    conds = [('direct answer', 'direct'), ('chain of thought', 'cot'), ('ReAct, plain loop', 'react'), ('+ guard only', 'react+guard'),
+             ('+ improved tool only', 'react+tool'), ('+ guard + improved tool', 'react+both')]
+    n = S['direct']['n']
+    b = [text(380, 22, f'Six configurations, 12 questions x {R["repeats"]} repeats, {R["model"]} (ch3_react.py)', 't-title', 'middle')]
+    b.append(text(170, 52, f'accuracy over {n} runs (typed exact grader)', 't-note', 'middle'))
+    b.append(text(575, 52, 'cost per correct answer, US cents', 't-note', 'middle'))
+    items = [(lab, S[k]['acc'] * 100) for lab, k in conds]
+    b += hbars(20, 66, items, 150, row_h=28, cls='s1', label_w=190, fmt=lambda v: f'{v:.0f}%', vmax=100)
+    cpc = [('', (S[k]['cost_per_correct'] or 0) * 100) for _, k in conds]
+    b += hbars(430, 66, cpc, 230, row_h=28, cls='s3', label_w=16, fmt=lambda v: f'{v:.3f}c', vmax=max(v for _, v in cpc) * 1.2)
+    y = 66 + len(conds) * 28 + 18
+    rows = [f'{lab}: public {S[k]["acc_public"]:.0%}, private {S[k]["acc_private"]:.0%}; {S[k]["calls"]} calls; '
+            f'{S[k]["budget_hit"]} runs hit the step budget' for lab, k in conds[2:]]
+    b += para(20, y, rows, 't-muted')
+    y += 17 * len(rows) + 10
+    b += para(20, y, ['the guard alone fixes the public questions (the model had the facts but kept repeating itself);',
+                      'the improved tool alone fixes most private ones (the model could not find the depot entries);',
+                      'both together fix all twelve. The conditions also differ in prompts, budgets and tools, so this',
+                      'compares system configurations, not loop shapes alone.'], 't-muted')
+    return svg(760, y + 17 * 4 + 8, 'Six system configurations on twelve two-hop questions with gpt-5-mini, three repeats each: accuracy on the left, cost per correct answer on the right. The two fixes help different questions: the repeated-action guard the public ones, the improved tool the private ones; together they answer all twelve.', b)
 
 
 F['ch3_react_results'] = react_results()
@@ -240,26 +268,30 @@ F['ch3_react_results'] = react_results()
 
 # ---------------------------------------------------------------- 6. the repetition failure and the guard
 def react_failure():
-    b = [text(380, 22, 'The most common ReAct failure, and where the fix lives', 't-title', 'middle')]
-    frames_ = [('step 1', ['Thought: need both years', 'Action: wiki[Sputnik 1]', 'Obs: launched 1957']),
-               ('step 2', ['Thought: 1969 - 1957', 'Action: calc[1969-1957]', 'Obs: 12']),
-               ('step 3', ['Thought: 1969 - 1957', 'Action: calc[1969-1957]', 'Obs: 12']),
-               ('steps 4 to 8', ['the same thought', 'the same action', 'budget exhausted: wrong'])]
+    S = R['summary']
+    b = [text(380, 22, 'The most common ReAct failure in our run, and where the two fixes live', 't-title', 'middle')]
+    frames_ = [('step 1', ['wiki[Eiffel Tower]', 'Obs: completed 1889']),
+               ('step 2', ['wiki[Sydney Opera House]', 'Obs: opened 1973']),
+               ('steps 3 and 4', ['calc[1973-1889]', 'Obs: 84', 'calc[1973-1889] again']),
+               ('steps 5 to 7', ['look-ups start over', 'budget of 7 runs out', 'no answer: wrong'])]
     for i, (t, lines) in enumerate(frames_):
         x = 30 + i * 182
         b += frame(x, 44, 170, 112, i + 1, t, 'box' if i < 2 else 'box-4')
-        b += para(x + 14, 92, lines, 't-tick')
+        b += para(x + 14, 88, lines, 't-tick')
         if i < 3:
             b.append(arrow(x + 170, 100, x + 182, 100))
-    b += para(380, 178, ['the answer was in the context after step 2; the model kept regenerating its last thought',
-                         'instead of finishing (the "reasoning error" row of the ReAct paper\'s Table 2)'], 't-muted', 'middle')
-    b += [line(30, 212, 730, 212, 'edge-dim'), text(380, 236, 'two fixes that are not "a bigger model"', 't-title', 'middle')]
-    b += block(30, 252, 340, 96, 'the loop: a repeated-action guard', ['the loop sees the same (tool, args) twice and', 'replaces the observation with "you have been',
+    b += para(380, 178, ['the answer (84) was in the context after step 3; the model kept acting instead of finishing',
+                         '(the "reasoning error" row of the ReAct paper, which includes failing to recover from repetitive steps)'], 't-muted', 'middle')
+    b += [line(30, 212, 730, 212, 'edge-dim'), text(380, 236, 'two fixes outside the model, measured separately', 't-title', 'middle')]
+    b += block(30, 252, 340, 96, 'the loop: a repeated-action guard', ['the loop sees the same (tool, argument) twice and',
+                                                                       'replaces the observation with "you have been',
                                                                        'round this loop; using what you have, finish now"'], 'box-4')
-    b += block(390, 252, 340, 96, 'the tool: observations that name next steps', ['a company entry lists its depots as look-up names;', 'several matches come back as entries, not errors;',
+    b += block(390, 252, 340, 96, 'the tool: observations that name next steps', ['a company entry lists its depots as look-up names;',
+                                                                                 'several matches come back as entries, not errors;',
                                                                                  'a miss explains how entries are named'], 'box-3')
-    b.append(text(380, 372, f'on the twelve questions: {R["summary"]["react"]["acc"]:.0%} to {R["summary"]["react+"]["acc"]:.0%}, with fewer calls and lower cost (Section 3.3)', 't-muted', 'middle'))
-    return svg(760, 388, 'The repetition failure of a plain ReAct loop (the answer is available after step 2, the model repeats the action until the step budget runs out) and the two fixes that live in the loop and the tool rather than in the model: a repeated-action guard that forces the finish, and tool observations that name the next things to look up.', b)
+    b.append(text(380, 372, f'plain loop {S["react"]["acc"]:.0%}; guard only {S["react+guard"]["acc"]:.0%}; improved tool only '
+                            f'{S["react+tool"]["acc"]:.0%}; both {S["react+both"]["acc"]:.0%} (36 runs each)', 't-muted', 'middle'))
+    return svg(760, 388, 'The repetition failure of a plain ReAct loop in our run (the answer is available after step 3, the model keeps acting until the step budget runs out) and the two fixes that live in the loop and the tool rather than in the model, with the accuracy of each fix alone and of both together.', b)
 
 
 F['ch3_react_failure'] = react_failure()
@@ -297,10 +329,11 @@ F['ch3_plan_execute'] = plan_execute()
 def cost_growth():
     g = C['growth']
     xs = [r['steps'] for r in g]
-    return two_lines(760, 320, 'Input tokens a task costs against the number of tool steps, for a ReAct loop that re-reads its history and a plan-and-execute design with small per-step contexts (planning numbers of ch3_cost.py).',
-                     xs, [('ReAct, re-reads history', [r['react_input'] for r in g]), ('plan-and-execute', [r['plan_exec_input'] for r in g])],
-                     'tool steps in the task', 'input tokens per task', 140000, [0, 25000, 50000, 75000, 100000, 125000], xs,
-                     notes=['planning numbers: 1,500 prompt,', '150 thought, 300 observation', f'ratio {g[-1]["react_input"] / g[-1]["plan_exec_input"]:.1f}x at 20 steps'], right=250, notes_at='middle')
+    return two_lines(760, 330, 'Billed-equivalent input tokens per task against the number of tool steps: a ReAct loop that replays its full history, the same loop with prompt caching or with compaction, and plan-and-execute with bounded per-step contexts (planning numbers of ch3_cost.py).',
+                     xs, [('ReAct, full replay', [r['react_input'] for r in g]), ('ReAct + compaction', [r['react_compacted'] for r in g]),
+                          ('ReAct + caching', [r['react_cached_equiv'] for r in g]), ('plan-and-execute', [r['plan_exec_input'] for r in g])],
+                     'tool steps in the task', 'input tokens per task (billed equivalent)', 140000, [0, 25000, 50000, 75000, 100000, 125000], xs,
+                     notes=[], right=250, notes_at='top')
 
 
 F['ch3_cost_growth'] = cost_growth()
@@ -340,14 +373,16 @@ def reflexion_results():
         return None
     S = X['summary']
     n = S['n']
-    b = [text(380, 22, f'{len(X["tasks"])} coding tasks x {X["samples"]} samples, {X["model"]}, hidden tests (ch3_reflexion.py)', 't-title', 'middle')]
-    items = [('passed on attempt 1', S['pass1'] / n * 100), ('after self-critique only', S['self_only'] / n * 100), ('after tests fed back', S['reflexion'] / n * 100)]
-    b += hbars(30, 56, items, 300, row_h=32, cls='s2', label_w=190, fmt=lambda v: f'{v:.0f}%', vmax=100)
-    y = 56 + 3 * 32 + 14
-    b += para(30, y, [f'{n} first attempts; {S["pass1"]} passed. Of the {S["failures"]} failures, self-critique alone (no test output shown)',
-                      f'fixed {S["self_only_fixed"]}; feeding the failing test back fixed {S["reflexion_fixed"]}. Both branches started from the same failed',
-                      f'attempt with the same budget of {X["max_attempts"]} attempts. Whole experiment: {S["calls"]} API calls, ${S["cost_usd"]:.3f}.'], 't-muted')
-    return svg(760, y + 17 * 3 + 8, 'Our own reflection experiment: ten small coding tasks with hidden unit tests, three samples each; every failed first attempt was continued both by self-critique alone and by feeding back the failing test, from the same starting point.', b)
+    b = [text(380, 22, f'{S["n"]} first attempts at {len(X["tasks"])} coding tasks, graded on held-out tests', 't-title', 'middle')]
+    items = [('first attempt', S['first_heldout'] / n * 100), (f'after {X["self_rounds"]} rounds of self-review', S['self_heldout'] / n * 100),
+             ('after the feedback-test loop', S['fb_heldout'] / n * 100)]
+    b += hbars(20, 50, items, 300, row_h=32, cls='s2', label_w=230, fmt=lambda v: f'{v:.0f}%', vmax=100)
+    y = 50 + 3 * 32 + 16
+    b += para(20, y, [f'all {n} first attempts went through both strategies, the right ones too. Self-review changed the',
+                      f'code in {S["self_changed"]} of {n} attempts; it fixed {S["self_fixed"]} and broke {S["self_broke"]}. The feedback loop only touched the {S["fb_entered"]}',
+                      f'attempts its tests rejected; it fixed {S["fb_fixed"]} and broke {S["fb_broke"]}. Its check was not perfect: {S["feedback_false_accept"]} of the {S["feedback_accept"]} attempts',
+                      f'the feedback suite accepted failed the held-out tests. {S["calls"]} API calls, ${S["cost_usd"]:.2f}, {X["model"]}.'], 't-muted')
+    return svg(760, y + 17 * 4 + 8, 'Our repair experiment: fifty first attempts at ten coding tasks, each sent through two rounds of self-review and through a loop driven by the project\'s feedback tests, all graded on held-out tests the loops never saw.', b)
 
 
 r = reflexion_results()
@@ -421,10 +456,25 @@ def retry_math():
         series.append((f'p = {p:.0%} per attempt', [next(r['p_success'] for r in ret if r['p'] == p and r['k'] == k) * 100 for k in ks]))
     return two_lines(760, 300, 'Probability of success within k attempts when a verifier can tell right from wrong, for three per-attempt pass rates.',
                      ks, series, 'attempts allowed (k)', 'P(success within k), %', 100, [0, 25, 50, 75, 100], ks,
-                     notes=['P = 1 - (1 - p)^k', 'cost per correct stays c / p', 'for any k (ch3_cost.py part 3)'], right=240, fmt=lambda v: f'{v:.0f}', notes_at='bottom')
+                     notes=['P = 1 - (1 - p)^k; assumes', 'independent attempts, fixed p,', 'and a perfect verifier'], right=240, fmt=lambda v: f'{v:.0f}', notes_at='bottom')
 
 
 F['ch3_retry_math'] = retry_math()
+
+
+# ---------------------------------------------------------------- 13b. what an acceptance is worth
+def verifier():
+    ps = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    prec = lambda p, r, f: p * r / (p * r + (1 - p) * f) * 100
+    series = [('f = 0.05, r = 1', [prec(p, 1, 0.05) for p in ps]), ('f = 0.2, r = 1', [prec(p, 1, 0.2) for p in ps]),
+              ('no verifier', [p * 100 for p in ps])]
+    return two_lines(760, 300, 'Probability that an accepted answer is correct, against the share of candidates that are correct, for two verifiers and for no verifier.',
+                     [round(p * 100) for p in ps], series, 'share of candidates that are correct, p (%)', 'P(correct | accepted), %', 100,
+                     [0, 25, 50, 75, 100], [10, 30, 50, 70, 90],
+                     notes=['p r / (p r + (1 - p) f)', 'p = 90%, f = 0.2: 97.8%', 'p = 30%, f = 0.2: 68.2%'], right=240, fmt=lambda v: f'{v:.0f}', notes_at='bottom')
+
+
+F['ch3_verifier'] = verifier()
 
 
 # ---------------------------------------------------------------- 14. code as action and the agentless counterpoint
@@ -460,10 +510,9 @@ F['ch3_code_as_action'] = code_as_action()
 def companies():
     pats = ['fixed pipeline', 'ReAct loop', 'plan+execute', 'reflect on tests', 'search/best-of-n', 'judge/human gate']
     rows = [('Uber Genie, uReview, FixrLeak', [1, 0, 0, 1, 0, 1]), ('Amazon Q code transformation', [0, 0, 1, 1, 0, 1]), ('Spotify Honk', [0, 1, 0, 1, 0, 1]),
-            ('DoorDash support, Flux', [1, 1, 0, 0, 0, 1]), ('LinkedIn SQL Bot, Hiring Asst.', [0, 1, 1, 1, 0, 1]), ('Stripe Minions', [0, 1, 0, 1, 0, 1]),
-            ('Airbnb test migration', [1, 0, 0, 1, 0, 0]), ('Anthropic SWE-bench scaffold', [0, 1, 0, 0, 0, 0]), ('Google Deep Research', [0, 1, 1, 0, 0, 1]),
-            ('Klarna assistant (as reported)', [0, 1, 0, 0, 0, 1])]
-    b = [text(380, 22, 'Patterns described in the production write-ups of Section 3.8 (filled = on the page)', 't-title', 'middle')]
+            ('DoorDash support, Assistant', [1, 1, 0, 0, 0, 1]), ('LinkedIn SQL Bot, Hiring Asst.', [0, 1, 1, 1, 0, 1]), ('Stripe Minions', [0, 1, 0, 1, 0, 1]),
+            ('Airbnb test migration', [1, 0, 0, 1, 0, 0]), ('Anthropic SWE-bench scaffold', [0, 1, 0, 0, 0, 0]), ('Google Deep Research', [0, 1, 1, 0, 0, 1])]
+    b = [text(380, 22, 'Patterns the companies describe in their own write-ups (filled = stated on the page)', 't-title', 'middle')]
     x0, lw, cw, y0, rh = 30, 220, 78, 134, 26
     for j, p in enumerate(pats):
         cx = x0 + lw + j * cw + cw / 2
@@ -475,9 +524,9 @@ def companies():
             cx = x0 + lw + j * cw + cw / 2
             b.append(f'<g class="mark"><title>{esc(name)}: {esc(pats[j])}</title><rect class="{"cell" if v else "cell-masked"}" x="{cx - 11:.1f}" y="{y + 3:.1f}" width="22" height="{rh - 6}" rx="4" style="fill-opacity:{0.85 if v else 1}"/></g>')
     y = y0 + len(rows) * rh + 14
-    b += para(30, y, ['nearly every row is filled in one of the last two columns: a verifier (tests, CI, a judge model) or a',
-                      'human gate. The shape of the loop varied from company to company; the presence of a check did not.'], 't-muted')
-    return svg(760, y + 42, 'The patterns described in the production write-ups of Section 3.8, one row per system: fixed pipelines and ReAct loops are both common; almost every system adds an external check (tests, CI, a judge model) or a human gate.', b)
+    b += para(30, y, ['our reading of the write-ups, not a survey: most rows have a verifier (tests, CI, a judge',
+                      'model) or a human gate. Klarna is left out: its assistant\'s architecture was not published.'], 't-muted')
+    return svg(760, y + 42, 'The patterns the companies of Section 3.9 describe in their own engineering write-ups, one row per system, as we read them: fixed pipelines and loops are both common, and most systems add an external check or a human gate.', b)
 
 
 F['ch3_companies'] = companies()
@@ -485,12 +534,12 @@ F['ch3_companies'] = companies()
 
 # ---------------------------------------------------------------- 16. choosing a pattern
 def decision():
-    b = [text(380, 22, 'Choosing a pattern: start simple, add one thing per measured failure', 't-title', 'middle')]
+    b = [text(380, 22, 'A starting heuristic: begin simple, add one thing per measured failure', 't-title', 'middle')]
     steps = [('start', 'box', 'one call, or a fixed pipeline if the steps are known', 'measure accuracy, cost and latency on a labelled set'),
              ('wrong on multi-step reasoning?', 'box-2', 'add chain of thought, or a reasoning model', 'cost: output tokens; do not assume faithfulness'),
              ('facts or state not in the model?', 'box-3', 'add tools in a ReAct loop: step budget, repeat guard', 'cost: n calls on a growing context'),
              ('many steps; latency or tokens too high?', 'box-4', 'plan first, execute with small parallel contexts', 'cost: a wrong plan is found late; replan'),
-             ('an external check exists?', 'box-1', 'add reflection on tests, compiler, search, human', 'cost: up to k attempts; never self-critique alone'),
+             ('an external check exists?', 'box-1', 'add reflection on tests, compiler, search, human', 'cost: k attempts; self-review alone is weak'),
              ('early choices decide; states scorable?', 'box-4', 'search: best-of-n with a verifier, or a tree', 'cost: 10x to 100x tokens; puzzles, code with tests')]
     y = 44
     for i, (q, cls, act, note) in enumerate(steps):
@@ -500,8 +549,9 @@ def decision():
         if i < len(steps) - 1:
             b += [arrow(180, y + 44, 180, y + 58), text(190, y + 56, 'no, or still failing', 't-muted')]
         y += 58
-    b += para(380, y + 6, ['at every arrow the same three numbers are measured again:', 'accuracy on the labelled set, cost per correct answer, p95 latency'], 't-muted', 'middle')
-    return svg(760, y + 36, 'A decision ladder for choosing a reasoning pattern: start with one call or a fixed pipeline, and add chain of thought, a tool loop, a plan, an external check or search only when a measured failure demands it, re-measuring accuracy, cost per correct answer and latency at every step.', b)
+    b += para(380, y + 6, ['not a fixed sequence: skip or combine rungs when the task makes the need obvious (code with tests',
+                           'starts at reflection); at every arrow re-measure accuracy, cost per correct answer and p95 latency'], 't-muted', 'middle')
+    return svg(760, y + 36, 'A starting heuristic for choosing a reasoning pattern: start with one call or a fixed pipeline, and add chain of thought, a tool loop, a plan, an external check or search only when a measured failure demands it, re-measuring accuracy, cost per correct answer and latency at every step.', b)
 
 
 F['ch3_decision'] = decision()

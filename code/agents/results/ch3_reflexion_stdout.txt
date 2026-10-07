@@ -1,21 +1,27 @@
-== Reflection with an external check vs self-critique alone: 10 tasks x 5 samples, gpt-5-mini, up to 3 attempts ==
+== Repair strategies on 10 coding tasks x 5 first attempts, gpt-5-mini; every number below is on the HELD-OUT tests ==
+runner: separate `python -I` process + 10 s timeout = a demonstration, not a sandbox
+test suites checked against reference solutions: 20/20 pass (96 feedback test blocks, 88 held-out test blocks)
 
--- per task: how many of the 5 samples passed on attempt 1, after self-critique only, after tests fed back (<= 3 attempts) --
-task               pass@1  self-only  reflexion   first failing test fed back (reflexion arm)
-eval_expr             4/5        5/5        5/5   assert eval_expr("1+2*3") == 7.0 | -> NameError: name 'eval_expr' 
-parse_csv_line        5/5        5/5        5/5   
-TTLCache              0/5        0/5        2/5   t = [0.0] | clock = lambda: t[0] | c = TTLCache(2, 10, clock) | c.
-cron_matches          5/5        5/5        5/5   
-slugify               4/5        4/5        5/5   assert slugify("hello wonderful world", max_len=15) == "hello-wond
-osa_distance          5/5        5/5        5/5   
-number_to_words       4/5        4/5        5/5   assert number_to_words(1100) == "one thousand, one hundred" | -> A
-topological_sort      5/5        5/5        5/5   
-roman_to_int          4/5        4/5        5/5   for bad in ["IIII", "VV", "IC", "IM", "iv", "", "MMMM", "XCX", "IX
-parse_version         5/5        5/5        5/5   
+-- per task, out of 5: held-out passes for the first attempt, after self-review, after the feedback-test loop --
+task              feedback@1 held-out@1 self-review  fb-tests self changed
+eval_expr                4/5        4/5         4/5       5/5          5/5
+parse_csv_line           5/5        5/5         5/5       5/5          5/5
+TTLCache                 1/5        1/5         0/5       4/5          5/5
+cron_matches             5/5        4/5         5/5       4/5          5/5
+slugify                  5/5        5/5         5/5       5/5          2/5
+osa_distance             5/5        5/5         5/5       5/5          4/5
+number_to_words          5/5        5/5         5/5       5/5          5/5
+topological_sort         5/5        5/5         5/5       5/5          5/5
+roman_to_int             4/5        4/5         4/5       5/5          5/5
+parse_version            5/5        5/5         5/5       5/5          4/5
 
--- summary --
-first attempts: 50; passed on attempt 1: 41 (82%)
-of the 9 failures: self-critique alone fixed 1, tests fed back fixed 6 (up to 2 more attempts each)
-pass rate within 3 attempts: self-only 42/50 (84%), reflexion 47/50 (94%)
-total spend this run: $0.1137 (82 calls, 41,150 input + 51,714 output tokens)
+-- summary (held-out tests) --
+first attempts: 43/50 pass the held-out tests (86%)
+self-review, 2 rounds on all 50: 43/50 pass (86%); wrong->right 1, right->wrong 1
+   the code changed in 45 of 50 attempts, 38 of them already right
+feedback-test loop on all 50: 48/50 pass (96%); wrong->right 5, right->wrong 0
+   6 attempts failed the feedback suite and entered the loop; the rest were left alone
+feedback suite as a check on first attempts: accepted 44, of which 1 fail held-out (false accept);
+   rejected 6, of which 0 pass held-out (false reject)
+total spend this run: $0.2262 (160 calls, 139,138 input + 95,690 output tokens)
 stub used: no, every answer came from the API

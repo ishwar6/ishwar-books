@@ -96,9 +96,9 @@
   }
  ],
  "measured_acc": {
-  "direct answer": 0.0,
-  "chain of thought": 0.3333333333333333,
-  "ReAct, 5 tool steps": 0.5
+  "direct answer": 0.027777777777777776,
+  "chain of thought": 0.2222222222222222,
+  "ReAct, 5 tool steps": 0.5555555555555556
  },
  "assumed_acc": {
   "direct answer": 0.5,
@@ -110,9 +110,9 @@
   "best-of-5 with a free checker (tests)": 0.9
  },
  "cost_per_correct": {
-  "direct answer": null,
-  "chain of thought": 0.029250000000000005,
-  "ReAct, 5 tool steps": 0.1215,
+  "direct answer": 0.17820000000000003,
+  "chain of thought": 0.04387500000000001,
+  "ReAct, 5 tool steps": 0.10934999999999999,
   "plan-and-execute, 5 steps (parallel)": 0.04556249999999999,
   "tree of thoughts, b=3, d=3": 0.28350000000000003,
   "best-of-5 with a model verifier": 0.09749999999999999,
@@ -220,22 +220,188 @@
   {
    "steps": 2,
    "react_input": 5850,
+   "react_cached_equiv": 2745,
+   "react_compacted": 5850,
    "plan_exec_input": 5210
   },
   {
    "steps": 5,
    "react_input": 15750,
+   "react_cached_equiv": 4950,
+   "react_compacted": 14400,
    "plan_exec_input": 8150
   },
   {
    "steps": 10,
    "react_input": 41250,
+   "react_cached_equiv": 9525,
+   "react_compacted": 28650,
    "plan_exec_input": 13050
   },
   {
    "steps": 20,
    "react_input": 126000,
+   "react_cached_equiv": 22050,
+   "react_compacted": 57150,
    "plan_exec_input": 22850
+  }
+ ],
+ "cache_rate": 0.1,
+ "window": 3,
+ "bayes": [
+  {
+   "p": 0.9,
+   "r": 1.0,
+   "f": 0.2,
+   "precision": 0.9782608695652174
+  },
+  {
+   "p": 0.9,
+   "r": 1.0,
+   "f": 0.05,
+   "precision": 0.994475138121547
+  },
+  {
+   "p": 0.9,
+   "r": 0.9,
+   "f": 0.2,
+   "precision": 0.9759036144578314
+  },
+  {
+   "p": 0.7,
+   "r": 1.0,
+   "f": 0.2,
+   "precision": 0.9210526315789473
+  },
+  {
+   "p": 0.7,
+   "r": 1.0,
+   "f": 0.05,
+   "precision": 0.979020979020979
+  },
+  {
+   "p": 0.7,
+   "r": 0.9,
+   "f": 0.2,
+   "precision": 0.9130434782608695
+  },
+  {
+   "p": 0.5,
+   "r": 1.0,
+   "f": 0.2,
+   "precision": 0.8333333333333334
+  },
+  {
+   "p": 0.5,
+   "r": 1.0,
+   "f": 0.05,
+   "precision": 0.9523809523809523
+  },
+  {
+   "p": 0.5,
+   "r": 0.9,
+   "f": 0.2,
+   "precision": 0.8181818181818181
+  },
+  {
+   "p": 0.3,
+   "r": 1.0,
+   "f": 0.2,
+   "precision": 0.6818181818181819
+  },
+  {
+   "p": 0.3,
+   "r": 1.0,
+   "f": 0.05,
+   "precision": 0.8955223880597015
+  },
+  {
+   "p": 0.3,
+   "r": 0.9,
+   "f": 0.2,
+   "precision": 0.6585365853658537
+  }
+ ],
+ "best_of_n": [
+  {
+   "p": 0.3,
+   "r": 1.0,
+   "f": 0.2,
+   "n": 1,
+   "p_correct": 0.30000000000000004,
+   "p_wrong": 0.14,
+   "p_none": 0.5599999999999999,
+   "precision": 0.6818181818181819
+  },
+  {
+   "p": 0.3,
+   "r": 1.0,
+   "f": 0.2,
+   "n": 3,
+   "p_correct": 0.56208,
+   "p_wrong": 0.262304,
+   "p_none": 0.17561599999999994,
+   "precision": 0.6818181818181819
+  },
+  {
+   "p": 0.3,
+   "r": 1.0,
+   "f": 0.2,
+   "n": 5,
+   "p_correct": 0.6442682880000001,
+   "p_wrong": 0.3006585344,
+   "p_none": 0.055073177599999974,
+   "precision": 0.6818181818181819
+  },
+  {
+   "p": 0.3,
+   "r": 1.0,
+   "f": 0.2,
+   "n": 10,
+   "p_correct": 0.679750189847072,
+   "p_wrong": 0.3172167552619669,
+   "p_none": 0.0030330548909611385,
+   "precision": 0.6818181818181819
+  },
+  {
+   "p": 0.7,
+   "r": 1.0,
+   "f": 0.2,
+   "n": 1,
+   "p_correct": 0.7,
+   "p_wrong": 0.060000000000000005,
+   "p_none": 0.24000000000000005,
+   "precision": 0.9210526315789473
+  },
+  {
+   "p": 0.7,
+   "r": 1.0,
+   "f": 0.2,
+   "n": 3,
+   "p_correct": 0.9083199999999999,
+   "p_wrong": 0.07785600000000001,
+   "p_none": 0.013824000000000008,
+   "precision": 0.9210526315789473
+  },
+  {
+   "p": 0.7,
+   "r": 1.0,
+   "f": 0.2,
+   "n": 5,
+   "p_correct": 0.920319232,
+   "p_wrong": 0.07888450560000002,
+   "p_none": 0.0007962624000000007,
+   "precision": 0.9210526315789473
+  },
+  {
+   "p": 0.7,
+   "r": 1.0,
+   "f": 0.2,
+   "n": 10,
+   "p_correct": 0.9210520476004385,
+   "p_wrong": 0.07894731836575188,
+   "p_none": 6.340338096537612e-07,
+   "precision": 0.9210526315789473
   }
  ]
 }

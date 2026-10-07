@@ -1,25 +1,42 @@
-== Direct vs chain of thought vs ReAct: 12 questions, model gpt-5-mini (reasoning_effort=minimal) ==
+== Six system configurations, 12 two-hop questions x 3 repeats, gpt-5-mini (reasoning_effort=minimal) ==
+-- grader self-test: the typed exact grader against the first draft's substring grader --
+answer                                     expected                 old    typed  as intended?
+'184'                                      84                       right  wrong  yes
+'13'                                       3                        right  wrong  yes
+'It is not 84; the answer is 74.'          84                       right  wrong  yes
+'84 years'                                 84                       right  right  yes
+'2,954 m'                                  2954                     right  right  yes
+'three'                                    3                        right  right  yes
+'5.1 million'                              5.1                      right  right  yes
+'Mira Takacs; Rotterdam'                   mira takacs + rotterdam  right  right  yes
+'Mira Takacs'                              mira takacs + rotterdam  wrong  wrong  yes
+'48 locomotives; acquired 17 years later'  48 + 17                  right  right  yes
+self-test: 10/10 verdicts as intended
 
--- per question (public = facts the model may know; private = a fictional company it cannot know) --
- # kind     direct  cot     react   react+  steps steps+  question
- 1 public   wrong   ok      wrong   ok          8      5  How many years passed between the completion of 
- 2 public   wrong   wrong   ok      ok          4      5  How many metres taller is Mount Everest than Mou
- 3 public   wrong   ok      wrong   ok          8      5  How many years after the launch of Sputnik 1 did
- 4 public   wrong   ok      ok      ok          4      4  How many centuries, rounded down, separate the f
- 5 public   wrong   ok      wrong   ok          8      5  How many kilometres longer is the Amazon River t
- 6 public   wrong   wrong   ok      ok          6      5  By how many million people does the population o
- 7 private  wrong   wrong   ok      ok          2      3  Who is the chief executive of Northwind Freight,
- 8 private  wrong   wrong   wrong   ok          8      5  How many trucks do the Rotterdam and Gdansk depo
- 9 private  wrong   wrong   ok      ok          4      4  Which company did the chief executive of Northwi
-10 private  wrong   wrong   wrong   ok          6      5  How many years after the Porto depot of Northwin
-11 private  wrong   wrong   wrong   ok          8      4  In which city was the manager of the Rotterdam d
-12 private  wrong   wrong   ok      ok          3      3  How many locomotives did Harbour Rail have, and 
+-- correct runs out of 3, per question (1-6 public facts the model may know; 7-12 a fictional company it cannot know) --
+ # kind     direct      cot         react       react+guard react+tool  react+both  question
+ 1 public   0/3         3/3         0/3         3/3         2/3         3/3         How many years passed between the 
+ 2 public   0/3         0/3         2/3         3/3         1/3         3/3         How many metres taller is Mount Ev
+ 3 public   1/3         0/3         1/3         3/3         1/3         3/3         How many years after the launch of
+ 4 public   0/3         3/3         3/3         3/3         3/3         3/3         How many centuries, rounded down, 
+ 5 public   0/3         2/3         0/3         3/3         0/3         3/3         How many kilometres longer is the 
+ 6 public   0/3         0/3         2/3         3/3         3/3         3/3         By how many million people does th
+ 7 private  0/3         0/3         3/3         3/3         3/3         3/3         Who is the chief executive of Nort
+ 8 private  0/3         0/3         2/3         0/3         3/3         3/3         How many trucks do the Rotterdam a
+ 9 private  0/3         0/3         3/3         3/3         3/3         3/3         Which company did the chief execut
+10 private  0/3         0/3         1/3         0/3         2/3         3/3         How many years after the Porto dep
+11 private  0/3         0/3         0/3         0/3         3/3         3/3         In which city was the manager of t
+12 private  0/3         0/3         3/3         3/3         3/3         3/3         How many locomotives did Harbour R
 
--- summary (tokens and cost from the API usage fields; price per million: $0.25 in, $2.0 out; react+ = a loop guard that forces the finish after a repeated action + a wiki that lists related entries) --
-condition  acc all  public  private  calls   in tok  out tok   cost $  $/correct
-direct          0%      0%       0%     12      495      176   0.0005        nan
-cot            33%     67%       0%     12      699    1,013   0.0022     0.0006
-react          50%     50%      50%     64   27,233    2,491   0.0118     0.0020
-react+        100%    100%     100%     53   21,221    2,022   0.0093     0.0008
-total spend this run: $0.0238 (141 calls, 49,648 input + 5,702 output tokens, 0 hidden reasoning tokens)
+-- summary over 36 runs per condition (tokens and cost from the API usage fields; $0.25 in, $2.0 out per M) --
+condition      acc     range  public  private  calls   in tok  out tok  cost $ $/correct budget  rep.
+direct          3%     0%-8%      6%       0%     36    1,485      534  0.0014   0.00144      0     0
+cot            22%   17%-25%     44%       0%     36    2,097    3,193  0.0069   0.00086      0     0
+react          56%   42%-67%     44%      67%    189   79,916    7,236  0.0345   0.00172     16    21
+react+guard    75%   75%-75%    100%      50%    134   50,776    5,156  0.0230   0.00085      0    20
+react+tool     75%   67%-83%     56%      94%    170   69,596    6,332  0.0301   0.00111      9    15
+react+both    100% 100%-100%    100%     100%    150   59,082    5,651  0.0261   0.00072      0    13
+budget = runs that hit the 7-step budget; rep. = runs in which the model repeated an action it had already run
+answers marked wrong only because they also contain other numbers: 2, e.g. cot q3: 'Approximately 11 years and 9 months (about 12 years)'
+total spend this run: $0.1219 (715 calls, 262,952 input + 28,102 output tokens, 0 hidden reasoning tokens)
 stub used: no, every answer came from the API

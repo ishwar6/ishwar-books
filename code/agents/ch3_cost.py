@@ -80,8 +80,8 @@ for r in rows:
 # ---- 2. expected cost per correct answer
 log('')
 log('== 2. Expected cost per correct answer = cost per attempt / accuracy ==')
-log('accuracies below are ILLUSTRATIVE except the three marked "mea" (measured in ch3_react.py on twelve questions; the plain ReAct loop,')
-log('not the guarded one, which reached 100% there). A cost per correct answer with zero correct answers is undefined.')
+log('accuracies below are ILLUSTRATIVE except the three marked "mea" (measured in ch3_react.py: 12 questions x 3 repeats; the plain ReAct')
+log('loop, not the guard + improved tool version). A cost per correct answer with zero correct answers is undefined.')
 measured = {}
 try:
     R = json.load(open(os.path.join(os.path.dirname(__file__), 'results', 'ch3_react.json')))
@@ -107,6 +107,8 @@ log('or if a wrong answer has a cost of its own (a human review, a refund, a ret
 log('')
 log('== 3. With a verifier (tests, a checker, a human), retry up to k times ==')
 log('P(success within k) = 1 - (1 - p)^k      expected cost = c * (1 - (1 - p)^k) / p      (c = cost of one attempt, p = pass rate per attempt)')
+log('ASSUMES: attempts independent; the same p and the same cost c on every attempt; a PERFECT verifier (accepts every right answer,')
+log('rejects every wrong one). Feedback-driven retries break the first two (attempt 2 sees attempt 1), and real verifiers are not perfect.')
 c = rows[1]['cost_frontier']      # one chain-of-thought attempt at the frontier price
 log(f'one attempt c = ${c:.4f} (chain of thought, frontier price)')
 log(f'{"p per attempt":>14} {"k":>3} {"P(success)":>11} {"E[attempts]":>12} {"E[cost]":>9} {"$/correct":>10}')
@@ -120,16 +122,58 @@ for p in [0.3, 0.5, 0.7]:
 log('reading: with a verifier, retries raise the success rate quickly (p=0.5, k=3 gives 88%) and the cost per correct answer barely moves,')
 log('because failed attempts are cheap and recognised. Without a verifier there is nothing to retry on: you pay k times and keep the same accuracy.')
 
+log4_ = Log('ch3_cost_tokens')
+log4 = lambda *x: (log(*x), log4_(*x))
 # ---- 4. what the ReAct history costs as steps grow (why plan-and-execute separates the contexts)
-log('')
-log('== 4. ReAct input tokens against step count (each step re-reads the whole history) ==')
+log4('')
+log4('== 4. ReAct input tokens against step count ==')
+log4('ASSUMES: the loop replays the FULL growing history on every call (quadratic); plan-and-execute executors see a bounded context')
+log4('(linear). Two common changes: prompt caching bills the repeated prefix at a discount (CACHE_RATE below, an assumption: providers')
+log4('differ), and compaction keeps only the last WINDOW steps in full. Columns: billed-equivalent input tokens.')
+CACHE_RATE, WINDOW = 0.10, 3
+log4(f'CACHE_RATE = {CACHE_RATE} (cached tokens cost {CACHE_RATE:.0%} of normal input), WINDOW = {WINDOW} steps')
+log4(f'{"steps":>6} {"ReAct full":>11} {"+ caching":>10} {"+ compaction":>13} {"plan-exec":>10} {"ratio full/plan":>16}')
 growth = []
 for n in [2, 5, 10, 20]:
     inp = sum(P + k * (THOUGHT + OBS) for k in range(n + 1))
+    cached = sum((P if k == 0 else (THOUGHT + OBS)) + CACHE_RATE * (0 if k == 0 else P + (k - 1) * (THOUGHT + OBS)) for k in range(n + 1))
+    compact = sum(P + min(k, WINDOW) * (THOUGHT + OBS) for k in range(n + 1))
     pe = P + n * (EXEC_IN + OBS) + (P + PLAN + n * EXEC_OUT)
-    growth.append({'steps': n, 'react_input': inp, 'plan_exec_input': pe})
-    log(f'  {n:>2} steps: ReAct {inp:>8,} input tokens   plan-and-execute {pe:>7,}   ratio {inp / pe:.1f}x')
+    growth.append({'steps': n, 'react_input': inp, 'react_cached_equiv': round(cached), 'react_compacted': compact, 'plan_exec_input': pe})
+    log4(f'{n:>6} {inp:>11,} {round(cached):>10,} {compact:>13,} {pe:>10,} {inp / pe:>15.1f}x')
+log4('reading: the quadratic growth is a property of full replay, not of ReAct itself; caching changes the bill (not the context size or')
+log4('the attention cost), and compaction changes both at the price of forgetting detail.')
+
+log5_ = Log('ch3_cost_verifier')
+log5 = lambda *x: (log(*x), log5_(*x))
+# ---- 5. what a verifier's acceptance is worth: Bayes, not the false-accept rate
+log5('')
+log5('== 5. P(correct | accepted) = p*r / (p*r + (1-p)*f) ==')
+log5('p = P(candidate correct), r = P(accept | correct), f = P(accept | wrong). The false-accept rate f is NOT 1 - precision.')
+bayes = []
+log5(f'{"p":>5} {"r":>5} {"f":>5} {"P(correct | accepted)":>22}')
+for p_ in [0.9, 0.7, 0.5, 0.3]:
+    for r_, f_ in [(1.0, 0.2), (1.0, 0.05), (0.9, 0.2)]:
+        prec = p_ * r_ / (p_ * r_ + (1 - p_) * f_)
+        bayes.append({'p': p_, 'r': r_, 'f': f_, 'precision': prec})
+        log5(f'{p_:>5.2f} {r_:>5.2f} {f_:>5.2f} {prec:>21.1%}')
+log5('worked example: p=0.9, r=1, f=0.2 gives 0.9 / (0.9 + 0.02) = 97.8%. At p=0.3 the same verifier gives 68.2%: an acceptance')
+log5('means less on hard tasks, where most candidates are wrong.')
+log5('')
+log5('best-of-n, return the first accepted candidate (candidates independent, the same p, r, f for each):')
+log5(f'{"p":>5} {"n":>3} {"P(return correct)":>18} {"P(return wrong)":>16} {"P(nothing)":>11} {"precision":>10}')
+bon = []
+for p_, r_, f_ in [(0.3, 1.0, 0.2), (0.7, 1.0, 0.2)]:
+    a, b = p_ * r_, (1 - p_) * f_
+    for n in [1, 3, 5, 10]:
+        none = (1 - a - b) ** n
+        pc, pw = a / (a + b) * (1 - none), b / (a + b) * (1 - none)
+        bon.append({'p': p_, 'r': r_, 'f': f_, 'n': n, 'p_correct': pc, 'p_wrong': pw, 'p_none': none, 'precision': pc / (pc + pw)})
+        log5(f'{p_:>5.2f} {n:>3} {pc:>18.1%} {pw:>16.1%} {none:>11.1%} {pc / (pc + pw):>10.1%}')
+log5('reading: more candidates raise the chance of returning SOMETHING, not the precision of what is returned. Correlated errors (the')
+log5('same wrong answer in many samples) and picking the top-scored candidate instead of the first accepted both make this worse.')
 
 save('ch3_cost', {'params': dict(P=P, THOUGHT=THOUGHT, ANSWER=ANSWER, OBS=OBS, COT_OUT=COT_OUT, PLAN=PLAN, EXEC_IN=EXEC_IN, EXEC_OUT=EXEC_OUT,
                                  EVAL_OUT=EVAL_OUT, L_CALL=L_CALL, L_TOK=L_TOK, L_TOOL=L_TOOL), 'prices': PRICES, 'rows': rows,
-                  'measured_acc': measured, 'assumed_acc': acc_illustrative, 'cost_per_correct': cpc, 'retry': retry, 'growth': growth})
+                  'measured_acc': measured, 'assumed_acc': acc_illustrative, 'cost_per_correct': cpc, 'retry': retry, 'growth': growth,
+                  'cache_rate': CACHE_RATE, 'window': WINDOW, 'bayes': bayes, 'best_of_n': bon})

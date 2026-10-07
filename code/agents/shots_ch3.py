@@ -153,6 +153,19 @@ JOBS = [
          anchor='The o1 large language model family is trained with reinforcement learning to perform complex',
          highlight=['it can produce a long chain of thought before responding', 'refine their thinking process, try different strategies, and recognize their mistakes'],
          above=4, end='unsafe or inappropriate content.'),
+    # ---- the modern update (2021 to 2025): verifiers, trained self-correction, compute-optimal test-time scaling, faithfulness of reasoning models
+    dict(name='ch3-verifiers-abstract', arxiv_id='2110.14168', page=0, column='full',
+         anchor='State-of-the-art language models can match human',
+         highlight=['training verifiers to judge the correctness of model completions', 'generate many candidate solutions and select the one ranked highest by the verifier'],
+         above=4, end='a finetuning baseline.'),
+    dict(name='ch3-score-table2', arxiv_id='2409.12917', page=10, column='full', anchor='Table 2', above=4, below=126,
+         highlight=['-11.2%', '15.8%', 'SCoRe (Ours)']),
+    dict(name='ch3-snell-abstract', arxiv_id='2408.03314', page=0, column='full',
+         anchor='Enabling LLMs to improve their outputs by using more test-time computation',
+         highlight=['critically varies depending on the difficulty of the prompt', 'more than 4', 'outperform a 14'],
+         above=4, end='larger model.'),
+    dict(name='ch3-cotfaith-figure1', arxiv_id='2505.05410', page=1, figure=True, column='full',
+         anchor='Figure 1: CoT faithfulness scores of reasoning models', highlight=['CoT faithfulness scores'], below=0),
 ]
 
 
@@ -176,7 +189,7 @@ def finish(names, trim=None):
 
 TRIM = {'ch3-cot-figure1': 70, 'ch3-cot-abstract': 70, 'ch3-zeroshot-abstract': 70, 'ch3-unfaithful-abstract': 70, 'ch3-selfcorrect-abstract': 70,
         'ch3-ps-abstract': 0, 'ch3-rewoo-abstract': 70, 'ch3-critic-abstract': 70, 'ch3-tot-figure1': 0, 'ch3-sweagent-figure1': 70,
-        'ch3-agentless-abstract': 70, 'ch3-r1-abstract': 70, 'ch3-o1-training': 70, 'ch3-sc-abstract': 70}
+        'ch3-agentless-abstract': 70, 'ch3-r1-abstract': 70, 'ch3-o1-training': 70, 'ch3-sc-abstract': 70, 'ch3-verifiers-abstract': 340, 'ch3-snell-abstract': 70}
 
 if __name__ == '__main__':
     only = os.environ.get('ONLY')

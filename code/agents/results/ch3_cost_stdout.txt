@@ -20,12 +20,12 @@ relative to the direct answer (frontier price):
   best-of-5 with a free checker (tests)         9.8x cost    3.5x latency
 
 == 2. Expected cost per correct answer = cost per attempt / accuracy ==
-accuracies below are ILLUSTRATIVE except the three marked "mea" (measured in ch3_react.py on twelve questions; the plain ReAct loop,
-not the guarded one, which reached 100% there). A cost per correct answer with zero correct answers is undefined.
+accuracies below are ILLUSTRATIVE except the three marked "mea" (measured in ch3_react.py: 12 questions x 3 repeats; the plain ReAct
+loop, not the guard + improved tool version). A cost per correct answer with zero correct answers is undefined.
 pattern                                     accuracy  $ / attempt  $ / correct
-direct answer                                  0% mea       0.0050    undefined (no correct answers)
-chain of thought                              33% mea       0.0098       0.0293
-ReAct, 5 tool steps                           50% mea       0.0607       0.1215
+direct answer                                  3% mea       0.0050       0.1782
+chain of thought                              22% mea       0.0098       0.0439
+ReAct, 5 tool steps                           56% mea       0.0607       0.1093
 plan-and-execute, 5 steps (parallel)          80% ass       0.0364       0.0456
 tree of thoughts, b=3, d=3                    90% ass       0.2552       0.2835
 best-of-5 with a model verifier               80% ass       0.0780       0.0975
@@ -36,6 +36,8 @@ or if a wrong answer has a cost of its own (a human review, a refund, a retry) t
 
 == 3. With a verifier (tests, a checker, a human), retry up to k times ==
 P(success within k) = 1 - (1 - p)^k      expected cost = c * (1 - (1 - p)^k) / p      (c = cost of one attempt, p = pass rate per attempt)
+ASSUMES: attempts independent; the same p and the same cost c on every attempt; a PERFECT verifier (accepts every right answer,
+rejects every wrong one). Feedback-driven retries break the first two (attempt 2 sees attempt 1), and real verifiers are not perfect.
 one attempt c = $0.0098 (chain of thought, frontier price)
  p per attempt   k  P(success)  E[attempts]   E[cost]  $/correct
            30%   1         30%         1.00    0.0098     0.0325
@@ -53,8 +55,46 @@ one attempt c = $0.0098 (chain of thought, frontier price)
 reading: with a verifier, retries raise the success rate quickly (p=0.5, k=3 gives 88%) and the cost per correct answer barely moves,
 because failed attempts are cheap and recognised. Without a verifier there is nothing to retry on: you pay k times and keep the same accuracy.
 
-== 4. ReAct input tokens against step count (each step re-reads the whole history) ==
-   2 steps: ReAct    5,850 input tokens   plan-and-execute   5,210   ratio 1.1x
-   5 steps: ReAct   15,750 input tokens   plan-and-execute   8,150   ratio 1.9x
-  10 steps: ReAct   41,250 input tokens   plan-and-execute  13,050   ratio 3.2x
-  20 steps: ReAct  126,000 input tokens   plan-and-execute  22,850   ratio 5.5x
+== 4. ReAct input tokens against step count ==
+ASSUMES: the loop replays the FULL growing history on every call (quadratic); plan-and-execute executors see a bounded context
+(linear). Two common changes: prompt caching bills the repeated prefix at a discount (CACHE_RATE below, an assumption: providers
+differ), and compaction keeps only the last WINDOW steps in full. Columns: billed-equivalent input tokens.
+CACHE_RATE = 0.1 (cached tokens cost 10% of normal input), WINDOW = 3 steps
+ steps  ReAct full  + caching  + compaction  plan-exec  ratio full/plan
+     2       5,850      2,745         5,850      5,210             1.1x
+     5      15,750      4,950        14,400      8,150             1.9x
+    10      41,250      9,525        28,650     13,050             3.2x
+    20     126,000     22,050        57,150     22,850             5.5x
+reading: the quadratic growth is a property of full replay, not of ReAct itself; caching changes the bill (not the context size or
+the attention cost), and compaction changes both at the price of forgetting detail.
+
+== 5. P(correct | accepted) = p*r / (p*r + (1-p)*f) ==
+p = P(candidate correct), r = P(accept | correct), f = P(accept | wrong). The false-accept rate f is NOT 1 - precision.
+    p     r     f  P(correct | accepted)
+ 0.90  1.00  0.20                 97.8%
+ 0.90  1.00  0.05                 99.4%
+ 0.90  0.90  0.20                 97.6%
+ 0.70  1.00  0.20                 92.1%
+ 0.70  1.00  0.05                 97.9%
+ 0.70  0.90  0.20                 91.3%
+ 0.50  1.00  0.20                 83.3%
+ 0.50  1.00  0.05                 95.2%
+ 0.50  0.90  0.20                 81.8%
+ 0.30  1.00  0.20                 68.2%
+ 0.30  1.00  0.05                 89.6%
+ 0.30  0.90  0.20                 65.9%
+worked example: p=0.9, r=1, f=0.2 gives 0.9 / (0.9 + 0.02) = 97.8%. At p=0.3 the same verifier gives 68.2%: an acceptance
+means less on hard tasks, where most candidates are wrong.
+
+best-of-n, return the first accepted candidate (candidates independent, the same p, r, f for each):
+    p   n  P(return correct)  P(return wrong)  P(nothing)  precision
+ 0.30   1              30.0%            14.0%       56.0%      68.2%
+ 0.30   3              56.2%            26.2%       17.6%      68.2%
+ 0.30   5              64.4%            30.1%        5.5%      68.2%
+ 0.30  10              68.0%            31.7%        0.3%      68.2%
+ 0.70   1              70.0%             6.0%       24.0%      92.1%
+ 0.70   3              90.8%             7.8%        1.4%      92.1%
+ 0.70   5              92.0%             7.9%        0.1%      92.1%
+ 0.70  10              92.1%             7.9%        0.0%      92.1%
+reading: more candidates raise the chance of returning SOMETHING, not the precision of what is returned. Correlated errors (the
+same wrong answer in many samples) and picking the top-scored candidate instead of the first accepted both make this worse.
