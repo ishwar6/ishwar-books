@@ -1,0 +1,11 @@
+radix
+request 1: reuse 0, compute 8
+request 2: reuse 6, compute 2
+request 3: reuse 7, compute 1
+blocks of 4
+request 1: reuse 0, compute 8
+request 2: reuse 4, compute 4
+request 3: reuse 4, compute 4
+attention with the same K and V:
+query 0: weights [0.50, 0.50], output 4.00
+query ln(3): weights [0.25, 0.75], output 5.00

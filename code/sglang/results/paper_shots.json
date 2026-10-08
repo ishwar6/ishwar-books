@@ -4,16 +4,6 @@
   "crops": [
     {
       "page": 4,
-      "phrase": "Efficient KV Cache Reuse with RadixAttention",
-      "crop": [
-        124.93280029296875,
-        282.8131530761719,
-        367.0171203613281,
-        296.16835327148436
-      ]
-    },
-    {
-      "page": 4,
       "phrase": "KV cache computation depends only on prefix tokens.",
       "crop": [
         283.23614501953125,
@@ -23,5 +13,5 @@
       ]
     }
   ],
-  "note": "Cropped source pixels, no text reconstruction. Two crops separated and labelled; highlight added."
+  "note": "One source sentence, rendered from the PDF with a highlight; no reconstructed text or added image labels."
 }

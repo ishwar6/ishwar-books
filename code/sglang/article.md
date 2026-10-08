@@ -1,6 +1,6 @@
 ---
-title: "SGLang Explained: RadixAttention, Scheduling, and How It Differs from vLLM"
-description: "Build prefix caching from scratch, check the attention maths, and compare SGLang with modern vLLM using runnable experiments and primary sources."
+title: "SGLang Explained: How It Reuses Work, and How It Differs from vLLM"
+description: "Follow a handbook assistant from its first request to a shared KV cache. Learn RadixAttention step by step, then compare SGLang with vLLM."
 date: 2026-10-08
 tags: [inference, sglang, vllm, kv-cache, llm]
 series: "LLM Inference from the Ground Up"
@@ -9,341 +9,401 @@ motif: graph
 accent: "#4fc3d9"
 ---
 
-An assistant reads an 8,000-token company handbook, then answers a question. A second user asks a different question about the same handbook. A third request asks for a summary. The questions differ, but most of what the model has to read is identical.
-
-[Part 3](llm-inference-3-vllm.md) explained how vLLM packs requests into GPU memory and keeps a batch busy. Here we follow another inference engine, **SGLang**, starting with a different question: **how much of the work has already been done?**
-
-We will build two small prefix-cache indexes, run them on exactly the same requests, check reuse with actual attention calculations, and work through where the time and memory go. That gives us a way to compare the engines without relying on a headline speedup.
-
-> [!IMPORTANT] What was actually run
-> The companion code ran on an Apple Silicon CPU with Python 3.12.13 and NumPy 2.5.3. It includes a two-layer causal-attention calculation, a compressed radix tree, a block-hash cache, randomized correctness checks, and explicit scheduling simulations. **These are teaching experiments, not measurements of SGLang or vLLM serving a model on a GPU.** The GPU launch commands later are a reproduction recipe; they were not executed for this article. Source behavior was checked on 8 October 2026, with upstream commit IDs recorded in the [research manifest](https://github.com/ishwar6/ishwar-books/blob/main/code/sglang/results/sources.json).
-
-## 1. What SGLang is
-
-SGLang is a system for running language models. You load a model into a server, send prompts, and receive generated tokens. It manages the batch, the KV cache, device execution, and request lifecycle. The project began with a Python language for expressing connected model calls and a runtime designed to execute those calls efficiently. The runtime can also serve ordinary API requests; using the original language frontend is not a requirement. [Sources: the SGLang paper](https://arxiv.org/abs/2312.07104), [current project documentation](https://docs.sglang.io/).
-
-Consider an application that reads a document and launches three tasks:
+You are building an assistant for a company's employee handbook. Every request includes the same instructions and the same handbook, followed by a question:
 
 ```text
-company policy + document + "Summarise this."
-company policy + document + "Extract the risks."
-company policy + document + "Draft a reply."
+Request 1: instructions + handbook + "How much annual leave do I get?"
+Request 2: instructions + handbook + "Can I carry unused leave forward?"
+Request 3: instructions + handbook + "How do I apply for leave?"
 ```
 
-The application still chooses the tasks. The inference engine decides how to execute their model calls. If the beginning of each prompt is identical, it should be possible to compute that beginning once, then branch.
+The model must answer three different questions. But should it process the entire handbook from scratch three times?
 
-{{FIG:tree|A shared prefix can serve several different continuations. The tree indexes cached work; it does not store a ready-made answer to each question.}}
+**SGLang helps avoid that repeated work.** It is an inference engine: the software that loads a language model, accepts requests, runs the model, and sends back its answers. One of its central ideas, **RadixAttention**, finds prompt beginnings the model has already processed and reuses the saved computation.
 
-SGLang's best-known mechanism for finding that shared work is **RadixAttention**. Despite the name, it does not replace softmax attention with a new mathematical definition. It organises reusable KV state around token prefixes.
+vLLM is another inference engine, and modern vLLM also reuses repeated prompt beginnings. The interesting difference is how the engines organise that work, and what happens when requests compete for memory and GPU time.
 
-And vLLM? Modern vLLM also caches shared prefixes. A useful comparison therefore asks how each system finds, stores, schedules, and reuses the work. It does not start by giving one engine a cache and switching the other's cache off.
+We will follow the handbook assistant through those decisions. First, see what happens to one request. Then add a second request, build a small cache, compare it with vLLM's approach, and work out when the saving actually makes the assistant faster. You do not need to know tree data structures beforehand.
 
-## 2. Why the same prefix can reuse KV
+## 1. What the inference engine does with your question
 
-A quick reminder from [Part 2](llm-inference-2-kv-cache.md): at each attention layer, a token produces a **query**, a **key**, and a **value**. The query describes what the current position is looking for. Keys are compared with it; the resulting weights mix the values.
+A model is a set of learned weights plus the computations that use them. Serving that model to many people takes more than running one forward pass. Someone has to queue incoming requests, put work into batches, allocate memory, and return generated tokens to the right user. That is the inference engine's job.
 
-For position $$i$$, causal attention is:
+> [!DEFINITION] Token
+> A piece of text represented by an integer ID. A token might be a word, part of a word, or punctuation. The model processes token IDs rather than the characters you see on screen.
 
-$$
-o_i = \sum_{j=1}^{i} \alpha_{ij}v_j,
-\qquad
-\alpha_{ij}=\frac{\exp(q_i^T k_j/\sqrt{d_k})}
-{\sum_{u=1}^{i}\exp(q_i^T k_u/\sqrt{d_k})}.
-$$
+Our first handbook question passes through two main stages:
 
-Here $$d_k$$ is the width of a query/key vector. The dot product scores a match; dividing by its square root keeps the scores from growing simply because the vectors get wider. Softmax turns the scores into positive weights that sum to one.
+| Stage | What happens in our assistant | What the user sees |
+|---|---|---|
+| **Prefill** | The engine runs the model over the instructions, handbook, and question, building the state needed to answer. | Waiting for the answer to begin. |
+| **Decode** | The model generates further answer tokens, using the prompt and the answer written so far. | The answer appearing a piece at a time. |
 
-The crucial detail is the upper limit: **position $$i$$ can read only positions 1 through $$i$$**. A future question cannot change the earlier handbook tokens' states. With the same model, positional setup, and preceding tokens, their keys and values can be reused at every layer.
+Prefill also provides the prediction used to select the first output token. Decode then continues from it. [Part 1](llm-inference-1-prefill-and-decode.md) explains these two stages in more depth.
 
-> [!PAPER] The condition in the original research
-> [![Two separately labelled crops from page 4 of the SGLang paper: the RadixAttention section heading and the sentence explaining that KV computation depends only on prefix tokens.](/img/sglang/paper-prefix.png)](/img/sglang/paper-prefix.png)
+{{FIG:request|The same model does both jobs: process the supplied text, then continue it. Prefix reuse saves some of the first job; the new answer still has to be generated.}}
+
+SGLang can accept ordinary serving requests, so you can use it behind an existing assistant. Its original project also included a Python language for describing connected model calls, but that frontend is not required to use the serving engine. [Sources: SGLang project](https://docs.sglang.io/), [original paper](https://arxiv.org/abs/2312.07104).
+
+For now, focus on the first stage. Most of our second request's input is exactly the same as the first request's. To avoid processing it again, we need to know what can be saved.
+
+## 2. Save the model's working state, not the answer
+
+As the model reads the handbook, each attention layer computes arrays called **keys** and **values**, usually shortened to **K** and **V**. Later token positions use them to read information from earlier positions.
+
+> [!DEFINITION] KV cache
+> The stored keys and values from token positions the model has already processed. Keeping them lets later positions use that earlier work without rebuilding it. A cache is simply storage kept for possible reuse.
+
+Within one answer, this is already useful. When generating the next word, the model can reuse the saved state for the prompt and the answer so far. It does not need to rebuild that whole history at every step.
+
+Now extend the idea **across requests**. After answering the annual-leave question, retain the handbook's KV state. When the carry-forward question arrives, reuse the handbook state and compute the new question's state.
+
+The cached object is not “the answer to the annual-leave question.” It is the model's representation of the shared beginning. Different questions can use it to produce different answers.
+
+> [!DEFINITION] Prefix
+> A sequence starting at the very beginning. Here, the **shared prefix** is the identical run of token IDs at the start of two prompts. It is an exact match, not a judgement that two passages mean roughly the same thing.
+
+### Why the later question does not change the earlier handbook
+
+A standard causal language model reads in one direction: a token position can use itself and earlier positions, but cannot look at later positions.
+
+In our prompt, the handbook comes **before** the question. While processing a handbook token, the model cannot look ahead at the question. Changing that later question therefore does not change the handbook's keys and values, provided the model, preceding tokens, and positional setup stay the same.
+
+> [!PAPER] Zheng et al., SGLang · Section 3 · Page 4
+> [![The SGLang paper states: KV cache computation depends only on prefix tokens.](/img/sglang/paper-prefix.png)](/img/sglang/paper-prefix.png)
 >
-> Source: Zheng et al., [SGLang, arXiv version 2, page 4](https://arxiv.org/pdf/2312.07104v2#page=4). These are actual PDF pixels, with a highlight added. The two excerpts are shown separately so their surrounding layout is not misrepresented.
+> **Context:** the authors are explaining when two model calls can share previously computed keys and values.
+>
+> **What it says:** the KV state at a position is determined by the input up to that position. In our example, the later question cannot change the earlier handbook state.
+>
+> **Why it matters:** keep the shared instructions and handbook before the changing question. The second request can then reuse the first request's handbook state and process its new question. Putting different questions first would remove that shared beginning.
+>
+> [Read Section 3 of the paper](https://arxiv.org/pdf/2312.07104v2#page=4)
 
-### A calculation you can run
 
-Our `attention_check()` constructs two causal-attention layers with fixed random weights. It computes a nine-token sequence in two ways:
 
-1. Process all nine tokens together.
-2. Process the first six, save each layer's K and V, then process only the last three against that saved state.
-
-The largest absolute difference in the final three output vectors is **4.44 × 10⁻¹⁶**, ordinary floating-point rounding in this float64 calculation.
-
-Then we change the first token but deliberately reuse the old cache. The largest error becomes **0.952**. The code asserts both outcomes, so a broken implementation cannot quietly produce the article's result.
-
-This is an attention-equivalence test with random weights, not a trained language model or a quality evaluation. Its purpose is to isolate the mathematical condition that makes caching possible.
-
-### The same paragraph in a different place is not enough
-
-Suppose two prompts contain the same handbook, but one starts with a different timestamp. The handbook now has a different preceding context. Its later-layer states can differ even when the handbook's own token IDs match.
-
-That is why a prefix cache matches **the sequence from the beginning**, not arbitrary repeated text in the middle. Put stable instructions and documents early when that preserves the intended prompt semantics. Put changing questions later. Match token IDs, not visual similarity: chat templates, whitespace, tool definitions, and tokenization can change the actual sequence. Adapters and multimodal inputs also belong in the cache identity where applicable.
-
-## 3. RadixAttention, one insertion at a time
-
-A **trie** is a tree of shared prefixes. A **radix tree** compresses stretches with no branches into one edge. Instead of creating a separate node for every token, an edge can hold a whole sequence.
-
-Use letters as token IDs for a moment. Our first completed prompt is:
+This arrangement can share the handbook:
 
 ```text
-A B C D E
+instructions → handbook → question that changes
 ```
 
-We store one edge, `ABCDE`. The next prompt is `ABCXY`. Matching stops after `ABC`, so the edge splits:
+This one usually cannot share the handbook across different questions:
 
 ```text
-root
-  └── ABC              shared KV
-       ├── DE          first continuation
-       └── XY          second continuation
+question that changes → instructions → handbook
 ```
 
-A third prompt, `ABCDZ`, follows `ABC`, matches `D` on the first branch, and splits that edge again. Its first four token positions are reusable. Only `Z` needs new prefix computation in this simplified example.
+In the second arrangement, the handbook can attend to a different earlier question, so its states may differ. Changing a timestamp, chat template, or tool definition near the beginning can also shorten the reusable prefix. Preserve the intended meaning when arranging a prompt; do not move information blindly just to improve a cache-hit number.
 
-The tree is an index: token sequences lead to locations containing the corresponding KV tensors. Splitting an index edge need not recompute the underlying tensors. The original design maintains the tree on the CPU while the KV tensors occupy device memory. [Source: SGLang paper, Section 3](https://arxiv.org/html/2312.07104v2#S3).
+### A little maths: the same stored values, a different answer
 
-The companion `Radix` class implements matching and edge splitting. Its tests compare the matched length against a deliberately slow reference: scan every previously inserted sequence and find the longest common prefix. Six hundred randomized request checks cover three page-size comparisons, followed by explicit edge-splitting and context-identity checks.
+Attention reads stored values by assigning them weights. A new **query** determines those weights. You can think of a query as what the current position wants to find in earlier positions.
 
-### A cache must also forget
+Consider just two stored positions. To keep the arithmetic small, let their keys be 0 and 1, and their values be 2 and 6. Each vector has only one component in this example.
 
-Finished requests leave potentially useful KV behind, but a running request needs guaranteed access to its own state. Reclaiming a node that an active request still uses would be a correctness bug.
-
-The original RadixAttention policy protects in-use nodes and evicts unused leaves by recency. Dropping a leaf preserves a shared ancestor until that ancestor itself becomes an eligible leaf. Current SGLang has configurable eviction policies; its source tracks references and evictable leaves. Our small index deliberately leaves out eviction, references, and real tensor allocation. The later scheduling experiment models a capacity limit separately. [Sources: paper, Section 3](https://arxiv.org/html/2312.07104v2#S3), [pinned SGLang cache implementation](https://github.com/sgl-project/sglang/blob/943621c3364de6948fc02ee13c55b4f1cdf97f3a/python/sglang/srt/mem_cache/radix_cache.py).
-
-## 4. How vLLM finds the same reusable work
-
-vLLM's documented prefix cache uses **hashes of complete blocks**. A block's identity includes its parent prefix hash, its own token IDs, and relevant extra identity such as adapters or multimodal inputs. [Source: vLLM prefix-cache design](https://docs.vllm.ai/en/latest/design/prefix_caching/).
-
-An illustrative recurrence is:
+With query 0, both key matches score 0. Their attention weights are equal:
 
 $$
-h_j = H(h_{j-1},\; t_{jB:(j+1)B},\; e_j).
+o=\tfrac12(2)+\tfrac12(6)=4.
 $$
 
-$$B$$ is the block size, $$H$$ a hash function, and $$e_j$$ the extra identity. The parent hash carries the preceding context forward. Two equal blocks after different prefixes should not produce the same cache identity.
+Now choose query $$\ln 3$$, the number whose exponential is 3. The scores become 0 and $$\ln 3$$. Softmax exponentiates them, giving 1 and 3, then divides by their sum:
 
-Our `BlockHash` class expresses that idea with SHA-256:
+$$
+\text{weights}=\left(\frac{e^0}{e^0+e^{\ln 3}},\frac{e^{\ln 3}}{e^0+e^{\ln 3}}\right)
+=\left(\frac14,\frac34\right).
+$$
+
+The weighted result is now:
+
+$$
+o=\tfrac14(2)+\tfrac34(6)=5.
+$$
+
+**The keys and values stayed the same. The query changed, so the result changed.** Reusing KV does not force two questions to get the same answer. These two scalar calculations illustrate the attention operation; a language model repeats it with large vectors, many heads, and many layers.
+
+The companion code runs this example. It also checks two complete causal-attention layers: reusing an unchanged prefix agrees with recomputing the full sequence to floating-point precision; deliberately reusing a changed prefix does not. The [KV-cache article](llm-inference-2-kv-cache.md) develops the full mechanics.
+
+## 3. How SGLang finds the saved beginning: RadixAttention
+
+Our assistant may answer thousands of questions. Some requests share the whole handbook; others share only the instructions. Scanning every old prompt would be an awkward way to find reusable work.
+
+A **prefix tree** groups sequences by their common beginning. A **radix tree** is a compact version: a stretch with no branch is stored as one edge rather than as a separate node for every token.
+
+Let us build one. For this small example, six token IDs stand for our shared instructions and handbook:
+
+```text
+shared beginning: 10 11 12 13 14 15
+first question:                     20 21
+second question:                    30 31
+```
+
+These are invented IDs for seeing how the algorithm works, not a real tokenizer's encoding of the handbook.
+
+**First request.** The tree is empty. Compute all eight positions and record the sequence with references to its saved KV.
+
+**Second request.** Follow the stored sequence from the beginning. The first six IDs match. The next ID is 30 instead of 20, so split the path at that point. Reuse the six matching positions and compute the two new ones.
+
+{{FIG:radix_steps|The branch appears exactly where the token sequences differ. Both questions refer to the same saved beginning, while their different continuations have separate state.}}
+
+The tree describes where to find the states. It is not the huge array of states itself: the index is maintained on the CPU, while the KV tensors can live in GPU memory. Splitting a tree edge changes the index; it does not require recalculating the shared prefix. [Source: SGLang paper, Section 3](https://arxiv.org/html/2312.07104v2#S3).
+
+### Run the three-request example
+
+Here is the actual use of the small radix-tree implementation in the companion code:
 
 ```python
-parent = b""
-for block in full_blocks(tokens):
-    parent = sha256(parent + serialize(block)).digest()
-    # This digest identifies the block together with its prefix.
+from experiments import Radix
+
+prefix = [10, 11, 12, 13, 14, 15]
+prompts = [
+    prefix + [20, 21],
+    prefix + [30, 31],
+    prefix + [20, 40],
+]
+cache = Radix()
+
+for number, prompt in enumerate(prompts, 1):
+    reused = cache.match(prompt)
+    print(f"request {number}: reuse {reused}, compute {len(prompt) - reused}")
+    cache.insert(prompt)
 ```
 
-This is a teaching sketch. Production serialization, namespaces, allocation, collision handling, and model-specific cache groups need more machinery.
+Running `python code/sglang/walkthrough.py` from the repository root gives this radix-cache output:
 
-**PagedAttention and RadixAttention answer different questions.** Paging arranges physical KV storage in reusable allocation units. A radix tree finds previously computed prefixes. A system can use a radix index and paged storage together. Comparing the two as mutually exclusive attention algorithms mixes the storage layer with the lookup layer.
+```text
+request 1: reuse 0, compute 8
+request 2: reuse 6, compute 2
+request 3: reuse 7, compute 1
+```
 
-### Run both indexes on the same workload
+The third request is worth looking at. It shares the six-token beginning **and token 20** with the first request. Matching can continue into that branch, stopping only when 40 differs from 21. The reusable part is discovered from the tokens; it does not have to end at a boundary we called “the handbook.”
 
-We create 64 prompts. Every prompt contains:
+This example runs the lookup and insertion logic on the CPU. It counts token positions needing computation; it does not execute a model for those positions or measure SGLang's GPU speed. The full [`Radix` implementation](https://github.com/ishwar6/ishwar-books/blob/main/code/sglang/experiments.py) includes the edge splitting just illustrated.
 
-- A shared 1,024-token introduction.
-- One of four 256-token group contexts.
-- A unique 64-token question.
+### What if the cache fills up?
 
-Requests arrive in alternating group order. There is enough cache space to retain everything. Each request finishes inserting its prompt before the next lookup. The token IDs are synthetic, so tokenization is not a hidden variable.
+Saved work competes for limited memory. A running request's state must remain available, while unused state from finished requests can be removed to make room.
 
-Without reuse, the number of prompt tokens computed is:
+The original RadixAttention design tracks which nodes are in use and evicts unused leaves by recency. Removing an old question branch can preserve the handbook shared by newer questions. Current SGLang offers configurable eviction policies; our small teaching class leaves memory management out. [Sources: paper, Section 3](https://arxiv.org/html/2312.07104v2#S3), [SGLang cache source](https://github.com/sgl-project/sglang/blob/943621c3364de6948fc02ee13c55b4f1cdf97f3a/python/sglang/srt/mem_cache/radix_cache.py).
+
+So a second handbook request can reuse the first request's work **if that work is still available**. A matching prompt alone does not guarantee a cache hit.
+
+## 4. How vLLM handles the same two requests
+
+vLLM also supports prefix reuse. Its documented approach identifies complete blocks of tokens using a **hash**: a compact fingerprint used to look up the cached block.
+
+Crucially, the fingerprint includes the preceding prefix's identity. The same four tokens after two different beginnings cannot simply share a block. [Source: vLLM prefix-cache design](https://docs.vllm.ai/en/latest/design/prefix_caching/).
+
+Use four-token blocks to see the difference:
+
+```text
+First request:   [10 11 12 13] [14 15 20 21]
+Second request:  [10 11 12 13] [14 15 30 31]
+                 └ same block ┘ └ different ┘
+```
+
+Our exact-token radix example reuses six positions. The four-token block example reuses the first four: the second block differs, so it must be computed again.
+
+A simplified block-key rule is:
 
 $$
-64(1024+256+64)=86{,}016.
+\text{block key}=H(\text{previous block key},\;\text{this block's tokens},\;\text{extra identity}).
 $$
 
-With perfect reuse in this workload:
+$$H$$ denotes the hash function. The previous key ties this block to everything before it. Extra identity can distinguish adapters or multimodal inputs. Actual implementations also need model-specific cache handling and suitable isolation between requests.
+
+Run the same prompts through the companion `BlockHash(4)` class and the output is:
+
+```text
+request 1: reuse 0, compute 8
+request 2: reuse 4, compute 4
+request 3: reuse 4, compute 4
+```
+
+This does **not** mean SGLang always reuses individual tokens while vLLM always uses blocks of four. Four is our teaching choice. Current SGLang's radix implementation also rounds matches to the configured page size; backends and model architectures impose further constraints. [Source: SGLang's `RadixKey.match_at`](https://github.com/sgl-project/sglang/blob/943621c3364de6948fc02ee13c55b4f1cdf97f3a/python/sglang/srt/mem_cache/radix_cache.py).
+
+### Where PagedAttention fits
+
+[Part 3](llm-inference-3-vllm.md) introduced vLLM's PagedAttention. It is easy to mix up two different jobs:
+
+| Job | Question it answers |
+|---|---|
+| **Paged KV storage** | Where in memory should this request's keys and values go? |
+| **Prefix-cache lookup** | Have these token positions already been computed, and where is their saved state? |
+
+A radix tree can point to KV stored in pages. Paging and radix lookup can therefore be used together. RadixAttention does not replace the attention equation or make paging unnecessary.
+
+### When both approaches save exactly the same work
+
+Now make the handbook example larger. We generate 64 synthetic requests with:
+
+- 1,024 shared instruction tokens;
+- one of four 256-token handbook sections;
+- a unique 64-token question.
+
+All requests finish sequentially, and the teaching cache is large enough to keep everything. Without reuse, there are:
 
 $$
-1024+4(256)+64(64)=6{,}144.
+64\times(1024+256+64)=86{,}016
 $$
 
-The shared introduction is computed once, each group context once, and every question once. Both our radix index and our 16-token block-hash index reach that result.
+prompt-token computations. With reuse, compute the common instructions once, each section once, and every question:
 
-{{FIG:work|Executed CPU experiment: both indexes eliminate the same repeated token work for aligned prefixes. This is not an engine throughput comparison.}}
+$$
+1024+4\times256+64\times64=6{,}144.
+$$
 
-| Synthetic workload | No cache: tokens computed | Radix index | 16-token block-hash index |
+All shared lengths align with 16-token blocks. **Both the radix index and the 16-token block-hash index reach 6,144.**
+
+{{FIG:work|In this executed cache simulation, both indexes avoid 79,872 repeated token computations. Each bar shows how many token positions still need computation.}}
+
+The data structure matters, but shared workload, alignment, and available memory determine what can actually be reused. This is why “one uses a tree” is not enough to predict which engine will be faster.
+
+## 5. What the handbook assistant actually gains
+
+We have shown that the engine can avoid repeated work. Now ask what the user or operator gets from it.
+
+### A shorter wait for the answer to start
+
+If the handbook accounts for most of the prompt, reusing its KV can reduce prefill work substantially. But the engine must still process the new question. Those new positions still attend to the cached handbook; reusing the handbook does not make it disappear from attention.
+
+The engine also has to generate the answer. Suppose, for illustration, a request spends 100 ms in prefill and 900 ms generating the answer. Prefix reuse reduces prefill to 20 ms:
+
+| | Before reuse | After reuse |
+|---|---:|---:|
+| Prefill | 100 ms | 20 ms |
+| Generate the answer | 900 ms | 900 ms |
+| Total | 1,000 ms | 920 ms |
+
+Prefill became five times faster, but the whole request became only:
+
+$$
+\frac{1000}{920}\approx1.09
+$$
+
+times faster. These are assumed times to explain the arithmetic, not measured server results.
+
+For a long handbook and a short answer, prefill savings may be a large part of the total. For a short prompt and a long answer, generating the answer may dominate. Measure the wait for the first token separately from the time to finish. [Source: vLLM's prefix-caching limits](https://docs.vllm.ai/en/latest/features/automatic_prefix_caching/).
+
+### Room for more concurrent requests
+
+If many active requests share the same cached handbook state, they may reference one physical copy instead of storing duplicate copies.
+
+For a conventional transformer, the unsharded KV payload per token is:
+
+$$
+\text{bytes per token}=2\times L\times H_{\mathrm{KV}}\times d_h\times b.
+$$
+
+Read the factors from left to right: two arrays (K and V), $$L$$ layers, $$H_{\mathrm{KV}}$$ KV heads per layer, $$d_h$$ numbers per head, and $$b$$ bytes per number.
+
+For example, with 32 layers, eight KV heads, head width 128, and two bytes per number:
+
+$$
+2\times32\times8\times128\times2=131{,}072\;\text{bytes}=128\;\text{KiB}.
+$$
+
+An 8,192-token shared beginning then occupies **1 GiB**. Thirty-two independent copies would occupy 32 GiB; one shared copy occupies 1 GiB, plus each request's private question and answer state.
+
+That calculation counts KV payload, not total GPU memory. Model weights and temporary working memory still take space. Other model architectures, quantized caches, and multi-GPU placement need different accounting. The useful lesson is simple: **sharing can save both computation and duplicate storage**.
+
+## 6. What changes when the assistant gets busy?
+
+So far, one request has finished before the next starts. A real service has requests arriving together. Prefix reuse is only one part of keeping that service responsive.
+
+### Put related work near each other, without making people wait too long
+
+Suppose there are four different handbooks, A through D, but the cache has room for only two. With requests arriving as `A B C D A B C D`, an old handbook may be evicted before it is needed again.
+
+Our small capacity simulation makes that concrete. Each request needs a 1,024-token handbook and a fresh 64-token question:
+
+| Order of 32 requests | Handbook misses | Handbook hits | Prompt tokens computed |
 |---|---:|---:|---:|
-| Aligned prefixes | 86,016 | 6,144 | 6,144 |
-| Unaligned prefixes | 86,080 | 5,959 | 6,208 |
+| A, B, C, D, repeated | 32 | 0 | 34,816 |
+| Eight A requests, then eight B, then C, then D | 4 | 28 | 6,144 |
 
-For the second row, we change the three segment lengths to 1,027, 257, and 61. The exact-prefix index can reuse the last few matching tokens; the block index rounds a reusable prefix down to complete blocks.
+The simulation keeps only two whole handbooks and evicts the least recently used one. It illustrates **locality**: doing related work close together makes saved state more likely to survive until its next use.
 
-For matched length $$m$$, the teaching block model reuses:
+Grouping is possible if the requests are already waiting. It is not free: delaying one person's request to help other requests reuse a cache can increase that person's wait. SGLang's research considers cache-aware scheduling; the practical goal is to save work while still meeting users' latency targets. [Source: SGLang paper, Section 3](https://arxiv.org/html/2312.07104v2#S3).
 
-$$
-m_B=B\left\lfloor\frac{m}{B}\right\rfloor,
-\qquad 0\le m-m_B < B.
-$$
+If there are multiple server replicas, placement matters too. A request sent to a worker that already holds its handbook can avoid rebuilding it. SGLang's cache-aware routing work addresses this problem, balancing reuse against load. A warm worker with a long queue can still lose to a cold worker that is idle. [Source: SGLang team's scheduler and router report](https://www.lmsys.org/blog/2024-12-04-sglang-v0-4/).
 
-The difference here is **249 additional token computations across 64 requests**, not an order-of-magnitude engine advantage.
+### Prepare the next batch while the GPU runs the current one
 
-Do not turn this into “SGLang always caches individual tokens.” Current SGLang's radix implementation also rounds matches to the configured page size. A backend or model can impose additional constraints. Our exact-prefix tree illustrates page size 1; our block model illustrates size 16. Neither is a universal default claim. [Source: `RadixKey.match_at` and `page_aligned` at the pinned revision](https://github.com/sgl-project/sglang/blob/943621c3364de6948fc02ee13c55b4f1cdf97f3a/python/sglang/srt/mem_cache/radix_cache.py).
+Even when KV reuse works, the GPU can sit idle while the CPU prepares the next batch's metadata and memory mappings.
 
-## 5. Token savings are not latency savings
+SGLang's overlap scheduler lets that preparation happen while the current GPU computation is still running. Imagine CPU preparation takes 2 ms and GPU execution takes 8 ms. In a serial schedule, each batch costs 10 ms. With ideal overlap, batches after startup can complete every 8 ms because preparation fits inside the device's working time.
 
-The aligned experiment avoids 92.9% of prompt-token computation, a 14-fold reduction in that token count. It does **not** demonstrate 14 times faster inference.
+{{FIG:overlap|Orange is CPU preparation; blue is GPU execution. In the lower timeline, preparation for the next batch overlaps the current batch's GPU work. The durations are illustrative.}}
 
-A useful decomposition of time to first token is:
+This is a different saving from prefix reuse: it reduces idle time rather than repeated prompt computation. Modern vLLM also supports asynchronous scheduling; it is not a feature exclusive to SGLang. [Sources: SGLang overlap explanation](https://www.lmsys.org/blog/2024-12-04-sglang-v0-4/), [vLLM scheduler source](https://github.com/vllm-project/vllm/blob/458ba2edf85bc9b7ebc0d5141f34ea658520faf5/vllm/config/scheduler.py).
 
-$$
-T_{\mathrm{first}} = T_{\mathrm{queue}} + T_{\mathrm{input}}
-+ T_{\mathrm{lookup/transfer}} + T_{\mathrm{remaining\ prefill}}
-+ T_{\mathrm{first\ output}}.
-$$
+### Keep more handbooks outside GPU memory
 
-Queueing can dominate a busy service. An offloaded cache must be transferred. The uncached suffix still needs attention over the retained prefix. The first output also requires model execution and transport to the client.
+SGLang's **HiCache** can extend saved KV into host memory and an optional storage backend. That can retain more handbooks, but a host-memory hit still requires moving the state back before the GPU can use it. [Source: HiCache design](https://docs.sglang.io/docs/advanced_features/hicache_design).
 
-You can see the remaining attention work directly. If a prompt has $$n$$ tokens and $$p$$ are cached, the new query rows still attend to earlier keys. The number of causal query-key pairs for those new rows is:
+For our 1 GiB example, an assumed effective transfer rate of 25 GB/s gives about **43 ms** just to move the data. If recomputing that prefix takes 20 ms, a blocking 43 ms transfer loses. If recomputation takes 200 ms, the transfer may be worthwhile. Lookup, allocation, and contention add costs; overlap may hide some of them.
 
-$$
-\sum_{i=p+1}^{n} i
-=\frac{n(n+1)-p(p+1)}{2}.
-$$
+The decision is whether retrieving the saved work is cheaper than doing it again. vLLM has KV offload and transfer integrations too, including [LMCache](https://docs.vllm.ai/en/latest/examples/disaggregated/lmcache/). Compare the configuration that fits your model and hardware, not just whether “offload” appears on a feature list.
 
-For $$n=10$$ and $$p=8$$, we compute 19 pairs rather than 55: the ninth token attends to nine positions and the tenth to ten. We do not attend only within a two-token suffix. Other layer operations save different amounts, and GPU kernels have their own efficiency curves.
+## 7. So how does SGLang differ from vLLM?
 
-There is also a whole-request limit. If prefill takes 100 ms and generation takes 900 ms, making prefill five times faster gives:
+We can now compare the engines in terms of the problems we have actually seen:
 
-$$
-\frac{100+900}{100/5+900}=1.087.
-$$
+| Problem | SGLang | vLLM |
+|---|---|---|
+| Find the handbook already processed | Radix-tree cache family | Hash-linked full-block prefix cache |
+| Fit requests into memory and run them together | KV allocation and request batching | Paged KV management and request batching |
+| Reduce GPU idle time between batches | Overlap scheduling | Asynchronous scheduling support |
+| Retain reusable KV beyond GPU memory | HiCache | Offload/transfer integrations such as LMCache |
+| Produce output that follows a schema | Structured-output backends | Structured-output backends |
 
-That is about **1.09 times faster end to end**, even though the prefill improvement was fivefold. These times are assumed arithmetic inputs, not measurements.
+The last row addresses a separate requirement. If our assistant must return `{"answer": "...", "policy_section": "..."}`, a grammar can constrain which tokens are allowed next. Both engines offer this. Valid JSON still needs correct facts, so check those separately. [Sources: SGLang structured outputs](https://docs.sglang.io/docs/advanced_features/structured_outputs), [vLLM structured outputs](https://docs.vllm.ai/en/latest/features/structured_outputs/).
 
-Prefix reuse matters most when repeated input work is a substantial part of the workload. It cannot eliminate the sequential cost of generating a long answer. [Source for the prefill/decode distinction: vLLM APC documentation](https://docs.vllm.ai/en/latest/features/automatic_prefix_caching/).
+Both also support other serving optimizations; their exact coverage depends on the release, model, backend, and hardware. The comparison above is about the mechanisms discussed here, not every feature either project offers. Source revisions are recorded in the companion directory, checked on 8 October 2026.
 
-## 6. How much memory can sharing save?
+For our handbook assistant, the useful question is: **which configuration answers our actual requests within the target time using less hardware?** Test at least these three cases:
 
-For a conventional transformer with grouped-query attention, unsharded KV payload per token is:
+1. **One shared handbook, many questions.** This reveals the value of retaining and reusing the prefix.
+2. **Many unrelated handbooks.** This tests what happens when little is shared or the cache is too small.
+3. **Long generated answers.** This shows whether generation time dominates after input work is reduced.
 
-$$
-M_{\mathrm{token}}=2L H_{\mathrm{KV}}d_h b.
-$$
+Use the same model snapshot, hardware, request trace, and generation settings. Record time to first token, time to finish, completed requests per second, errors, and answer quality. Test both a fresh cache and a deliberately warmed one. Report slow requests too, not only the average.
 
-The factor 2 counts keys and values. $$L$$ is the layer count, $$H_{\mathrm{KV}}$$ the number of KV heads, $$d_h$$ the head width, and $$b$$ bytes per element. Query-head count is not the right quantity when several query heads share KV heads.
+A server that produces more tokens per second but makes people wait much longer for the first one may be a poor trade for this assistant. A batch-processing job may accept that trade. There is no universal winner independent of workload.
 
-Take a hypothetical configuration with 32 layers, eight KV heads, width 128, and two-byte values:
+## 8. Try it yourself
 
-$$
-2\times32\times8\times128\times2
-=131{,}072\;\text{bytes}=128\;\text{KiB/token}.
-$$
+The [companion code](https://github.com/ishwar6/ishwar-books/tree/main/code/sglang) contains the complete cache implementations and saved outputs.
 
-An 8,192-token prefix therefore occupies **1 GiB** of KV payload. Thirty-two independent copies occupy 32 GiB; one shared copy occupies 1 GiB, before private suffixes and metadata. This arithmetic appears in the executed results file.
-
-This is not total device memory. We have excluded model weights, activations, graph buffers, allocator overhead, and private generated tokens. Sharding changes per-device placement. MLA, sliding-window attention, hybrid state, and cache quantization require their own accounting.
-
-Sharing is valuable in two ways: it avoids producing the same states repeatedly, and it can keep multiple requests from storing duplicate states simultaneously.
-
-## 7. Why scheduling and routing change the result
-
-Imagine four tenants, each with a different 1,024-token prefix. The cache can hold only two whole tenant prefixes. Requests arrive as:
-
-```text
-A B C D A B C D ...       eight rounds, 32 requests
-```
-
-Under a simple least-recently-used whole-prefix policy, every prefix has been evicted when its next request arrives. Our simulation gets **32 misses and zero hits**.
-
-Now suppose all requests are already waiting and we group them:
-
-```text
-A A A A A A A A B B ... C C ... D D ...
-```
-
-The same simulation gets **four misses and 28 hits**. Including a fresh 64-token question per request, prompt work falls from **34,816 to 6,144 tokens**.
-
-This is a model of locality, not SGLang's actual scheduler. Real arrivals have deadlines; postponing a tenant to improve cache reuse can make that tenant's wait unacceptable. The useful objective is completed work within latency targets, not the largest cache-hit number.
-
-At several replicas, routing matters too. A warm prefix on worker A is no help if the next request goes to worker B, unless the system can obtain that state there. SGLang's v0.4 release introduced a cache-aware router alongside CPU/GPU overlap. Its reported gains belong to its stated shared-prefix workloads, not every deployment. [Source: the team's December 2024 release report](https://www.lmsys.org/blog/2024-12-04-sglang-v0-4/).
-
-A practical routing decision has to balance the expected saving from a cache hit against extra queueing or transfer time. A warm but overloaded worker can lose to a cold idle worker.
-
-## 8. Keeping the CPU out of the GPU's way
-
-For each batch, the host prepares request metadata and memory mappings, then the device runs the model. If those phases run serially, the device waits during preparation. SGLang's overlap scheduler prepares a following batch while current device work is in flight. Dependencies still need explicit handling; “zero overhead” describes work being hidden, not work disappearing. [Source: SGLang v0.4 scheduler explanation](https://www.lmsys.org/blog/2024-12-04-sglang-v0-4/).
-
-Assume preparation takes $$C=2$$ ms and GPU work $$G=8$$ ms. For $$N=100$$ equal batches:
-
-$$
-T_{\mathrm{serial}}=N(C+G)=1000\;\text{ms},
-$$
-
-$$
-T_{\mathrm{pipeline}}\approx C+G+(N-1)\max(C,G)=802\;\text{ms}.
-$$
-
-The first batch fills the pipeline. Each later batch can complete every 8 ms if preparation is fully hidden. The ideal improvement is about 1.25 times for this finite example. Synchronization, variable batch sizes, and data dependencies can reduce it.
-
-{{FIG:overlap|An illustrative timeline generated by the companion code. These are assumed durations, not profiler traces.}}
-
-Modern vLLM also has asynchronous scheduling support. Its pinned scheduler configuration explicitly describes avoiding GPU utilization gaps. This is another shared optimization whose exact implementation and compatibility constraints matter more than a yes/no feature label. [Source: vLLM scheduler configuration](https://github.com/vllm-project/vllm/blob/458ba2edf85bc9b7ebc0d5141f34ea658520faf5/vllm/config/scheduler.py).
-
-## 9. Beyond device memory: HiCache
-
-SGLang's **HiCache** extends prefix storage through GPU memory, host memory, and an optional storage backend. Host caches belong to individual instances; a storage tier is shared only when its backend is configured that way. A cache hit therefore needs a location as well as a length. [Source: HiCache design documentation](https://docs.sglang.io/docs/advanced_features/hicache_design).
-
-{{FIG:tiers|More cache capacity introduces a transfer decision. A host or storage hit is not equivalent to an already-resident device hit.}}
-
-For payload size $$S$$ and effective transfer bandwidth $$B$$, a first approximation is:
-
-$$
-T_{\mathrm{restore}} \approx T_{\mathrm{fixed}}+\frac{S}{B}.
-$$
-
-At an assumed effective 25 GB/s, transferring our 1 GiB prefix alone takes **42.95 ms**. This uses binary GiB for the payload and decimal GB/s for bandwidth. Allocation, lookup, staging, and contention add time; pipelining can hide part of it.
-
-If recomputing the prefix takes 20 ms, a blocking 43 ms copy loses. If recomputation takes 200 ms, the same copy may help. Measure both on the actual path. These are break-even examples, not measured link or model performance.
-
-vLLM also has KV transfer and offload integrations, including LMCache. “SGLang has hierarchical caching; vLLM cannot move KV” would be an inaccurate comparison. The setup, backend, model coverage, and operational behavior must be compared. [Source: vLLM LMCache integration](https://docs.vllm.ai/en/latest/examples/disaggregated/lmcache/).
-
-## 10. Structured output is a separate question
-
-A cache can avoid repeated input work. A grammar can constrain which output tokens are allowed. These solve different problems.
-
-For a schema that requires a JSON object, a grammar-aware decoder masks tokens that cannot continue a valid output. That can reduce formatting failures, but it does not prove that an extracted amount or date is correct. Measure schema validity and semantic accuracy separately.
-
-Both SGLang and vLLM document structured outputs, including grammar backends such as XGrammar. Supported schema features and interactions with reasoning or tool parsers vary by release and model. Do not interpret “JSON supported” as identical behavior across all schemas. [Sources: SGLang structured outputs](https://docs.sglang.io/docs/advanced_features/structured_outputs), [vLLM structured outputs](https://docs.vllm.ai/en/latest/features/structured_outputs/).
-
-## 11. SGLang versus vLLM: the comparison to keep
-
-| Question | SGLang | vLLM | What to inspect |
-|---|---|---|---|
-| How is prefix reuse indexed? | Radix-tree family of caches | Hash-linked full-block prefix cache | Actual hit length, page/block alignment, model-specific cache behavior |
-| Does it batch and manage KV memory? | Yes | Yes | Allocation pressure, preemption, batch limits |
-| Can host preparation overlap device work? | Overlap scheduler | Async scheduling support | Compatibility and gaps in a real profiler trace |
-| Can it constrain output? | Structured-output grammar backends | Structured-output grammar backends | Schema coverage, valid output, semantic correctness |
-| Can KV live beyond one device? | HiCache and distributed serving features | KV connector/offload integrations | Transfer cost, capacity, supported configurations |
-| Is it universally faster? | No demonstrated universal winner | No demonstrated universal winner | The same workload, hardware, output quality, and latency target |
-
-The source trail above explains the rows; this table is not a fresh GPU benchmark. The original SGLang paper's **up to 6.4 times** throughput result is a historical result against its tested baselines. It is not a measured advantage over the October 2026 vLLM source. [Source: paper abstract and evaluation](https://arxiv.org/abs/2312.07104).
-
-If your application already works well on one engine, test a specific hypothesis before switching. For example: “shared long documents are driving our first-token latency; does the alternative retain and route those prefixes better under our memory limit?” That is a measurable question. “Which name is faster?” is not.
-
-## 12. Run the code, then test a real server
-
-The complete [companion directory](https://github.com/ishwar6/ishwar-books/tree/main/code/sglang) includes the experiment, saved JSON, source manifest, figure generator, and research-screenshot recipe.
+### Start with the small example in this article
 
 From the repository root:
 
 ```bash
 python3 -m venv /tmp/sglang-article-env
 /tmp/sglang-article-env/bin/pip install -r code/sglang/requirements.txt
-/tmp/sglang-article-env/bin/python code/sglang/experiments.py
-/tmp/sglang-article-env/bin/python code/sglang/figures.py
-/tmp/sglang-article-env/bin/python code/sglang/assemble.py
+/tmp/sglang-article-env/bin/python code/sglang/walkthrough.py
 ```
 
-The CPU experiment needs only NumPy. Pillow and PyMuPDF in the requirements support screenshot reproduction. The assembler inserts saved figures into this article and checks local image paths and unresolved placeholders.
-
-### Launch either engine on a compatible GPU machine
-
-Use separate environments with a recorded engine release, matching driver/toolchain, and the **same downloaded model snapshot**. Point both commands at that snapshot so a moving model revision does not become a hidden variable. Install each engine using its hardware-specific guide: [SGLang](https://docs.sglang.io/docs/get-started/install), [vLLM](https://docs.vllm.ai/en/latest/getting_started/installation/gpu/).
-
-Run one server at a time on the same device:
+It prints the three-request radix and block-cache results, followed by the two attention calculations. Then run the larger experiment:
 
 ```bash
-# SGLang environment; replace the snapshot path.
+/tmp/sglang-article-env/bin/python code/sglang/experiments.py
+```
+
+That reproduces the 64-prompt comparison, the cache-capacity simulation, and the attention-equivalence check. These examples were executed on the CPU. Their token counts explain the mechanisms; they are not GPU engine benchmarks.
+
+### Then try a real model server
+
+On a compatible GPU machine, install either engine in its own environment using its [SGLang installation guide](https://docs.sglang.io/docs/get-started/install) or [vLLM installation guide](https://docs.vllm.ai/en/latest/getting_started/installation/gpu/). Use the same downloaded model snapshot for both.
+
+Start **one** of these servers at a time on the same GPU, replacing the model path:
+
+```bash
+# SGLang
 python -m sglang.launch_server \
   --model-path /models/qwen2.5-0.5b-instruct-snapshot \
   --served-model-name comparison-model \
@@ -351,64 +411,32 @@ python -m sglang.launch_server \
 ```
 
 ```bash
-# vLLM environment; the exact same model snapshot.
+# vLLM
 vllm serve /models/qwen2.5-0.5b-instruct-snapshot \
   --served-model-name comparison-model \
   --enable-prefix-caching \
   --host 127.0.0.1 --port 8000
 ```
 
-These are baseline examples, not performance-tuned configurations. Check flags against the installed version's `--help`. SGLang's serving entry point and request format are documented in its [request tutorial](https://docs.sglang.io/docs/basic_usage/send_request); vLLM's server exposes its [compatible API](https://docs.vllm.ai/en/latest/serving/online_serving/).
+Check the installed version's `--help` for available flags. The official request guides cover [SGLang](https://docs.sglang.io/docs/basic_usage/send_request) and [vLLM](https://docs.vllm.ai/en/latest/serving/online_serving/).
 
-The companion client uses raw completions so differing chat templates do not obscure a first smoke test:
+Now send two different questions after the same handbook-like prefix:
 
 ```bash
 python3 code/sglang/probe_server.py \
   --url http://127.0.0.1:30000 --model comparison-model \
   --output /tmp/sglang-probe.json
-
-python3 code/sglang/probe_server.py \
-  --url http://127.0.0.1:8000 --model comparison-model \
-  --output /tmp/vllm-probe.json
 ```
 
-It sends two different questions after an identical long text prefix and records the response, observed first-text latency, total latency, and server-reported token usage when available. **Two requests are a connectivity/reuse smoke test, not a throughput benchmark.** The second may benefit from the first; the first may already find cached state if the server was used earlier. Inspect engine cache metrics to establish whether reuse actually occurred.
+Use port 8000 and a different output filename for vLLM. The probe saves the answers, time to first nonempty text, total streaming time, and token usage when supplied by the server.
 
-For a defensible performance comparison, expand beyond that probe:
+This checks that requests work. Two requests cannot establish a throughput winner, and a faster second response alone does not prove a cache hit; inspect the engine's cache metrics. The GPU commands are a reproduction recipe and were not run for this article. The [README](https://github.com/ishwar6/ishwar-books/blob/main/code/sglang/README.md) records what was run and the limits of each experiment.
 
-1. Record model and tokenizer revisions, engine versions, GPU model/count, quantization, attention backend, memory limits, and every launch argument.
-2. Replay identical request traces: unique prompts, repeated system prompts, shared long documents, multi-turn sessions, and any structured outputs your application needs.
-3. Separate cold-start, deliberately warmed, and steady-state runs. Include traces whose working set exceeds cache capacity. Use both arrival-rate sweeps and concurrency sweeps; fixed-concurrency tests hide some overload behavior.
-4. Keep generation settings and intended output lengths comparable. Record actual generated tokens and validate output quality; an engine that stops early has done less work.
-5. Report errors, throughput, p50/p95/p99 first-token and whole-request latency, decoding latency, cache-hit tokens, and preemptions. Repeat runs and report variability.
+Return to the three questions at the start. SGLang can retain the common handbook's working state, find it through the radix cache, and use it while processing each new question. vLLM can avoid much of the same repeated work using a different index. Once you understand that shared task, the comparison becomes concrete: how much work was reused, how much memory it occupied, and how long the user waited for a correct answer.
 
-For a response of $$n_{\mathrm{out}}>1$$ tokens, average time per output token after the first is often summarized as:
+## Sources and experiment details
 
-$$
-\mathrm{TPOT}=\frac{T_{\mathrm{last}}-T_{\mathrm{first}}}{n_{\mathrm{out}}-1}.
-$$
-
-Streaming chunks can contain several tokens, so packet timestamps are not exact token-generation timestamps. Use engine instrumentation when the distinction matters. The probe intentionally does not label chunk intervals as inter-token latency.
-
-Finally, count the requests that satisfy your service target:
-
-$$
-\mathrm{goodput}=\frac{\#\{\text{successful requests meeting the latency target}\}}
-{\text{measurement duration}}.
-$$
-
-High throughput with long tail delays may be the wrong trade for an interactive assistant. A batch job may prefer it. The engine choice follows the workload and the target.
-
-## What to remember
-
-SGLang makes repeated prompt structure an explicit part of execution through its radix-cache design. Modern vLLM can reuse the same prefixes through a different index. Our aligned experiment shows why the representation alone does not determine the saving: both recover the same repeated work.
-
-The harder questions come next: whether the prefix is still resident, which worker holds it, how much new work remains, whether transfers beat recomputation, and whether the request finishes on time. Those are the questions to bring to a real SGLang-versus-vLLM benchmark.
-
-## Sources and reproduction
-
-- Zheng et al., [SGLang: Efficient Execution of Structured Language Model Programs](https://arxiv.org/abs/2312.07104), with [version 2 PDF](https://arxiv.org/pdf/2312.07104v2) used for the screenshot.
-- SGLang team, [v0.4 scheduler and router explanation](https://www.lmsys.org/blog/2024-12-04-sglang-v0-4/), December 2024. Historical results, explicitly dated.
-- SGLang, [HiCache design](https://docs.sglang.io/docs/advanced_features/hicache_design), [structured outputs](https://docs.sglang.io/docs/advanced_features/structured_outputs), and [request tutorial](https://docs.sglang.io/docs/basic_usage/send_request).
-- vLLM, [prefix-cache design](https://docs.vllm.ai/en/latest/design/prefix_caching/), [APC behavior](https://docs.vllm.ai/en/latest/features/automatic_prefix_caching/), [structured outputs](https://docs.vllm.ai/en/latest/features/structured_outputs/), and [LMCache integration](https://docs.vllm.ai/en/latest/examples/disaggregated/lmcache/).
-- [Pinned source revisions and checksums](https://github.com/ishwar6/ishwar-books/blob/main/code/sglang/results/sources.json), [executed experiment results](https://github.com/ishwar6/ishwar-books/blob/main/code/sglang/results/experiments.json), and [reproduction instructions](https://github.com/ishwar6/ishwar-books/blob/main/code/sglang/README.md).
+- Zheng et al., [SGLang: Efficient Execution of Structured Language Model Programs](https://arxiv.org/abs/2312.07104), especially Section 3 on RadixAttention.
+- SGLang team, [scheduler overlap and cache-aware routing](https://www.lmsys.org/blog/2024-12-04-sglang-v0-4/), December 2024.
+- vLLM, [prefix-cache design](https://docs.vllm.ai/en/latest/design/prefix_caching/) and [where prefix caching helps](https://docs.vllm.ai/en/latest/features/automatic_prefix_caching/).
+- [Small walkthrough output](https://github.com/ishwar6/ishwar-books/blob/main/code/sglang/results/walkthrough_stdout.txt), [larger experiment results](https://github.com/ishwar6/ishwar-books/blob/main/code/sglang/results/experiments.json), and [pinned source revisions](https://github.com/ishwar6/ishwar-books/blob/main/code/sglang/results/sources.json).

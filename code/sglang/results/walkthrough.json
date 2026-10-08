@@ -1,0 +1,59 @@
+{
+  "radix": [
+    {
+      "request": 1,
+      "reused": 0,
+      "computed": 8
+    },
+    {
+      "request": 2,
+      "reused": 6,
+      "computed": 2
+    },
+    {
+      "request": 3,
+      "reused": 7,
+      "computed": 1
+    }
+  ],
+  "blocks of 4": [
+    {
+      "request": 1,
+      "reused": 0,
+      "computed": 8
+    },
+    {
+      "request": 2,
+      "reused": 4,
+      "computed": 4
+    },
+    {
+      "request": 3,
+      "reused": 4,
+      "computed": 4
+    }
+  ],
+  "attention": [
+    {
+      "query": 0.0,
+      "weights": [
+        0.5,
+        0.5
+      ],
+      "output": 4.0
+    },
+    {
+      "query": 1.0986122886681098,
+      "weights": [
+        0.25,
+        0.7500000000000001
+      ],
+      "output": 5.000000000000001
+    }
+  ],
+  "latency_example": {
+    "cold_ms": 1000,
+    "warm_ms": 920,
+    "speedup": 1.0869565217391304
+  }
+}
