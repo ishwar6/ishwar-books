@@ -1,0 +1,26 @@
+{
+  "checked": "2026-10-08",
+  "sglang_commit": "943621c3364de6948fc02ee13c55b4f1cdf97f3a",
+  "vllm_commit": "458ba2edf85bc9b7ebc0d5141f34ea658520faf5",
+  "sources": {
+    "sglang_radix.py": "https://raw.githubusercontent.com/sgl-project/sglang/943621c3364de6948fc02ee13c55b4f1cdf97f3a/python/sglang/srt/mem_cache/radix_cache.py",
+    "sglang_args.py": "https://raw.githubusercontent.com/sgl-project/sglang/943621c3364de6948fc02ee13c55b4f1cdf97f3a/python/sglang/srt/server_args.py",
+    "vllm_scheduler.py": "https://raw.githubusercontent.com/vllm-project/vllm/458ba2edf85bc9b7ebc0d5141f34ea658520faf5/vllm/config/scheduler.py",
+    "vllm_prefix.md": "https://raw.githubusercontent.com/vllm-project/vllm/458ba2edf85bc9b7ebc0d5141f34ea658520faf5/docs/design/prefix_caching.md",
+    "sglang_hicache.md": "https://docs.sglang.io/docs/advanced_features/hicache_design.md",
+    "sglang_structured.md": "https://docs.sglang.io/docs/advanced_features/structured_outputs.md"
+  },
+  "sha256": {
+    "sglang_structured.md": "f2692459b4d6280e54c27aa879460f0c3db800ffd5c0eeed52547a4b9a5d7944",
+    "sglang_radix.py": "fbb8c52a7abad8cda047941d7fc662c65a77848820bb55e9d505d8c9adc469ab",
+    "vllm_prefix.md": "67ee4e2b7bc23d40e9b366e4a9053ae4ecd0925ddef51f412ac5c16b9dc83a61",
+    "sglang_hicache.md": "398d6f9f1135d8ef7a0ed0191594966e3f3a1f1aa92b91e5e0378b82561bffa4",
+    "sglang_args.py": "06e1912f52dcfbc360b532a4e3d71cc4388cffd59ee9bc6fe58c7d5251f72ae3",
+    "vllm_scheduler.py": "952acdc8e43caa0b419f9908f3987879a2ff3560dc5c4006db8321f6dfd1fbed"
+  },
+  "paper": {
+    "url": "https://arxiv.org/pdf/2312.07104v2",
+    "sha256": "161e0a0123a89cd8a57d68734ae704680b0e577fee41e1e7e1029c37a9d99b57"
+  },
+  "note": "Source snapshots checked for explanations and examples; these revisions were not installed or benchmarked as serving engines."
+}

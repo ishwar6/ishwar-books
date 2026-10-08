@@ -1,0 +1,23 @@
+{
+  "title": "SGLang Explained: RadixAttention, Scheduling, and How It Differs from vLLM \u00b7 Ishwar Jangid",
+  "mathErrors": 0,
+  "math": 37,
+  "figures": 4,
+  "brokenImages": [],
+  "bodyWidth": 1440,
+  "viewport": 1440,
+  "mobile": {
+    "bodyWidth": 390,
+    "viewport": 390
+  },
+  "errors": [],
+  "checked": "2026-10-08",
+  "cpu_experiments": "passed",
+  "stream_parser_tests": 4,
+  "typecheck": "passed",
+  "production_build": "passed",
+  "katex_source_check": "0 errors; 0 single-dollar signs",
+  "visual_review": "desktop, mobile, research excerpt, token-work chart, social card inspected",
+  "gpu_engine_benchmark": "not run",
+  "note": "Report describes staged production build. Diagrams and tables use existing horizontally scrollable mobile styles."
+}
