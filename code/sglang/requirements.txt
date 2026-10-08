@@ -1,2 +1,6 @@
 numpy==2.5.3
 PyMuPDF==1.28.2
+# measure_prefix.py, the JSON example in simulate.py, and termshots.py
+torch==2.14.1
+transformers==5.18.0
+Pillow==12.3.0

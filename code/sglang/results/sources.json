@@ -1,26 +1,46 @@
 {
-  "checked": "2026-10-08",
-  "sglang_commit": "943621c3364de6948fc02ee13c55b4f1cdf97f3a",
-  "vllm_commit": "458ba2edf85bc9b7ebc0d5141f34ea658520faf5",
+  "checked": "2026-10-08 (rechecked 2026-10-09)",
+  "sglang_commit": "b2cb24995d4adefb2628d73cbf9cf84dae896bc1",
+  "vllm_commit": "c23ca06b6d944579ad9d220297441236755b4744",
   "sources": {
-    "sglang_radix.py": "https://raw.githubusercontent.com/sgl-project/sglang/943621c3364de6948fc02ee13c55b4f1cdf97f3a/python/sglang/srt/mem_cache/radix_cache.py",
-    "sglang_args.py": "https://raw.githubusercontent.com/sgl-project/sglang/943621c3364de6948fc02ee13c55b4f1cdf97f3a/python/sglang/srt/server_args.py",
-    "vllm_scheduler.py": "https://raw.githubusercontent.com/vllm-project/vllm/458ba2edf85bc9b7ebc0d5141f34ea658520faf5/vllm/config/scheduler.py",
-    "vllm_prefix.md": "https://raw.githubusercontent.com/vllm-project/vllm/458ba2edf85bc9b7ebc0d5141f34ea658520faf5/docs/design/prefix_caching.md",
-    "sglang_hicache.md": "https://docs.sglang.io/docs/advanced_features/hicache_design.md",
-    "sglang_structured.md": "https://docs.sglang.io/docs/advanced_features/structured_outputs.md"
+    "sglang:python/sglang/srt/arg_groups/fields/schedule.py": "https://github.com/sgl-project/sglang/blob/b2cb24995d4adefb2628d73cbf9cf84dae896bc1/python/sglang/srt/arg_groups/fields/schedule.py",
+    "sglang:python/sglang/srt/arg_groups/fields/memory.py": "https://github.com/sgl-project/sglang/blob/b2cb24995d4adefb2628d73cbf9cf84dae896bc1/python/sglang/srt/arg_groups/fields/memory.py",
+    "sglang:python/sglang/srt/arg_groups/fields/exec_.py": "https://github.com/sgl-project/sglang/blob/b2cb24995d4adefb2628d73cbf9cf84dae896bc1/python/sglang/srt/arg_groups/fields/exec_.py",
+    "sglang:python/sglang/srt/arg_groups/serving_hook.py": "https://github.com/sgl-project/sglang/blob/b2cb24995d4adefb2628d73cbf9cf84dae896bc1/python/sglang/srt/arg_groups/serving_hook.py",
+    "sglang:python/sglang/srt/managers/schedule_policy.py": "https://github.com/sgl-project/sglang/blob/b2cb24995d4adefb2628d73cbf9cf84dae896bc1/python/sglang/srt/managers/schedule_policy.py",
+    "sglang:python/sglang/srt/mem_cache/radix_cache.py": "https://github.com/sgl-project/sglang/blob/b2cb24995d4adefb2628d73cbf9cf84dae896bc1/python/sglang/srt/mem_cache/radix_cache.py",
+    "sglang:python/sglang/srt/constrained/base_grammar_backend.py": "https://github.com/sgl-project/sglang/blob/b2cb24995d4adefb2628d73cbf9cf84dae896bc1/python/sglang/srt/constrained/base_grammar_backend.py",
+    "sglang:docs/docs/advanced_features/radix_eviction_policy.mdx": "https://github.com/sgl-project/sglang/blob/b2cb24995d4adefb2628d73cbf9cf84dae896bc1/docs/docs/advanced_features/radix_eviction_policy.mdx",
+    "sglang:docs/docs/advanced_features/hyperparameter_tuning.mdx": "https://github.com/sgl-project/sglang/blob/b2cb24995d4adefb2628d73cbf9cf84dae896bc1/docs/docs/advanced_features/hyperparameter_tuning.mdx",
+    "vllm:vllm/config/cache.py": "https://github.com/vllm-project/vllm/blob/c23ca06b6d944579ad9d220297441236755b4744/vllm/config/cache.py",
+    "vllm:vllm/config/scheduler.py": "https://github.com/vllm-project/vllm/blob/c23ca06b6d944579ad9d220297441236755b4744/vllm/config/scheduler.py",
+    "vllm:vllm/config/vllm.py": "https://github.com/vllm-project/vllm/blob/c23ca06b6d944579ad9d220297441236755b4744/vllm/config/vllm.py",
+    "vllm:vllm/v1/core/kv_cache_manager.py": "https://github.com/vllm-project/vllm/blob/c23ca06b6d944579ad9d220297441236755b4744/vllm/v1/core/kv_cache_manager.py",
+    "vllm:docs/design/prefix_caching.md": "https://github.com/vllm-project/vllm/blob/c23ca06b6d944579ad9d220297441236755b4744/docs/design/prefix_caching.md",
+    "vllm:docs/features/automatic_prefix_caching.md": "https://github.com/vllm-project/vllm/blob/c23ca06b6d944579ad9d220297441236755b4744/docs/features/automatic_prefix_caching.md",
+    "vllm:docs/features/structured_outputs.md": "https://github.com/vllm-project/vllm/blob/c23ca06b6d944579ad9d220297441236755b4744/docs/features/structured_outputs.md"
   },
   "sha256": {
-    "sglang_structured.md": "f2692459b4d6280e54c27aa879460f0c3db800ffd5c0eeed52547a4b9a5d7944",
-    "sglang_radix.py": "fbb8c52a7abad8cda047941d7fc662c65a77848820bb55e9d505d8c9adc469ab",
-    "vllm_prefix.md": "67ee4e2b7bc23d40e9b366e4a9053ae4ecd0925ddef51f412ac5c16b9dc83a61",
-    "sglang_hicache.md": "398d6f9f1135d8ef7a0ed0191594966e3f3a1f1aa92b91e5e0378b82561bffa4",
-    "sglang_args.py": "06e1912f52dcfbc360b532a4e3d71cc4388cffd59ee9bc6fe58c7d5251f72ae3",
-    "vllm_scheduler.py": "952acdc8e43caa0b419f9908f3987879a2ff3560dc5c4006db8321f6dfd1fbed"
+    "sglang:python/sglang/srt/arg_groups/fields/schedule.py": "907f9f0a4280d4f04b9b0efc3d9727167fd6ec1d5ebfb1d957e78a91a1d852e9",
+    "sglang:python/sglang/srt/arg_groups/fields/memory.py": "260a4d9600a9a9806423ef0f390890e29a2d91bb2c712ba1c971abd51266910d",
+    "sglang:python/sglang/srt/arg_groups/fields/exec_.py": "1523c2840ff5747b6c19b79ac047e0676a11d72c0594797a9f3407e27e093b5e",
+    "sglang:python/sglang/srt/arg_groups/serving_hook.py": "e2931ac0c1dc682fb806cedfcc8a7cb6c074fd13303611d5d9adea5f0711fb0b",
+    "sglang:python/sglang/srt/managers/schedule_policy.py": "2190b4ca3de665ab7920ae296a2fb5681ec1f0a27f65282948d46e2e7edd91aa",
+    "sglang:python/sglang/srt/mem_cache/radix_cache.py": "fbb8c52a7abad8cda047941d7fc662c65a77848820bb55e9d505d8c9adc469ab",
+    "sglang:python/sglang/srt/constrained/base_grammar_backend.py": "b88176aa869e72895a77d791fefc0f26839c3340f9c69b445062a61a2ba15dde",
+    "sglang:docs/docs/advanced_features/radix_eviction_policy.mdx": "4ba2e6210d27ed1de045ae5b6aad9e475f9a7debdd64671178c04193c560876b",
+    "sglang:docs/docs/advanced_features/hyperparameter_tuning.mdx": "9d846c8b4ca8fd8942a3b01e5e28dd1790b25668466c5b7545df455a14ea4d7b",
+    "vllm:vllm/config/cache.py": "d37db21e7a6a1b477a580b54d90011d8708c4e7f6e3903221432d9a39830559b",
+    "vllm:vllm/config/scheduler.py": "952acdc8e43caa0b419f9908f3987879a2ff3560dc5c4006db8321f6dfd1fbed",
+    "vllm:vllm/config/vllm.py": "99423d8176afe808eef7207f92313fd018c48d0eec0e7de694f8da80c274ed4b",
+    "vllm:vllm/v1/core/kv_cache_manager.py": "940d4cba8c5ad2c5f2d209beddbac97c812e83302266dc8e38f8e4b8683dccd1",
+    "vllm:docs/design/prefix_caching.md": "67ee4e2b7bc23d40e9b366e4a9053ae4ecd0925ddef51f412ac5c16b9dc83a61",
+    "vllm:docs/features/automatic_prefix_caching.md": "c393866710f3a2c6b8dc17ef24072fa9142a9caf6396cdf52810d8249e8d5b4d",
+    "vllm:docs/features/structured_outputs.md": "0720d1d9b94f77b00710f76bb0c06a90b5ea7fbcbfb165ea65261bdf88733b1c"
   },
   "paper": {
     "url": "https://arxiv.org/pdf/2312.07104v2",
     "sha256": "161e0a0123a89cd8a57d68734ae704680b0e577fee41e1e7e1029c37a9d99b57"
   },
-  "note": "Source snapshots checked for explanations and examples; these revisions were not installed or benchmarked as serving engines."
+  "note": "Source files read to state defaults and behaviour; these revisions were not installed or benchmarked as serving engines."
 }

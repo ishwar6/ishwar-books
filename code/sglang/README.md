@@ -5,15 +5,17 @@ Edit `article.md`, then run `assemble.py`; the published Markdown is generated f
 
 ## What was run
 
-The revised examples ran on macOS arm64, Python 3.12.14, NumPy 2.5.3. `walkthrough.py` prints the three-request trace and two small attention calculations used directly in the article. `experiments.py` performs real CPU arithmetic and simulations, not SGLang/vLLM model serving:
+Runs on macOS arm64 (Apple M5 Pro), Python 3.12. Nothing here runs SGLang or vLLM.
 
-- Two layers of causal attention: full computation versus prefix-KV reuse, plus an intentionally invalid changed-prefix reuse.
-- Compressed radix-tree insertion and prefix matching, compared with a SHA-256 full-block index on aligned and unaligned synthetic token sequences.
-- 600 randomized request checks against a brute-force longest-prefix oracle and adversarial checks for edge splitting and preceding-context identity.
-- Capacity-limited, whole-prefix LRU scheduling simulation (not the SGLang scheduler).
-- Memory, ideal overlap, and transfer arithmetic.
+- `walkthrough.py`: the three-request trace and the two-number attention example (CPU).
+- `experiments.py`: two layers of causal attention (full computation versus prefix-KV reuse, plus an intentionally invalid changed-prefix reuse), a radix tree versus a SHA-256 full-block index on aligned and unaligned synthetic workloads, 600 randomized checks against a brute-force longest-prefix oracle, and a whole-prefix LRU scheduling toy (CPU).
+- `measure_prefix.py`: **real timings**. Qwen2.5-0.5B, BF16, PyTorch on the Apple GPU (`mps`). Cold prefill of prefix + suffix against warm prefill of the suffix on a cached prefix; prefix sweep 512 to 8,192 tokens, suffix sweep 16 to 1,024 tokens, one decode step at context 2,112. Median of 9 runs after 3 warm-ups. Checks that the next token and logits match.
+- `simulate.py`: KV bytes per token, FLOP counts, whole-request arithmetic, memory sharing, leaf-first LRU trace, block-rounding loss, a capacity sweep (radix with whole-leaf eviction, radix trimming leaf tails as an ablation, 16- and 64-token hashed blocks with a reverse-order LRU free queue), FCFS/random/LPM scheduling and a starvation case, and the jump-forward pass count with the Qwen2.5 tokenizer. Times in the scheduling sections come from a cost model fitted to `results/measure_prefix.json` (worst fit error 30%); they are estimates for this one machine, not engine benchmarks. Requests are served one at a time: no batching, no decode, no real memory pool.
+- `test_simulate.py`, `test_probe.py`: unit tests for the simulated caches and the probe parser.
 
-The small example is saved in `results/walkthrough.json` and `results/walkthrough_stdout.txt`. Larger experiment outputs are in `results/experiments.json` and `results/experiments_stdout.txt`. Do not present their token counts or assumed times as GPU benchmark results. The attention model has random fixed weights, no learned language ability, two layers, width 16, and float64 arithmetic. The cache indexes omit real tensors, reference counts, eviction, adapters, multimodal namespaces, and hybrid-model constraints. Requests insert sequentially with no capacity limit in the index experiment; the separate scheduler simulation has an explicit two-prefix limit.
+Outputs: `results/*.json` and `results/*_stdout.txt`. Figures: `figures.py` writes `results/figures.json`; `assemble.py` inlines them into the article.
+
+Screenshots: `shots_paper.py` (highlighted crops of arXiv 2312.07104v2, manifest in `results/shots_paper.json`), `paper_shots.py` (the one-sentence crop), `web_shots.sh` with `docshot.mjs` (LMSYS blog figures, vLLM and SGLang docs passages), `termshots.py` (terminal pictures of the saved logs).
 
 ## Reproduce from the repository root
 
@@ -22,6 +24,9 @@ python3 -m venv /tmp/sglang-article-env
 /tmp/sglang-article-env/bin/pip install -r code/sglang/requirements.txt
 /tmp/sglang-article-env/bin/python code/sglang/walkthrough.py
 /tmp/sglang-article-env/bin/python code/sglang/experiments.py
+/tmp/sglang-article-env/bin/python code/sglang/measure_prefix.py   # needs a GPU or patience
+/tmp/sglang-article-env/bin/python code/sglang/simulate.py
+/tmp/sglang-article-env/bin/python code/sglang/termshots.py
 /tmp/sglang-article-env/bin/python code/sglang/figures.py
 /tmp/sglang-article-env/bin/python code/sglang/assemble.py
 python3 -m unittest discover -s code/sglang -p 'test_*.py'
@@ -41,7 +46,7 @@ curl -L --fail https://arxiv.org/pdf/2312.07104v2 -o /tmp/sglang-v2.pdf
 
 The screenshot contains one sentence from page 4. `results/paper_shots.json` records the PDF checksum, page, crop coordinates, and highlight. Production details stay here; the article explains why the finding matters to the handbook example. No downloaded PDF is committed.
 
-`results/sources.json` pins the upstream source revisions and downloaded-file checksums. The official source was inspected, not installed as a benchmark. Documentation links were checked on 2026-10-08. Recheck feature flags before using another release.
+`results/sources.json` pins the upstream source revisions and downloaded-file checksums. The official source was inspected, not installed as a benchmark. Documentation links were checked on 2026-10-09. Defaults quoted in the article were read from SGLang b2cb249 and vLLM c23ca06 (8 October 2026). Recheck feature flags before using another release.
 
 ## Real-server smoke test
 

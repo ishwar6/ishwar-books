@@ -1,0 +1,65 @@
+$ python code/sglang/simulate.py
+cost model fitted to measured M5 Pro prefill: t(n, c) = 11.0 + 0.0391 n + 3.80e-6 n (c + n/2) ms, worst error 30%
+KV CACHE BYTES PER TOKEN  (2 x layers x kv_heads x head_dim x 2 bytes)
+  Qwen2.5-0.5B  2 x 24 x 2 x 64 x 2 =  12,288 bytes =    12 KiB   6,000-token handbook:   70.3 MiB
+  Qwen2.5-7B    2 x 28 x 4 x 128 x 2 =  57,344 bytes =    56 KiB   6,000-token handbook:  328.1 MiB
+  Llama 3.1 8B  2 x 32 x 8 x 128 x 2 = 131,072 bytes =   128 KiB   6,000-token handbook:  750.0 MiB
+
+PREFILL FLOPs, Qwen2.5-0.5B  (2N per token + 4 L d per (query, key) pair)
+  P=  512 S=64: cold   426.6 GFLOP, warm  48.8 GFLOP, FLOP ratio    8.7x, measured time ratio   2.1x
+  P= 1024 S=64: cold   829.7 GFLOP, warm  51.6 GFLOP, FLOP ratio   16.1x, measured time ratio   4.0x
+  P= 2048 S=64: cold  1703.7 GFLOP, warm  57.3 GFLOP, FLOP ratio   29.8x, measured time ratio   7.6x
+  P= 4096 S=64: cold  3722.2 GFLOP, warm  68.5 GFLOP, FLOP ratio   54.3x, measured time ratio  12.5x
+  P= 8192 S=64: cold  8841.5 GFLOP, warm  91.1 GFLOP, FLOP ratio   97.1x, measured time ratio  20.7x
+  Llama 3.1 8B, 8,192-token prefix: 132 TFLOP = 133 ms at 100% of an H100 (989 TFLOP/s)
+
+WHOLE REQUEST  P=2048, S=64, decode 12.71 ms per token (all measured)
+  answer     1 tokens: cold    100.4 ms, warm     13.2 ms, speedup  7.63x
+  answer    20 tokens: cold    341.9 ms, warm    254.6 ms, speedup  1.34x
+  answer   200 tokens: cold   2629.7 ms, warm   2542.4 ms, speedup  1.03x
+  answer  1000 tokens: cold  12797.7 ms, warm  12710.4 ms, speedup  1.01x
+  expected prefill at hit probability 50%: 56.8 ms
+  expected prefill at hit probability 90%: 21.9 ms
+
+MEMORY SHARING  32 active requests: 512 instruction + 1536 handbook (1 of 4) + 64 question tokens
+  no sharing : 67,584 token slots   tree: 8,704 token slots   ratio 7.8x
+  Qwen2.5-0.5B   0.77 GiB  ->   0.10 GiB
+  Llama 3.1 8B   8.25 GiB  ->   1.06 GiB
+
+LRU EVICTION TRACE  capacity 10 tokens, leaf-first
+  handbook + q1        reuse 0, compute 8; stored 8 tokens: 1 2 3 4 5 6 20 21
+  handbook + q2        reuse 6, compute 2; stored 10 tokens: 1 2 3 4 5 6 | 20 21 | 30 31
+  handbook + q3        reuse 6, compute 2; stored 10 tokens: 1 2 3 4 5 6 | 30 31 | 40 41
+  handbook + q2 again  reuse 8, compute 0; stored 10 tokens: 1 2 3 4 5 6 | 30 31 | 40 41
+  handbook + q1 again  reuse 6, compute 2; stored 10 tokens: 1 2 3 4 5 6 | 30 31 | 20 21
+
+BLOCK ALIGNMENT  shared prefix length uniform in 0..4095, tokens lost to rounding down
+  block   1: mean lost   0.00 tokens   formula (B-1)/2 =    0.0
+  block  16: mean lost   7.52 tokens   formula (B-1)/2 =    7.5
+  block  32: mean lost  15.55 tokens   formula (B-1)/2 =   15.5
+  block  64: mean lost  31.56 tokens   formula (B-1)/2 =   31.5
+  block 128: mean lost  63.57 tokens   formula (B-1)/2 =   63.5
+
+CAPACITY SWEEP  600 requests: 6 handbooks (900-2,100 tokens), Zipf popularity, 35% follow-ups
+  capacity   radix(page 1)   radix(trim tails)   blocks(16)   blocks(64)
+     4,096           52.5%               58.3%        58.0%        57.0%
+     8,192           78.3%               81.6%        81.3%        80.5%
+    16,384           94.4%               94.7%        94.4%        93.6%
+    32,768           96.3%               96.3%        95.9%        95.0%
+    65,536           96.3%               96.3%        95.9%        95.0%
+
+SCHEDULING ORDER  32 waiting requests (A B C D repeated), cache 4,096 tokens = 2 handbooks
+  each: 512 instructions + 1536 handbook + 64 question; best possible = 8,704 tokens computed
+  policy   tokens computed   hit rate   all done   mean wait   worst wait
+  fcfs              51,712      23.5%     2630 ms     1366 ms      2630 ms
+  random            27,136      59.8%     1550 ms      841 ms      1550 ms
+  lpm                8,704      87.1%      740 ms      421 ms       740 ms
+
+STARVATION  60 handbook-A questions every 10 ms + one handbook-D question at 25 ms
+  fcfs: D waits    187 ms   A mean   299 ms, A worst   422 ms
+  lpm : D waits    987 ms   A mean   221 ms, A worst   341 ms
+
+JUMP-FORWARD  Qwen2.5 tokenizer, one JSON answer
+  {"employee": "Asha Rao", "leave_type": "annual", "days": 12}
+  tokens 22: forced 15, free 7; forced runs 4
+  forward passes: token by token 22, with jump-forward 11

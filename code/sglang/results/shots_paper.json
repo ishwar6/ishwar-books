@@ -1,0 +1,76 @@
+{
+  "url": "https://arxiv.org/pdf/2312.07104v2",
+  "sha256": "161e0a0123a89cd8a57d68734ae704680b0e577fee41e1e7e1029c37a9d99b57",
+  "jobs": [
+    {
+      "name": "paper-radix-lru",
+      "page": 3,
+      "anchor": "RadixAttention. A radix tree is a data structure",
+      "above": 2,
+      "highlight": [
+        "evicts the least recently used leaf first",
+        "each node maintains a reference counter",
+        "A node is evictable if its reference counter is zero"
+      ],
+      "end": "in favor of a larger batch size"
+    },
+    {
+      "name": "paper-schedule",
+      "page": 5,
+      "anchor": "requests by matched prefix length and prioritize",
+      "above": 2,
+      "highlight": [
+        "prioritize requests with longer matched prefixes",
+        "depth-first search order",
+        "it can lead to starvation"
+      ],
+      "end": "as future work"
+    },
+    {
+      "name": "paper-fig4",
+      "page": 5,
+      "anchor": "Figure 4: The decoding process of normal and compressed FSMs",
+      "figure": true,
+      "below": 0
+    },
+    {
+      "name": "paper-fig5",
+      "page": 6,
+      "anchor": "Figure 5: Normalized throughput on Llama-7B models",
+      "figure": true,
+      "below": 8
+    },
+    {
+      "name": "paper-arena",
+      "page": 7,
+      "anchor": "Production deployment.",
+      "above": 2,
+      "highlight": [
+        "52.4% RadixAttention cache hit rate",
+        "74.1% for Vicuna-33B",
+        "average of 1.7"
+      ],
+      "end": "average of 1.7"
+    },
+    {
+      "name": "paper-overhead",
+      "page": 8,
+      "anchor": "Overhead of RadixAttention.",
+      "above": 2,
+      "highlight": [
+        "only 0.2 seconds"
+      ],
+      "end": "turn on RadixAttention by default"
+    },
+    {
+      "name": "paper-alg1",
+      "page": 14,
+      "anchor": "Algorithm 1 Cache-Aware Scheduling",
+      "highlight": [
+        "requests.sort()"
+      ],
+      "end": "return finished_requests",
+      "column": "full"
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "kind": "Real PyTorch measurement of prefix-KV reuse; not an SGLang or vLLM benchmark",
+  "model": "Qwen/Qwen2.5-0.5B",
+  "dtype": "bfloat16",
+  "device": "mps",
+  "machine": "arm64",
+  "platform": "macOS-26.5.1-arm64-arm-64bit",
+  "chip": "Apple M5 Pro",
+  "torch": "2.14.1",
+  "transformers": "5.18.0",
+  "python": "3.12.13",
+  "repeats": 9,
+  "warmup": 3,
+  "statistic": "median",
+  "prefix_sweep": [
+    {
+      "P": 512,
+      "S": 64,
+      "cold_ms": 30.25,
+      "warm_ms": 14.65,
+      "speedup": 2.06,
+      "same_next_token": true,
+      "max_abs_logit_diff": 0.0
+    },
+    {
+      "P": 1024,
+      "S": 64,
+      "cold_ms": 51.2,
+      "warm_ms": 12.94,
+      "speedup": 3.96,
+      "same_next_token": true,
+      "max_abs_logit_diff": 0.0
+    },
+    {
+      "P": 2048,
+      "S": 64,
+      "cold_ms": 100.4,
+      "warm_ms": 13.15,
+      "speedup": 7.64,
+      "same_next_token": true,
+      "max_abs_logit_diff": 0.0
+    },
+    {
+      "P": 4096,
+      "S": 64,
+      "cold_ms": 211.17,
+      "warm_ms": 16.88,
+      "speedup": 12.51,
+      "same_next_token": true,
+      "max_abs_logit_diff": 0.0
+    },
+    {
+      "P": 8192,
+      "S": 64,
+      "cold_ms": 462.27,
+      "warm_ms": 22.34,
+      "speedup": 20.69,
+      "same_next_token": true,
+      "max_abs_logit_diff": 0.0
+    }
+  ],
+  "suffix_sweep": [
+    {
+      "P": 2048,
+      "S": 16,
+      "cold_ms": 99.31,
+      "warm_ms": 15.69,
+      "speedup": 6.33,
+      "same_next_token": true,
+      "max_abs_logit_diff": 0.1641
+    },
+    {
+      "P": 2048,
+      "S": 64,
+      "cold_ms": 99.91,
+      "warm_ms": 13.34,
+      "speedup": 7.49,
+      "same_next_token": true,
+      "max_abs_logit_diff": 0.0
+    },
+    {
+      "P": 2048,
+      "S": 256,
+      "cold_ms": 115.4,
+      "warm_ms": 19.53,
+      "speedup": 5.91,
+      "same_next_token": true,
+      "max_abs_logit_diff": 0.0
+    },
+    {
+      "P": 2048,
+      "S": 1024,
+      "cold_ms": 148.03,
+      "warm_ms": 58.81,
+      "speedup": 2.52,
+      "same_next_token": true,
+      "max_abs_logit_diff": 0.0
+    }
+  ],
+  "decode_ms_at_2112": 12.71
+}

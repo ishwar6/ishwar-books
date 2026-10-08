@@ -1,0 +1,778 @@
+{
+  "kind": "CPU simulations; times from a cost model fitted to real Qwen2.5-0.5B timings on an Apple M5 Pro; not engine benchmarks",
+  "cost_model": {
+    "a_ms": 11.039517452906658,
+    "b_ms_per_token": 0.03907411718047614,
+    "c_ms_per_pair": 3.800873951402017e-06,
+    "max_rel_error": 0.30435104097841253
+  },
+  "kv_bytes": {
+    "Qwen2.5-0.5B": {
+      "layers": 24,
+      "kv_heads": 2,
+      "head_dim": 64,
+      "bytes_per_token": 12288,
+      "handbook_6000_tokens_MiB": 70.3125
+    },
+    "Qwen2.5-7B": {
+      "layers": 28,
+      "kv_heads": 4,
+      "head_dim": 128,
+      "bytes_per_token": 57344,
+      "handbook_6000_tokens_MiB": 328.125
+    },
+    "Llama 3.1 8B": {
+      "layers": 32,
+      "kv_heads": 8,
+      "head_dim": 128,
+      "bytes_per_token": 131072,
+      "handbook_6000_tokens_MiB": 750.0
+    }
+  },
+  "flops": {
+    "non_embedding_params": 357898112,
+    "layers": 24,
+    "query_width": 896,
+    "rows": [
+      {
+        "P": 512,
+        "S": 64,
+        "cold_gflop": 426.59241984,
+        "warm_gflop": 48.808443904,
+        "flop_ratio": 8.740135634708064,
+        "measured_ratio": 2.06
+      },
+      {
+        "P": 1024,
+        "S": 64,
+        "cold_gflop": 829.743546368,
+        "warm_gflop": 51.627016192,
+        "flop_ratio": 16.07188653479794,
+        "measured_ratio": 3.96
+      },
+      {
+        "P": 2048,
+        "S": 64,
+        "cold_gflop": 1703.691534336,
+        "warm_gflop": 57.264160768,
+        "flop_ratio": 29.75144508339754,
+        "measured_ratio": 7.64
+      },
+      {
+        "P": 4096,
+        "S": 64,
+        "cold_gflop": 3722.17044992,
+        "warm_gflop": 68.53844992,
+        "flop_ratio": 54.30777110168995,
+        "measured_ratio": 12.51
+      },
+      {
+        "P": 8192,
+        "S": 64,
+        "cold_gflop": 8841.46003968,
+        "warm_gflop": 91.087028224,
+        "flop_ratio": 97.06607199805882,
+        "measured_ratio": 20.69
+      }
+    ],
+    "llama8b_8192_tflop": 131.954653528064,
+    "llama8b_8192_ideal_h100_ms": 133.4222988150293
+  },
+  "end_to_end": [
+    {
+      "answer_tokens": 1,
+      "cold_ms": 100.4,
+      "warm_ms": 13.15,
+      "speedup": 7.634980988593156
+    },
+    {
+      "answer_tokens": 20,
+      "cold_ms": 341.89,
+      "warm_ms": 254.64000000000001,
+      "speedup": 1.342640590637763
+    },
+    {
+      "answer_tokens": 200,
+      "cold_ms": 2629.69,
+      "warm_ms": 2542.44,
+      "speedup": 1.0343174273532512
+    },
+    {
+      "answer_tokens": 1000,
+      "cold_ms": 12797.69,
+      "warm_ms": 12710.44,
+      "speedup": 1.006864435849585
+    }
+  ],
+  "sharing": {
+    "active": 32,
+    "naive_tokens": 67584,
+    "tree_tokens": 8704,
+    "ratio": 7.764705882352941,
+    "formula_tree": 8704
+  },
+  "lru_trace": [
+    {
+      "request": "handbook + q1",
+      "reused": 0,
+      "computed": 8,
+      "stored": 8,
+      "edges": [
+        "1 2 3 4 5 6 20 21"
+      ]
+    },
+    {
+      "request": "handbook + q2",
+      "reused": 6,
+      "computed": 2,
+      "stored": 10,
+      "edges": [
+        "1 2 3 4 5 6",
+        "20 21",
+        "30 31"
+      ]
+    },
+    {
+      "request": "handbook + q3",
+      "reused": 6,
+      "computed": 2,
+      "stored": 10,
+      "edges": [
+        "1 2 3 4 5 6",
+        "30 31",
+        "40 41"
+      ]
+    },
+    {
+      "request": "handbook + q2 again",
+      "reused": 8,
+      "computed": 0,
+      "stored": 10,
+      "edges": [
+        "1 2 3 4 5 6",
+        "30 31",
+        "40 41"
+      ]
+    },
+    {
+      "request": "handbook + q1 again",
+      "reused": 6,
+      "computed": 2,
+      "stored": 10,
+      "edges": [
+        "1 2 3 4 5 6",
+        "30 31",
+        "20 21"
+      ]
+    }
+  ],
+  "alignment": {
+    "1": {
+      "mean_lost": 0.0,
+      "formula": 0.0
+    },
+    "16": {
+      "mean_lost": 7.5205,
+      "formula": 7.5
+    },
+    "32": {
+      "mean_lost": 15.54578,
+      "formula": 15.5
+    },
+    "64": {
+      "mean_lost": 31.56274,
+      "formula": 31.5
+    },
+    "128": {
+      "mean_lost": 63.57426,
+      "formula": 63.5
+    }
+  },
+  "capacity_sweep": [
+    {
+      "capacity_tokens": 4096,
+      "radix_page1": 0.524512364990046,
+      "radix_trim": 0.5827169086479969,
+      "block16": 0.5800501014477083,
+      "block64": 0.5698299149438426
+    },
+    {
+      "capacity_tokens": 8192,
+      "radix_page1": 0.7832480893939215,
+      "radix_trim": 0.8156041385940156,
+      "block16": 0.8130500005906046,
+      "block64": 0.8049378184154168
+    },
+    {
+      "capacity_tokens": 16384,
+      "radix_page1": 0.9436236049236439,
+      "radix_trim": 0.9470572895607446,
+      "block16": 0.9442987114823541,
+      "block64": 0.9358957700894176
+    },
+    {
+      "capacity_tokens": 32768,
+      "radix_page1": 0.9628109874273897,
+      "radix_trim": 0.9628109874273897,
+      "block16": 0.9592291973137482,
+      "block64": 0.949561453323605
+    },
+    {
+      "capacity_tokens": 65536,
+      "radix_page1": 0.9628109874273897,
+      "radix_trim": 0.9628109874273897,
+      "block16": 0.9592291973137482,
+      "block64": 0.949561453323605
+    }
+  ],
+  "offline_scheduling": {
+    "capacity": 4096,
+    "optimal_computed": 8704,
+    "fcfs": {
+      "computed_tokens": 51712,
+      "hit_rate": 0.23484848484848486,
+      "total_ms": 2629.684921441411,
+      "mean_ttft_ms": 1365.8629785644127,
+      "max_ttft_ms": 2629.684921441411,
+      "timeline": [
+        {
+          "req": 0,
+          "book": 0,
+          "start": 0.0,
+          "end": 102.04,
+          "computed": 2112
+        },
+        {
+          "req": 1,
+          "book": 1,
+          "start": 102.04,
+          "end": 183.58,
+          "computed": 1600
+        },
+        {
+          "req": 2,
+          "book": 2,
+          "start": 183.58,
+          "end": 265.11,
+          "computed": 1600
+        },
+        {
+          "req": 3,
+          "book": 3,
+          "start": 265.11,
+          "end": 346.65,
+          "computed": 1600
+        },
+        {
+          "req": 4,
+          "book": 0,
+          "start": 346.65,
+          "end": 428.19,
+          "computed": 1600
+        },
+        {
+          "req": 5,
+          "book": 1,
+          "start": 428.19,
+          "end": 509.73,
+          "computed": 1600
+        },
+        {
+          "req": 6,
+          "book": 2,
+          "start": 509.73,
+          "end": 591.26,
+          "computed": 1600
+        },
+        {
+          "req": 7,
+          "book": 3,
+          "start": 591.26,
+          "end": 672.8,
+          "computed": 1600
+        },
+        {
+          "req": 8,
+          "book": 0,
+          "start": 672.8,
+          "end": 754.34,
+          "computed": 1600
+        },
+        {
+          "req": 9,
+          "book": 1,
+          "start": 754.34,
+          "end": 835.87,
+          "computed": 1600
+        },
+        {
+          "req": 10,
+          "book": 2,
+          "start": 835.87,
+          "end": 917.41,
+          "computed": 1600
+        },
+        {
+          "req": 11,
+          "book": 3,
+          "start": 917.41,
+          "end": 998.95,
+          "computed": 1600
+        },
+        {
+          "req": 12,
+          "book": 0,
+          "start": 998.95,
+          "end": 1080.48,
+          "computed": 1600
+        },
+        {
+          "req": 13,
+          "book": 1,
+          "start": 1080.48,
+          "end": 1162.02,
+          "computed": 1600
+        },
+        {
+          "req": 14,
+          "book": 2,
+          "start": 1162.02,
+          "end": 1243.56,
+          "computed": 1600
+        },
+        {
+          "req": 15,
+          "book": 3,
+          "start": 1243.56,
+          "end": 1325.09,
+          "computed": 1600
+        },
+        {
+          "req": 16,
+          "book": 0,
+          "start": 1325.09,
+          "end": 1406.63,
+          "computed": 1600
+        },
+        {
+          "req": 17,
+          "book": 1,
+          "start": 1406.63,
+          "end": 1488.17,
+          "computed": 1600
+        },
+        {
+          "req": 18,
+          "book": 2,
+          "start": 1488.17,
+          "end": 1569.71,
+          "computed": 1600
+        },
+        {
+          "req": 19,
+          "book": 3,
+          "start": 1569.71,
+          "end": 1651.24,
+          "computed": 1600
+        },
+        {
+          "req": 20,
+          "book": 0,
+          "start": 1651.24,
+          "end": 1732.78,
+          "computed": 1600
+        },
+        {
+          "req": 21,
+          "book": 1,
+          "start": 1732.78,
+          "end": 1814.32,
+          "computed": 1600
+        },
+        {
+          "req": 22,
+          "book": 2,
+          "start": 1814.32,
+          "end": 1895.85,
+          "computed": 1600
+        },
+        {
+          "req": 23,
+          "book": 3,
+          "start": 1895.85,
+          "end": 1977.39,
+          "computed": 1600
+        },
+        {
+          "req": 24,
+          "book": 0,
+          "start": 1977.39,
+          "end": 2058.93,
+          "computed": 1600
+        },
+        {
+          "req": 25,
+          "book": 1,
+          "start": 2058.93,
+          "end": 2140.46,
+          "computed": 1600
+        },
+        {
+          "req": 26,
+          "book": 2,
+          "start": 2140.46,
+          "end": 2222.0,
+          "computed": 1600
+        },
+        {
+          "req": 27,
+          "book": 3,
+          "start": 2222.0,
+          "end": 2303.54,
+          "computed": 1600
+        },
+        {
+          "req": 28,
+          "book": 0,
+          "start": 2303.54,
+          "end": 2385.07,
+          "computed": 1600
+        },
+        {
+          "req": 29,
+          "book": 1,
+          "start": 2385.07,
+          "end": 2466.61,
+          "computed": 1600
+        },
+        {
+          "req": 30,
+          "book": 2,
+          "start": 2466.61,
+          "end": 2548.15,
+          "computed": 1600
+        },
+        {
+          "req": 31,
+          "book": 3,
+          "start": 2548.15,
+          "end": 2629.68,
+          "computed": 1600
+        }
+      ]
+    },
+    "random": {
+      "computed_tokens": 27136,
+      "hit_rate": 0.5984848484848485,
+      "total_ms": 1549.8342614800713,
+      "mean_ttft_ms": 840.7012318254016,
+      "max_ttft_ms": 1549.8342614800713
+    },
+    "lpm": {
+      "computed_tokens": 8704,
+      "hit_rate": 0.8712121212121212,
+      "total_ms": 739.9462665090662,
+      "mean_ttft_ms": 420.99365109823987,
+      "max_ttft_ms": 739.9462665090662,
+      "timeline": [
+        {
+          "req": 0,
+          "book": 0,
+          "start": 0.0,
+          "end": 102.04,
+          "computed": 2112
+        },
+        {
+          "req": 4,
+          "book": 0,
+          "start": 102.04,
+          "end": 116.09,
+          "computed": 64
+        },
+        {
+          "req": 8,
+          "book": 0,
+          "start": 116.09,
+          "end": 130.13,
+          "computed": 64
+        },
+        {
+          "req": 12,
+          "book": 0,
+          "start": 130.13,
+          "end": 144.18,
+          "computed": 64
+        },
+        {
+          "req": 16,
+          "book": 0,
+          "start": 144.18,
+          "end": 158.23,
+          "computed": 64
+        },
+        {
+          "req": 20,
+          "book": 0,
+          "start": 158.23,
+          "end": 172.27,
+          "computed": 64
+        },
+        {
+          "req": 24,
+          "book": 0,
+          "start": 172.27,
+          "end": 186.32,
+          "computed": 64
+        },
+        {
+          "req": 28,
+          "book": 0,
+          "start": 186.32,
+          "end": 200.36,
+          "computed": 64
+        },
+        {
+          "req": 1,
+          "book": 1,
+          "start": 200.36,
+          "end": 281.9,
+          "computed": 1600
+        },
+        {
+          "req": 5,
+          "book": 1,
+          "start": 281.9,
+          "end": 295.95,
+          "computed": 64
+        },
+        {
+          "req": 9,
+          "book": 1,
+          "start": 295.95,
+          "end": 309.99,
+          "computed": 64
+        },
+        {
+          "req": 13,
+          "book": 1,
+          "start": 309.99,
+          "end": 324.04,
+          "computed": 64
+        },
+        {
+          "req": 17,
+          "book": 1,
+          "start": 324.04,
+          "end": 338.09,
+          "computed": 64
+        },
+        {
+          "req": 21,
+          "book": 1,
+          "start": 338.09,
+          "end": 352.13,
+          "computed": 64
+        },
+        {
+          "req": 25,
+          "book": 1,
+          "start": 352.13,
+          "end": 366.18,
+          "computed": 64
+        },
+        {
+          "req": 29,
+          "book": 1,
+          "start": 366.18,
+          "end": 380.23,
+          "computed": 64
+        },
+        {
+          "req": 2,
+          "book": 2,
+          "start": 380.23,
+          "end": 461.76,
+          "computed": 1600
+        },
+        {
+          "req": 6,
+          "book": 2,
+          "start": 461.76,
+          "end": 475.81,
+          "computed": 64
+        },
+        {
+          "req": 10,
+          "book": 2,
+          "start": 475.81,
+          "end": 489.85,
+          "computed": 64
+        },
+        {
+          "req": 14,
+          "book": 2,
+          "start": 489.85,
+          "end": 503.9,
+          "computed": 64
+        },
+        {
+          "req": 18,
+          "book": 2,
+          "start": 503.9,
+          "end": 517.95,
+          "computed": 64
+        },
+        {
+          "req": 22,
+          "book": 2,
+          "start": 517.95,
+          "end": 531.99,
+          "computed": 64
+        },
+        {
+          "req": 26,
+          "book": 2,
+          "start": 531.99,
+          "end": 546.04,
+          "computed": 64
+        },
+        {
+          "req": 30,
+          "book": 2,
+          "start": 546.04,
+          "end": 560.09,
+          "computed": 64
+        },
+        {
+          "req": 3,
+          "book": 3,
+          "start": 560.09,
+          "end": 641.62,
+          "computed": 1600
+        },
+        {
+          "req": 7,
+          "book": 3,
+          "start": 641.62,
+          "end": 655.67,
+          "computed": 64
+        },
+        {
+          "req": 11,
+          "book": 3,
+          "start": 655.67,
+          "end": 669.72,
+          "computed": 64
+        },
+        {
+          "req": 15,
+          "book": 3,
+          "start": 669.72,
+          "end": 683.76,
+          "computed": 64
+        },
+        {
+          "req": 19,
+          "book": 3,
+          "start": 683.76,
+          "end": 697.81,
+          "computed": 64
+        },
+        {
+          "req": 23,
+          "book": 3,
+          "start": 697.81,
+          "end": 711.85,
+          "computed": 64
+        },
+        {
+          "req": 27,
+          "book": 3,
+          "start": 711.85,
+          "end": 725.9,
+          "computed": 64
+        },
+        {
+          "req": 31,
+          "book": 3,
+          "start": 725.9,
+          "end": 739.95,
+          "computed": 64
+        }
+      ]
+    }
+  },
+  "starvation": {
+    "fcfs": {
+      "d_wait_ms": 186.67040181360068,
+      "a_mean_ms": 298.86497239044195,
+      "a_max_ms": 422.3056995070642,
+      "total_ms": 1012.3056995070642,
+      "d_start_ms": 130.13
+    },
+    "lpm": {
+      "d_wait_ms": 987.3056995070642,
+      "a_mean_ms": 221.404917827013,
+      "a_max_ms": 340.7687999666126,
+      "total_ms": 1012.3056995070642,
+      "d_start_ms": 930.77
+    }
+  },
+  "jump_forward": {
+    "text": "{\"employee\": \"Asha Rao\", \"leave_type\": \"annual\", \"days\": 12}",
+    "tokens": 22,
+    "free": 7,
+    "forced": 15,
+    "forced_runs": 4,
+    "passes_normal": 22,
+    "passes_jump": 11,
+    "tokens_text": [
+      "{\"",
+      "employee",
+      "\":",
+      " \"",
+      "A",
+      "sha",
+      " Rao",
+      "\",",
+      " \"",
+      "leave",
+      "_type",
+      "\":",
+      " \"",
+      "annual",
+      "\",",
+      " \"",
+      "days",
+      "\":",
+      " ",
+      "1",
+      "2",
+      "}"
+    ],
+    "kinds": [
+      "forced",
+      "forced",
+      "forced",
+      "forced",
+      "free",
+      "free",
+      "free",
+      "free",
+      "forced",
+      "forced",
+      "forced",
+      "forced",
+      "forced",
+      "free",
+      "forced",
+      "forced",
+      "forced",
+      "forced",
+      "forced",
+      "free",
+      "free",
+      "forced"
+    ]
+  }
+}

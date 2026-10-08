@@ -1,0 +1,20 @@
+$ python code/sglang/measure_prefix.py
+model Qwen/Qwen2.5-0.5B  bf16  device mps  torch 2.14.1
+layers 24  kv_heads 2  head_dim 64
+
+SHARED PREFIX SWEEP (suffix S = 64 new tokens)
+     P      S   cold ms   warm ms   speedup   same token   max |logit diff|
+   512     64      30.2      14.7      2.1x         True   0.0000
+  1024     64      51.2      12.9      4.0x         True   0.0000
+  2048     64     100.4      13.2      7.6x         True   0.0000
+  4096     64     211.2      16.9     12.5x         True   0.0000
+  8192     64     462.3      22.3     20.7x         True   0.0000
+
+SUFFIX SWEEP (shared prefix P = 2048)
+     P      S   cold ms   warm ms   speedup
+  2048     16      99.3      15.7      6.3x
+  2048     64      99.9      13.3      7.5x
+  2048    256     115.4      19.5      5.9x
+  2048   1024     148.0      58.8      2.5x
+
+DECODE one token at context 2,112: 12.71 ms per step
