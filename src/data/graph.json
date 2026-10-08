@@ -246,6 +246,90 @@
       "group": "hardware",
       "route": "books/gpu-programming/01-cpu-parallelism#11-the-machine-and-the-four-kinds-of-cpu-parallelism",
       "blurb": "What a CPU can and cannot do in parallel, and why that is not enough."
+    },
+    {
+      "id": "agentic-systems",
+      "label": "Agentic Systems (book)",
+      "group": "agents",
+      "route": "books/agentic-systems",
+      "blurb": "A book on agent patterns, evals, tracing and guardrails, with real runs and what companies learned in production."
+    },
+    {
+      "id": "agent-loop",
+      "label": "What an agent is",
+      "group": "agents",
+      "route": "books/agentic-systems/01-what-an-agent-is#11-from-one-llm-call-to-a-loop",
+      "blurb": "An LLM in a loop that picks tools and acts until the task is done, and when a plain workflow is the better choice."
+    },
+    {
+      "id": "building-blocks",
+      "label": "Model, tools, memory and state",
+      "group": "agents",
+      "route": "books/agentic-systems/02-the-building-blocks#21-the-five-blocks-and-how-they-connect",
+      "blurb": "The five parts every agent is made of, and how they connect."
+    },
+    {
+      "id": "context-engineering",
+      "label": "Context engineering",
+      "group": "agents",
+      "route": "books/agentic-systems/02-the-building-blocks#27-context-engineering-the-art-of-what-to-put-in-the-window",
+      "blurb": "Choosing what goes into the model's window at each step, and what stays out."
+    },
+    {
+      "id": "react",
+      "label": "ReAct and reasoning loops",
+      "group": "agents",
+      "route": "books/agentic-systems/03-reasoning-patterns#33-acting-in-a-loop-react",
+      "blurb": "Think, act, look at the result, repeat. Measured with an exact grader and an ablation of what really helps."
+    },
+    {
+      "id": "reflection",
+      "label": "Reflection and verifiers",
+      "group": "agents",
+      "route": "books/agentic-systems/03-reasoning-patterns#35-checking-the-answer-who-tells-the-agent-it-was-wrong",
+      "blurb": "Self-review rarely fixes answers; a real check, such as a test suite, does."
+    },
+    {
+      "id": "workflow-patterns",
+      "label": "Chaining, routing and parallel calls",
+      "group": "agents",
+      "route": "books/agentic-systems/04-workflow-patterns#41-workflows-versus-agents-who-holds-the-control-flow",
+      "blurb": "Fixed workflows where your code holds the control flow: prompt chains, routers and fan-out."
+    },
+    {
+      "id": "orchestrator",
+      "label": "Orchestrators and evaluator loops",
+      "group": "agents",
+      "route": "books/agentic-systems/04-workflow-patterns#45-orchestrator-workers-when-the-split-cannot-be-written-in-advance",
+      "blurb": "One model splits the work for others, and a checker loop refines an answer until it passes."
+    },
+    {
+      "id": "prefix-caching",
+      "label": "Prefix caching",
+      "group": "inference",
+      "route": "writings/llm-inference-5-sglang-vs-vllm#2-save-the-models-working-state-not-the-answer",
+      "blurb": "Requests that start the same way reuse the saved KV cache, so the shared start is not computed again."
+    },
+    {
+      "id": "sglang",
+      "label": "SGLang and RadixAttention",
+      "group": "inference",
+      "route": "writings/llm-inference-5-sglang-vs-vllm#5-how-sglang-finds-the-saved-beginning-radixattention",
+      "blurb": "A radix tree of cached prefixes, compared step by step with vLLM's hashed blocks."
+    },
+    {
+      "id": "cache-scheduling",
+      "label": "Cache-aware scheduling",
+      "group": "inference",
+      "route": "writings/llm-inference-5-sglang-vs-vllm#10-when-the-assistant-gets-busy-the-order-of-requests-matters",
+      "blurb": "Serving requests that share a cached start together raises reuse, at the risk of making others wait."
+    },
+    {
+      "id": "json-decoding",
+      "label": "Faster structured output",
+      "group": "inference",
+      "route": "writings/llm-inference-5-sglang-vs-vllm#11-a-second-idea-from-the-paper-decode-json-faster",
+      "blurb": "When the JSON format fixes the next tokens, write them at once instead of one step at a time."
     }
   ],
   "edges": [
@@ -408,6 +492,70 @@
     [
       "jev",
       "langgraph"
+    ],
+    [
+      "agentic-systems",
+      "agent-loop"
+    ],
+    [
+      "agent-loop",
+      "building-blocks"
+    ],
+    [
+      "building-blocks",
+      "context-engineering"
+    ],
+    [
+      "agent-loop",
+      "react"
+    ],
+    [
+      "react",
+      "reflection"
+    ],
+    [
+      "agent-loop",
+      "workflow-patterns"
+    ],
+    [
+      "workflow-patterns",
+      "orchestrator"
+    ],
+    [
+      "langgraph",
+      "workflow-patterns"
+    ],
+    [
+      "guardrails",
+      "orchestrator"
+    ],
+    [
+      "rag",
+      "context-engineering"
+    ],
+    [
+      "kv-cache",
+      "prefix-caching"
+    ],
+    [
+      "prefix-caching",
+      "sglang"
+    ],
+    [
+      "vllm",
+      "prefix-caching"
+    ],
+    [
+      "sglang",
+      "cache-scheduling"
+    ],
+    [
+      "sglang",
+      "json-decoding"
+    ],
+    [
+      "context-engineering",
+      "prefix-caching"
     ]
   ]
 }
