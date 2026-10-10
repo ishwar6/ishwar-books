@@ -1,0 +1,15 @@
+== A. WikiText-2 test set ==
+characters: 1,294,336   UTF-8 bytes: 1,296,370
+GPT-2 (124M)             tokens 287,644  bytes/token 4.51  loss 3.2257 nats/token  PPL   25.17  bits/byte 1.0326  (52s)
+Qwen2.5-0.5B base        tokens 299,078  bytes/token 4.33  loss 2.5258 nats/token  PPL   12.50  bits/byte 0.8407  (254s)
+
+== B. same model, different measuring choices (Qwen2.5-0.5B base) ==
+window  1024 stride  1024:  loss 2.6848  PPL  14.66  bits/byte 0.8927
+window  1024 stride   512:  loss 2.5258  PPL  12.50  bits/byte 0.8407
+window   256 stride   256:  loss 3.0588  PPL  21.30  bits/byte 1.0141
+window  2048 stride  1024:  loss 2.4571  PPL  11.67  bits/byte 0.8178
+
+Qwen2.5-0.5B-Instruct    tokens 299,078  bytes/token 4.33  loss 2.6140 nats/token  PPL   13.65  bits/byte 0.8700  (300s)
+== C. assistant-style text: 200 GSM8K test solutions in the chat template, loss on answer tokens only ==
+Qwen2.5-0.5B base        answer tokens 17,715  loss 1.2056  PPL 3.34
+Qwen2.5-0.5B-Instruct    answer tokens 17,715  loss 1.0454  PPL 2.84

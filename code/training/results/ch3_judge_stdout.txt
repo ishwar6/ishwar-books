@@ -1,0 +1,10 @@
+== judge: Qwen2.5-0.5B-Instruct ==
+easy    n=100  picks the better answer: when it is A 0.00, when it is B 1.00 | consistent 0.00 (right both times 0.00) | always "A" 0.00, always "B" 1.00 | mean P("A") 0.08 | swap-and-average 0.20
+maths   n=100  picks the better answer: when it is A 0.00, when it is B 1.00 | consistent 0.00 (right both times 0.00) | always "A" 0.00, always "B" 1.00 | mean P("A") 0.02 | swap-and-average 0.65
+length  n= 60  prefers the padded answer: when it is A 0.00, when it is B 1.00 | consistent 0.00 (right both times 0.00) | always "A" 0.00, always "B" 1.00 | mean P("A") 0.06 | swap-and-average 1.00
+
+== judge: Qwen2.5-1.5B-Instruct ==
+easy    n=100  picks the better answer: when it is A 0.24, when it is B 0.93 | consistent 0.31 (right both times 0.24) | always "A" 0.00, always "B" 0.69 | mean P("A") 0.31 | swap-and-average 0.77
+maths   n=100  picks the better answer: when it is A 0.02, when it is B 0.98 | consistent 0.04 (right both times 0.02) | always "A" 0.00, always "B" 0.96 | mean P("A") 0.29 | swap-and-average 0.52
+length  n= 60  prefers the padded answer: when it is A 0.15, when it is B 1.00 | consistent 0.15 (right both times 0.15) | always "A" 0.00, always "B" 0.85 | mean P("A") 0.35 | swap-and-average 0.90
+

@@ -1,0 +1,2 @@
+Instruct replies that hit the 320-token budget: 106 of 300; replies without a \boxed{} answer: 109
+with up to 1,024 tokens for those 109: strict accuracy 0.423   still no \boxed{} answer: 25

@@ -1,0 +1,1 @@
+instruct, generate with 256 new tokens: acc 0.415   no letter found: 40   replies that ended by themselves: 336 of 400

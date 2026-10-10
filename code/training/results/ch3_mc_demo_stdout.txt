@@ -1,0 +1,23 @@
+== the question (MMLU, abstract algebra), correct answer: D ==
+  The following are multiple choice questions (with answers) about abstract algebra.
+  
+  Statement 1 | Every permutation is a cycle. Statement 2 | Every cycle is a permutation.
+  A. True, True
+  B. False, False
+  C. True, False
+  D. False, True
+  Answer:
+
+-- base --
+1. letter probabilities after "Answer:":  P(" A") = 0.374  P(" B") = 0.258  P(" C") = 0.206  P(" D") = 0.158   (sum 0.997)
+   top 5 next tokens: ' A' 0.374, ' B' 0.258, ' C' 0.206, ' D' 0.158, ' True' 0.001
+2. log-probability of each option text: A -19.57  B -16.25  C -16.72  D -16.82
+   per character:                       A -1.957  B -1.354  C -1.520  D -1.529
+3. generated: ' A\n\nThe following are multiple choice questions (with answers) about abstract algebra.\n\nStatement 1 | The order of a per'
+
+-- instruct --
+1. letter probabilities after "Answer:":  P(" A") = 0.485  P(" B") = 0.176  P(" C") = 0.226  P(" D") = 0.112   (sum 0.999)
+   top 5 next tokens: ' A' 0.485, ' C' 0.226, ' B' 0.176, ' D' 0.112, ' Answer' 0.000
+2. log-probability of each option text: A -22.55  B -18.75  C -19.30  D -18.03
+   per character:                       A -2.255  B -1.562  C -1.755  D -1.639
+3. generated: 'To determine whether each statement is true or false, let\'s analyze them one by one:\n\n**Statement 1:** "Every permutatio'

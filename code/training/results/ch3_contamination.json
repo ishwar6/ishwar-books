@@ -1,0 +1,116 @@
+{
+ "corpus_words": 86678513,
+ "A": {
+  "gsm8k": {
+   "n": 270,
+   "flagged": 0,
+   "examples": []
+  },
+  "mmlu": {
+   "n": 400,
+   "flagged": 1,
+   "examples": [
+    "democracy if we look to the laws they afford equal justice to all"
+   ]
+  },
+  "wikitext2-test": {
+   "n": 300,
+   "flagged": 39,
+   "examples": [
+    "according to the digital sheet music published at musicnotes com by sony atv",
+    "000 long tons 18 289 t each this was the genesis of the",
+    "pneumatic system which allowed for a faster firing cycle of the main guns"
+   ]
+  },
+  "copied exactly": {
+   "found": 10,
+   "n": 10,
+   "windows_kept": 1.0
+  },
+  "lightly reworded": {
+   "found": 9,
+   "n": 10,
+   "windows_kept": 0.5514018691588785
+  },
+  "paraphrased by a model": {
+   "found": 0,
+   "n": 10,
+   "windows_kept": 0.0
+  },
+  "reword_example": [
+   "Jean has 30 lollipops. Jean eats 2 of the lollipops. With the remaining lollipops, Jean wants to package 2 lollipops in one bag. How many bags can Jean fill?",
+   "Jean owns 30 lollipops. Jean eats two of the lollipops. With the remaining lollipops, Jean wants to package 2 lollipops in one bag. What number of bags can Jean fill?"
+  ],
+  "para_faithful": {
+   "n": 5,
+   "found": 0
+  },
+  "para_example": [
+   "Miguel uses 2 pads of paper a week for his drawing. If there are 30 sheets of paper on a pad of paper, how many sheets of paper does he use every month?",
+   "How many sheets of paper does Miguel use each month if he uses 2 pads per week for his drawings, with each pad containing 30 sheets?"
+  ]
+ },
+ "B": {
+  "GSM8K test questions": {
+   "exact": 3,
+   "n": 286,
+   "examples": [
+    [
+     "es to get through. The potatoes are roughly the same size, so it takes about the",
+     "same amount of time to peel and cut"
+    ],
+    [
+     "eek. Last week he played 2 matches on Monday, 1 match on Friday, and on Saturday",
+     "he played double the number of matches he"
+    ]
+   ]
+  },
+  "GSM8K train questions": {
+   "exact": 257,
+   "n": 283,
+   "examples": [
+    [
+     "rence. After downloading 800 files, he deleted 70% of them because they were not",
+     "helpful. He downloaded 400 more files but again"
+    ],
+    [
+     "z found out that 40% of his Grade 5 students got a final grade below B. How many",
+     "of his students got a final grade of"
+    ]
+   ]
+  },
+  "MMLU test questions": {
+   "exact": 7,
+   "n": 661,
+   "examples": [
+    [
+     "t 1 | If H is a subgroup of G and a belongs to G then |aH| = |Ha|. Statement 2 |",
+     "If H is a subgroup of G and"
+    ],
+    [
+     "What is the percentage of children aged 13-15 in the United States who reported",
+     "being bullied at least once in the past"
+    ]
+   ]
+  },
+  "WikiText-2 test paragraphs": {
+   "exact": 0,
+   "n": 300,
+   "examples": []
+  },
+  "HumanEval prompts": {
+   "exact": 5,
+   "n": 159,
+   "examples": [
+    [
+     " or equal to the value of the integer itself. The frequency of an integer is the",
+     "number of times it appears in the list."
+    ],
+    [
+     "stones. The number of stones in the next level is: - the next odd number if n is",
+     "odd. - the next even number if n"
+    ]
+   ]
+  }
+ }
+}

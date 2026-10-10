@@ -1,0 +1,5 @@
+400 pairs: Chat 100, Chat Hard 100, Safety 100, Reasoning 100
+chosen answer is the longer one in 179 of 400 pairs
+OA DeBERTa (2023)     overall 0.645 | Chat 0.79  Chat Hard 0.54  Safety 0.71  Reasoning 0.54 | acc when chosen is longer 0.73, shorter 0.57 | picks the longer answer 0.56
+Skywork V2 (2025)     overall 0.848 | Chat 0.98  Chat Hard 0.66  Safety 0.82  Reasoning 0.93 | acc when chosen is longer 0.94, shorter 0.77 | picks the longer answer 0.55
+implicit (DPO-style)  overall 0.618 | Chat 0.83  Chat Hard 0.49  Safety 0.56  Reasoning 0.59 | acc when chosen is longer 0.68, shorter 0.57 | picks the longer answer 0.55

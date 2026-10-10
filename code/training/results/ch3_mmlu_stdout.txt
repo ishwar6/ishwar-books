@@ -1,0 +1,38 @@
+MMLU subset: 400 questions from 56 of 57 subjects (random, seed 0)
+correct letters in the subset: A=96, B=85, C=116, D=103
+
+base     letter-5shot           acc 0.490   mean P(A..D) 0.998   (238s)
+base     letter-0shot           acc 0.480   mean P(A..D) 0.996   (311s)
+base     format-paren           acc 0.487   mean P(A..D) 0.928   (477s)
+base     format-qa              acc 0.470   mean P(A..D) 0.982   (562s)
+base     format-inline          acc 0.390   mean P(A..D) 0.765   (600s)
+base     format-noheader        acc 0.482   mean P(A..D) 0.920   (661s)
+base     cloze                  acc 0.325
+base     cloze-norm             acc 0.330   (960s)
+base     answer always at A     acc 0.463   predicted letters: A=185 B=90 C=70 D=55
+base     answer always at B     acc 0.495   predicted letters: A=88 B=198 C=65 D=49
+base     answer always at C     acc 0.458   predicted letters: A=88 B=84 C=183 D=45
+base     answer always at D     acc 0.458   predicted letters: A=73 B=89 C=55 D=183
+base     generate               acc 0.490   no letter found: 0   (1529s)
+         sample output: ' A\n\nStatement 1 | Every subgroup of a cyclic group is cyclic. Statement 2 | Every cyclic g'
+         sample output: ' C\n\nStatement 1 | If a R is a ring, then R[x] is a ring. Statement 2 | If R is a ring and '
+         sample output: ' B\n\nFind the degree for the given field extension Q(sqrt(2)) over Q.\nA. 0\nB. 2\nC. 1\nD. 3\nA'
+
+instruct letter-5shot           acc 0.492   mean P(A..D) 1.000   (126s)
+instruct letter-0shot           acc 0.470   mean P(A..D) 0.999   (189s)
+instruct format-paren           acc 0.445   mean P(A..D) 0.778   (231s)
+instruct format-qa              acc 0.472   mean P(A..D) 0.993   (280s)
+instruct format-inline          acc 0.425   mean P(A..D) 0.560   (337s)
+instruct format-noheader        acc 0.492   mean P(A..D) 0.970   (377s)
+instruct chat-letter            acc 0.470   mean P(A..D) 0.906   (477s)
+instruct cloze                  acc 0.347
+instruct cloze-norm             acc 0.335   (798s)
+instruct answer always at A     acc 0.565   predicted letters: A=226 B=80 C=61 D=33
+instruct answer always at B     acc 0.492   predicted letters: A=120 B=197 C=61 D=22
+instruct answer always at C     acc 0.475   predicted letters: A=110 B=82 C=190 D=18
+instruct answer always at D     acc 0.347   predicted letters: A=115 B=81 C=65 D=139
+instruct generate               acc 0.390   no letter found: 63   (1200s)
+         sample output: "To determine whether each statement is true or false, let's analyze them one by one:\n\n**St"
+         sample output: "To determine the correctness of each statement, let's analyze them one by one:\n\n**Statemen"
+         sample output: 'To determine the degree of the field extension \\( \\text{Q}(\\sqrt{2}) \\) over \\( \\text{Q} \\'
+

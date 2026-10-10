@@ -1,0 +1,8 @@
+verbose, same quality    mean length difference   +101 words | raw win rate  65.1% | fit: theta -0.026, phi +1.201 | length-controlled win rate logistic(theta) =  49.4%
+better, same length      mean length difference     +6 words | raw win rate  64.6% | fit: theta +0.663, phi +1.280 | length-controlled win rate logistic(theta) =  66.0%
+baseline vs itself       mean length difference     +2 words | raw win rate  50.4% | fit: theta +0.006, phi +0.893 | length-controlled win rate logistic(theta) =  50.2%
+
+worked example, one instruction of the verbose model: length difference 97 words, std 97
+  tanh(97 / 97) = tanh(1.00) = 0.762
+  with length:    logistic(-0.026 + 1.201 x 0.762) = 0.709
+  length removed: logistic(-0.026) = 0.494

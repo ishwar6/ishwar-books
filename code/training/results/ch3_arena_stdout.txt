@@ -1,0 +1,27 @@
+== one Elo update, by hand ==
+A has 1200, B has 1100.  expected score of A: 1 / (1 + 10^((1100 - 1200)/400)) = 0.6401
+A wins (score 1), K = 32:  A -> 1200 + 32 x (1 - 0.6401) = 1211.5   B -> 1100 - 32 x (1 - 0.6401) = 1088.5
+B wins instead (an upset):  A -> 1200 - 32 x 0.6401 = 1179.5   B -> 1100 + 32 x 0.6401 = 1120.5
+
+== 6000 simulated votes between random pairs ==
+model       true  online Elo    Elo over 100 orders  Bradley-Terry   95% bootstrap CI
+model-A     1250        1253       1224 to  1293           1255      1234 to  1279
+model-B     1210        1244       1163 to  1257           1207      1185 to  1230
+model-C     1190        1189       1131 to  1216           1174      1153 to  1196
+model-D     1120        1158       1080 to  1172           1122      1101 to  1144
+model-E     1060        1064       1030 to  1116           1072      1049 to  1095
+model-F     1000        1000       1000 to  1000           1000      1000 to  1000
+model-B and model-C are 20 points apart; their intervals overlap: the data cannot separate them
+
+== more votes, narrower intervals (Bradley-Terry, 95% bootstrap CI width for model-A) ==
+   300 votes:  model-A =  1209, 95% CI  1109 to  1311  (width  202)
+  1000 votes:  model-A =  1220, 95% CI  1165 to  1276  (width  111)
+  3000 votes:  model-A =  1231, 95% CI  1201 to  1261  (width   61)
+ 10000 votes:  model-A =  1247, 95% CI  1230 to  1265  (width   35)
+
+== a win rate and its 95% confidence interval (normal approximation and bootstrap) ==
+   20 votes: model-A beats model-B 0.550   normal CI 0.332 to 0.768   bootstrap CI 0.350 to 0.750
+  100 votes: model-A beats model-B 0.640   normal CI 0.546 to 0.734   bootstrap CI 0.550 to 0.730
+  400 votes: model-A beats model-B 0.560   normal CI 0.511 to 0.609   bootstrap CI 0.510 to 0.608
+ 1600 votes: model-A beats model-B 0.572   normal CI 0.548 to 0.596   bootstrap CI 0.547 to 0.595
+(true probability: 0.557)

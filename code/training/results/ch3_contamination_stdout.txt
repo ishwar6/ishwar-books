@@ -1,0 +1,28 @@
+== A. 13-gram overlap with the WikiText-103 training split ==
+benchmark items: 1000 (300 GSM8K, 400 MMLU, 300 WikiText-2 test paragraphs); distinct 13-grams: 63,791
+corpus: 86,678,513 words (WikiText-103 train + 30 planted lines), scanned in 110s
+gsm8k             0 of 270 items share at least one 13-gram with the corpus (the 30 planted questions not counted)
+mmlu              1 of 400 items share at least one 13-gram with the corpus
+    e.g. mmlu #179: "democracy if we look to the laws they afford equal justice to all"
+wikitext2-test   39 of 300 items share at least one 13-gram with the corpus
+    e.g. wikitext2-test #4: "according to the digital sheet music published at musicnotes com by sony atv"
+    e.g. wikitext2-test #6: "000 long tons 18 289 t each this was the genesis of the"
+planted, copied exactly         : found 10 of 10   (share of the original 13-grams still present: 100%)
+planted, lightly reworded       : found 9 of 10   (share of the original 13-grams still present: 55%)
+planted, paraphrased by a model : found 0 of 10   (share of the original 13-grams still present: 0%)
+    original   : Jean has 30 lollipops. Jean eats 2 of the lollipops. With the remaining lollipops, Jean wants to package 2 lollipops in one bag. How many bags can Jean fill?
+    reworded   : Jean owns 30 lollipops. Jean eats two of the lollipops. With the remaining lollipops, Jean wants to package 2 lollipops in one bag. What number of bags can Jean fill?
+the paraphrasing model kept exactly the same numbers in 5 of 10; of those, 0 were found
+    original   : Miguel uses 2 pads of paper a week for his drawing. If there are 30 sheets of paper on a pad of paper, how many sheets of paper does he use every month?
+    paraphrase : How many sheets of paper does Miguel use each month if he uses 2 pads per week for his drawings, with each pad containing 30 sheets?
+
+== B. memorisation probe: first half in, does the model write the next 8 words exactly? ==
+GSM8K test questions           3 of 286 continued exactly (1.0%)
+    ...'es to get through. The potatoes are roughly the same size, so it takes about the' -> 'same amount of time to peel and cut'
+GSM8K train questions        257 of 283 continued exactly (90.8%)
+    ...'rence. After downloading 800 files, he deleted 70% of them because they were not' -> 'helpful. He downloaded 400 more files but again'
+MMLU test questions            7 of 661 continued exactly (1.1%)
+    ...'t 1 | If H is a subgroup of G and a belongs to G then |aH| = |Ha|. Statement 2 |' -> 'If H is a subgroup of G and'
+WikiText-2 test paragraphs     0 of 300 continued exactly (0.0%)
+HumanEval prompts              5 of 159 continued exactly (3.1%)
+    ...' or equal to the value of the integer itself. The frequency of an integer is the' -> 'number of times it appears in the list.'

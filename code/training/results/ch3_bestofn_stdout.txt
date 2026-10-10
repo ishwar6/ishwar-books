@@ -1,0 +1,12 @@
+150 questions x 16 samples; 0.229 of all samples are right; no boxed answer in 1332
+mean reward of right samples 8.02, of wrong samples -0.75
+  n  proxy (RM score of pick) gold (best-of-n acc)  majority vote  oracle pass@n
+  1                      0.71                0.233          0.233          0.233
+  2                      3.13                0.327          0.273          0.327
+  4                      4.73                0.367          0.333          0.387
+  8                      6.08                0.440          0.387          0.473
+ 16                      7.03                0.507          0.473          0.593
+questions with both right and wrong samples: 88; the RM gives the right ones a higher average score in 1.00 of them
+
+the wrong solution with the highest reward (11.09); reference 230, it says 470:
+  . **Cost of the labor:** |    - Rate per hour: $50 |    - Number of hours: 3 |    - Total labor cost: |      \[ |      50 \times 3 = 150 |      \] |  | 3. **Total cost:** |    - Sum of the costs of the new radiator and the labor: |      \[ |      320 + 150 = 470 |      \] |  | Thus, the total amount Mark paid is $\boxed{470}$.

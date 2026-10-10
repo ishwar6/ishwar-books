@@ -1,0 +1,16 @@
+== the unbiased pass@k estimator, by hand ==
+n= 10 c= 3 k=  1:  unbiased pass@k = 0.3000   (naive 1-(1-c/n)^k = 0.3000)
+n= 10 c= 3 k=  5:  unbiased pass@k = 0.9167   (naive 1-(1-c/n)^k = 0.8319)
+n= 10 c= 3 k=  8:  unbiased pass@k = 1.0000   (naive 1-(1-c/n)^k = 0.9424)
+n= 10 c= 0 k=  5:  unbiased pass@k = 0.0000   (naive 1-(1-c/n)^k = 0.0000)
+n=200 c=10 k=100:  unbiased pass@k = 0.9992   (naive 1-(1-c/n)^k = 0.9941)
+
+greedy: 47/164 problems pass  ->  pass@1 (greedy) = 0.287   (428s)
+sampled: 10 completions per problem, 328 of 1640 pass   (2436s)
+problems by number of passing samples c: c=0: 96, c=1: 15, c=2: 9, c=3: 5, c=4: 5, c=5: 10, c=6: 2, c=7: 3, c=8: 4, c=9: 5, c=10: 10
+pass@1  = 0.200   (the biased shortcut 1-(1-c/n)^k would say 0.200)
+pass@2  = 0.266   (the biased shortcut 1-(1-c/n)^k would say 0.259)
+pass@5  = 0.353   (the biased shortcut 1-(1-c/n)^k would say 0.333)
+pass@10 = 0.415   (the biased shortcut 1-(1-c/n)^k would say 0.376)
+
+example HumanEval/0: 3 of 10 samples pass

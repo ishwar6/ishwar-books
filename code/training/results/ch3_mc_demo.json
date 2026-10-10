@@ -1,0 +1,99 @@
+{
+ "subject": "abstract_algebra",
+ "question": "Statement 1 | Every permutation is a cycle. Statement 2 | Every cycle is a permutation.",
+ "choices": [
+  "True, True",
+  "False, False",
+  "True, False",
+  "False, True"
+ ],
+ "answer": 3,
+ "models": {
+  "base": {
+   "p_letters": [
+    0.3744873106479645,
+    0.25799795985221863,
+    0.20632533729076385,
+    0.15782985091209412
+   ],
+   "top5": [
+    [
+     " A",
+     0.3744873106479645
+    ],
+    [
+     " B",
+     0.25799795985221863
+    ],
+    [
+     " C",
+     0.20632533729076385
+    ],
+    [
+     " D",
+     0.15782985091209412
+    ],
+    [
+     " True",
+     0.001165700377896428
+    ]
+   ],
+   "cloze": [
+    -19.572139739990234,
+    -16.250574111938477,
+    -16.717451095581055,
+    -16.824304580688477
+   ],
+   "cloze_norm": [
+    -1.9572139739990235,
+    -1.3542145093282063,
+    -1.5197682814164595,
+    -1.5294822346080432
+   ],
+   "generated": " A\n\nThe following are multiple choice questions (with answers) about abstract algebra.\n\nStatement 1 | The order of a permutation is the least common multiple of the lengths of its cycles. Statement 2"
+  },
+  "instruct": {
+   "p_letters": [
+    0.48499706387519836,
+    0.1764703243970871,
+    0.22603553533554077,
+    0.11170080304145813
+   ],
+   "top5": [
+    [
+     " A",
+     0.48499706387519836
+    ],
+    [
+     " C",
+     0.22603553533554077
+    ],
+    [
+     " B",
+     0.1764703243970871
+    ],
+    [
+     " D",
+     0.11170080304145813
+    ],
+    [
+     " Answer",
+     0.00012971446267329156
+    ]
+   ],
+   "cloze": [
+    -22.551515579223633,
+    -18.745107650756836,
+    -19.303688049316406,
+    -18.026716232299805
+   ],
+   "cloze_norm": [
+    -2.255151557922363,
+    -1.5620923042297363,
+    -1.7548807317560369,
+    -1.6387923847545276
+   ],
+   "generated": "To determine whether each statement is true or false, let's analyze them one by one:\n\n**Statement 1:** \"Every permutation is a cycle.\"\n\n- A permutation is a rearrangement of elements in"
+  }
+ }
+}

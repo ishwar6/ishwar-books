@@ -1,0 +1,51 @@
+{
+ "nq": 150,
+ "ns": 16,
+ "rows": [
+  {
+   "n": 1,
+   "proxy": 0.7139712748428185,
+   "gold": 0.23333333333333334,
+   "majority": 0.23333333333333334,
+   "oracle": 0.23333333333333334
+  },
+  {
+   "n": 2,
+   "proxy": 3.1324280900570254,
+   "gold": 0.32666666666666666,
+   "majority": 0.2733333333333333,
+   "oracle": 0.32666666666666666
+  },
+  {
+   "n": 4,
+   "proxy": 4.7252429775769516,
+   "gold": 0.36666666666666664,
+   "majority": 0.3333333333333333,
+   "oracle": 0.38666666666666666
+  },
+  {
+   "n": 8,
+   "proxy": 6.077060809930166,
+   "gold": 0.44,
+   "majority": 0.38666666666666666,
+   "oracle": 0.47333333333333333
+  },
+  {
+   "n": 16,
+   "proxy": 7.025119712352753,
+   "gold": 0.5066666666666667,
+   "majority": 0.47333333333333333,
+   "oracle": 0.5933333333333334
+  }
+ ],
+ "p_right": 0.22875,
+ "rm_ranks_right_higher": 1.0,
+ "mixed_questions": 88,
+ "top_wrong": {
+  "q": "Mark's car breaks down and he needs to get a new radiator.  The cost for a new radiator is $400 but he goes to get it at a junk shop and gets it for 80% off.  He then hires a mechanic to install it and it takes 3 hours at $50 an hour.  How much did he pay?",
+  "text": "To determine the total cost Mark paid, we need to calculate the cost of each component (new radiator, labor) separately and then sum them up.\n\n1. **Cost of the new radiator:**\n   - Original price per unit: $400\n   - Discounted price: 80% off\n   - Cost after discount calculation:\n     \\[\n     400 \\times 0.80 = 320\n     \\]\n   Therefore, the cost of the new radiator is $320.\n\n2. **Cost of the labor:**\n   - Rate per hour: $50\n   - Number of hours: 3\n   - Total labor cost:\n     \\[\n     50 \\times 3 = 150\n     \\]\n\n3. **Total cost:**\n   - Sum of the costs of the new radiator and the labor:\n     \\[\n     320 + 150 = 470\n     \\]\n\nThus, the total amount Mark paid is $\\boxed{470}$.",
+  "score": 11.086368560791016,
+  "ref": "230",
+  "got": "470"
+ }
+}

@@ -1,0 +1,5 @@
+base     loose rule  49.0% (no letter   0)   strict rule  49.0% (no letter   0)   loose rule took the word "A" (as in "A cyclic group") as the answer: 0
+instruct loose rule  39.0% (no letter  63)   strict rule  38.2% (no letter  79)   loose rule took the word "A" (as in "A cyclic group") as the answer: 2
+
+an Instruct reply where the loose rule finds a letter but the strict rule finds no answer:
+  'To determine whether each statement is true or false, let\'s analyze them one by one:\n\n**Statement 1:** "Every permutation is a cycle."\n\n- A permutation is a rearrangement of elements in a set. It can '
