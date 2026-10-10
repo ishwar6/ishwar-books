@@ -1,0 +1,33 @@
+Qwen2.5-0.5B: 24 layers, hidden 896, MLP 4864, 14 query heads, 2 key/value heads of 64
+  q_proj    W:   896 x   896 =    802,816 weights;  LoRA r=16 adds r(d_in + d_out) = 16 x 1,792 = 28,672
+  k_proj    W:   128 x   896 =    114,688 weights;  LoRA r=16 adds r(d_in + d_out) = 16 x 1,024 = 16,384
+  v_proj    W:   128 x   896 =    114,688 weights;  LoRA r=16 adds r(d_in + d_out) = 16 x 1,024 = 16,384
+  o_proj    W:   896 x   896 =    802,816 weights;  LoRA r=16 adds r(d_in + d_out) = 16 x 1,792 = 28,672
+  gate_proj W:  4864 x   896 =  4,358,144 weights;  LoRA r=16 adds r(d_in + d_out) = 16 x 5,760 = 92,160
+  up_proj   W:  4864 x   896 =  4,358,144 weights;  LoRA r=16 adds r(d_in + d_out) = 16 x 5,760 = 92,160
+  down_proj W:   896 x  4864 =  4,358,144 weights;  LoRA r=16 adds r(d_in + d_out) = 16 x 5,760 = 92,160
+all parameters: 494,032,768; the 7 linear layers x 24 layers hold 357,826,560
+  rank   1:     549,888 trainable = 0.111% of the model
+  rank   2:   1,099,776 trainable = 0.223% of the model
+  rank   4:   2,199,552 trainable = 0.445% of the model
+  rank   8:   4,399,104 trainable = 0.890% of the model
+  rank  16:   8,798,208 trainable = 1.781% of the model
+  rank  64:  35,192,832 trainable = 7.124% of the model
+  rank 256: 140,771,328 trainable = 28.494% of the model
+peft count for r=16: 8,798,208 (formula: 8,798,208)
+at initialisation B = 0, so LoRA changes nothing: max |logits with LoRA - without| = 0.0e+00
+
+== a rank-1 update on a 4 x 4 matrix ==
+B (4x1) = [1.0, 0.5, -1.0, 2.0]   A (1x4) = [0.2, -0.4, 0.0, 0.6]
+    0.20  -0.40   0.00   0.60
+    0.10  -0.20   0.00   0.30
+   -0.20   0.40   0.00  -0.60
+    0.40  -0.80   0.00   1.20
+16 numbers in Delta W, built from 4 + 4 = 8 numbers; rank 1
+
+== training memory (weights + gradients + AdamW state, before activations) ==
+  full fine-tuning, bf16 mixed precision       7.36 GiB
+  LoRA r=16, frozen weights in bf16            1.05 GiB
+  QLoRA r=16, frozen weights in 4-bit NF4      0.36 GiB
+  frozen weights alone of a 7B model: bf16    13 GiB, 4-bit     3 GiB
+  frozen weights alone of a 65B model: bf16   121 GiB, 4-bit    30 GiB

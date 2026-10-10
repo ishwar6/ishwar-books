@@ -1,0 +1,35 @@
+== 1. facts: top-5 next tokens ==
+'The capital of France is'                    ' Paris' 0.32  ' ______' 0.11  ' ____' 0.06  ' __' 0.06  ':\n' 0.05
+'Water freezes at a temperature of'           ' ' 0.60  ' -' 0.16  ' $' 0.07  ' −' 0.04  ' \\(' 0.01
+'The chemical symbol for gold is'             ' ____' 0.37  ' __' 0.20  ' ______' 0.07  ' Au' 0.07  '\n' 0.04
+'Romeo and Juliet was written by'             ' William' 0.33  ' Shakespeare' 0.17  ' the' 0.06  ' which' 0.05  ' a' 0.04
+'The largest planet in the solar system is'   ' Jupiter' 0.45  ' the' 0.05  ' ' 0.04  ' Mercury' 0.03  ' __' 0.03
+
+== 2. grammar: log P(right) vs log P(wrong) ==
+'The keys to the cabinet'            ' are'    -1.99   ' is'     -5.41   prefers the right one: True  (ratio 30.4x)
+'The author of the books'            ' is'     -7.75   ' are'    -9.16   prefers the right one: True  (ratio 4.1x)
+'Yesterday she'                      ' went'   -2.59   ' goes'   -9.33   prefers the right one: True  (ratio 841.8x)
+'The children who live next door'    ' are'    -2.55   ' is'     -8.75   prefers the right one: True  (ratio 495.3x)
+'I have never'                       ' seen'   -2.22   ' saw'    -8.01   prefers the right one: True  (ratio 324.8x)
+'Each of the students'               ' has'    -5.22   ' have'   -9.69   prefers the right one: True  (ratio 86.6x)
+
+== 3. in-context learning: accuracy vs number of examples in the prompt ==
+English to French                          k=0: 43%  k=1: 86%  k=2: 82%  k=4: 86%  k=8: 82%   (28 test items)
+antonyms                                   k=0: 36%  k=1: 93%  k=2: 89%  k=4: 82%  k=8: 89%   (28 test items)
+sentiment with made-up labels (blue/red)   k=0: 0%  k=1: 54%  k=2: 4%  k=4: 100%  k=8: 100%   (28 test items)
+example 4-shot prompt for the made-up labels task:
+   Label each review:
+   I loved this film : blue
+   What a wonderful day : blue
+   I hated this film : red
+   What an awful day : red
+   The view was beautiful :
+what the model answers with only two labelled examples:
+   'The view was beautiful' -> 'green'
+   'The room was dirty' -> 'yellow'
+   'Superb quality' -> 'green'
+
+== 4. our 12M TinyStories GPT: grammar inside its tiny world ==
+'Lily and her mom went to the'                   ' park' 0.37  ' store' 0.16  ' kitchen' 0.07  ' beach' 0.02  ' shop' 0.02
+'Tom was very sad because he lost his'           ' toy' 0.35  ' ball' 0.10  ' favorite' 0.05  ' friend' 0.04  ' red' 0.02
+'The little girl smiled because she was very'    ' happy' 0.26  ' brave' 0.06  ' kind' 0.04  ' excited' 0.03  ' proud' 0.03

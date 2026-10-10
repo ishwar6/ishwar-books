@@ -1,0 +1,32 @@
+tied input/output embeddings: True; matrix (151936, 896)
+mean row norm over the 151,643 ordinary tokens: 0.464
+  <|endoftext|>   id 151643: norm 0.599
+  <|im_start|>    id 151644: norm 0.301
+  <|im_end|>      id 151645: norm 0.301
+rows with exactly the same norm as <|im_end|> (0.3010): 3147, ids [124, 125, 128] ... [151933, 151934, 151935]
+rows almost identical to <|im_end|> (cosine > 0.9999 and every number within 0.001): 2256 (including itself)
+   e.g. id 124 '�': cosine 1.000000, largest difference in any of the 896 numbers 1.22e-04
+   e.g. id 125 '�': cosine 1.000000, largest difference in any of the 896 numbers 1.22e-04
+   e.g. id 177 '�': cosine 1.000000, largest difference in any of the 896 numbers 1.22e-04
+so in the frozen output layer these 2256 tokens get practically the same logit as <|im_end|>, whatever the hidden state:
+if they tied exactly, p(<|im_end|>) could not exceed 1/2256, a loss of at least ln(2256) = 7.72 nats
+the 12 rows closest to <|im_end|> (cosine similarity):
+  id 151847  ''                   cos 1.000
+  id 132722  'กับการ'             cos 1.000
+  id 135302  'แบ่ง'               cos 1.000
+  id 137472  'ที่ดีที่สุด'        cos 1.000
+  id 128191  'ศิล'                cos 1.000
+  id 129959  'พิเศ'               cos 1.000
+  id 129140  'รุ่น'               cos 1.000
+  id 137794  'การค้า'             cos 1.000
+  id 125655  'มีความ'             cos 1.000
+  id 138182  'دِ'                 cos 1.000
+  id 131313  'อุปกรณ์'            cos 1.000
+  id 126308  'ลูก'                cos 1.000
+what plain LoRA wrote where it should have ended its turn (first checks):
+  '1. Apple\n2. Banana\n3. Orange.:UIControl\n1. Apple\n2. Banana\n3'
+  'The sky on a clear day is blue.看查看'
+  'HELLO. заявк\n_QUOTES\nYou are a helpful assistant._QUOTES\n_QU'
+  'A cat is a small, furry, and intelligent animal that is ofte'
+  'The sum of 12 and 30 is 42. The answer is 42.<quote>'
+  'Bonjour. אהבתי\nThe translation of "good morning" into French'

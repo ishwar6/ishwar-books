@@ -1,0 +1,56 @@
+== 1. Training compute C = 6 N D ==
+our tiny GPT (ch4_pretrain.py)   N= 1.23e+07  D= 1.23e+07  C=6ND= 9.08e+14 FLOPs  tokens/param=       1   [this chapter]
+GPT-3 175B                       N= 1.75e+11  D=    3e+11  C=6ND= 3.15e+23 FLOPs  tokens/param=       2   [Brown et al. 2020, Table D.1]
+Chinchilla 70B                   N=    7e+10  D=  1.4e+12  C=6ND= 5.88e+23 FLOPs  tokens/param=      20   [Hoffmann et al. 2022]
+Llama 3 8B                       N=    8e+09  D=  1.5e+13  C=6ND=  7.2e+23 FLOPs  tokens/param=   1,875   [Grattafiori et al. 2024 (over 15T tokens)]
+Llama 3 405B                     N= 4.05e+11  D= 1.56e+13  C=6ND= 3.79e+25 FLOPs  tokens/param=      39   [Grattafiori et al. 2024, Sec 3.3]
+Qwen2.5-0.5B                     N=  4.9e+08  D=  1.8e+13  C=6ND= 5.29e+22 FLOPs  tokens/param=  36,735   [Qwen2.5 report (18T tokens)]
+
+== 2. How long does that take? ==
+tiny GPT on the laptop: 37,367 tokens/s x 6 x 12,318,720 params = 2.76 TFLOP/s achieved
+   C = 9.08e+14 FLOPs / 2.76e+12 FLOP/s = 5.5 minutes (pure training steps)
+Llama 3 405B: 3.79e+25 / (16,384 H100 x 989 TFLOP/s x 40% MFU) = 67.7 days
+GPT-3 175B: 3.15e+23 / (16,384 H100 x 989 TFLOP/s x 40% MFU) = 0.6 days
+Llama 3 405B at the laptop speed: 4.35e+05 years
+
+== 3. Kaplan et al. (2020) power laws ==
+  N =   1e+06:  L(N) = (8.8e13 / N)^0.076 = 4.016 nats/token
+  N =   1e+07:  L(N) = (8.8e13 / N)^0.076 = 3.371 nats/token
+  N =   1e+08:  L(N) = (8.8e13 / N)^0.076 = 2.830 nats/token
+  N =   1e+09:  L(N) = (8.8e13 / N)^0.076 = 2.376 nats/token
+  N =   1e+10:  L(N) = (8.8e13 / N)^0.076 = 1.994 nats/token
+  N =   1e+11:  L(N) = (8.8e13 / N)^0.076 = 1.674 nats/token
+  every 10x more parameters multiplies the loss by 10^-0.076 = 0.839 (a 16.1% drop)
+
+== 4. Chinchilla parametric fit (Approach 3): L(N, D) = E + A / N^alpha + B / D^beta ==
+  Gopher 280B, 300B tokens: 6ND = 5.04e+23;  L = 1.69 + 0.052 + 0.251 = 1.993
+  Chinchilla 70B, 1.4T tokens: 6ND = 5.88e+23;  L = 1.69 + 0.083 + 0.163 = 1.937
+
+== 5. Compute-optimal N and D for a budget C (minimise L subject to C = 6ND) ==
+  a = beta/(alpha+beta) = 0.452, b = alpha/(alpha+beta) = 0.548, G = 1.345
+  C =    1e+18:  N_opt =  8.06e+07  D_opt =  2.07e+09  tokens/param =   25.7  L = 3.535
+  C =    1e+20:  N_opt =  6.45e+08  D_opt =  2.58e+10  tokens/param =   40.1  L = 2.600
+  C =    1e+21:  N_opt =  1.82e+09  D_opt =  9.14e+10  tokens/param =   50.1  L = 2.329
+  C = 5.76e+23:  N_opt =  3.22e+10  D_opt =  2.98e+12  tokens/param =   92.6  L = 1.931
+  C =    1e+24:  N_opt =  4.13e+10  D_opt =  4.04e+12  tokens/param =   97.7  L = 1.911
+  C =  3.8e+25:  N_opt =  2.13e+11  D_opt =  2.97e+13  tokens/param =  139.0  L = 1.817
+  (Approach 3 gives N ~ C^0.46; Approaches 1 and 2 give N ~ C^0.50 and about 20 tokens per parameter, Table 3)
+
+== 6. The 20-tokens-per-parameter rule, worked ==
+  C = 1e21 FLOPs, D = 20N  ->  C = 6 N (20 N) = 120 N^2  ->  N = sqrt(1e21/120) = 2.89e+09, D = 5.77e+10
+  IsoFLOP slice at C = 1e21 with the Approach 3 fit:
+    N =    2e+08  D = 8.33e+11  ( 4166.7 tok/param)  L = 2.4905
+    N =    4e+08  D = 4.17e+11  ( 1041.7 tok/param)  L = 2.4024
+    N =    7e+08  D = 2.38e+11  (  340.1 tok/param)  L = 2.3575
+    N =    1e+09  D = 1.67e+11  (  166.7 tok/param)  L = 2.3400
+    N =  1.5e+09  D = 1.11e+11  (   74.1 tok/param)  L = 2.3301   <- lowest
+    N =  2.9e+09  D = 5.75e+10  (   19.8 tok/param)  L = 2.3354
+    N =    5e+09  D = 3.33e+10  (    6.7 tok/param)  L = 2.3594
+    N =    1e+10  D = 1.67e+10  (    1.7 tok/param)  L = 2.4160
+
+== 7. Memory for mixed-precision training with Adam (bytes per parameter) ==
+  bf16 weights 2 + bf16 gradients 2 + fp32 master weights 4 + Adam m (fp32) 4 + Adam v (fp32) 4 = 16 bytes/parameter
+  our tiny GPT  :  1.23e+07 x 16 B =       0.18 GiB  (before activations)
+  Qwen2.5-0.5B  :  4.94e+08 x 16 B =       7.36 GiB  (before activations)
+  Llama 3 8B    :     8e+09 x 16 B =     119.21 GiB  (before activations)
+  Llama 3 405B  :  4.05e+11 x 16 B =   6,034.97 GiB  (before activations)

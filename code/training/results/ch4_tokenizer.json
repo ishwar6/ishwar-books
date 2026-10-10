@@ -1,0 +1,441 @@
+{
+ "bpe": [
+  {
+   "pair": [
+    "e",
+    "s"
+   ],
+   "count": 9,
+   "vocab": [
+    "l o w </w>",
+    "l o w e r </w>",
+    "n e w es t </w>",
+    "w i d es t </w>"
+   ]
+  },
+  {
+   "pair": [
+    "es",
+    "t"
+   ],
+   "count": 9,
+   "vocab": [
+    "l o w </w>",
+    "l o w e r </w>",
+    "n e w est </w>",
+    "w i d est </w>"
+   ]
+  },
+  {
+   "pair": [
+    "est",
+    "</w>"
+   ],
+   "count": 9,
+   "vocab": [
+    "l o w </w>",
+    "l o w e r </w>",
+    "n e w est</w>",
+    "w i d est</w>"
+   ]
+  },
+  {
+   "pair": [
+    "l",
+    "o"
+   ],
+   "count": 7,
+   "vocab": [
+    "lo w </w>",
+    "lo w e r </w>",
+    "n e w est</w>",
+    "w i d est</w>"
+   ]
+  },
+  {
+   "pair": [
+    "lo",
+    "w"
+   ],
+   "count": 7,
+   "vocab": [
+    "low </w>",
+    "low e r </w>",
+    "n e w est</w>",
+    "w i d est</w>"
+   ]
+  },
+  {
+   "pair": [
+    "n",
+    "e"
+   ],
+   "count": 6,
+   "vocab": [
+    "low </w>",
+    "low e r </w>",
+    "ne w est</w>",
+    "w i d est</w>"
+   ]
+  },
+  {
+   "pair": [
+    "ne",
+    "w"
+   ],
+   "count": 6,
+   "vocab": [
+    "low </w>",
+    "low e r </w>",
+    "new est</w>",
+    "w i d est</w>"
+   ]
+  },
+  {
+   "pair": [
+    "new",
+    "est</w>"
+   ],
+   "count": 6,
+   "vocab": [
+    "low </w>",
+    "low e r </w>",
+    "newest</w>",
+    "w i d est</w>"
+   ]
+  },
+  {
+   "pair": [
+    "low",
+    "</w>"
+   ],
+   "count": 5,
+   "vocab": [
+    "low</w>",
+    "low e r </w>",
+    "newest</w>",
+    "w i d est</w>"
+   ]
+  },
+  {
+   "pair": [
+    "w",
+    "i"
+   ],
+   "count": 3,
+   "vocab": [
+    "low</w>",
+    "low e r </w>",
+    "newest</w>",
+    "wi d est</w>"
+   ]
+  }
+ ],
+ "real": [
+  {
+   "text": "The cat sat on the mat.",
+   "GPT-2 (50,257)": [
+    "The",
+    " cat",
+    " sat",
+    " on",
+    " the",
+    " mat",
+    "."
+   ],
+   "Qwen2.5 (151,665)": [
+    "The",
+    " cat",
+    " sat",
+    " on",
+    " the",
+    " mat",
+    "."
+   ],
+   "TinyStories (4,096)": [
+    "The",
+    " cat",
+    " sat",
+    " on",
+    " the",
+    " mat",
+    "."
+   ]
+  },
+  {
+   "text": "Pretraining is unbelievably expensive.",
+   "GPT-2 (50,257)": [
+    "P",
+    "ret",
+    "raining",
+    " is",
+    " unbelievably",
+    " expensive",
+    "."
+   ],
+   "Qwen2.5 (151,665)": [
+    "Pre",
+    "training",
+    " is",
+    " unbelie",
+    "vably",
+    " expensive",
+    "."
+   ],
+   "TinyStories (4,096)": [
+    "P",
+    "ret",
+    "ra",
+    "in",
+    "ing",
+    " is",
+    " un",
+    "b",
+    "el",
+    "ie",
+    "v",
+    "ab",
+    "ly",
+    " expensive",
+    "."
+   ]
+  },
+  {
+   "text": "def add(a, b): return a + b",
+   "GPT-2 (50,257)": [
+    "def",
+    " add",
+    "(",
+    "a",
+    ",",
+    " b",
+    "):",
+    " return",
+    " a",
+    " +",
+    " b"
+   ],
+   "Qwen2.5 (151,665)": [
+    "def",
+    " add",
+    "(a",
+    ",",
+    " b",
+    "):",
+    " return",
+    " a",
+    " +",
+    " b"
+   ],
+   "TinyStories (4,096)": [
+    "de",
+    "f",
+    " add",
+    "(",
+    "a",
+    ",",
+    " b",
+    ")",
+    ":",
+    " return",
+    " a",
+    " ",
+    "+",
+    " b"
+   ]
+  },
+  {
+   "text": "The year 2024 had 366 days.",
+   "GPT-2 (50,257)": [
+    "The",
+    " year",
+    " 2024",
+    " had",
+    " 366",
+    " days",
+    "."
+   ],
+   "Qwen2.5 (151,665)": [
+    "The",
+    " year",
+    " ",
+    "2",
+    "0",
+    "2",
+    "4",
+    " had",
+    " ",
+    "3",
+    "6",
+    "6",
+    " days",
+    "."
+   ],
+   "TinyStories (4,096)": [
+    "The",
+    " year",
+    " ",
+    "2",
+    "0",
+    "2",
+    "4",
+    " had",
+    " 3",
+    "6",
+    "6",
+    " days",
+    "."
+   ]
+  },
+  {
+   "text": "\u0928\u092e\u0938\u094d\u0924\u0947, \u0906\u092a \u0915\u0948\u0938\u0947 \u0939\u0948\u0902?",
+   "GPT-2 (50,257)": [
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    ",",
+    " \ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    " \ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    " \ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "?"
+   ],
+   "Qwen2.5 (151,665)": [
+    "\u0928",
+    "\u092e",
+    "\u0938",
+    "\u094d\ufffd",
+    "\ufffd",
+    "\u0947",
+    ",",
+    " \ufffd",
+    "\ufffd",
+    "\u092a",
+    " \u0915",
+    "\ufffd",
+    "\ufffd",
+    "\u0938",
+    "\u0947",
+    " \u0939",
+    "\ufffd",
+    "\ufffd",
+    "\u0902",
+    "?"
+   ],
+   "TinyStories (4,096)": [
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    ",",
+    " ",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    " ",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    " ",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "\ufffd",
+    "?"
+   ]
+  },
+  {
+   "text": "Once upon a time, a little girl named Lily",
+   "GPT-2 (50,257)": [
+    "Once",
+    " upon",
+    " a",
+    " time",
+    ",",
+    " a",
+    " little",
+    " girl",
+    " named",
+    " Lily"
+   ],
+   "Qwen2.5 (151,665)": [
+    "Once",
+    " upon",
+    " a",
+    " time",
+    ",",
+    " a",
+    " little",
+    " girl",
+    " named",
+    " Lily"
+   ],
+   "TinyStories (4,096)": [
+    "Once",
+    " upon",
+    " a",
+    " time",
+    ",",
+    " a",
+    " little",
+    " girl",
+    " named",
+    " Lily"
+   ]
+  }
+ ]
+}

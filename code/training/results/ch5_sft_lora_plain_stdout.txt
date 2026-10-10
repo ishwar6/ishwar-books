@@ -1,0 +1,47 @@
+mode lora: training 8,798,208 of 502,830,976 parameters (1.75%), lr 0.0002, batch 8
+step    0  held-out loss 1.5324
+step   25  train loss 1.2107  lr 1.89e-04  (489s)
+step   50  train loss 1.0947  lr 1.42e-04  (1642s)  held-out loss 1.3936
+step   75  train loss 1.5116  lr 7.77e-05  (1958s)
+step  100  train loss 1.4690  lr 2.26e-05  (2347s)  held-out loss 1.3881
+step  125  train loss 1.2971  lr 3.48e-08  (2567s)  held-out loss 1.3862
+training took 42.9 minutes
+instruction-following checks (greedy, 150 new tokens at most):
+  [fail] RUNS ON 'List three fruits as a bulleted list with exactly three item' -> '1. Apple\n2. Banana\n3. Orange.:UIControl\n1. Apple\n2. Banana\n3. Orange.:UIControl\n1. Apple\n2. Banana\n3. Orange.:'
+  [fail] stops  'Answer in one word: what colour is the sky on a clear day?' -> 'The sky on a clear day is blue.看查看'
+  [fail] RUNS ON "Write the word 'hello' in capital letters and nothing else." -> 'HELLO. заявк\n_QUOTES\nYou are a helpful assistant._QUOTES\n_QUOTES\nYou are a helpful assistant._QUOTES\n_QUOTES\nY'
+  [fail] RUNS ON 'Describe a cat in one sentence, using only lowercase letters' -> 'A cat is a small, furry, and intelligent animal that is often associated with warmth, affection, and companion'
+  [fail] stops  'What is 12 + 30? Reply with just the number.' -> 'The sum of 12 and 30 is 42. The answer is 42.<quote>'
+  [fail] RUNS ON "Translate 'good morning' into French. Give only the translat" -> 'Bonjour. אהבתי\nThe translation of "good morning" into French is "Bonjour." The word "good" is translated as "b'
+  [fail] stops  'Write a haiku about rain. Use exactly three lines.' -> "Raindrops dance on the roof,\nNature's symphony of life.荮\n\nThe raindrops dance on the roof,\nNature's symphony o"
+  [PASS] stops  'Give a JSON object with the keys "name" and "age" for a pers' -> '{\n  "name": "Ana",\n  "age": 30\n} \n\nThis JSON object represents a person named Ana with the name "Ana" and age '
+  [PASS] stops  'In one sentence, what is the capital of Japan?' -> 'The capital of Japan is Tokyo.看查看'
+  [fail] stops  'Write exactly two sentences about the moon.' -> '1. The moon is the only natural satellite of the Earth.\n2. The moon is a celestial body that orbits the Earth '
+  [fail] RUNS ON 'Explain photosynthesis in fewer than 30 words.' -> 'Photosynthesis is the process by which plants, algae, and some bacteria convert light energy into chemical ene'
+  [fail] RUNS ON "Start your answer with the word 'Yes'. Is water wet?" -> 'Yes, water is wet. Water is a liquid that is made up of molecules that are in constant motion. When water is w'
+passed 2/12, ended its turn 6/12
+forgetting probes: wikitext-2 perplexity 16.86, 4-shot antonyms 96%
+Q: Give three tips for a good night's sleep.
+A: 1. Create a relaxing bedtime routine: Try to go to bed at the same time every night, even on weekends. This will help your body get used to the routine and make it easier to fall asleep.
+
+2. Avoid stimulating activities before bedtime: Avoid using electronic devices, such as phones, tablets, and computers, for at least an hour before bedtime. This will help your body get ready for sleep.
+
+3. Avoid
+   (ended its turn: False)
+Q: Write a short, polite email asking a colleague to send the meeting notes.
+A: Dear [Colleague's Name],
+
+I hope this email finds you well. I am writing to ask you to please send me the meeting notes for our upcoming meeting. I am looking forward to hearing from you soon.
+
+Thank you for your time and cooperation.
+
+Best regards,
+[Your Name] 
+
+Note: Please include the meeting date and time in the email. If you have any questions or concerns, please do not hesitate to reach out 
+   (ended its turn: False)
+Q: What is the difference between weather and climate?
+A: Weather refers to the average conditions of the atmosphere over a period of time, such as temperature, humidity, wind, precipitation, and atmospheric pressure. It is a short-term condition that is influenced by the Earth's orbit around the Sun and the movement of the Earth's axis.
+
+Climate, on the other hand, is a long-term condition of the Earth's surface, atmosphere, and oceans. It is the averag
+   (ended its turn: False)

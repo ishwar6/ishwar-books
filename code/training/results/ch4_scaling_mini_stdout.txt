@@ -1,0 +1,5 @@
+d= 64 layers=2 heads=2:    100,096 non-embedding (   378,624 total) params, final val loss 3.396, C=1.49e+13 FLOPs, 45s
+d=128 layers=2 heads=4:    396,800 non-embedding (   953,856 total) params, final val loss 2.880, C=3.75e+13 FLOPs, 66s
+d=192 layers=4 heads=6:  1,779,840 non-embedding ( 2,615,424 total) params, final val loss 2.629, C=1.03e+14 FLOPs, 110s
+d=256 layers=4 heads=8:  3,159,552 non-embedding ( 4,273,664 total) params, final val loss 2.489, C=1.68e+14 FLOPs, 135s
+d=384 layers=6 heads=6: 10,647,552 non-embedding (12,318,720 total) params, final val loss 2.383, C=4.84e+14 FLOPs, 305s

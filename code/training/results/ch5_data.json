@@ -1,0 +1,61 @@
+{
+ "rows": 51760,
+ "with_input": 19157,
+ "first": [
+  [
+   "generate",
+   4608
+  ],
+  [
+   "create",
+   3611
+  ],
+  [
+   "describe",
+   2953
+  ],
+  [
+   "write",
+   2787
+  ],
+  [
+   "what",
+   2369
+  ],
+  [
+   "given",
+   2180
+  ],
+  [
+   "explain",
+   2032
+  ],
+  [
+   "name",
+   1964
+  ],
+  [
+   "identify",
+   1505
+  ],
+  [
+   "find",
+   1342
+  ],
+  [
+   "rewrite",
+   1266
+  ],
+  [
+   "list",
+   1099
+  ]
+ ],
+ "reply_median": 108.5,
+ "reply_p90": 348.0,
+ "example": {
+  "instruction": "What are the three primary colors?",
+  "input": "",
+  "output": "The three primary colors are red, blue, and yellow. These colors are called primary because they cannot be created by mixing other colors and all other colors can be made by combining them in various proportions. In the additive color system, used for light, the primary colors are red, green, and blue (RGB)."
+ }
+}

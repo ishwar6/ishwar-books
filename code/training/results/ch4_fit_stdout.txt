@@ -1,0 +1,9 @@
+fit on 5 runs (6.6M tokens each): log L = 2.064 -0.0757 log N
+  -> L(N) = (Nc / N)^alpha with alpha = 0.076, Nc = 7.01e+11
+  N =    100,096: measured 3.396, fit 3.296
+  N =    396,800: measured 2.880, fit 2.970
+  N =  1,779,840: measured 2.629, fit 2.651
+  N =  3,159,552: measured 2.489, fit 2.538
+  N = 10,647,552: measured 2.383, fit 2.315
+  every 10x more parameters multiplies the loss by 0.840 here (Kaplan et al.: 0.839)
+  extrapolation to N = 1e8 (not measured): 1.954  (a warning: the data, 14.9M tokens, would run out first)

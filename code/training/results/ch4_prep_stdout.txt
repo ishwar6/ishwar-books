@@ -1,0 +1,5 @@
+vocab size: 4096
+train tokens: 14,880,999   val tokens: 5,580,195   train characters: 59,975,054   chars/token: 4.03
+example: Once | Ġupon | Ġa | Ġtime | , | Ġa | Ġlittle | Ġgirl | Ġnamed | ĠLily | Ġfound | Ġa | Ġshiny | Ġred | Ġball | .
+fp32: 367 ms per step of 32x256 tokens = 22,314 tokens/s  (params 12,318,720, non-embedding 10,647,552)
+bf16: 219 ms per step of 32x256 tokens = 37,367 tokens/s  (params 12,318,720, non-embedding 10,647,552)

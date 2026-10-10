@@ -1,0 +1,41 @@
+model: 12,318,720 parameters (10,647,552 non-embedding)
+data: 14,880,999 training tokens, 1500 steps x 8,192 tokens = 12,288,000 tokens seen
+step     0  val loss 8.374  (4s)
+   sample @ 0: Once upon a time word tid spaghettiudden squ fairy slidistilly ele mean slid steak cloud cloud goat caterpill grumpy clay Olive hall eleist Rex pat vo caterpill
+step     0  train loss 8.374  lr 1.00e-05  grad norm 4.81
+   sample @ 50: Once upon a time, very, Tim was to see his day he was a mom's not day, but he said, " day The big, " day.  The and the new the tree, little fun and the toys. Sh
+step   100  val loss 4.031  (35s)
+step   100  train loss 4.058  lr 1.00e-03  grad norm 0.86
+   sample @ 150: Once upon a time, there was a small blue little boy named Tim. Tim went to play with his red car in the box. One day, Tim said, "Thank you and you?" They were p
+step   200  val loss 3.402  (62s)
+step   200  train loss 3.359  lr 9.89e-04  grad norm 0.87
+step   300  val loss 3.043  (91s)
+   sample @ 300: Once upon a time, there was a girl named Lily. She liked to play outside with her toy toys. One day, she went to the store, Mia went to the park to eat it. They
+step   300  train loss 3.083  lr 9.55e-04  grad norm 0.92
+step   400  val loss 2.819  (118s)
+step   400  train loss 2.854  lr 9.02e-04  grad norm 0.80
+step   500  val loss 2.669  (144s)
+step   500  train loss 2.753  lr 8.31e-04  grad norm 0.85
+step   600  val loss 2.553  (172s)
+   sample @ 600: Once upon a time, there was a humble dog named Max. Max was a very small girl who loved to play in the yard. One sunny day, Max was playing in the park. He saw 
+step   600  train loss 2.585  lr 7.45e-04  grad norm 0.79
+step   700  val loss 2.453  (206s)
+step   700  train loss 2.381  lr 6.50e-04  grad norm 0.79
+step   800  val loss 2.365  (240s)
+step   800  train loss 2.374  lr 5.50e-04  grad norm 0.81
+step   900  val loss 2.296  (280s)
+step   900  train loss 2.311  lr 4.50e-04  grad norm 0.79
+step  1000  val loss 2.235  (314s)
+   sample @ 1000: Once upon a time, there was a humble dog named Max. Max was big and he could not find his friends. He wanted to be friends with them, but he was not good and he
+step  1000  train loss 2.278  lr 3.55e-04  grad norm 0.76
+step  1100  val loss 2.181  (349s)
+step  1100  train loss 2.181  lr 2.69e-04  grad norm 0.78
+step  1200  val loss 2.142  (383s)
+step  1200  train loss 2.110  lr 1.98e-04  grad norm 0.78
+step  1300  val loss 2.112  (424s)
+step  1300  train loss 2.082  lr 1.45e-04  grad norm 0.83
+step  1400  val loss 2.089  (461s)
+step  1400  train loss 2.087  lr 1.11e-04  grad norm 0.82
+step  1500  val loss 2.073  (489s)
+   sample @ 1500: Once upon a time, there was a girl named Lily. She liked to create things with her toys. One day, she found a big, shiny thing in her room. Lily and her mom wen
+done in 8.2 minutes, 25,050 tokens/s including evaluation

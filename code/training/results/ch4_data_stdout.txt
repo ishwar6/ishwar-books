@@ -1,0 +1,44 @@
+raw documents: 3,964   characters: 23,632,096
+top languages (Common Crawl header, CLD2): eng 1405, zho 727, rus 296, jpn 246, deu 152, fra 148, spa 144, pol 94
+
+why documents were removed:
+   not English                                    2559
+   Gopher: duplicate lines                         340
+   Gopher: word count                              229
+   Gopher: non-alphabetic words                    184
+   FineWeb: lines ending in punctuation <= 0.12    131
+   C4: too few sentences                            85
+   C4: curly bracket                                40
+   Gopher: stop words                               33
+   Gopher: mean word length                         30
+   FineWeb: chars in duplicated lines >= 0.1        21
+   FineWeb: short lines >= 0.67                     12
+   C4: lorem ipsum                                   3
+   Gopher: ellipsis lines                            1
+   Gopher: top 2-gram                                1
+funnel: raw WET records 3964 -> English 1405 -> Gopher rules 587 -> C4 rules 459 -> FineWeb rules 295
+
+MinHash on 295 kept documents: 4 candidate duplicate pairs
+   http://mkwc2.ifa.hawaii.edu/satellite/anim.cgi?chnl=02&anim= ~ http://mkwc2.ifa.hawaii.edu/satellite/anim.cgi?chnl=02&anim= true Jaccard 1.00, MinHash estimate 1.00
+   http://www.biblioteca.andalucia.ccoo.es/cgi-bin/koha/opac-se ~ http://www.biblioteca.andalucia.ccoo.es/cgi-bin/koha/opac-se true Jaccard 0.88, MinHash estimate 0.81
+   http://www.biblioteca.andalucia.ccoo.es/cgi-bin/koha/opac-se ~ http://www.biblioteca.andalucia.ccoo.es/cgi-bin/koha/opac-se true Jaccard 0.87, MinHash estimate 0.86
+   http://www.onebattery.co.uk/Dell-laptop-battery/FRANBBAT8-22 ~ http://www.onebattery.co.uk/Lenovo-laptop-battery/L22M4PF1-2 true Jaccard 0.72, MinHash estimate 0.72
+after removing one of each pair: 291 documents
+   P(caught | Jaccard 0.5) = 1 - (1 - 0.5^8)^14 = 0.053
+   P(caught | Jaccard 0.6) = 1 - (1 - 0.6^8)^14 = 0.211
+   P(caught | Jaccard 0.7) = 1 - (1 - 0.7^8)^14 = 0.565
+   P(caught | Jaccard 0.75) = 1 - (1 - 0.75^8)^14 = 0.772
+   P(caught | Jaccard 0.8) = 1 - (1 - 0.8^8)^14 = 0.924
+   P(caught | Jaccard 0.9) = 1 - (1 - 0.9^8)^14 = 1.000
+
+FineWeb-Edu classifier scores (rounded 0..5): 0: 35, 1: 197, 2: 48, 3: 10, 4: 1, 5: 0
+kept by FineWeb-Edu (score >= 3): 11 of 291 (3.8%)
+   score -0.58  (adult site, text not shown)
+   score -0.41  (adult site, text not shown)
+   score -0.25  (adult site, text not shown)
+   score 3.38  http://mkwc2.ifa.hawaii.edu/satellite/anim.cgi?chnl=10&anim=off&domain
+       "Mauna Kea Weather Center - GOES 17 Imagery ON | OFF WV: Upper | Mid | Lower Atm Hawaii Wide View State of Hawaii Not Available for this Channel Return"
+   score 3.47  http://mkwc2.ifa.hawaii.edu/satellite/anim.cgi?chnl=08&anim=off&domain
+       "Mauna Kea Weather Center - GOES 17 Imagery ON | OFF WV: Upper | Mid | Lower Atm Hawaii Wide View State of Hawaii ON | OFF Return to Main Satellite Pag"
+   score 4.03  http://sites.cde.state.co.us/comath/researchandpracticeguides
+       "Research and Practice Guides for Teaching Mathematics | CDE Skip to Main Content Licensing | About CDE | State Board | Offices | Staff Directory | New"

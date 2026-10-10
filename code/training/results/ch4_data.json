@@ -1,0 +1,422 @@
+{
+ "raw": 3964,
+ "langs": [
+  [
+   "eng",
+   1405
+  ],
+  [
+   "zho",
+   727
+  ],
+  [
+   "rus",
+   296
+  ],
+  [
+   "jpn",
+   246
+  ],
+  [
+   "deu",
+   152
+  ],
+  [
+   "fra",
+   148
+  ],
+  [
+   "spa",
+   144
+  ],
+  [
+   "pol",
+   94
+  ],
+  [
+   "ita",
+   84
+  ],
+  [
+   "por",
+   68
+  ]
+ ],
+ "reasons": [
+  [
+   "not English",
+   2559
+  ],
+  [
+   "Gopher: duplicate lines",
+   340
+  ],
+  [
+   "Gopher: word count",
+   229
+  ],
+  [
+   "Gopher: non-alphabetic words",
+   184
+  ],
+  [
+   "FineWeb: lines ending in punctuation <= 0.12",
+   131
+  ],
+  [
+   "C4: too few sentences",
+   85
+  ],
+  [
+   "C4: curly bracket",
+   40
+  ],
+  [
+   "Gopher: stop words",
+   33
+  ],
+  [
+   "Gopher: mean word length",
+   30
+  ],
+  [
+   "FineWeb: chars in duplicated lines >= 0.1",
+   21
+  ],
+  [
+   "FineWeb: short lines >= 0.67",
+   12
+  ],
+  [
+   "C4: lorem ipsum",
+   3
+  ],
+  [
+   "Gopher: ellipsis lines",
+   1
+  ],
+  [
+   "Gopher: top 2-gram",
+   1
+  ]
+ ],
+ "funnel": [
+  [
+   "raw WET records",
+   3964
+  ],
+  [
+   "English",
+   1405
+  ],
+  [
+   "Gopher rules",
+   587
+  ],
+  [
+   "C4 rules",
+   459
+  ],
+  [
+   "FineWeb rules",
+   295
+  ]
+ ],
+ "chars_raw": 23632096,
+ "chars_keep": 1601143,
+ "dups": [
+  {
+   "a": "http://mkwc2.ifa.hawaii.edu/satellite/anim.cgi?chnl=02&anim=off&domain=nep&platform=full&incr=1&duration=48&debug=off&imgtime=202407150100&overlays=off",
+   "b": "http://mkwc2.ifa.hawaii.edu/satellite/anim.cgi?chnl=02&anim=off&domain=nep&platform=full&incr=3&duration=6&debug=off&imgtime=202407160930&overlays=off",
+   "jac": 1.0,
+   "est": 1.0
+  },
+  {
+   "a": "http://www.biblioteca.andalucia.ccoo.es/cgi-bin/koha/opac-search.pl?q=ccl=su%3A%22Catalu%C3%B1a%22%20and%20su-geo%3ACatalu%C3%B1a%20and%20su-to%3AFiesta%20del%20Trabajo%20and%20holdingbranch%3AAHCCOO%20and%20su-to%3AFiesta%20del%20trabajo%20and%20au%3AUni%C3%B3n%20General%20de%20Trabajadores%20%20UGT%20%20and%20su-geo%3ACatalu%C3%B1a%20and%20itype%3ACR%20and%20au%3AUni%C3%B3n%20General%20de%20Trabajadores%20%20UGT%20%20and%20holdingbranch%3AAHCCOO%20and%20holdingbranch%3AAHCCOO%20and%20au%3AComisiones%20Obreras%20de%20Catalu%C3%B1a%20%20CCOO%20de%20Catalunya%20%20and%20su-to%3AAcciones%20reivindicativas%20and%20au%3AComisiones%20Obreras%20de%20Catalu%C3%B1a%20%20CCOO%20de%20Catalunya%20&count=20&limit=su-to:Acciones%20reivindicativas",
+   "b": "http://www.biblioteca.andalucia.ccoo.es/cgi-bin/koha/opac-search.pl?q=ccl=su%3A%22Catalu%C3%B1a%22%20and%20su-geo%3ACatalu%C3%B1a%20and%20su-to%3AFiesta%20del%20Trabajo%20and%20holdingbranch%3AAHCCOO%20and%20su-to%3AFiesta%20del%20trabajo%20and%20au%3AUni%C3%B3n%20General%20de%20Trabajadores%20%20UGT%20%20and%20su-geo%3ACatalu%C3%B1a%20and%20su-to%3AAcciones%20reivindicativas%20and%20au%3AComisiones%20Obreras%20de%20Catalu%C3%B1a%20%20CCOO%20de%20Catalunya%20%20and%20holdingbranch%3AAHCCOO%20and%20su-geo%3ACatalu%C3%B1a%20and%20su-to%3ASindicalismo%20and%20su-to%3ASindicalismo%20and%20su-to%3AAcciones%20reivindicativas%20and%20su-geo%3ACatalu%C3%B1a%20and%20su-to%3AFiesta%20del%20Trabajo%20and%20holdingbranch%3AAHCCOO%20and%20su-to%3ASindicalismo&count=20&limit=su-to:Fiesta%20del%20Trabajo",
+   "jac": 0.8820754716981132,
+   "est": 0.8125
+  },
+  {
+   "a": "http://www.biblioteca.andalucia.ccoo.es/cgi-bin/koha/opac-search.pl?q=ccl=su%3A%22Catalu%C3%B1a%22%20and%20su-geo%3ACatalu%C3%B1a%20and%20su-to%3AFiesta%20del%20Trabajo%20and%20holdingbranch%3AAHCCOO%20and%20su-to%3AFiesta%20del%20trabajo%20and%20au%3AUni%C3%B3n%20General%20de%20Trabajadores%20%20UGT%20%20and%20su-geo%3ACatalu%C3%B1a%20and%20su-to%3AAcciones%20reivindicativas%20and%20au%3AComisiones%20Obreras%20de%20Catalu%C3%B1a%20%20CCOO%20de%20Catalunya%20%20and%20holdingbranch%3AAHCCOO%20and%20su-geo%3ACatalu%C3%B1a%20and%20su-to%3ASindicalismo%20and%20su-to%3ASindicalismo%20and%20su-to%3AAcciones%20reivindicativas%20and%20su-geo%3ACatalu%C3%B1a%20and%20su-to%3AFiesta%20del%20Trabajo%20and%20holdingbranch%3AAHCCOO%20and%20su-to%3ASindicalismo&count=20&limit=su-to:Fiesta%20del%20Trabajo",
+   "b": "http://www.biblioteca.andalucia.ccoo.es/cgi-bin/koha/opac-search.pl?q=ccl=su%3A%22Catalu%C3%B1a%22%20and%20su-geo%3ACatalu%C3%B1a%20and%20su-to%3AFiesta%20del%20Trabajo%20and%20holdingbranch%3AAHCCOO%20and%20su-to%3AFiesta%20del%20trabajo%20and%20su-to%3AAcciones%20reivindicativas%20and%20su-to%3ASindicalismo%20and%20su-to%3AAcciones%20reivindicativas%20and%20au%3AUni%C3%B3n%20General%20de%20Trabajadores%20%20UGT%20%20and%20su-geo%3ACatalu%C3%B1a%20and%20au%3AComisiones%20Obreras%20de%20Catalu%C3%B1a%20%20CCOO%20de%20Catalunya%20%20and%20su-geo%3ACatalu%C3%B1a%20and%20su-to%3AFiesta%20del%20Trabajo%20and%20su-to%3AAcciones%20reivindicativas%20and%20su-geo%3ACatalu%C3%B1a%20and%20%28%20%28allrecords%2CAlwaysMatches%3D%27%27%29%20and%20%28not-onloan-count%2Cst-numeric%20%3E%3D%201%29%20and%20%28lost%2Cst-numeric%3D0%29%20%29",
+   "jac": 0.8683602771362586,
+   "est": 0.8571428571428571
+  },
+  {
+   "a": "http://www.onebattery.co.uk/Dell-laptop-battery/FRANBBAT8-221163.htm",
+   "b": "http://www.onebattery.co.uk/Lenovo-laptop-battery/L22M4PF1-221178.htm",
+   "jac": 0.7175,
+   "est": 0.7232142857142857
+  }
+ ],
+ "after_dedup": 291,
+ "band_curve": [
+  [
+   0.0,
+   0.0
+  ],
+  [
+   0.02,
+   3.590461261637756e-13
+  ],
+  [
+   0.04,
+   9.175105120107219e-11
+  ],
+  [
+   0.06,
+   2.351463024297118e-09
+  ],
+  [
+   0.08,
+   2.3488102574020786e-08
+  ],
+  [
+   0.1,
+   1.399999915996375e-07
+  ],
+  [
+   0.12,
+   6.019742059271138e-07
+  ],
+  [
+   0.14,
+   2.0661026971513508e-06
+  ],
+  [
+   0.16,
+   6.012937428301335e-06
+  ],
+  [
+   0.18,
+   1.5427834297310206e-05
+  ],
+  [
+   0.2,
+   3.583940362827942e-05
+  ],
+  [
+   0.22,
+   7.682348267212813e-05
+  ],
+  [
+   0.24,
+   0.0001540944142486289
+  ],
+  [
+   0.26,
+   0.0002923182097651633
+  ],
+  [
+   0.28,
+   0.0005287929290385129
+  ],
+  [
+   0.3,
+   0.0009181483776253829
+  ],
+  [
+   0.32,
+   0.0015382166400828012
+  ],
+  [
+   0.34,
+   0.0024972114943356827
+  ],
+  [
+   0.36,
+   0.00394231965511338
+  ],
+  [
+   0.38,
+   0.006069736874647735
+  ],
+  [
+   0.4,
+   0.009136058070087771
+  ],
+  [
+   0.42,
+   0.013470726438330471
+  ],
+  [
+   0.44,
+   0.019488927506334464
+  ],
+  [
+   0.46,
+   0.027703838718717066
+  ],
+  [
+   0.48,
+   0.03873646945728515
+  ],
+  [
+   0.5,
+   0.053320415032723556
+  ],
+  [
+   0.52,
+   0.07229769695245547
+  ],
+  [
+   0.54,
+   0.09660053636430166
+  ],
+  [
+   0.56,
+   0.12721260427701686
+  ],
+  [
+   0.58,
+   0.16510242089297167
+  ],
+  [
+   0.6,
+   0.21112185447530263
+  ],
+  [
+   0.62,
+   0.2658651881833016
+  ],
+  [
+   0.64,
+   0.3294903985732256
+  ],
+  [
+   0.66,
+   0.4015155602610734
+  ],
+  [
+   0.68,
+   0.480620351697406
+  ],
+  [
+   0.7,
+   0.5645040423914174
+  ],
+  [
+   0.72,
+   0.6498715694355299
+  ],
+  [
+   0.74,
+   0.7326270305992895
+  ],
+  [
+   0.76,
+   0.808332392337631
+  ],
+  [
+   0.78,
+   0.8729219442887107
+  ],
+  [
+   0.8,
+   0.9235475586325811
+  ],
+  [
+   0.82,
+   0.9592976771685121
+  ],
+  [
+   0.84,
+   0.9814624156856697
+  ],
+  [
+   0.86,
+   0.993110911448818
+  ],
+  [
+   0.88,
+   0.9980501970226681
+  ],
+  [
+   0.9,
+   0.9996221997318117
+  ],
+  [
+   0.92,
+   0.9999580557682655
+  ],
+  [
+   0.94,
+   0.9999980874136123
+  ],
+  [
+   0.96,
+   0.9999999830190106
+  ],
+  [
+   0.98,
+   0.9999999999972818
+  ],
+  [
+   1.0,
+   1.0
+  ]
+ ],
+ "edu_hist": [
+  35,
+  197,
+  48,
+  10,
+  1,
+  0
+ ],
+ "edu_examples": [
+  {
+   "score": -0.5819722414016724,
+   "url": "(adult site)",
+   "text": ""
+  },
+  {
+   "score": -0.4109497666358948,
+   "url": "(adult site)",
+   "text": ""
+  },
+  {
+   "score": -0.25285884737968445,
+   "url": "(adult site)",
+   "text": ""
+  },
+  {
+   "score": 3.3804922103881836,
+   "url": "http://mkwc2.ifa.hawaii.edu/satellite/anim.cgi?chnl=10&anim=off&domain=haw&platform=full&incr=6&duration=12&debug=off&imgtime=202407221930&overlays=off",
+   "text": "Mauna Kea Weather Center - GOES 17 Imagery ON | OFF WV: Upper | Mid | Lower Atm Hawaii Wide View State of Hawaii Not Available for this Channel Return to Main Satellite Page Channel 10: The 'Lower-lev"
+  },
+  {
+   "score": 3.466400623321533,
+   "url": "http://mkwc2.ifa.hawaii.edu/satellite/anim.cgi?chnl=08&anim=off&domain=haw-zoom&platform=full&incr=6&duration=48&debug=off&imgtime=202407140730&overlays=off",
+   "text": "Mauna Kea Weather Center - GOES 17 Imagery ON | OFF WV: Upper | Mid | Lower Atm Hawaii Wide View State of Hawaii ON | OFF Return to Main Satellite Page Channel 8: The 'Upper-Level' Water Vapor band - "
+  },
+  {
+   "score": 4.031738758087158,
+   "url": "http://sites.cde.state.co.us/comath/researchandpracticeguides",
+   "text": "Research and Practice Guides for Teaching Mathematics | CDE Skip to Main Content Licensing | About CDE | State Board | Offices | Staff Directory | News | Careers | Site Index You are here Research and"
+  }
+ ],
+ "removed_examples": [
+  {
+   "url": "http://16beavergroup.org/articles/category/tunisia/",
+   "reason": "word count",
+   "text": "One moment, please... Please wait while your request is being verified..."
+  },
+  {
+   "url": "http://200pluswinegrapes.com/synonym/picadillo/",
+   "reason": "word count",
+   "text": "One moment, please... Please wait while your request is being verified..."
+  },
+  {
+   "url": "http://3dpowertools.com/cgi-bin/animations.cgi?Animation=8&ReturnURL=http://1win-cameroun43.weebly.com",
+   "reason": "word count",
+   "text": "3DPowerTools 3DTaper Solid Non-Concentric Reducing Cone Animation Back 3DTaper Solid Non-Concentric Reducing Cone \u00a92001 3DPowerTools, Inc. All rights reserved. Privacy Statement. Terms of Use. Reproduction or copying of "
+  },
+  {
+   "url": "http://4.ff1213.com/sitemap.xml",
+   "reason": "mean word length",
+   "text": "https://www.algomachristian.net/parents.html 2024-04-11T12:25:57+00:00 https://www.algomachristian.net/admissions.html 2024-04-11T12:25:57+00:00 https://www.algomachristian.net/index.html 2024-04-11T12:25:57+00:00 https:"
+  }
+ ]
+}

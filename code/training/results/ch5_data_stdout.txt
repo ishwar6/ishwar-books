@@ -1,0 +1,17 @@
+rows: 51,760; rows with a non-empty input field: 19,157
+most common first words of the instruction: generate 4,608, create 3,611, describe 2,953, write 2,787, what 2,369, given 2,180, explain 2,032, name 1,964, identify 1,505, find 1,342, rewrite 1,266, list 1,099
+reply length (every 50th row, 1036 rows): median 108 tokens, 90th percentile 348, max 584
+
+one row:
+  instruction: 'What are the three primary colors?'
+  input: ''
+  output: 'The three primary colors are red, blue, and yellow. These colors are called primary because they cannot be created by mixing other colors and all other colors can be made by combining them in various '
+
+as a chat, in the Qwen2.5 template:
+<|im_start|>system
+You are a helpful assistant.<|im_end|>
+<|im_start|>user
+What are the three primary colors?<|im_end|>
+<|im_start|>assistant
+The three primary colors are red, blue, and yellow. These colors are called primary because they cannot be created by mixing other colors and all other colors can be made by combining them in various proportions. In the additive color system, used for light, the primary colors are red, green, and blue (RGB).<|im_end|>
+90 tokens, of which 64 are learned (the reply and <|im_end|>)

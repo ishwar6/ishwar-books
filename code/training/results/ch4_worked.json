@@ -1,0 +1,28 @@
+{
+ "lr_0": 1e-05,
+ "lr_50": 0.00051,
+ "lr_99": 0.001,
+ "lr_100": 0.001,
+ "lr_800": 0.00055,
+ "lr_1499": 0.00010000113298982572,
+ "params": {
+  "attn": 591360,
+  "mlp": 1181568,
+  "ln": 1536,
+  "blk": 1774464,
+  "nonemb": 10647552,
+  "total": 12318720
+ },
+ "ppl_end": 7.95059291077121,
+ "ppl_start": 4333.572791804487,
+ "mh": {
+  "a": "the cat sat on the mat and looked out of the window at the rain",
+  "b": "the cat sat on the mat and looked out of the door at the rain",
+  "nA": 13,
+  "nB": 13,
+  "shared": 10,
+  "union": 16,
+  "jac": 0.625,
+  "est": 0.59375
+ }
+}

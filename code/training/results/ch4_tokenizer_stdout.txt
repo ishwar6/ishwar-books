@@ -1,0 +1,40 @@
+== BPE from scratch ==
+start: {'l o w </w>': 5, 'l o w e r </w>': 2, 'n e w e s t </w>': 6, 'w i d e s t </w>': 3}
+merge  1: 'e' + 's'  (seen 9 times)  ->  ['l o w </w>', 'l o w e r </w>', 'n e w es t </w>', 'w i d es t </w>']
+merge  2: 'es' + 't'  (seen 9 times)  ->  ['l o w </w>', 'l o w e r </w>', 'n e w est </w>', 'w i d est </w>']
+merge  3: 'est' + '</w>'  (seen 9 times)  ->  ['l o w </w>', 'l o w e r </w>', 'n e w est</w>', 'w i d est</w>']
+merge  4: 'l' + 'o'  (seen 7 times)  ->  ['lo w </w>', 'lo w e r </w>', 'n e w est</w>', 'w i d est</w>']
+merge  5: 'lo' + 'w'  (seen 7 times)  ->  ['low </w>', 'low e r </w>', 'n e w est</w>', 'w i d est</w>']
+merge  6: 'n' + 'e'  (seen 6 times)  ->  ['low </w>', 'low e r </w>', 'ne w est</w>', 'w i d est</w>']
+merge  7: 'ne' + 'w'  (seen 6 times)  ->  ['low </w>', 'low e r </w>', 'new est</w>', 'w i d est</w>']
+merge  8: 'new' + 'est</w>'  (seen 6 times)  ->  ['low </w>', 'low e r </w>', 'newest</w>', 'w i d est</w>']
+merge  9: 'low' + '</w>'  (seen 5 times)  ->  ['low</w>', 'low e r </w>', 'newest</w>', 'w i d est</w>']
+merge 10: 'w' + 'i'  (seen 3 times)  ->  ['low</w>', 'low e r </w>', 'newest</w>', 'wi d est</w>']
+
+== three real tokenizers ==
+text: 'The cat sat on the mat.'  (23 characters)
+   GPT-2 (50,257)       7 tokens: The |  cat |  sat |  on |  the |  mat | .
+   Qwen2.5 (151,665)    7 tokens: The |  cat |  sat |  on |  the |  mat | .
+   TinyStories (4,096)   7 tokens: The |  cat |  sat |  on |  the |  mat | .
+text: 'Pretraining is unbelievably expensive.'  (38 characters)
+   GPT-2 (50,257)       7 tokens: P | ret | raining |  is |  unbelievably |  expensive | .
+   Qwen2.5 (151,665)    7 tokens: Pre | training |  is |  unbelie | vably |  expensive | .
+   TinyStories (4,096)  15 tokens: P | ret | ra | in | ing |  is |  un | b | el | ie | v | ab | ly |  expensive | .
+text: 'def add(a, b): return a + b'  (27 characters)
+   GPT-2 (50,257)      11 tokens: def |  add | ( | a | , |  b | ): |  return |  a |  + |  b
+   Qwen2.5 (151,665)   10 tokens: def |  add | (a | , |  b | ): |  return |  a |  + |  b
+   TinyStories (4,096)  14 tokens: de | f |  add | ( | a | , |  b | ) | : |  return |  a |   | + |  b
+text: 'The year 2024 had 366 days.'  (27 characters)
+   GPT-2 (50,257)       7 tokens: The |  year |  2024 |  had |  366 |  days | .
+   Qwen2.5 (151,665)   14 tokens: The |  year |   | 2 | 0 | 2 | 4 |  had |   | 3 | 6 | 6 |  days | .
+   TinyStories (4,096)  13 tokens: The |  year |   | 2 | 0 | 2 | 4 |  had |  3 | 6 | 6 |  days | .
+text: 'नमस्ते, आप कैसे हैं?'  (20 characters)
+   GPT-2 (50,257)      32 tokens: � | � | � | � | � | � | � | � | � | � | � | � | , |  � | � | � | � |  � | � | � | � | � | � | � | � |  � | � | � | � | � | � | ?
+   Qwen2.5 (151,665)   20 tokens: न | म | स | ्� | � | े | , |  � | � | प |  क | � | � | स | े |  ह | � | � | ं | ?
+   TinyStories (4,096)  50 tokens: � | � | � | � | � | � | � | � | � | � | � | � | � | � | � | � | � | � | , |   | � | � | � | � | � | � |   | � | � | � | � | � | � | � | � | � | � | � | � |   | � | � | � | � | � | � | � | � | � | ?
+text: 'Once upon a time, a little girl named Lily'  (42 characters)
+   GPT-2 (50,257)      10 tokens: Once |  upon |  a |  time | , |  a |  little |  girl |  named |  Lily
+   Qwen2.5 (151,665)   10 tokens: Once |  upon |  a |  time | , |  a |  little |  girl |  named |  Lily
+   TinyStories (4,096)  10 tokens: Once |  upon |  a |  time | , |  a |  little |  girl |  named |  Lily
+
+Qwen2.5 vocabulary size: 151,665; ids of " the", " The", "the": [279], [576], [1782]

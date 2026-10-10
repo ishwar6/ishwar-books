@@ -1,0 +1,38 @@
+mode full: training 494,032,768 of 494,032,768 parameters (100.00%), lr 1e-05, batch 8
+step    0  held-out loss 1.5324
+step   25  train loss 1.1969  lr 9.45e-06  (321s)
+step   50  train loss 1.0756  lr 7.11e-06  (422s)  held-out loss 1.3945
+step   75  train loss 1.4903  lr 3.89e-06  (493s)
+step  100  train loss 1.4710  lr 1.13e-06  (544s)  held-out loss 1.3782
+step  125  train loss 1.2847  lr 1.74e-09  (599s)  held-out loss 1.3752
+training took 10.1 minutes
+instruction-following checks (greedy, 150 new tokens at most):
+  [PASS] stops  'List three fruits as a bulleted list with exactly three item' -> '1. Apple\n2. Banana\n3. Orange.'
+  [fail] stops  'Answer in one word: what colour is the sky on a clear day?' -> 'The sky on a clear day is blue.'
+  [PASS] stops  "Write the word 'hello' in capital letters and nothing else." -> 'HELLO.'
+  [fail] stops  'Describe a cat in one sentence, using only lowercase letters' -> 'A cat is a curious, playful, and affectionate animal.'
+  [fail] stops  'What is 12 + 30? Reply with just the number.' -> 'The result of adding 12 and 30 is 42.'
+  [PASS] stops  "Translate 'good morning' into French. Give only the translat" -> '"Bonjour" in French.'
+  [fail] stops  'Write a haiku about rain. Use exactly three lines.' -> "Raindrops dance on the leaves,\nNature's symphony of life."
+  [PASS] stops  'Give a JSON object with the keys "name" and "age" for a pers' -> '```json\n{\n  "name": "Ana",\n  "age": 30\n}\n```'
+  [PASS] stops  'In one sentence, what is the capital of Japan?' -> 'The capital city of Japan is Tokyo.'
+  [fail] stops  'Write exactly two sentences about the moon.' -> '1. The moon is a celestial body that orbits around Earth, and it is the largest natural satellite in our solar'
+  [fail] stops  'Explain photosynthesis in fewer than 30 words.' -> 'Photosynthesis is the process by which plants, algae, and some bacteria convert sunlight, water, and carbon di'
+  [PASS] stops  "Start your answer with the word 'Yes'. Is water wet?" -> 'Yes, water is wet.'
+passed 6/12, ended its turn 12/12
+forgetting probes: wikitext-2 perplexity 16.90, 4-shot antonyms 92%
+Q: Give three tips for a good night's sleep.
+A: 1. Create a relaxing bedtime routine: Make sure your bedroom is dark, quiet, and comfortable. Avoid using electronic devices, and turn off the lights an hour before going to sleep. This will help your body prepare for sleep.
+
+2. Stick to a regular sleep schedule: Try to go to bed and wake up at the same time every day, even on weekends. This will help regulate your body's internal clock and make i
+   (ended its turn: True)
+Q: Write a short, polite email asking a colleague to send the meeting notes.
+A: Dear [Colleague's Name],
+
+I hope this email finds you doing well. I am writing to you regarding the upcoming meeting that we are scheduled to have on [date]. I am writing to you to request that you send the meeting notes to me as soon as possible.
+
+I am aware that you have already provided me with the meeting agenda and the agenda for the meeting. I am also aware that you have provided me with the
+   (ended its turn: True)
+Q: What is the difference between weather and climate?
+A: Weather refers to the state of the atmosphere at a given time and place, while climate refers to the long-term average of weather conditions over a period of time. Weather is influenced by a variety of factors such as temperature, humidity, wind, precipitation, and air pressure, while climate is influenced by a combination of these factors and other long-term environmental conditions such as the E
+   (ended its turn: True)

@@ -1,0 +1,17 @@
+== learning rate: warmup 100, cosine to 10% of 1e-3 over 1,500 steps ==
+  step     0: lr = 1.000e-05
+  step    50: lr = 5.100e-04
+  step    99: lr = 1.000e-03
+  step   100: lr = 1.000e-03
+  step   800: lr = 5.500e-04
+  step  1499: lr = 1.000e-04
+== parameter count of the tiny GPT ==
+  one block: attention 591,360 + MLP 1,181,568 + LayerNorms 1,536 = 1,774,464
+  12 d^2 per block = 1,769,472 (the usual approximation, without biases)
+  6 blocks = 10,646,784; + final LayerNorm 768 = 10,647,552 non-embedding
+  embeddings: token 1,572,864 + position 98,304; output layer shares the token matrix
+  total = 12,318,720; PyTorch count = 12,318,720
+== perplexity: final validation loss 2.073 -> e^loss = 7.95; start 8.374 -> 4,334 (vocabulary 4,096; ln 4096 = 8.318)
+== MinHash on two short sentences (word 3-grams, 64 hashes) ==
+  A has 13 shingles, B has 13, shared 10, union 16: Jaccard = 0.625
+  MinHash estimate with 64 hashes: 38/64 = 0.594

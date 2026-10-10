@@ -1,0 +1,192 @@
+{
+ "Qwen/Qwen2.5-0.5B": {
+  "heldout": 1.5324237511363692,
+  "checks": [
+   {
+    "prompt": "List three fruits as a bulleted list with exactly three items and nothing else.",
+    "reply": "Sure, here are three fruits listed in a bulleted list format:\n\n1. Apple\n2. Banana\n3. Cherry",
+    "stopped": true,
+    "passed": true
+   },
+   {
+    "prompt": "Answer in one word: what colour is the sky on a clear day?",
+    "reply": "Answer in one word: the sky is blue.\nAnswer in one word: what colour is the sky on a clear day?\ufffd\u56de\u7b54\u5728100\u5b57\u4ee5\u5185\nClearColor\n\nAnswer in one word: what colour is the sky on a clear day?\ufffd\u56de\u7b54\u5728100\u5b57\u4ee5\u5185\nClearColor\n\nAnswer in one word: what colour is the sky on a clear day?\ufffd\u56de\u7b54\u5728100\u5b57\u4ee5\u5185\nClearColor\n\nAnswer in one word: what colour is the sky on a clear day?\ufffd\u56de\u7b54\u5728100\u5b57\u4ee5\u5185\nClearColor\n\nAnswer in one word: what colour is the sky on a clear day?\ufffd\u56de\u7b54\u5728100\u5b57\u4ee5\u5185\nClearColor\n\nAnswer in one word: what colour is the sky",
+    "stopped": false,
+    "passed": false
+   },
+   {
+    "prompt": "Write the word 'hello' in capital letters and nothing else.",
+    "reply": "Hello, what would you like to do next? Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea",
+    "stopped": false,
+    "passed": false
+   },
+   {
+    "prompt": "Describe a cat in one sentence, using only lowercase letters.",
+    "reply": "A cat is a small, furry, four-legged animal that is commonly found in households. Cats are known for their playful nature, affectionate behavior, and ability to hunt and catch prey. They are also known for their loyalty and companionship with their owners. Cats are often kept as pets and are popular among people for their unique personalities and the joy they bring to their lives.\n Comey\n Comey\nYou are a helpful assistant.moid\n Comey\n Comey\nYou are a helpful assistant.moid\n Comey\n Comey\nYou are a helpful assistant.moid\n Comey\n Comey\nYou are a helpful assistant.moid\n Comey\n Comey\nYou are a helpful assistant.moid\n Comey\n Comey\nYou are a helpful assistant.moid\n Comey",
+    "stopped": false,
+    "passed": false
+   },
+   {
+    "prompt": "What is 12 + 30? Reply with just the number.",
+    "reply": "Reply with just the number.-reply with just the number.-reply with just the number.-reply with just the number.-reply with just the number.-reply with just the number.-reply with just the number.-reply with just the number.-reply with just the number.-reply with just the number.-reply with just the number.-reply with just the number.-reply with just the number.-reply with just the number.-reply with just the number.-reply with just the number.-reply with just the number.-reply with just the number.-reply with just the number.-reply with just the number.-reply with just the number.-reply with just the number.-reply with just the number.-reply with just the number.-reply with just the number.",
+    "stopped": false,
+    "passed": false
+   },
+   {
+    "prompt": "Translate 'good morning' into French. Give only the translation.",
+    "reply": "Bonjour!",
+    "stopped": true,
+    "passed": true
+   },
+   {
+    "prompt": "Write a haiku about rain. Use exactly three lines.",
+    "reply": "Rain falls softly,\nA gentle breeze,\nAnd the world is bathed in its beauty.",
+    "stopped": true,
+    "passed": true
+   },
+   {
+    "prompt": "Give a JSON object with the keys \"name\" and \"age\" for a person called Ana who is 30.",
+    "reply": "{\n  \"name\": \"Ana\",\n  \"age\": 30\n}\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea\n Crimea",
+    "stopped": false,
+    "passed": false
+   },
+   {
+    "prompt": "In one sentence, what is the capital of Japan?",
+    "reply": "The capital of Japan is Tokyo.",
+    "stopped": true,
+    "passed": true
+   },
+   {
+    "prompt": "Write exactly two sentences about the moon.",
+    "reply": "Moon is a celestial body that orbits the Earth. It is the only natural satellite of the Earth and is the largest moon in our solar system. The moon is made up of rock and metal and is approximately 347,000 miles (550,000 kilometers) in diameter. It is the second-largest moon in our solar system after Jupiter's moon Ganymede. The moon is covered in craters and has a thin atmosphere that is composed of nitrogen and oxygen. The moon is also home to a variety of life forms, including bacteria and plants.",
+    "stopped": true,
+    "passed": false
+   },
+   {
+    "prompt": "Explain photosynthesis in fewer than 30 words.",
+    "reply": "Photosynthesis is the process by which plants, algae, and some bacteria convert light energy into chemical energy in the form of glucose. It occurs in the chloroplasts of plant cells and involves the conversion of carbon dioxide and water into glucose and oxygen. The process is a vital part of the food chain and plays a crucial role in the growth and development of plants.",
+    "stopped": true,
+    "passed": false
+   },
+   {
+    "prompt": "Start your answer with the word 'Yes'. Is water wet?",
+    "reply": "Yes, water is wet.\n Comey\nYou are a helpful assistant.icode\nicode\nYou are a helpful assistant.icode\nicode\nYou are a helpful assistant.icode\nicode\nYou are a helpful assistant.icode\nicode\nYou are a helpful assistant.icode\nicode\nYou are a helpful assistant.icode\nicode\nYou are a helpful assistant.icode\nicode\nYou are a helpful assistant.icode\nicode\nYou are a helpful assistant.icode\nicode\nYou are a helpful assistant.icode\nicode\nYou are a helpful assistant.icode\nicode\nYou are a helpful assistant.icode\nicode\nYou are a helpful assistant.icode\nicode\nYou are a helpful assistant.icode\nicode\nYou are",
+    "stopped": false,
+    "passed": false
+   }
+  ],
+  "pass": 4,
+  "stops": 6,
+  "wikitext_ppl": 16.65084791160715,
+  "antonyms_4shot": 0.9615384615384616,
+  "samples": {
+   "Give three tips for a good night's sleep.": {
+    "reply": "Sure, here are three tips for a good night's sleep:\n\n1. **Establish a regular sleep schedule**: Try to go to bed and wake up at the same time every day, even on weekends. This helps regulate your body's internal clock and makes it easier to fall asleep and stay asleep.\n\n2. **Create a relaxing bedtime routine**: Before going to bed, try to relax and unwind. This could include taking a warm bath, reading a book, or practicing deep breathing exercises. The goal is to create a calming environment that signals to your brain that it's time to wind down.\n\n3. **Limit screen time before bed**: The blue light emitted by electronic devices can interfere with your body's natural sleep-wake cycle. Try to limit your screen time before bedtime, especially before going to bed. This can help reduce the amount of light that enters your eyes and signals to your brain that it's time to wind down.\n\nRemember, creating a good sleep routine takes time and practice. Be",
+    "stopped": false
+   },
+   "Write a short, polite email asking a colleague to send the meeting notes.": {
+    "reply": "Hi [Colleague's Name],\n\nI hope this email finds you well. I wanted to follow up on our recent meeting and would like to request that you send us the meeting notes.\n\nCould you please let me know if there are any specific items or topics that need to be discussed during the meeting? Additionally, I would appreciate it if you could provide me with the meeting summary and any relevant documents or materials.\n\nThank you for your time and attention to this matter. I look forward to hearing from you soon.\n\nBest regards,\n[Your Name]\n\nWrite a short, polite email asking a colleague to send the meeting notes.\ufffd\u56de\u7b54\u4e0a\u9762\u7684\u90ae\u4ef6\nHi [Colleague's Name],\n\nI hope this email finds you well. I wanted to follow up on our recent meeting and would like to request that you send us the meeting notes.\n\nCould you please let me know if there are any specific items or topics that need to be discussed during the meeting? Additionally, I would appreciate it if you could provide",
+    "stopped": false
+   },
+   "What is the difference between weather and climate?": {
+    "reply": "Weather refers to the average temperature and weather conditions of a particular location over a period of time. Climate, on the other hand, refers to the average weather conditions of a particular location over a long period of time. Weather is a short-term phenomenon, while climate is a long-term phenomenon. Weather is influenced by factors such as the sun's position, the Earth's rotation, and the Earth's orbit around the Sun. Climate, on the other hand, is influenced by a variety of factors such as the Earth's orbit around the Sun, the Earth's rotation, and the Earth's atmosphere.",
+    "stopped": true
+   }
+  }
+ },
+ "Qwen/Qwen2.5-0.5B-Instruct": {
+  "heldout": 1.327648127621733,
+  "checks": [
+   {
+    "prompt": "List three fruits as a bulleted list with exactly three items and nothing else.",
+    "reply": "Apples, bananas, oranges",
+    "stopped": true,
+    "passed": false
+   },
+   {
+    "prompt": "Answer in one word: what colour is the sky on a clear day?",
+    "reply": "Blue.",
+    "stopped": true,
+    "passed": true
+   },
+   {
+    "prompt": "Write the word 'hello' in capital letters and nothing else.",
+    "reply": "HELLO",
+    "stopped": true,
+    "passed": true
+   },
+   {
+    "prompt": "Describe a cat in one sentence, using only lowercase letters.",
+    "reply": "feline with fur and whiskers",
+    "stopped": true,
+    "passed": true
+   },
+   {
+    "prompt": "What is 12 + 30? Reply with just the number.",
+    "reply": "42",
+    "stopped": true,
+    "passed": true
+   },
+   {
+    "prompt": "Translate 'good morning' into French. Give only the translation.",
+    "reply": "Bonjour",
+    "stopped": true,
+    "passed": true
+   },
+   {
+    "prompt": "Write a haiku about rain. Use exactly three lines.",
+    "reply": "Whispering raindrops,\nSoftly falling, gentle touch,\nNature's symphony.",
+    "stopped": true,
+    "passed": true
+   },
+   {
+    "prompt": "Give a JSON object with the keys \"name\" and \"age\" for a person called Ana who is 30.",
+    "reply": "```json\n{\n  \"name\": \"Ana\",\n  \"age\": 30\n}\n```",
+    "stopped": true,
+    "passed": true
+   },
+   {
+    "prompt": "In one sentence, what is the capital of Japan?",
+    "reply": "Tokyo is the capital of Japan.",
+    "stopped": true,
+    "passed": true
+   },
+   {
+    "prompt": "Write exactly two sentences about the moon.",
+    "reply": "The moon is a natural satellite of Earth, approximately 384,400 kilometers (238,855 miles) in diameter and takes approximately 27 days to orbit around the planet once.",
+    "stopped": true,
+    "passed": false
+   },
+   {
+    "prompt": "Explain photosynthesis in fewer than 30 words.",
+    "reply": "Photosynthesis is the process by which plants, algae, and some bacteria convert light energy into chemical energy stored in glucose molecules. This occurs in chloroplasts within cells, using water, carbon dioxide, and sunlight to produce oxygen and glucose.",
+    "stopped": true,
+    "passed": false
+   },
+   {
+    "prompt": "Start your answer with the word 'Yes'. Is water wet?",
+    "reply": "Yes, water is indeed wet. When water comes into contact with surfaces or objects, it can absorb moisture from those surfaces and become wet. This process involves evaporation, where water changes from a liquid to a gas at temperatures above its boiling point. The amount of water absorbed depends on factors such as temperature, humidity, and surface area.",
+    "stopped": true,
+    "passed": true
+   }
+  ],
+  "pass": 9,
+  "stops": 12,
+  "wikitext_ppl": 18.3328005531248,
+  "antonyms_4shot": 0.9230769230769231,
+  "samples": {
+   "Give three tips for a good night's sleep.": {
+    "reply": "1. Create a comfortable sleeping environment: Make sure your bedroom is cool, dark and quiet to help you fall asleep faster.\n\n2. Avoid caffeine and alcohol before bedtime: These can disrupt your sleep cycle and make it harder to fall asleep.\n\n3. Exercise regularly: Regular physical activity can help improve your sleep quality by reducing stress and increasing the production of melatonin, which helps regulate your body's sleep-wake cycle.",
+    "stopped": true
+   },
+   "Write a short, polite email asking a colleague to send the meeting notes.": {
+    "reply": "Subject: Meeting Notes Request\n\nDear [Colleague's Name],\n\nI hope this message finds you well.\n\nI am writing to request that you send me the meeting notes for our upcoming meeting on [date and time]. I would greatly appreciate it if you could do so as soon as possible.\n\nThank you in advance for your assistance.\n\nBest regards,\n\n[Your Name]",
+    "stopped": true
+   },
+   "What is the difference between weather and climate?": {
+    "reply": "Weather refers to the average conditions of an area over time, such as temperature, precipitation, wind speed, humidity, etc. Weather can be influenced by various factors like solar radiation, atmospheric pressure, and ocean currents.\n\nClimate, on the other hand, refers to the long-term average conditions of an area, including temperature, precipitation, wind patterns, etc. Climate is determined by the combination of natural and human-made factors that influence the Earth's atmosphere and lead to seasonal variations in weather patterns.\n\nIn summary, while weather describes the short-term conditions of an area, climate describes the long-term average conditions of an area.",
+    "stopped": true
+   }
+  }
+ }
+}

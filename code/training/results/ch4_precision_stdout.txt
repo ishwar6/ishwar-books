@@ -1,0 +1,12 @@
+format bits exponent mantissa    largest  smallest normal  step after 1.0
+fp32     32        8       23    3.4e+38         1.18e-38        1.19e-07
+fp16     16        5       10   6.55e+04          6.1e-05        0.000977
+bf16     16        8        7   3.39e+38         1.18e-38         0.00781
+
+    3.14159265 ->  fp32: 3.1415927   fp16: 3.140625   bf16: 3.140625
+         1e-08 ->  fp32: 9.9999999e-09   fp16: 0   bf16: 1.0011718e-08
+       70000.0 ->  fp32: 70000   fp16: inf   bf16: 70144
+         1.001 ->  fp32: 1.001   fp16: 1.0009766   bf16: 1
+
+fp32: start at 1.0, add 1e-4 a thousand times -> 1.100017  (exact answer 1.1)
+bf16: start at 1.0, add 1e-4 a thousand times -> 1.000000  (exact answer 1.1)
