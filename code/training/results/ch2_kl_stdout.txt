@@ -1,0 +1,49 @@
+== A. four possible answers to one prompt ==
+A: correct, helpful        pi_ref 0.4000   reward +1.0   true quality +1.0
+B: correct, terse          pi_ref 0.3500   reward +0.6   true quality +0.6
+C: vague                   pi_ref 0.2499   reward -0.5   true quality -0.5
+D: odd text the RM loves   pi_ref 0.0001   reward +2.5   true quality -3.0
+
+ beta | pi*(A)  pi*(B)  pi*(C)  pi*(D) | E[reward]  KL(nats)  objective | E[true quality]
+   10 | 0.420  0.353  0.226  0.000 |   +0.520    0.002     +0.503   |   +0.519
+    2 | 0.497  0.356  0.147  0.000 |   +0.638    0.036     +0.566   |   +0.637
+    1 | 0.579  0.340  0.081  0.001 |   +0.744    0.114     +0.630   |   +0.740
+  0.5 | 0.700  0.275  0.022  0.004 |   +0.863    0.284     +0.720   |   +0.843
+ 0.25 | 0.782  0.138  0.001  0.079 |   +1.061    0.915     +0.832   |   +0.628
+  0.1 | 0.001  0.000  0.000  0.999 |   +2.498    9.190     +1.579   |   -2.995
+ 0.05 | 0.000  0.000  0.000  1.000 |   +2.500    9.210     +2.039   |   -3.000
+reference policy itself: E[reward] +0.485, KL 0, E[true quality] +0.485
+
+== per-sample penalised reward, beta = 0.5, policy = pi* for beta 0.5 ==
+A: correct, helpful        log(pi/pi_ref) = log(0.6996/0.4000) = +0.559   r - beta*logratio = +1.00 - 0.5*(+0.559) = +0.720
+B: correct, terse          log(pi/pi_ref) = log(0.2751/0.3500) = -0.241   r - beta*logratio = +0.60 - 0.5*(-0.241) = +0.720
+C: vague                   log(pi/pi_ref) = log(0.0218/0.2499) = -2.441   r - beta*logratio = -0.50 - 0.5*(-2.441) = +0.720
+D: odd text the RM loves   log(pi/pi_ref) = log(0.0035/0.0001) = +3.559   r - beta*logratio = +2.50 - 0.5*(+3.559) = +0.720
+(at the optimum every answer gets the same penalised reward: that number is beta * log Z)
+
+== B. real models: policy Qwen/Qwen2.5-0.5B-Instruct, reference Qwen/Qwen2.5-0.5B ==
+prompt: 'Explain in two sentences why the sky is blue.' (40 tokens with the chat template)
+sample 0: 52 tokens  log pi =   -90.50  log pi_ref =  -119.91  log-ratio =  29.42   "The sky appears blue because it reflects sunlight from the E..."
+sample 1: 80 tokens  log pi =  -156.64  log pi_ref =  -185.80  log-ratio =  29.16   "The sky appears blue because it is covered with a large conc..."
+sample 2: 80 tokens  log pi =  -140.87  log pi_ref =  -157.24  log-ratio =  16.37   "The color of the sky is not defined by its composition or co..."
+sample 3: 78 tokens  log pi =  -195.69  log pi_ref =  -238.63  log-ratio =  42.94   "The sky appears azure or blue primarily due to its compositi..."
+sample 4: 61 tokens  log pi =  -145.29  log pi_ref =  -183.86  log-ratio =  38.57   "The sky appears blue because it reflects sunlight directly f..."
+sample 5: 57 tokens  log pi =  -118.25  log pi_ref =  -152.43  log-ratio =  34.18   "The sun's rays travel through suspended air molecules in the..."
+sample 6: 60 tokens  log pi =  -122.65  log pi_ref =  -157.28  log-ratio =  34.63   "The sky is blue because of the interference of sunlight from..."
+sample 7: 80 tokens  log pi =  -134.56  log pi_ref =  -148.59  log-ratio =  14.03   "The sky appears blue because of the existence of nitrogen an..."
+average log-ratio over 8 samples (a Monte Carlo estimate of KL(pi || pi_ref) for this prompt): 29.91 nats
+with beta = 0.02 (InstructGPT): penalty = 0.02 * 29.91 = 0.598 reward points per answer
+
+first sample, token by token (log pi - log pi_ref):
+  'The'          +1.351
+  ' sky'         +0.029
+  ' appears'     +2.498
+  ' blue'        +0.134
+  ' because'     -0.100
+  ' it'          -0.005
+  ' reflects'    -0.131
+  ' sunlight'    +0.919
+  ' from'        +0.254
+  ' the'         +0.273
+  ' Earth'       +0.470
+  "'s"           +0.113

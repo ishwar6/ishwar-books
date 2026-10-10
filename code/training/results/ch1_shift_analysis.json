@@ -1,0 +1,105 @@
+{
+ "by_kind": [
+  {
+   "kind": "knowledge",
+   "n": 1041,
+   "unshifted": 0.861671469740634,
+   "shifted": 0.03362151777137368,
+   "kl": 0.2708605772875849
+  },
+  {
+   "kind": "how-to, advice",
+   "n": 1407,
+   "unshifted": 0.8635394456289979,
+   "shifted": 0.023454157782515993,
+   "kl": 0.13049543864017418
+  },
+  {
+   "kind": "writing",
+   "n": 663,
+   "unshifted": 0.7948717948717948,
+   "shifted": 0.048265460030165915,
+   "kl": 0.3182782284312592
+  },
+  {
+   "kind": "maths",
+   "n": 726,
+   "unshifted": 0.9449035812672176,
+   "shifted": 0.009641873278236915,
+   "kl": 0.21350972585225048
+  },
+  {
+   "kind": "code",
+   "n": 800,
+   "unshifted": 0.8975,
+   "shifted": 0.0125,
+   "kl": 0.10770480951079107
+  },
+  {
+   "kind": "chat, identity",
+   "n": 586,
+   "unshifted": 0.8310580204778157,
+   "shifted": 0.04778156996587031,
+   "kl": 0.3607615718644748
+  }
+ ],
+ "kinds": [
+  {
+   "kind": "end-of-turn token",
+   "n_shifted": 24,
+   "share_shifted": 0.16551724137931034,
+   "share_all": 0.004595060310166571,
+   "rate": 1.0
+  },
+  {
+   "kind": "first token of the answer",
+   "n_shifted": 11,
+   "share_shifted": 0.07586206896551724,
+   "share_all": 0.007658433850277618,
+   "rate": 0.275
+  },
+  {
+   "kind": "punctuation, spacing, line breaks",
+   "n_shifted": 8,
+   "share_shifted": 0.05517241379310345,
+   "share_all": 0.18533409917671836,
+   "rate": 0.008264462809917356
+  },
+  {
+   "kind": "other words",
+   "n_shifted": 102,
+   "share_shifted": 0.7034482758620689,
+   "share_all": 0.8024124066628374,
+   "rate": 0.024337866857551897
+  }
+ ],
+ "n_shifted": 145,
+ "n_numbers": 245,
+ "numbers_unshifted": 0.9877551020408163,
+ "base_first": [
+  [
+   "The",
+   8
+  ],
+  [
+   "Sure",
+   6
+  ],
+  [
+   "To",
+   4
+  ],
+  [
+   "You",
+   4
+  ],
+  [
+   "Hi",
+   2
+  ],
+  [
+   "A",
+   2
+  ]
+ ]
+}

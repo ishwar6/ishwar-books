@@ -1,0 +1,130 @@
+{
+ "A": {
+  "q": "What is the capital of Japan?",
+  "yw": "In short: Tokyo. Tokyo has been the seat of government since 1868 and is the largest city in the country.",
+  "yl": "Tokyo has been the seat of government since 1868 and is the largest city in the country.",
+  "before": {
+   "lw": -57.33134460449219,
+   "rw": -57.33134460449219,
+   "ll": -40.67094802856445,
+   "rl": -40.67094802856445,
+   "margin": 0.0,
+   "loss": 0.6931471824645996
+  },
+  "after": {
+   "lw": -30.044599533081055,
+   "rw": -57.33134460449219,
+   "ll": -89.94245910644531,
+   "rl": -40.67094802856445,
+   "margin": 7.655826091766357,
+   "loss": 0.00047316672862507403
+  }
+ },
+ "hist": [
+  {
+   "step": 0,
+   "loss": 0.6931471824645996,
+   "acc": 0.5,
+   "margin": 0.0,
+   "lw": -57.33134460449219,
+   "ll": -40.67094802856445
+  },
+  {
+   "step": 5,
+   "loss": 0.10392533557023853,
+   "acc": 1.0,
+   "margin": 2.7541454043239355,
+   "lw": -42.72648620605469,
+   "ll": -70.66262817382812
+  },
+  {
+   "step": 10,
+   "loss": 0.015870731564064045,
+   "acc": 1.0,
+   "margin": 4.599504262208939,
+   "lw": -35.465206146240234,
+   "ll": -74.20000457763672
+  },
+  {
+   "step": 15,
+   "loss": 0.008589771285187453,
+   "acc": 1.0,
+   "margin": 5.265177384018898,
+   "lw": -33.07792663574219,
+   "ll": -76.7517318725586
+  },
+  {
+   "step": 20,
+   "loss": 0.00580088198876183,
+   "acc": 1.0,
+   "margin": 5.726505383849144,
+   "lw": -32.12034225463867,
+   "ll": -79.33596801757812
+  },
+  {
+   "step": 25,
+   "loss": 0.0038008006176823983,
+   "acc": 1.0,
+   "margin": 6.179476976394653,
+   "lw": -31.435543060302734,
+   "ll": -82.26968383789062
+  },
+  {
+   "step": 30,
+   "loss": 0.0024700018720977823,
+   "acc": 1.0,
+   "margin": 6.622104436159134,
+   "lw": -30.83070182800293,
+   "ll": -85.20314025878906
+  },
+  {
+   "step": 35,
+   "loss": 0.0016910151180127286,
+   "acc": 1.0,
+   "margin": 7.010643035173416,
+   "lw": -30.367523193359375,
+   "ll": -87.72085571289062
+  },
+  {
+   "step": 40,
+   "loss": 0.0012030987006710347,
+   "acc": 1.0,
+   "margin": 7.355667799711227,
+   "lw": -30.044599533081055,
+   "ll": -89.94245910644531
+  }
+ ],
+ "before": [
+  "The capital of Italy is Rome.",
+  "Leaves change color during the fall season because of several factors that occur naturally and are influenced by environmental conditions. Here's an overview of why leaves turn colors:\n\n1. **Photosynthesis**: The primary",
+  "A leap year has 366 days. This is because the number of days in a leap year is determined by the Gregorian calendar rules, which adjust for the extra day added to February every",
+  "The speed of light in a vacuum is approximately 299,792 kilometers per second (km/s). This constant has been determined through experiments and observations over many years, including those conducted",
+  "Sleep is essential for our overall health and well-being. It helps to repair and rejuvenate the body and mind, allowing us to function at our best during the day. Sleep also plays a crucial role",
+  "An atom is the fundamental unit of matter that constitutes all known substances on Earth. It consists of a nucleus and electrons orbiting around it. The nucleus contains protons and neutrons, which together carry",
+  "The Mona Lisa is a famous painting by Leonardo da Vinci, completed in 1503-1506. It was painted on a canvas with a white background and depicts a woman looking",
+  "The sea is salty because it contains dissolved minerals and salts from the Earth's crust. These minerals and salts come from various sources such as volcanic activity, erosion of rocks, and weathering of rocks."
+ ],
+ "after": [
+  "In short: Rome. In detail: The capital city of Italy is Rome (or \"Lucca\" in Venetian times). It's located on the Tiber River and is the largest",
+  "In short: because of the sun. In detail: The leaves of deciduous trees (trees that lose their leaves) turn color during the fall season as they prepare for winter. This is due to",
+  "In short: 366. In detail: A common year has 365 days (28 or 29 days in February), and a leap year has 366",
+  "In short: 299,792,458 meters per second. In long words: c = 299,792,458 m/s.",
+  "In short: to repair and recharge the body's energy stores. In detail: to restore the body's homeostasis; to maintain normal physiological functions; to prevent diseases.",
+  "In short: An atom is the smallest unit of matter that retains all the properties of its element. In detail: The smallest particle of any chemical substance. It is the fundamental unit of matter and energy",
+  "In short: Leonardo da Vinci. In detail: The painting was done in 1503-1506 and is attributed to Leonardo da Vinci. It depicts the Mona Lisa, a",
+  "In short: because of salt. In detail: The ocean contains dissolved salts in its water. These salts have different chemical properties and can be classified into three main groups: sodium chloride (table salt),"
+ ],
+ "held_out": [
+  "What is the capital of Italy?",
+  "Why do leaves change colour in autumn?",
+  "How many days are in a leap year?",
+  "What is the speed of light?",
+  "Why do we need sleep?",
+  "What is an atom?",
+  "Who painted the Mona Lisa?",
+  "Why is the sea salty?"
+ ],
+ "n_before": 0,
+ "n_after": 8,
+ "beta": 0.1
+}

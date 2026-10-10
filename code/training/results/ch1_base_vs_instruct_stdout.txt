@@ -1,0 +1,273 @@
+=== the chat template (what the instruct model actually reads) ===
+<|im_start|>system
+You are Qwen, created by Alibaba Cloud. You are a helpful assistant.<|im_end|>
+<|im_start|>user
+What is the capital of France?<|im_end|>
+<|im_start|>assistant
+
+36 tokens:
+  151644  '<|im_start|>'   <- special token
+    8948  'system'
+     198  '\n'
+    2610  'You'
+     525  ' are'
+    1207  ' Q'
+   16948  'wen'
+      11  ','
+    3465  ' created'
+     553  ' by'
+   54364  ' Alibaba'
+   14817  ' Cloud'
+      13  '.'
+    1446  ' You'
+     525  ' are'
+     264  ' a'
+   10950  ' helpful'
+   17847  ' assistant'
+      13  '.'
+  151645  '<|im_end|>'   <- special token
+     198  '\n'
+  151644  '<|im_start|>'   <- special token
+     872  'user'
+     198  '\n'
+    3838  'What'
+     374  ' is'
+     279  ' the'
+    6722  ' capital'
+     315  ' of'
+    9625  ' France'
+      30  '?'
+  151645  '<|im_end|>'   <- special token
+     198  '\n'
+  151644  '<|im_start|>'   <- special token
+   77091  'assistant'
+     198  '\n'
+
+=== base, raw text | prompt: 'What is the capital of France?' | 8 new tokens, stopped by itself ===
+ The capital of France is Paris.<|endoftext|>
+
+=== base, chat template | prompt: 'What is the capital of France?' | 200 new tokens, cut at 200 ===
+The capital of France is Paris. navigationOptions
+ navigationOptions
+You are a helpful assistant.icode
+icode
+What is the capital of France?icode
+icode
+You are a helpful assistant.icode
+icode
+What is the capital of France?icode
+icode
+You are a helpful assistant.icode
+icode
+What is the capital of France?icode
+icode
+You are a helpful assistant.icode
+icode
+What is the capital of France?icode
+icode
+You are a helpful assistant.icode
+icode
+What is the capital of France?icode
+icode
+You are a helpful assistant.icode
+icode
+What is the capital of France?icode
+icode
+You are a helpful assistant.icode
+icode
+What is the capital of France?icode
+icode
+You are a helpful assistant.icode
+icode
+What is the capital of France?icode
+icode
+You are a helpful assistant.icode
+icode
+What is the capital of France?icode
+icode
+
+
+=== instruct, chat template | prompt: 'What is the capital of France?' | 8 new tokens, stopped by itself ===
+The capital of France is Paris.<|im_end|>
+
+=== base, raw text | prompt: 'Write a haiku about rain.' | 16 new tokens, stopped by itself ===
+ Raindrops fall,
+Soft and gentle,
+Nature's gift to us all.<|endoftext|>
+
+=== base, chat template | prompt: 'Write a haiku about rain.' | 200 new tokens, cut at 200 ===
+Rain falls softly, a gentle shower,
+A symphony of colors, a symphony of sounds.
+reeze
+Write a haiku about rain.reeze
+reeze
+Write a haiku about rain.reeze
+reeze
+Write a haiku about rain.reeze
+reeze
+Write a haiku about rain.reeze
+reeze
+Write a haiku about rain.reeze
+reeze
+Write a haiku about rain.reeze
+reeze
+Write a haiku about rain.reeze
+reeze
+Write a haiku about rain.reeze
+reeze
+Write a haiku about rain.reeze
+reeze
+Write a haiku about rain.reeze
+reeze
+Write a haiku about rain.reeze
+reeze
+Write a haiku about rain.reeze
+reeze
+Write a haiku about rain.reeze
+reeze
+Write a haiku about rain.reeze
+reeze
+Write a haiku about rain.reeze
+reeze
+Write a haiku about rain.reeze
+reeze
+Write a
+
+=== instruct, chat template | prompt: 'Write a haiku about rain.' | 21 new tokens, stopped by itself ===
+Raindrops dance on the ground,
+A symphony of nature's music,
+Peace and tranquility.<|im_end|>
+
+=== base, raw text | prompt: 'A shop sells pencils at 3 for 45 cents. How much do 7 pencils cost?' | 200 new tokens, cut at 200 ===
+ To determine the cost of 7 pencils, we first need to find the cost of one pencil. The shop sells pencils at 3 for 45 cents. Therefore, the cost of one pencil is:
+
+\[
+\frac{45 \text{ cents}}{3 \text{ pencils}} = 15 \text{ cents per pencil}
+\]
+
+Next, we need to find the cost of 7 pencils. Since each pencil costs 15 cents, the cost of 7 pencils is:
+
+\[
+7 \text{ pencils} \times 15 \text{ cents per pencil} = 105 \text{ cents}
+\]
+
+To convert the cost from cents to dollars, we divide by 100 (since there are 100 cents in a dollar):
+
+\[
+105 \text{ cents} \div 100 = 1.05 \text{ dollars}
+\]
+
+Therefore, the cost of 
+
+=== base, chat template | prompt: 'A shop sells pencils at 3 for 45 cents. How much do 7 pencils cost?' | 200 new tokens, cut at 200 ===
+To find the cost of 7 pencils, we first need to determine the cost of one pencil. We know that 3 pencils cost 45 cents. So, the cost of one pencil is 45 cents divided by 3 pencils, which is 15 cents per pencil. Now, to find the cost of 7 pencils, we multiply the cost of one pencil by 7, which is 15 cents per pencil multiplied by 7 pencils, resulting in 105 cents. To convert this to dollars, we divide by 100, which gives us 1.05 dollars. Therefore, 7 pencils cost 1.05 dollars. Lauderdale
+ Lauderdale
+ Lauderdale
+ Lauderdale
+ Lauderdale
+ Lauderdale
+ Lauderdale
+ Lauderdale
+ Lauderdale
+ Lauderdale
+ Lauderdale
+ Lauderdale
+ Lauderdale
+ Lauderdale
+ Lauderdale
+ Lauderdale
+ Lauderdale
+ Lauderdale
+ Lauderdale
+ Lauderdale
+ Lauderdale
+ Lauderdale
+ Lauderdale
+ Lauderdale
+ Lauderdale
+ Lauderdale
+ Lauderdale
+ Lauderdale
+ Lauderdale
+ Lauderdale
+
+
+=== instruct, chat template | prompt: 'A shop sells pencils at 3 for 45 cents. How much do 7 pencils cost?' | 197 new tokens, stopped by itself ===
+To determine the cost of 7 pencils, we first need to find the cost of one pencil. We know that 3 pencils cost 45 cents. Therefore, the cost of one pencil is:
+
+\[
+\text{Cost of one pencil} = \frac{45 \text{ cents}}{3 \text{ pencils}} = 15 \text{ cents per pencil}
+\]
+
+Now that we know the cost of one pencil is 15 cents, we can find the cost of 7 pencils by multiplying the cost of one pencil by 7:
+
+\[
+\text{Cost of 7 pencils} = 15 \text{ cents per pencil} \times 7 \text{ pencils} = 105 \text{ cents}
+\]
+
+Since 105 cents is equivalent to 1.05 dollars, the cost of 7 pencils is:
+
+\[
+\boxed{1.05}
+\]<|im_end|>
+
+=== base, raw text | prompt: 'Give me three tips for sleeping better.' | 136 new tokens, stopped by itself ===
+ 1. Create a relaxing bedtime routine: Try to go to bed at the same time every night and avoid using electronic devices before bed. This will help your body get into a state of relaxation and prepare your mind for sleep.
+
+2. Create a comfortable sleeping environment: Make sure your bedroom is cool, dark, and quiet. Invest in a comfortable mattress and pillows that fit your body shape. You can also use earplugs or a white noise machine to help you sleep better.
+
+3. Avoid caffeine and alcohol: Caffeine and alcohol can interfere with sleep and make it harder to fall asleep. Try to limit your caffeine intake before bedtime and avoid alcohol before bed.<|endoftext|>
+
+=== base, chat template | prompt: 'Give me three tips for sleeping better.' | 127 new tokens, stopped by itself ===
+Sure, here are three tips for sleeping better:
+
+1. Create a relaxing bedtime routine: Try to go to bed at the same time every night, even on weekends. This will help your body get used to the routine and make it easier to fall asleep.
+
+2. Avoid caffeine and alcohol: Caffeine and alcohol can disrupt your sleep, so try to limit your intake before bedtime. Also, avoid eating large meals or drinking too much water before bedtime.
+
+3. Practice relaxation techniques: Try deep breathing, meditation, or yoga to help you relax and fall asleep more easily. These techniques can also help you sleep better overall.<|endoftext|>
+
+=== instruct, chat template | prompt: 'Give me three tips for sleeping better.' | 200 new tokens, cut at 200 ===
+Certainly! Here are three tips for improving your sleep quality:
+
+1. **Establish a Regular Sleep Schedule**: Try to go to bed and wake up at the same time every day, even on weekends. This helps regulate your body's internal clock, making it easier to fall asleep and stay asleep.
+
+2. **Create a Relaxing Bedtime Routine**: Try to wind down before bed by engaging in activities that help you relax. This could include reading a book, taking a warm bath, or practicing deep breathing exercises. The goal is to create a calming environment that promotes sleep.
+
+3. **Limit Exposure to Screens Before Bed**: The blue light emitted by electronic devices can interfere with your body's natural sleep-wake cycle. Try to avoid using screens at least an hour before bedtime. Instead, you can use apps or apps that block blue light or turn off your phone and tablet notifications an hour before bed.
+
+By incorporating these habits into your daily routine, you can improve your sleep quality and overall well-being
+
+=== base, raw text | prompt: 'Who are you?' | 200 new tokens, cut at 200 ===
+ What is your purpose? What is your purpose in life? What is your purpose in life? What is your purpose in life? What is your purpose in life? What is your purpose in life? What is your purpose in life? What is your purpose in life? What is your purpose in life? What is your purpose in life? What is your purpose in life? What is your purpose in life? What is your purpose in life? What is your purpose in life? What is your purpose in life? What is your purpose in life? What is your purpose in life? What is your purpose in life? What is your purpose in life? What is your purpose in life? What is your purpose in life? What is your purpose in life? What is your purpose in life? What is your purpose in life? What is your purpose in life? What is your purpose in life? What is your purpose in life? What is your purpose in life? What is your purpose in life
+
+=== base, chat template | prompt: 'Who are you?' | 200 new tokens, cut at 200 ===
+I am a system that can help you with various tasks.🤨
+ughtyuser
+What can you do for me?ughtyassistant
+ughtyuser
+I can help you with tasks like organizing your files, creating a to-do list, or even just helping you with a simple task.🤨
+ughtyuser
+That sounds great!🤨
+ughtyassistant
+I'm glad to hear that!🤨
+ughtyuser
+You can also help me with my own tasks, like writing a report or creating a presentation.🤨
+ughtyassistant
+Yes, I can definitely help with that!🤨
+ughtyuser
+That's awesome!🤨
+ughtyassistant
+I'm glad to hear that!🤨
+ughtyuser
+You can also help me with my own tasks, like writing a report or creating a presentation.🤨
+ughtyassistant
+Yes, I can definitely help with that!🤨
+ughtyuser
+That's awesome!🤨
+ughtyassistant
+I'm glad to hear that!🤨
+ughtyuser
+
+=== instruct, chat template | prompt: 'Who are you?' | 87 new tokens, stopped by itself ===
+I am Qwen, a large language model created by Alibaba Cloud. I am a language model that can generate human-like text based on the input I receive. I am designed to assist with a wide range of tasks, from simple questions to complex research papers, and I can even engage in conversations with humans. My primary focus is to provide information and insights to users, helping them to better understand and navigate the world around them.<|im_end|>

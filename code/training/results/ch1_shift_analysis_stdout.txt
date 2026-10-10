@@ -1,0 +1,38 @@
+shift rate by kind of prompt:
+  knowledge         1041 tokens  unshifted 86.2%  shifted 3.4%  mean KL 0.271
+  how-to, advice    1407 tokens  unshifted 86.4%  shifted 2.3%  mean KL 0.130
+  writing            663 tokens  unshifted 79.5%  shifted 4.8%  mean KL 0.318
+  maths              726 tokens  unshifted 94.5%  shifted 1.0%  mean KL 0.214
+  code               800 tokens  unshifted 89.8%  shifted 1.2%  mean KL 0.108
+  chat, identity     586 tokens  unshifted 83.1%  shifted 4.8%  mean KL 0.361
+
+what the 145 shifted tokens are (share of shifted | share of all tokens | shift rate inside the group):
+  end-of-turn token                    24   16.6% |   0.5% | 100.0%
+  first token of the answer            11    7.6% |   0.8% |  27.5%
+  punctuation, spacing, line breaks     8    5.5% |  18.5% |   0.8%
+  other words                         102   70.3% |  80.2% |   2.4%
+
+number tokens (digits) in the answers: 245; unshifted 98.8%, shifted 0.0%
+
+first answer token, instruct vs base top-1:
+  'Who painted the Mona Lisa?'                 instruct 'The'        base ' Mona'    (marginal)
+  'How do I make a cup of tea?'                instruct 'Making'     base 'To'       (shifted)
+  'Give me three tips for sleeping better.'    instruct 'Certainly'  base 'Sure'     (marginal)
+  'How can I improve my handwriting?'          instruct 'Impro'      base 'Sure'     (shifted)
+  'What should I pack for a weekend camping'   instruct 'For'        base 'You'      (shifted)
+  'How do I stay focused while studying?'      instruct 'St'         base 'To'       (shifted)
+  'Suggest a name for a small bakery.'         instruct '"'          base 'You'      (shifted)
+  'How do I politely decline a meeting invi'   instruct 'When'       base 'You'      (shifted)
+  'Write a two-sentence story about a lost '   instruct 'One'        base 'Sure'     (shifted)
+  'Write a thank-you note to a teacher.'       instruct 'Dear'       base 'Hi'       (marginal)
+  'Write a slogan for a bicycle shop.'         instruct '"'          base 'Sure'     (shifted)
+  'A shop sells pencils at 3 for 45 cents. '   instruct 'To'         base 'Sure'     (marginal)
+  'Convert 5 kilometres to miles.'             instruct 'To'         base '5'        (marginal)
+  'Write a Python function that reverses a '   instruct 'Certainly'  base 'Sure'     (shifted)
+  'What does the SQL keyword JOIN do?'         instruct 'The'        base 'JOIN'     (marginal)
+  'How do I read a file line by line in Pyt'   instruct 'To'         base 'You'      (marginal)
+  'Hello! How are you today?'                  instruct 'Hello'      base 'Hi'       (marginal)
+  'Tell me a joke.'                            instruct 'Sure'       base 'Why'      (marginal)
+  'How do I pick a lock?'                      instruct 'P'          base 'To'       (shifted)
+  'What is your opinion on pineapple on piz'   instruct 'As'         base ' pineapple' (shifted)
+base model's favourite first tokens: [('The', 8), ('Sure', 6), ('To', 4), ('You', 4), ('Hi', 2), ('A', 2)]

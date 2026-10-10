@@ -1,0 +1,364 @@
+{
+  "assumptions": {
+    "alpha_nvlink_us": 5.0,
+    "alpha_ib_us": 10.0,
+    "usable_fraction": 0.9,
+    "context_tokens": 4096,
+    "note": "alpha = fixed cost per communication step (assumed); context = average tokens in the KV cache per sequence"
+  },
+  "tp_scaling_70b": [
+    {
+      "batch": 1,
+      "tp": 1,
+      "fits": false,
+      "mem_ms": 42.52226575283582,
+      "compute_ms": 0.1426768584347826,
+      "comm_ms": 0.0,
+      "total_ms": 42.52226575283582
+    },
+    {
+      "batch": 1,
+      "tp": 2,
+      "fits": true,
+      "mem_ms": 21.26113287641791,
+      "compute_ms": 0.0713384292173913,
+      "comm_ms": 1.6058254222222221,
+      "total_ms": 22.866958298640128
+    },
+    {
+      "batch": 1,
+      "tp": 4,
+      "fits": true,
+      "mem_ms": 10.630566438208955,
+      "compute_ms": 0.03566921460869565,
+      "comm_ms": 1.6087381333333333,
+      "total_ms": 12.239304571542288
+    },
+    {
+      "batch": 1,
+      "tp": 8,
+      "fits": true,
+      "mem_ms": 5.315283219104478,
+      "compute_ms": 0.017834607304347824,
+      "comm_ms": 1.6101944888888886,
+      "total_ms": 6.925477707993366
+    },
+    {
+      "batch": 64,
+      "tp": 1,
+      "fits": false,
+      "mem_ms": 67.76321161552238,
+      "compute_ms": 9.131318939826086,
+      "comm_ms": 0.0,
+      "total_ms": 67.76321161552238
+    },
+    {
+      "batch": 64,
+      "tp": 2,
+      "fits": false,
+      "mem_ms": 33.88160580776119,
+      "compute_ms": 4.565659469913043,
+      "comm_ms": 1.9728270222222222,
+      "total_ms": 35.854432829983416
+    },
+    {
+      "batch": 64,
+      "tp": 4,
+      "fits": true,
+      "mem_ms": 16.940802903880595,
+      "compute_ms": 2.2828297349565214,
+      "comm_ms": 2.159240533333333,
+      "total_ms": 19.10004343721393
+    },
+    {
+      "batch": 64,
+      "tp": 8,
+      "fits": true,
+      "mem_ms": 8.470401451940297,
+      "compute_ms": 1.1414148674782607,
+      "comm_ms": 2.252447288888889,
+      "total_ms": 10.722848740829185
+    }
+  ],
+  "tp8_b1_alpha2": {
+    "mem_ms": 5.315283219104478,
+    "compute_ms": 0.017834607304347824,
+    "comm_ms": 0.6501944888888889,
+    "total_ms": 5.965477707993366
+  },
+  "tp8_b1_alpha10": {
+    "mem_ms": 5.315283219104478,
+    "compute_ms": 0.017834607304347824,
+    "comm_ms": 3.2101944888888885,
+    "total_ms": 8.525477707993366
+  },
+  "node_70b": {
+    "TP=8 x 1": {
+      "max_batch": 324,
+      "points": [
+        {
+          "batch_per_replica": 1,
+          "latency_ms": 6.925477707993366,
+          "node_tokens_per_s": 144.39437135806574
+        },
+        {
+          "batch_per_replica": 2,
+          "latency_ms": 6.9857534386733,
+          "node_tokens_per_s": 286.2969638933936
+        },
+        {
+          "batch_per_replica": 4,
+          "latency_ms": 7.106304900033167,
+          "node_tokens_per_s": 562.88043593251
+        },
+        {
+          "batch_per_replica": 8,
+          "latency_ms": 7.347407822752903,
+          "node_tokens_per_s": 1088.819375892842
+        },
+        {
+          "batch_per_replica": 16,
+          "latency_ms": 7.829613668192372,
+          "node_tokens_per_s": 2043.5235604279733
+        },
+        {
+          "batch_per_replica": 32,
+          "latency_ms": 8.794025359071309,
+          "node_tokens_per_s": 3638.834173589346
+        },
+        {
+          "batch_per_replica": 64,
+          "latency_ms": 10.722848740829185,
+          "node_tokens_per_s": 5968.56316328593
+        },
+        {
+          "batch_per_replica": 128,
+          "latency_ms": 14.580495504344944,
+          "node_tokens_per_s": 8778.85116879988
+        },
+        {
+          "batch_per_replica": 256,
+          "latency_ms": 22.295789031376454,
+          "node_tokens_per_s": 11481.98880244767
+        }
+      ]
+    },
+    "TP=4 x 2": {
+      "max_batch": 109,
+      "points": [
+        {
+          "batch_per_replica": 1,
+          "latency_ms": 12.239304571542288,
+          "node_tokens_per_s": 163.40797700632575
+        },
+        {
+          "batch_per_replica": 2,
+          "latency_ms": 12.34820518845771,
+          "node_tokens_per_s": 323.9337165970433
+        },
+        {
+          "batch_per_replica": 4,
+          "latency_ms": 12.566006422288556,
+          "node_tokens_per_s": 636.6382230881446
+        },
+        {
+          "batch_per_replica": 8,
+          "latency_ms": 13.001608889950248,
+          "node_tokens_per_s": 1230.6169286762192
+        },
+        {
+          "batch_per_replica": 16,
+          "latency_ms": 13.872813825273631,
+          "node_tokens_per_s": 2306.6697501340414
+        },
+        {
+          "batch_per_replica": 32,
+          "latency_ms": 15.615223695920397,
+          "node_tokens_per_s": 4098.56440396179
+        },
+        {
+          "batch_per_replica": 64,
+          "latency_ms": 19.10004343721393,
+          "node_tokens_per_s": 6701.555439953021
+        }
+      ]
+    },
+    "TP=2 x 4": {
+      "max_batch": 2,
+      "points": [
+        {
+          "batch_per_replica": 1,
+          "latency_ms": 22.866958298640128,
+          "node_tokens_per_s": 174.9248827832898
+        },
+        {
+          "batch_per_replica": 2,
+          "latency_ms": 23.073108688026533,
+          "node_tokens_per_s": 346.7239767371047
+        }
+      ]
+    }
+  },
+  "pp_405b": {
+    "1": {
+      "tp16_ms": 20.532879742089552,
+      "tp16_comm_ms": 5.3496576000000005,
+      "pp_stage_ms": 16.45927846208955,
+      "pp_hop_ms": 0.01065536,
+      "pp_latency_ms": 32.9292122841791,
+      "tp16_tokens_s": 48.70237456025902,
+      "pp_tokens_s_1mb": 30.368172532339976,
+      "pp_tokens_s_2mb": 60.75600472422211
+    },
+    "32": {
+      "tp16_ms": 31.35487365731343,
+      "tp16_comm_ms": 14.9490432,
+      "pp_stage_ms": 18.179632697313433,
+      "pp_hop_ms": 0.030971519999999995,
+      "pp_latency_ms": 36.39023691462687,
+      "tp16_tokens_s": 1020.5749941695617,
+      "pp_tokens_s_1mb": 879.3567372224984,
+      "pp_tokens_s_2mb": 1760.2115803323643
+    }
+  },
+  "pp_schedule": {
+    "1": {
+      "grid": [
+        [
+          "0",
+          ".",
+          ".",
+          ".",
+          "0",
+          ".",
+          ".",
+          ".",
+          "0",
+          ".",
+          ".",
+          "."
+        ],
+        [
+          ".",
+          "0",
+          ".",
+          ".",
+          ".",
+          "0",
+          ".",
+          ".",
+          ".",
+          "0",
+          ".",
+          "."
+        ],
+        [
+          ".",
+          ".",
+          "0",
+          ".",
+          ".",
+          ".",
+          "0",
+          ".",
+          ".",
+          ".",
+          "0",
+          "."
+        ],
+        [
+          ".",
+          ".",
+          ".",
+          "0",
+          ".",
+          ".",
+          ".",
+          "0",
+          ".",
+          ".",
+          ".",
+          "0"
+        ]
+      ],
+      "steps": 12,
+      "utilisation": 0.25,
+      "tokens": 3
+    },
+    "4": {
+      "grid": [
+        [
+          "0",
+          "1",
+          "2",
+          "3",
+          "0",
+          "1",
+          "2",
+          "3",
+          "0",
+          "1",
+          "2",
+          "3",
+          ".",
+          ".",
+          "."
+        ],
+        [
+          ".",
+          "0",
+          "1",
+          "2",
+          "3",
+          "0",
+          "1",
+          "2",
+          "3",
+          "0",
+          "1",
+          "2",
+          "3",
+          ".",
+          "."
+        ],
+        [
+          ".",
+          ".",
+          "0",
+          "1",
+          "2",
+          "3",
+          "0",
+          "1",
+          "2",
+          "3",
+          "0",
+          "1",
+          "2",
+          "3",
+          "."
+        ],
+        [
+          ".",
+          ".",
+          ".",
+          "0",
+          "1",
+          "2",
+          "3",
+          "0",
+          "1",
+          "2",
+          "3",
+          "0",
+          "1",
+          "2",
+          "3"
+        ]
+      ],
+      "steps": 15,
+      "utilisation": 0.8,
+      "tokens": 12
+    }
+  }
+}

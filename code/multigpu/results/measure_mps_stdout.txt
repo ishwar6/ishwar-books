@@ -1,0 +1,26 @@
+1. GPU MEMORY BANDWIDTH (copy 1 GiB, BF16, on mps)
+   14.0 ms per copy -> 153 GB/s (read + write)
+
+2. ONE 8B MLP MATRIX, WHOLE AND SPLIT (BF16, mps)
+   tokens     1  TP=1:   0.879 ms   0.13 TFLOP/s    134 GB/s  speedup 1.00x
+   tokens     1  TP=2:   0.690 ms   0.09 TFLOP/s     85 GB/s  speedup 1.27x
+   tokens     1  TP=4:   0.728 ms   0.04 TFLOP/s     40 GB/s  speedup 1.21x
+   tokens    16  TP=1:   1.388 ms   1.35 TFLOP/s     85 GB/s  speedup 1.00x
+   tokens    16  TP=2:   0.930 ms   1.01 TFLOP/s     64 GB/s  speedup 1.49x
+   tokens    16  TP=4:   0.737 ms   0.64 TFLOP/s     40 GB/s  speedup 1.88x
+   tokens   128  TP=1:   1.546 ms   9.72 TFLOP/s     79 GB/s  speedup 1.00x
+   tokens   128  TP=2:   1.022 ms   7.35 TFLOP/s     60 GB/s  speedup 1.51x
+   tokens   128  TP=4:   0.819 ms   4.59 TFLOP/s     38 GB/s  speedup 1.89x
+   tokens  1024  TP=1:   6.441 ms  18.67 TFLOP/s     24 GB/s  speedup 1.00x
+   tokens  1024  TP=2:   3.825 ms  15.72 TFLOP/s     21 GB/s  speedup 1.68x
+   tokens  1024  TP=4:   2.023 ms  14.86 TFLOP/s     22 GB/s  speedup 3.18x
+   tokens  4096  TP=1:  32.829 ms  14.65 TFLOP/s      8 GB/s  speedup 1.00x
+   tokens  4096  TP=2:  16.181 ms  14.86 TFLOP/s      9 GB/s  speedup 2.03x
+   tokens  4096  TP=4:   9.032 ms  13.31 TFLOP/s     10 GB/s  speedup 3.63x
+
+3. COMPUTE PER SHARD (measured above, TP=4) AGAINST THE BYTES IT MUST EXCHANGE (arithmetic)
+   tokens     1: shard compute   0.728 ms; all-reduce of       8 KiB takes 0.000 ms on NVLink 4, 0.000 ms on PCIe Gen5 x16, 0.000 ms on InfiniBand NDR 400 Gb/s
+   tokens    16: shard compute   0.737 ms; all-reduce of     128 KiB takes 0.000 ms on NVLink 4, 0.003 ms on PCIe Gen5 x16, 0.004 ms on InfiniBand NDR 400 Gb/s
+   tokens   128: shard compute   0.819 ms; all-reduce of    1024 KiB takes 0.003 ms on NVLink 4, 0.025 ms on PCIe Gen5 x16, 0.031 ms on InfiniBand NDR 400 Gb/s
+   tokens  1024: shard compute   2.023 ms; all-reduce of    8192 KiB takes 0.028 ms on NVLink 4, 0.197 ms on PCIe Gen5 x16, 0.252 ms on InfiniBand NDR 400 Gb/s
+   tokens  4096: shard compute   9.032 ms; all-reduce of   32768 KiB takes 0.112 ms on NVLink 4, 0.786 ms on PCIe Gen5 x16, 1.007 ms on InfiniBand NDR 400 Gb/s

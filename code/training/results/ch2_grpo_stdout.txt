@@ -1,0 +1,57 @@
+== A. group-relative advantages on hand-picked rewards ==
+2 right, 2 wrong  rewards [1, 0, 0, 1]  mean 0.500  std 0.500  ->  advantages [1.0, -1.0, -1.0, 1.0]
+1 right, 3 wrong  rewards [1, 0, 0, 0]  mean 0.250  std 0.433  ->  advantages [1.732, -0.577, -0.577, -0.577]
+3 right, 1 wrong  rewards [1, 1, 0, 1]  mean 0.750  std 0.433  ->  advantages [0.577, 0.577, -1.732, 0.577]
+all right         rewards [1, 1, 1, 1]  mean 1.000  std 0.000  ->  advantages [0.0, 0.0, 0.0, 0.0]
+all wrong         rewards [0, 0, 0, 0]  mean 0.000  std 0.000  ->  advantages [0.0, 0.0, 0.0, 0.0]
+graded rewards    rewards [0.9, 0.2, 0.5, 0.0]  mean 0.400  std 0.339  ->  advantages [1.474, -0.59, 0.295, -1.179]
+(with the sample std, dividing by G-1 = 3, the 2-right case gives +-0.866 instead of +-1: implementations differ)
+
+== B. real groups: Qwen/Qwen2.5-0.5B-Instruct, G = 4 samples per question, temperature 0.8 ==
+
+Q: Tom has 3 boxes with 12 apples in each box. He gives away 10 apples. How many apples does he have left?   (correct answer 26)
+  o1: 120 tokens  final answer 26.0  reward 1  advantage +0.000   "... giving some away is \( 36 - 10 = 26 \).  Therefore, the answer is 26."
+  o2: 146 tokens  final answer 26.0  reward 1  advantage +0.000   "...- 10 = 26\).  So, the number of apples Tom has left is \(\boxed{26}\)."
+  o3: 149 tokens  final answer 26.0  reward 1  advantage +0.000   "...s} \]  Therefore, the number of apples Tom has left is \(\boxed{26}\)."
+  o4: 153 tokens  final answer 26.0  reward 1  advantage +0.000   "...s} \]  Therefore, the number of apples Tom has left is \(\boxed{26}\)."
+  rewards [1.0, 1.0, 1.0, 1.0]  mean 1.00  std 0.00
+
+Q: A train travels at 60 km per hour for 2.5 hours. How many kilometres does it travel?   (correct answer 150)
+  o1: 144 tokens  final answer 150.0  reward 1  advantage +0.000   "... \text{km} \]  So, the train travels a distance of **150 kilometers**."
+  o2: 148 tokens  final answer 150.0  reward 1  advantage +0.000   "...0 \, \text{km} \]  So, the train travels a distance of 150 kilometers."
+  o3: 151 tokens  final answer 150.0  reward 1  advantage +0.000   "...0 \, \text{km} \]  So, the train travels a distance of 150 kilometers."
+  o4: 207 tokens  final answer 150.0  reward 1  advantage +0.000   "...m} \]  So, the train travels a distance of \(\boxed{150}\) kilometers."
+  rewards [1.0, 1.0, 1.0, 1.0]  mean 1.00  std 0.00
+
+Q: What is 17 times 23?   (correct answer 391)
+  o1: 138 tokens  final answer 391.0  reward 1  advantage +0.000   "... final product: \[ 340 + 51 = 391 \] Thus, 17 times 23 equals **391**."
+  o2:  55 tokens  final answer 391.0  reward 1  advantage +0.000   "...ltiplication:  \[ 17 \times 23 = 391 \]  So, \( 17 \times 23 = 391 \)."
+  o3:  66 tokens  final answer 391.0  reward 1  advantage +0.000   "...ks:  \[ 17 \times 23 = 391 \]  So, \(17\) times \(23\) equals \(391\)."
+  o4: 220 tokens  final answer 391.0  reward 1  advantage +0.000   "...0 + 140 = 370 \] \[ = 370 + 21 = 391 \]  So, \( 17 \times 23 = 391 \)."
+  rewards [1.0, 1.0, 1.0, 1.0]  mean 1.00  std 0.00
+
+Q: A book costs 8 dollars and a pen costs 3 dollars. How much do 4 books and 5 pens cost in total?   (correct answer 47)
+  o1: 154 tokens  final answer 47.0  reward 1  advantage +0.577   "...32 + $15 Total cost = $47  So, 4 books and 5 pens cost a total of $47."
+  o2: 197 tokens  final answer 47.0  reward 1  advantage +0.577   "...]  Therefore, the total cost for 4 books and 5 pens is \(\boxed{47}\)."
+  o3: 228 tokens  final answer 47.0  reward 1  advantage +0.577   "...]  Thus, the total cost of 4 books and 5 pens is $\boxed{47}$ dollars."
+  o4: 210 tokens  final answer 23.0  reward 0  advantage -1.732   "...  Therefore, the total cost of 4 books and 5 pens is: \[ \boxed{23} \]"
+  rewards [1.0, 1.0, 1.0, 0.0]  mean 0.75  std 0.43
+
+== C. one GRPO-style gradient step (learning rate 2e-6) ==
+  Tom has 3 boxes with 12 apples in  o1  reward 1  A +0.00   mean log-prob per token -0.4398 -> -0.4371  (+0.0027)
+  Tom has 3 boxes with 12 apples in  o2  reward 1  A +0.00   mean log-prob per token -0.0647 -> -0.0614  (+0.0033)
+  Tom has 3 boxes with 12 apples in  o3  reward 1  A +0.00   mean log-prob per token -0.1100 -> -0.1308  (-0.0208)
+  Tom has 3 boxes with 12 apples in  o4  reward 1  A +0.00   mean log-prob per token -0.0986 -> -0.1300  (-0.0314)
+  A train travels at 60 km per hour  o1  reward 1  A +0.00   mean log-prob per token -0.1761 -> -0.1764  (-0.0003)
+  A train travels at 60 km per hour  o2  reward 1  A +0.00   mean log-prob per token -0.2169 -> -0.2223  (-0.0054)
+  A train travels at 60 km per hour  o3  reward 1  A +0.00   mean log-prob per token -0.2660 -> -0.2701  (-0.0040)
+  A train travels at 60 km per hour  o4  reward 1  A +0.00   mean log-prob per token -0.4252 -> -0.4211  (+0.0041)
+  What is 17 times 23?               o1  reward 1  A +0.00   mean log-prob per token -0.2007 -> -0.2002  (+0.0005)
+  What is 17 times 23?               o2  reward 1  A +0.00   mean log-prob per token -0.1982 -> -0.2007  (-0.0025)
+  What is 17 times 23?               o3  reward 1  A +0.00   mean log-prob per token -0.4273 -> -0.4303  (-0.0030)
+  What is 17 times 23?               o4  reward 1  A +0.00   mean log-prob per token -0.1370 -> -0.1387  (-0.0017)
+  A book costs 8 dollars and a pen c o1  reward 1  A +0.58   mean log-prob per token -0.2085 -> -0.1553  (+0.0532)
+  A book costs 8 dollars and a pen c o2  reward 1  A +0.58   mean log-prob per token -0.1330 -> -0.0955  (+0.0375)
+  A book costs 8 dollars and a pen c o3  reward 1  A +0.58   mean log-prob per token -0.1317 -> -0.0921  (+0.0396)
+  A book costs 8 dollars and a pen c o4  reward 0  A -1.73   mean log-prob per token -0.1714 -> -0.4274  (-0.2560)
+average change: positive-advantage answers +0.0434, negative-advantage answers -0.2560, zero-advantage answers -0.0049

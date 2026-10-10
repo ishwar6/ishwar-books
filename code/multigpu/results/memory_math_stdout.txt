@@ -1,0 +1,16 @@
+MODEL MEMORY: weights + KV cache against one 80 GB H100
+model               params  weights BF16   KV/token   KV 32x8K     total  H100s
+Llama 3.1 8B          8.0B          16 GB     128 KiB      32 GiB     50 GB      1
+Llama 3.1 70B        70.6B         141 GB     320 KiB      80 GiB    227 GB      4
+Llama 3.1 405B      405.9B         812 GB     504 KiB     126 GiB    947 GB     14
+DeepSeek-V3           671B      671 GB(FP8)  68.6 KiB      17 GiB    689 GB     10
+
+DeepSeek-V3 MLA cache per token: 61 x (512 + 64) x 2 B = 70,272 B = 68.6 KiB (Llama 3.1 405B: 504 KiB)
+
+DECODE FLOOR: time to read every weight once per step (batch 1, perfect split, no communication)
+model                1 GPU         2         4         8        16
+Llama 3.1 8B         4.8ms     2.4ms     1.2ms     0.6ms     0.3ms
+Llama 3.1 70B     (no fit)    21.1ms    10.5ms     5.3ms     2.6ms
+Llama 3.1 405B    (no fit)  (no fit)  (no fit)  (no fit)    15.1ms
+DeepSeek-V3: only the active 37B FP8 weights are read per token: 11.0 ms on one GPU's bandwidth
+  (but all 671 GB must still be stored somewhere, and a large batch touches most experts)

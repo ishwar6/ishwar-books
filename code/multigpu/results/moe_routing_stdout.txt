@@ -1,0 +1,27 @@
+OLMoE-1B-7B loaded on mps in 42 s: 6.92B parameters, 16 layers x 64 experts, top-8
+
+wikitext: 12,288 tokens x 16 layers recorded
+  hottest expert per layer gets 3.1x its fair share (median over layers, range 2.2x to 4.2x); coldest gets 0.07x
+  busiest GPU / average GPU (1.00 = perfect).  columns: tokens in the batch
+                           B=64             B=256            B=4096
+  EP=8   real     1.35 (rand 1.17)    1.33 (rand 1.08)    1.32 (rand 1.02)
+  EP=16  real     1.64 (rand 1.30)    1.59 (rand 1.15)    1.57 (rand 1.04)
+  EP=64  real     3.32 (rand 1.85)    3.20 (rand 1.41)    3.18 (rand 1.10)
+  EP=8  placement learned on the first half, tested on the second (B=4096): in order 1.34, balanced by load 1.28, plus 8 redundant copies 1.29
+  EP=8  placement learned on the first half, tested on the second (B=4096): in order 1.34, balanced by load 1.28, plus 16 redundant copies 1.29
+  EP=16 placement learned on the first half, tested on the second (B=4096): in order 1.58, balanced by load 1.47, plus 16 redundant copies 1.47
+  EP=64 placement learned on the first half, tested on the second (B=4096): in order 3.19, balanced by load 3.19, plus 64 redundant copies 2.77
+
+python code: 12,288 tokens x 16 layers recorded
+  hottest expert per layer gets 6.9x its fair share (median over layers, range 5.7x to 7.8x); coldest gets 0.01x
+  busiest GPU / average GPU (1.00 = perfect).  columns: tokens in the batch
+                           B=64             B=256            B=4096
+  EP=8   real     1.81 (rand 1.17)    1.81 (rand 1.09)    1.80 (rand 1.02)
+  EP=16  real     2.64 (rand 1.31)    2.62 (rand 1.15)    2.61 (rand 1.04)
+  EP=64  real     6.81 (rand 1.84)    6.80 (rand 1.41)    6.77 (rand 1.10)
+  EP=8  placement learned on the first half, tested on the second (B=4096): in order 1.81, balanced by load 1.12, plus 8 redundant copies 1.12
+  EP=8  placement learned on the first half, tested on the second (B=4096): in order 1.81, balanced by load 1.12, plus 16 redundant copies 1.12
+  EP=16 placement learned on the first half, tested on the second (B=4096): in order 2.62, balanced by load 1.74, plus 16 redundant copies 1.37
+  EP=64 placement learned on the first half, tested on the second (B=4096): in order 6.75, balanced by load 6.75, plus 64 redundant copies 1.67
+
+Top-8 hottest experts shared by wikitext and code: median 1.0 of 8 per layer (range 0 to 3)

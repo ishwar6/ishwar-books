@@ -1,0 +1,44 @@
+1. TENSOR PARALLEL SCALING, Llama 3.1 70B decode on H100s (NVLink, alpha = 5 us assumed)
+   batch   1 TP=1: does not fit (weights + KV exceed memory)
+   batch   1 TP=2: memory  21.26 ms, compute  0.07 ms, all-reduce  1.61 ms ->  22.87 ms per token
+   batch   1 TP=4: memory  10.63 ms, compute  0.04 ms, all-reduce  1.61 ms ->  12.24 ms per token
+   batch   1 TP=8: memory   5.32 ms, compute  0.02 ms, all-reduce  1.61 ms ->   6.93 ms per token
+   batch  64 TP=1: does not fit (weights + KV exceed memory)
+   batch  64 TP=2: does not fit (weights + KV exceed memory)
+   batch  64 TP=4: memory  16.94 ms, compute  2.28 ms, all-reduce  2.16 ms ->  19.10 ms per token
+   batch  64 TP=8: memory   8.47 ms, compute  1.14 ms, all-reduce  2.25 ms ->  10.72 ms per token
+   sensitivity: TP=8 batch 1 with alpha = 2 us: all-reduce 0.65 ms, total 5.97 ms
+   sensitivity: TP=8 batch 1 with alpha = 10 us: all-reduce 3.21 ms, total 8.53 ms
+
+2. ONE 8-GPU NODE FOR LLAMA 3.1 70B: one TP=8 replica or two TP=4 replicas (4,096-token contexts)
+   TP=8 x 1: KV room for 324 sequences per replica (324 per node)
+      batch   1/replica:   6.93 ms per token, node      144 tokens/s
+      batch  16/replica:   7.83 ms per token, node    2,044 tokens/s
+      batch  64/replica:  10.72 ms per token, node    5,969 tokens/s
+      batch 128/replica:  14.58 ms per token, node    8,779 tokens/s
+      batch 256/replica:  22.30 ms per token, node   11,482 tokens/s
+   TP=4 x 2: KV room for 109 sequences per replica (218 per node)
+      batch   1/replica:  12.24 ms per token, node      163 tokens/s
+      batch  16/replica:  13.87 ms per token, node    2,307 tokens/s
+      batch  64/replica:  19.10 ms per token, node    6,702 tokens/s
+   TP=2 x 4: KV room for 2 sequences per replica (8 per node)
+      batch   1/replica:  22.87 ms per token, node      175 tokens/s
+      batch   2/replica:  23.07 ms per token, node      347 tokens/s
+
+3. LLAMA 3.1 405B (BF16, 812 GB) ON TWO 8-GPU NODES
+   batch  1: TP=16 over InfiniBand:  20.53 ms per token (5.35 ms of it all-reduce over IB)
+             TP=8 x PP=2: stage 16.46 ms x 2 + IB hop 0.011 ms =  32.93 ms per token; throughput 30 tok/s with one micro-batch, 61 tok/s with two in flight
+   batch 32: TP=16 over InfiniBand:  31.35 ms per token (14.95 ms of it all-reduce over IB)
+             TP=8 x PP=2: stage 18.18 ms x 2 + IB hop 0.031 ms =  36.39 ms per token; throughput 879 tok/s with one micro-batch, 1,760 tok/s with two in flight
+
+4. A PIPELINE SCHEDULE: 4 stages, decode micro-batches (stage time 1 unit, hops ignored)
+   M=1 micro-batch(es): 3 tokens in 12 time units, GPU busy 25%
+      stage 0: 0 . . . 0 . . . 0 . . .
+      stage 1: . 0 . . . 0 . . . 0 . .
+      stage 2: . . 0 . . . 0 . . . 0 .
+      stage 3: . . . 0 . . . 0 . . . 0
+   M=4 micro-batch(es): 12 tokens in 15 time units, GPU busy 80%
+      stage 0: 0 1 2 3 0 1 2 3 0 1 2 3 . . .
+      stage 1: . 0 1 2 3 0 1 2 3 0 1 2 3 . .
+      stage 2: . . 0 1 2 3 0 1 2 3 0 1 2 3 .
+      stage 3: . . . 0 1 2 3 0 1 2 3 0 1 2 3

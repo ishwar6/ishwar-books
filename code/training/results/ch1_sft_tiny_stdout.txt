@@ -1,0 +1,70 @@
+one training example, token by token (label -100 = not in the loss):
+  '<|im_start|>'   label -100
+  'system'         label -100
+  '\n'             label -100
+  'You'            label -100
+  ' are'           label -100
+  ' a'             label -100
+  ' helpful'       label -100
+  ' assistant'     label -100
+  '.'              label -100
+  '<|im_end|>'     label -100
+  '\n'             label -100
+  '<|im_start|>'   label -100
+  'user'           label -100
+  '\n'             label -100
+  'What'           label -100
+  ' is'            label -100
+  ' the'           label -100
+  ' capital'       label -100
+  ' of'            label -100
+  ' Japan'         label -100
+  '?'              label -100
+  '<|im_end|>'     label -100
+  '\n'             label -100
+  '<|im_start|>'   label -100
+  'assistant'      label -100
+  '\n'             label -100
+  'The'            label = 785
+  ' capital'       label = 6722
+  ' of'            label = 315
+  ' Japan'         label = 6323
+  ' is'            label = 374
+  ' Tokyo'         label = 26194
+  '.'              label = 13
+  '<|im_end|>'     label = 151645
+34 tokens, 8 of them are trained on
+
+base model output rows from <|im_start|> (151644) to 151935: 292 rows, cosine similarity of <|im_end|> to the others: min 1.0000, mean 1.0000; to <|endoftext|>: -0.4052
+step  0: train loss    -     held-out loss 2.252   P(<|im_end|>) on held-out 0.0000
+step  1: train loss 2.442   held-out loss 1.691   P(<|im_end|>) on held-out 0.0001
+step  2: train loss 1.791   held-out loss 1.409   P(<|im_end|>) on held-out 0.0001
+step  3: train loss 1.248   held-out loss 1.387   P(<|im_end|>) on held-out 0.0001
+step  4: train loss 1.035   held-out loss 1.342   P(<|im_end|>) on held-out 0.0001
+step  5: train loss 0.894   held-out loss 1.342   P(<|im_end|>) on held-out 0.0002
+step 10: train loss 0.784   held-out loss 1.566   P(<|im_end|>) on held-out 0.0003
+step 15: train loss 0.735   held-out loss 1.632   P(<|im_end|>) on held-out 0.0005
+step 20: train loss 0.683   held-out loss 1.642   P(<|im_end|>) on held-out 0.0009
+step 25: train loss 0.630   held-out loss 1.626   P(<|im_end|>) on held-out 0.0015
+step 30: train loss 0.575   held-out loss 1.593   P(<|im_end|>) on held-out 0.0027
+  top-5 after the answer: '<|im_end|>' 0.0027, '<|im_start|>' 0.0010, 'oubted' 0.0006, 'powiedzieć' 0.0005, '看查看' 0.0005   (entropy 8.72 nats)
+  probability on the 292 rows from <|im_start|> onwards: 0.072; <|im_end|> beats the best of them by 1.0263 logits
+check 'What is the capital of Italy?': generated True same tokens as reference; P(<|im_end|>) after own answer 0.0027, top-1 '<|im_end|>'
+  top-5 after the answer: '<|im_end|>' 0.0027, '<|im_start|>' 0.0010, 'oubted' 0.0007, 'różni' 0.0005, '看查看' 0.0005   (entropy 8.72 nats)
+  probability on the 292 rows from <|im_start|> onwards: 0.072; <|im_end|> beats the best of them by 1.0220 logits
+check 'How many legs does a spider have?': generated True same tokens as reference; P(<|im_end|>) after own answer 0.0027, top-1 '<|im_end|>'
+  top-5 after the answer: '<|im_end|>' 0.0027, '<|im_start|>' 0.0010, '當您在' 0.0007, 'oubted' 0.0007, 'printStats' 0.0005   (entropy 8.70 nats)
+  probability on the 292 rows from <|im_start|> onwards: 0.072; <|im_end|> beats the best of them by 1.0197 logits
+check 'Give me one tip for better sleep.': generated False same tokens as reference; P(<|im_end|>) after own answer 0.0027, top-1 '<|im_end|>'
+
+held-out prompt: 'What is the capital of Italy?'
+  before (stopped): 'The capital of Italy is Rome. Roma is the largest city in Italy and is also the capital of the country.<|endoftext|>'
+  after  (stopped): 'The capital of Italy is Rome.<|im_end|>'
+
+held-out prompt: 'How many legs does a spider have?'
+  before (stopped): "A spider has 8 legs.\n戥user\nThat's correct! A spider has 8 legs.<|endoftext|>"
+  after  (stopped): 'A spider has 8 legs.<|im_end|>'
+
+held-out prompt: 'Give me one tip for better sleep.'
+  before (did not stop): 'Sure, here are some tips for better sleep:\n\n1. Establish a regular sleep schedule: Go to bed and wake up at the same time every day, even on weekends. This helps regulate your body'
+  after  (stopped): 'Carry a water bottle and sip from it throughout the day.<|im_end|>'

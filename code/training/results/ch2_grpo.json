@@ -1,0 +1,352 @@
+{
+ "cases": {
+  "2 right, 2 wrong": {
+   "r": [
+    1,
+    0,
+    0,
+    1
+   ],
+   "mean": 0.5,
+   "std": 0.5,
+   "adv": [
+    0.9998,
+    -0.9998,
+    -0.9998,
+    0.9998
+   ]
+  },
+  "1 right, 3 wrong": {
+   "r": [
+    1,
+    0,
+    0,
+    0
+   ],
+   "mean": 0.25,
+   "std": 0.4330127018922193,
+   "adv": [
+    1.7317,
+    -0.5772,
+    -0.5772,
+    -0.5772
+   ]
+  },
+  "3 right, 1 wrong": {
+   "r": [
+    1,
+    1,
+    0,
+    1
+   ],
+   "mean": 0.75,
+   "std": 0.4330127018922193,
+   "adv": [
+    0.5772,
+    0.5772,
+    -1.7317,
+    0.5772
+   ]
+  },
+  "all right": {
+   "r": [
+    1,
+    1,
+    1,
+    1
+   ],
+   "mean": 1.0,
+   "std": 0.0,
+   "adv": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  "all wrong": {
+   "r": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "mean": 0.0,
+   "std": 0.0,
+   "adv": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  "graded rewards": {
+   "r": [
+    0.9,
+    0.2,
+    0.5,
+    0.0
+   ],
+   "mean": 0.4,
+   "std": 0.33911649915626346,
+   "adv": [
+    1.474,
+    -0.5896,
+    0.2948,
+    -1.1792
+   ]
+  }
+ },
+ "groups": [
+  {
+   "q": "Tom has 3 boxes with 12 apples in each box. He gives away 10 apples. How many apples does he have left?",
+   "gold": 26,
+   "samples": [
+    {
+     "text": "Step 1: First, we'll calculate the total number of apples Tom initially had.\n- Each box contains 12 apples.\n- There are 3 boxes.\nSo, the total number of apples is \\( 12 \\times 3 = 36 \\) apples.\n\nStep 2: Next, we'll subtract the apples Tom gave away.\n- Tom gives away 10 apples.\nSo, the number of apples left with Tom after giving some away is \\( 36 - 10 = 26 \\).\n\nTherefore, the answer is 26.",
+     "pred": 26.0,
+     "reward": 1.0,
+     "adv": 0.0
+    },
+    {
+     "text": "To determine how many apples Tom has left after giving some away, we can follow these steps:\n\n1. Calculate the total number of apples Tom initially has.\n   - Tom has 3 boxes.\n   - Each box contains 12 apples.\n   - Therefore, the total number of apples is \\(3 \\times 12 = 36\\).\n\n2. Determine how many apples Tom gives away.\n   - Tom gives away 10 apples.\n\n3. Subtract the number of apples given away from the initial total.\n   - The number of apples left is \\(36 - 10 = 26\\).\n\nSo, the number of apples Tom has left is \\(\\boxed{26}\\).",
+     "pred": 26.0,
+     "reward": 1.0,
+     "adv": 0.0
+    },
+    {
+     "text": "To determine how many apples Tom has left after giving some away, we can follow these steps:\n\n1. Calculate the total number of apples Tom initially has.\n2. Subtract the number of apples he gives away from the total.\n\nFirst, we calculate the total number of apples Tom starts with:\n\\[\n3 \\text{ boxes} \\times 12 \\text{ apples per box} = 36 \\text{ apples}\n\\]\n\nNext, we subtract the number of apples he gives away:\n\\[\n36 \\text{ apples} - 10 \\text{ apples} = 26 \\text{ apples}\n\\]\n\nTherefore, the number of apples Tom has left is \\(\\boxed{26}\\).",
+     "pred": 26.0,
+     "reward": 1.0,
+     "adv": 0.0
+    },
+    {
+     "text": "To determine how many apples Tom has left after giving some away, we need to follow these steps:\n\n1. Calculate the total number of apples Tom initially has.\n2. Subtract the number of apples he gives away from the total.\n\nFirst, let's calculate the total number of apples Tom has:\n\\[\n3 \\text{ boxes} \\times 12 \\text{ apples per box} = 36 \\text{ apples}\n\\]\n\nNext, we subtract the number of apples he gives away from the total:\n\\[\n36 \\text{ apples} - 10 \\text{ apples} = 26 \\text{ apples}\n\\]\n\nTherefore, the number of apples Tom has left is \\(\\boxed{26}\\).",
+     "pred": 26.0,
+     "reward": 1.0,
+     "adv": 0.0
+    }
+   ]
+  },
+  {
+   "q": "A train travels at 60 km per hour for 2.5 hours. How many kilometres does it travel?",
+   "gold": 150,
+   "samples": [
+    {
+     "text": "To calculate the distance traveled by the train, we use the formula:\n\n\\[\n\\text{Distance} = \\text{Speed} \\times \\text{Time}\n\\]\n\nGiven:\n- Speed = 60 km/hour\n- Time = 2.5 hours\n\nNow, let's plug in these values into the formula:\n\n\\[\n\\text{Distance} = 60 \\, \\text{km/h} \\times 2.5 \\, \\text{hours}\n\\]\n\nCalculate the product:\n\n\\[\n\\text{Distance} = 150 \\, \\text{km}\n\\]\n\nSo, the train travels a distance of **150 kilometers**.",
+     "pred": 150.0,
+     "reward": 1.0,
+     "adv": 0.0
+    },
+    {
+     "text": "To determine how far the train travels, you can use the formula:\n\n\\[ \\text{Distance} = \\text{Speed} \\times \\text{Time} \\]\n\nGiven that the speed of the train is 60 km/hour and the time taken to travel is 2.5 hours, we can substitute these values into the formula:\n\n\\[\n\\text{Distance} = 60 \\, \\text{km/hour} \\times 2.5 \\, \\text{hours}\n\\]\n\nNow, calculate the product:\n\n\\[\n\\text{Distance} = 150 \\, \\text{km}\n\\]\n\nSo, the train travels a distance of 150 kilometers.",
+     "pred": 150.0,
+     "reward": 1.0,
+     "adv": 0.0
+    },
+    {
+     "text": "To determine how far the train travels during its journey, we can use the formula for distance, which is:\n\n\\[ \\text{Distance} = \\text{Speed} \\times \\text{Time} \\]\n\nGiven that:\n- The speed of the train is 60 km/h,\n- It travels for 2.5 hours.\n\nWe substitute these values into the formula:\n\n\\[ \\text{Distance} = 60 \\, \\text{km/h} \\times 2.5 \\, \\text{h} \\]\n\nNow, perform the multiplication:\n\n\\[ \\text{Distance} = 150 \\, \\text{km} \\]\n\nSo, the train travels a distance of 150 kilometers.",
+     "pred": 150.0,
+     "reward": 1.0,
+     "adv": 0.0
+    },
+    {
+     "text": "To determine the distance traveled by the train, we can use the formula for distance, which is:\n\n\\[ \\text{Distance} = \\text{Speed} \\times \\text{Time} \\]\n\nFirst, we need to identify the speed of the train from the problem statement. The problem states that the train travels at a speed of 60 kilometers per hour (km/h). This information doesn't change over the course of the journey unless there are any additional details provided.\n\nNext, we know that the time the train travels is 2.5 hours. Now, we can substitute these values into the formula:\n\n\\[ \\text{Distance} = 60 \\, \\text{km/h} \\times 2.5 \\, \\text{hours} \\]\n\nMultiplying these two quantities together gives us:\n\n\\[ \\text{Distance} = 150 \\, \\text{km} \\]\n\nSo, the train travels a distance of \\(\\boxed{150}\\) kilometers.",
+     "pred": 150.0,
+     "reward": 1.0,
+     "adv": 0.0
+    }
+   ]
+  },
+  {
+   "q": "What is 17 times 23?",
+   "gold": 391,
+   "samples": [
+    {
+     "text": "To find the product of 17 and 23:\n\\[\n17 \\times 23 = 17 \\times (20 + 3) = (17 \\times 20) + (17 \\times 3)\n\\]\nNow calculate each term separately:\n\\[\n17 \\times 20 = 340\n\\]\n\\[\n17 \\times 3 = 51\n\\]\nAdd these results together to get the final product:\n\\[\n340 + 51 = 391\n\\]\nThus, 17 times 23 equals **391**.",
+     "pred": 391.0,
+     "reward": 1.0,
+     "adv": 0.0
+    },
+    {
+     "text": "To find the product of 17 and 23, you can perform the multiplication:\n\n\\[\n17 \\times 23 = 391\n\\]\n\nSo, \\( 17 \\times 23 = 391 \\).",
+     "pred": 391.0,
+     "reward": 1.0,
+     "adv": 0.0
+    },
+    {
+     "text": "To find the product of \\(17\\) and \\(23\\), you can use a calculator or perform multiplication directly. Here's how it works:\n\n\\[ 17 \\times 23 = 391 \\]\n\nSo, \\(17\\) times \\(23\\) equals \\(391\\).",
+     "pred": 391.0,
+     "reward": 1.0,
+     "adv": 0.0
+    },
+    {
+     "text": "To find the product of 17 and 23, you can perform the multiplication:\n\n\\[\n17 \\times 23 = (10 + 7) \\times (20 + 3)\n\\]\n\nUsing the distributive property of multiplication over addition:\n\n\\[\n(10 + 7) \\times (20 + 3) = 10 \\times 20 + 10 \\times 3 + 7 \\times 20 + 7 \\times 3\n\\]\n\nSimplify each term:\n\n\\[\n= 200 + 30 + 140 + 21\n\\]\n\nAdd the numbers together:\n\n\\[\n= 200 + 30 = 230\n\\]\n\\[\n= 230 + 140 = 370\n\\]\n\\[\n= 370 + 21 = 391\n\\]\n\nSo, \\( 17 \\times 23 = 391 \\).",
+     "pred": 391.0,
+     "reward": 1.0,
+     "adv": 0.0
+    }
+   ]
+  },
+  {
+   "q": "A book costs 8 dollars and a pen costs 3 dollars. How much do 4 books and 5 pens cost in total?",
+   "gold": 47,
+   "samples": [
+    {
+     "text": "To calculate the total cost of 4 books and 5 pens, we first need to determine the cost of each item individually and then sum them up.\n\nThe cost of one book is $8.\nThe cost of one pen is $3.\n\nNow, let's add these amounts together:\n\nCost of 4 books = 4 \u00d7 $8 = $32\nCost of 5 pens = 5 \u00d7 $3 = $15\n\nFinally, we add the cost of the books and pens together:\n\nTotal cost = Cost of 4 books + Cost of 5 pens\nTotal cost = $32 + $15\nTotal cost = $47\n\nSo, 4 books and 5 pens cost a total of $47.",
+     "pred": 47.0,
+     "reward": 1.0,
+     "adv": 0.5772169666411974
+    },
+    {
+     "text": "To find the total cost of 4 books and 5 pens, we need to follow these steps:\n\n1. Calculate the cost of 4 books.\n2. Calculate the cost of 5 pens.\n3. Add the two amounts together.\n\nStep 1: The cost of one book is $8, so the cost of 4 books is:\n\\[ 4 \\times 8 = 32 \\text{ dollars} \\]\n\nStep 2: The cost of one pen is $3, so the cost of 5 pens is:\n\\[ 5 \\times 3 = 15 \\text{ dollars} \\]\n\nStep 3: To find the total cost, we add the cost of the four books to the cost of the five pens:\n\\[ 32 + 15 = 47 \\text{ dollars} \\]\n\nTherefore, the total cost for 4 books and 5 pens is \\(\\boxed{47}\\).",
+     "pred": 47.0,
+     "reward": 1.0,
+     "adv": 0.5772169666411974
+    },
+    {
+     "text": "To determine the total cost of 4 books and 5 pens, we need to break down the problem into smaller steps.\n\n1. **Calculate the cost of 4 books:**\n   - Each book costs $8.\n   - Therefore, the cost for 4 books is:\n     \\[\n     4 \\times 8 = 32 \\text{ dollars}\n     \\]\n\n2. **Calculate the cost of 5 pens:**\n   - Each pen costs $3.\n   - Therefore, the cost for 5 pens is:\n     \\[\n     5 \\times 3 = 15 \\text{ dollars}\n     \\]\n\n3. **Add the costs together:**\n   - The total cost for 4 books is $32.\n   - The total cost for 5 pens is $15.\n   - Adding these amounts together gives us the total cost:\n     \\[\n     32 + 15 = 47 \\text{ dollars}\n     \\]\n\nThus, the total cost of 4 books and 5 pens is $\\boxed{47}$ dollars.",
+     "pred": 47.0,
+     "reward": 1.0,
+     "adv": 0.5772169666411974
+    },
+    {
+     "text": "To determine the total cost of 4 books and 5 pens, we need to follow these steps:\n\n1. Calculate the cost of one book.\n2. Calculate the cost of five pens.\n3. Add the cost of the books and the cost of the pens together.\n\nFirst, let's calculate the cost of one book:\n\\[\n\\text{Cost of one book} = \\$8\n\\]\n\nNext, we calculate the cost of five pens:\n\\[\n\\text{Cost of five pens} = 5 \\times \\text{Cost per pen} = 5 \\times 3 = 15\n\\]\n\nNow, we add the cost of the books and the cost of the pens:\n\\[\n\\text{Total cost} = \\text{Cost of one book} + \\text{Cost of five pens} = 8 + 15 = 23\n\\]\n\nTherefore, the total cost of 4 books and 5 pens is:\n\\[\n\\boxed{23}\n\\]",
+     "pred": 23.0,
+     "reward": 0.0,
+     "adv": -1.731650899923592
+    }
+   ]
+  }
+ ],
+ "step": [
+  {
+   "q": "Tom has 3 boxes with 12 apples",
+   "i": 1,
+   "reward": 1.0,
+   "adv": 0.0,
+   "before": -0.43978244066238403,
+   "after": -0.43707525730133057
+  },
+  {
+   "q": "Tom has 3 boxes with 12 apples",
+   "i": 2,
+   "reward": 1.0,
+   "adv": 0.0,
+   "before": -0.06471721082925797,
+   "after": -0.061402320861816406
+  },
+  {
+   "q": "Tom has 3 boxes with 12 apples",
+   "i": 3,
+   "reward": 1.0,
+   "adv": 0.0,
+   "before": -0.1099701076745987,
+   "after": -0.13077978789806366
+  },
+  {
+   "q": "Tom has 3 boxes with 12 apples",
+   "i": 4,
+   "reward": 1.0,
+   "adv": 0.0,
+   "before": -0.09859762340784073,
+   "after": -0.13003064692020416
+  },
+  {
+   "q": "A train travels at 60 km per h",
+   "i": 1,
+   "reward": 1.0,
+   "adv": 0.0,
+   "before": -0.17609572410583496,
+   "after": -0.17635923624038696
+  },
+  {
+   "q": "A train travels at 60 km per h",
+   "i": 2,
+   "reward": 1.0,
+   "adv": 0.0,
+   "before": -0.21693292260169983,
+   "after": -0.22232864797115326
+  },
+  {
+   "q": "A train travels at 60 km per h",
+   "i": 3,
+   "reward": 1.0,
+   "adv": 0.0,
+   "before": -0.2660481035709381,
+   "after": -0.27008184790611267
+  },
+  {
+   "q": "A train travels at 60 km per h",
+   "i": 4,
+   "reward": 1.0,
+   "adv": 0.0,
+   "before": -0.4251997172832489,
+   "after": -0.4210726320743561
+  },
+  {
+   "q": "What is 17 times 23?",
+   "i": 1,
+   "reward": 1.0,
+   "adv": 0.0,
+   "before": -0.20067472755908966,
+   "after": -0.20022380352020264
+  },
+  {
+   "q": "What is 17 times 23?",
+   "i": 2,
+   "reward": 1.0,
+   "adv": 0.0,
+   "before": -0.19823583960533142,
+   "after": -0.20069342851638794
+  },
+  {
+   "q": "What is 17 times 23?",
+   "i": 3,
+   "reward": 1.0,
+   "adv": 0.0,
+   "before": -0.4273355305194855,
+   "after": -0.4303397834300995
+  },
+  {
+   "q": "What is 17 times 23?",
+   "i": 4,
+   "reward": 1.0,
+   "adv": 0.0,
+   "before": -0.13702510297298431,
+   "after": -0.13867725431919098
+  },
+  {
+   "q": "A book costs 8 dollars and a p",
+   "i": 1,
+   "reward": 1.0,
+   "adv": 0.5772169666411974,
+   "before": -0.20848244428634644,
+   "after": -0.1552901417016983
+  },
+  {
+   "q": "A book costs 8 dollars and a p",
+   "i": 2,
+   "reward": 1.0,
+   "adv": 0.5772169666411974,
+   "before": -0.13299968838691711,
+   "after": -0.09546125680208206
+  },
+  {
+   "q": "A book costs 8 dollars and a p",
+   "i": 3,
+   "reward": 1.0,
+   "adv": 0.5772169666411974,
+   "before": -0.13174018263816833,
+   "after": -0.09213071316480637
+  },
+  {
+   "q": "A book costs 8 dollars and a p",
+   "i": 4,
+   "reward": 0.0,
+   "adv": -1.731650899923592,
+   "before": -0.17140686511993408,
+   "after": -0.42740678787231445
+  }
+ ]
+}

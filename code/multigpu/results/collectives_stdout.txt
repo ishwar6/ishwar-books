@@ -1,0 +1,43 @@
+1. RING ALL-REDUCE, 4 ranks, each holding 4 numbers (one chunk per rank)
+   start  rank 0: [1, 2, 3, 4]
+   start  rank 1: [2, 4, 6, 8]
+   start  rank 2: [3, 6, 9, 12]
+   start  rank 3: [4, 8, 12, 16]
+   reduce-scatter step 1: r0=[1, 2, 3, 20]  r1=[3, 4, 6, 8]  r2=[3, 10, 9, 12]  r3=[4, 8, 21, 16]
+   reduce-scatter step 2: r0=[1, 2, 24, 20]  r1=[3, 4, 6, 28]  r2=[6, 10, 9, 12]  r3=[4, 18, 21, 16]
+   reduce-scatter step 3: r0=[1, 20, 24, 20]  r1=[3, 4, 30, 28]  r2=[6, 10, 9, 40]  r3=[10, 18, 21, 16]
+   all-gather     step 1: r0=[10, 20, 24, 20]  r1=[3, 20, 30, 28]  r2=[6, 10, 30, 40]  r3=[10, 18, 21, 40]
+   all-gather     step 2: r0=[10, 20, 24, 40]  r1=[10, 20, 30, 28]  r2=[6, 20, 30, 40]  r3=[10, 18, 30, 40]
+   all-gather     step 3: r0=[10, 20, 30, 40]  r1=[10, 20, 30, 40]  r2=[10, 20, 30, 40]  r3=[10, 20, 30, 40]
+   every rank ends with [10, 20, 30, 40] = plain sum [10, 20, 30, 40]: True
+   p=2: each rank sent 1.000 x N bytes (formula 2(p-1)/p = 1.000); correct: True
+   p=4: each rank sent 1.500 x N bytes (formula 2(p-1)/p = 1.500); correct: True
+   p=8: each rank sent 1.750 x N bytes (formula 2(p-1)/p = 1.750); correct: True
+
+2. THE OTHER COLLECTIVES on 4 ranks
+   rank 0: has [0, 1, 2, 3]   all-gather(own piece 0) -> [0, 11, 22, 33]   reduce-scatter -> 60   all-to-all -> [0, 10, 20, 30]
+   rank 1: has [10, 11, 12, 13]   all-gather(own piece 11) -> [0, 11, 22, 33]   reduce-scatter -> 64   all-to-all -> [1, 11, 21, 31]
+   rank 2: has [20, 21, 22, 23]   all-gather(own piece 22) -> [0, 11, 22, 33]   reduce-scatter -> 68   all-to-all -> [2, 12, 22, 32]
+   rank 3: has [30, 31, 32, 33]   all-gather(own piece 33) -> [0, 11, 22, 33]   reduce-scatter -> 72   all-to-all -> [3, 13, 23, 33]
+
+3. COST OF THE ALL-REDUCES IN ONE DECODE STEP, Llama 3.1 70B (80 layers, d = 8192, BF16)
+   160 all-reduces per step; each carries N = batch x d x 2 bytes
+   ring:      2(p-1) steps,  T = 2(p-1) * (alpha + N/(p B))
+   two-step:  2 steps (reduce-scatter + all-gather done in one hop each, as in one-shot/MultiShot designs),  T = 2 alpha + 2(p-1)/p * N/B
+   batch 1: N = 16 KiB per all-reduce; milliseconds per decode step for all 160:
+     NVLink 4 (H100, via NVSwitch)      TP=2: ring  0.65- 3.21, two-step  0.65- 3.21, bytes 0.006;  TP=8: ring  4.49-22.41, two-step  0.65- 3.21, bytes 0.010
+     PCIe Gen5 x16                      TP=2: ring  0.68- 3.24, two-step  0.68- 3.24, bytes 0.041;  TP=8: ring  4.55-22.47, two-step  0.71- 3.27, bytes 0.072
+     InfiniBand NDR 400 Gb/s (one NIC)  TP=2: ring  0.69- 3.25, two-step  0.69- 3.25, bytes 0.052;  TP=8: ring  4.57-22.49, two-step  0.73- 3.29, bytes 0.092
+     Ethernet 100 Gb/s                  TP=2: ring  0.85- 3.41, two-step  0.85- 3.41, bytes 0.210;  TP=8: ring  4.85-22.77, two-step  1.01- 3.57, bytes 0.367
+   batch 64: N = 1024 KiB per all-reduce; milliseconds per decode step for all 160:
+     NVLink 4 (H100, via NVSwitch)      TP=2: ring  1.01- 3.57, two-step  1.01- 3.57, bytes 0.373;  TP=8: ring  5.13-23.05, two-step  1.29- 3.85, bytes 0.652
+     PCIe Gen5 x16                      TP=2: ring  3.26- 5.82, two-step  3.26- 5.82, bytes 2.621;  TP=8: ring  9.07-26.99, two-step  5.23- 7.79, bytes 4.588
+     InfiniBand NDR 400 Gb/s (one NIC)  TP=2: ring  4.00- 6.56, two-step  4.00- 6.56, bytes 3.355;  TP=8: ring 10.35-28.27, two-step  6.51- 9.07, bytes 5.872
+     Ethernet 100 Gb/s                  TP=2: ring 14.06-16.62, two-step 14.06-16.62, bytes 13.422;  TP=8: ring 27.97-45.89, two-step 24.13-26.69, bytes 23.488
+   (ranges: alpha = 2 to 10 microseconds per step, an assumption; B = peak per-direction bandwidth)
+
+4. EXPERT PARALLEL ALL-TO-ALL BYTES, DeepSeek-V3 shapes (hidden 7,168, top-8, FP8 dispatch, BF16 combine)
+   per token per MoE layer: dispatch 8 x 7,168 x 1 B = 57,344 B, combine 8 x 7,168 x 2 B = 114,688 B
+   per token, all 58 MoE layers: 10.0 MB
+   batch of 128 tokens: dispatch 7.34 MB / 98 GB/s = 75 us (DeepEP reports 77 us); combine 14.68 MB / 127 GB/s = 116 us (reports 114 us)
+   one decode step, 58 MoE layers at the reported EP8 latencies: 11.1 ms of all-to-all (at EP256: 32.1 ms), unless hidden behind compute

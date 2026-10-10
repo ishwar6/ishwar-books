@@ -1,0 +1,25 @@
+1. CHECK AGAINST DISTSERVE (Section 2.3): OPT-66B, 512-token prompt, 10 requests per second
+   2 x 64 layers x 9216 x 2 bytes x 512 tokens = 1,207,959,552 B = 1.125 GiB (paper: "approximately 1.13GB")
+   x 10 requests/s = 11.25 GiB/s = 90 Gibit/s (paper: 11.3GB per second, "90Gbps"; the paper counts in powers of 2)
+
+2. KV BYTES AND TRANSFER TIME FOR ONE PROMPT (BF16 cache)
+   Llama 3.1 8B (1 GPU)        1,024 tokens: KV   0.12 GiB, prefill ~     34 ms; transfer NVLink     0.3 ms, 8 x 400G NICs     0.3 ms, 1 x 400G NIC     2.7 ms, 100G Ethernet    10.7 ms
+   Llama 3.1 8B (1 GPU)        8,192 tokens: KV   1.00 GiB, prefill ~    302 ms; transfer NVLink     2.4 ms, 8 x 400G NICs     2.7 ms, 1 x 400G NIC    21.5 ms, 100G Ethernet    85.9 ms
+   Llama 3.1 8B (1 GPU)       32,768 tokens: KV   4.00 GiB, prefill ~   1633 ms; transfer NVLink     9.5 ms, 8 x 400G NICs    10.7 ms, 1 x 400G NIC    85.9 ms, 100G Ethernet   343.6 ms
+   Llama 3.1 70B (TP=8)        1,024 tokens: KV   0.31 GiB, prefill ~     37 ms; transfer NVLink     0.7 ms, 8 x 400G NICs     0.8 ms, 1 x 400G NIC     6.7 ms, 100G Ethernet    26.8 ms
+   Llama 3.1 70B (TP=8)        8,192 tokens: KV   2.50 GiB, prefill ~    314 ms; transfer NVLink     6.0 ms, 8 x 400G NICs     6.7 ms, 1 x 400G NIC    53.7 ms, 100G Ethernet   214.7 ms
+   Llama 3.1 70B (TP=8)       32,768 tokens: KV  10.00 GiB, prefill ~   1525 ms; transfer NVLink    23.9 ms, 8 x 400G NICs    26.8 ms, 1 x 400G NIC   214.7 ms, 100G Ethernet   859.0 ms
+   DeepSeek-V3 MLA (32 GPUs)   1,024 tokens: KV   0.07 GiB, prefill ~      5 ms; transfer NVLink     0.2 ms, 8 x 400G NICs     0.2 ms, 1 x 400G NIC     1.4 ms, 100G Ethernet     5.8 ms
+   DeepSeek-V3 MLA (32 GPUs)   8,192 tokens: KV   0.54 GiB, prefill ~     42 ms; transfer NVLink     1.3 ms, 8 x 400G NICs     1.4 ms, 1 x 400G NIC    11.5 ms, 100G Ethernet    46.1 ms
+   DeepSeek-V3 MLA (32 GPUs)  32,768 tokens: KV   2.14 GiB, prefill ~    213 ms; transfer NVLink     5.1 ms, 8 x 400G NICs     5.8 ms, 1 x 400G NIC    46.1 ms, 100G Ethernet   184.2 ms
+
+3. WHAT THE USER FEELS: extra delay before the second token (send all at the end vs layer by layer)
+   Llama 3.1 8B (1 GPU)       8,192 tokens over 1 x 400G NIC      : all at the end    21.5 ms, layer by layer   0.67 ms
+   Llama 3.1 8B (1 GPU)       8,192 tokens over 100G Ethernet     : all at the end    85.9 ms, layer by layer   2.68 ms
+   Llama 3.1 8B (1 GPU)       8,192 tokens over NVLink (same node): all at the end     2.4 ms, layer by layer   0.07 ms
+   Llama 3.1 70B (TP=8)       8,192 tokens over 1 x 400G NIC      : all at the end    53.7 ms, layer by layer   0.67 ms
+   Llama 3.1 70B (TP=8)       8,192 tokens over 100G Ethernet     : all at the end   214.7 ms, layer by layer   2.68 ms
+   Llama 3.1 70B (TP=8)       8,192 tokens over NVLink (same node): all at the end     6.0 ms, layer by layer   0.07 ms
+   DeepSeek-V3 MLA (32 GPUs)  8,192 tokens over 1 x 400G NIC      : all at the end    11.5 ms, layer by layer   0.19 ms
+   DeepSeek-V3 MLA (32 GPUs)  8,192 tokens over 100G Ethernet     : all at the end    46.1 ms, layer by layer   4.72 ms
+   DeepSeek-V3 MLA (32 GPUs)  8,192 tokens over NVLink (same node): all at the end     1.3 ms, layer by layer   0.02 ms

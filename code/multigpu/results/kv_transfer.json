@@ -1,0 +1,208 @@
+{
+  "mfu_assumed": 0.5,
+  "distserve_check": {
+    "bytes": 1207959552,
+    "GiB": 1.125,
+    "gbps_at_10rps": 96.63676416
+  },
+  "rows": [
+    {
+      "model": "Llama 3.1 8B (1 GPU)",
+      "tokens": 1024,
+      "kv_bytes": 134217728,
+      "prefill_ms": 33.813656102827096,
+      "NVLink (same node)": {
+        "transfer_ms": 0.2982616177777778,
+        "exposed_layerwise_ms": 0.009320675555555557
+      },
+      "8 x 400G NICs (TP=8 to TP=8)": {
+        "transfer_ms": 0.33554432,
+        "exposed_layerwise_ms": 0.01048576
+      },
+      "1 x 400G NIC": {
+        "transfer_ms": 2.68435456,
+        "exposed_layerwise_ms": 0.08388608
+      },
+      "100G Ethernet": {
+        "transfer_ms": 10.73741824,
+        "exposed_layerwise_ms": 0.33554432
+      }
+    },
+    {
+      "model": "Llama 3.1 8B (1 GPU)",
+      "tokens": 8192,
+      "kv_bytes": 1073741824,
+      "prefill_ms": 301.63799055945,
+      "NVLink (same node)": {
+        "transfer_ms": 2.3860929422222226,
+        "exposed_layerwise_ms": 0.07456540444444446
+      },
+      "8 x 400G NICs (TP=8 to TP=8)": {
+        "transfer_ms": 2.68435456,
+        "exposed_layerwise_ms": 0.08388608
+      },
+      "1 x 400G NIC": {
+        "transfer_ms": 21.47483648,
+        "exposed_layerwise_ms": 0.67108864
+      },
+      "100G Ethernet": {
+        "transfer_ms": 85.89934592,
+        "exposed_layerwise_ms": 2.68435456
+      }
+    },
+    {
+      "model": "Llama 3.1 8B (1 GPU)",
+      "tokens": 32768,
+      "kv_bytes": 4294967296,
+      "prefill_ms": 1633.4604203429403,
+      "NVLink (same node)": {
+        "transfer_ms": 9.54437176888889,
+        "exposed_layerwise_ms": 0.2982616177777778
+      },
+      "8 x 400G NICs (TP=8 to TP=8)": {
+        "transfer_ms": 10.73741824,
+        "exposed_layerwise_ms": 0.33554432
+      },
+      "1 x 400G NIC": {
+        "transfer_ms": 85.89934592,
+        "exposed_layerwise_ms": 2.68435456
+      },
+      "100G Ethernet": {
+        "transfer_ms": 343.59738368,
+        "exposed_layerwise_ms": 10.73741824
+      }
+    },
+    {
+      "model": "Llama 3.1 70B (TP=8)",
+      "tokens": 1024,
+      "kv_bytes": 335544320,
+      "prefill_ms": 36.872694751902934,
+      "NVLink (same node)": {
+        "transfer_ms": 0.7456540444444444,
+        "exposed_layerwise_ms": 0.009320675555555557
+      },
+      "8 x 400G NICs (TP=8 to TP=8)": {
+        "transfer_ms": 0.8388608000000001,
+        "exposed_layerwise_ms": 0.01048576
+      },
+      "1 x 400G NIC": {
+        "transfer_ms": 6.710886400000001,
+        "exposed_layerwise_ms": 0.08388608
+      },
+      "100G Ethernet": {
+        "transfer_ms": 26.843545600000002,
+        "exposed_layerwise_ms": 0.33554432
+      }
+    },
+    {
+      "model": "Llama 3.1 70B (TP=8)",
+      "tokens": 8192,
+      "kv_bytes": 2684354560,
+      "prefill_ms": 314.4370216007442,
+      "NVLink (same node)": {
+        "transfer_ms": 5.965232355555555,
+        "exposed_layerwise_ms": 0.07456540444444446
+      },
+      "8 x 400G NICs (TP=8 to TP=8)": {
+        "transfer_ms": 6.710886400000001,
+        "exposed_layerwise_ms": 0.08388608
+      },
+      "1 x 400G NIC": {
+        "transfer_ms": 53.687091200000005,
+        "exposed_layerwise_ms": 0.67108864
+      },
+      "100G Ethernet": {
+        "transfer_ms": 214.74836480000002,
+        "exposed_layerwise_ms": 2.68435456
+      }
+    },
+    {
+      "model": "Llama 3.1 70B (TP=8)",
+      "tokens": 32768,
+      "kv_bytes": 10737418240,
+      "prefill_ms": 1524.5658727186894,
+      "NVLink (same node)": {
+        "transfer_ms": 23.86092942222222,
+        "exposed_layerwise_ms": 0.2982616177777778
+      },
+      "8 x 400G NICs (TP=8 to TP=8)": {
+        "transfer_ms": 26.843545600000002,
+        "exposed_layerwise_ms": 0.33554432
+      },
+      "1 x 400G NIC": {
+        "transfer_ms": 214.74836480000002,
+        "exposed_layerwise_ms": 2.68435456
+      },
+      "100G Ethernet": {
+        "transfer_ms": 858.9934592000001,
+        "exposed_layerwise_ms": 10.73741824
+      }
+    },
+    {
+      "model": "DeepSeek-V3 MLA (32 GPUs)",
+      "tokens": 1024,
+      "kv_bytes": 71958528,
+      "prefill_ms": 4.846623832008088,
+      "NVLink (same node)": {
+        "transfer_ms": 0.15990784,
+        "exposed_layerwise_ms": 0.00262144
+      },
+      "8 x 400G NICs (TP=8 to TP=8)": {
+        "transfer_ms": 0.17989632,
+        "exposed_layerwise_ms": 0.00294912
+      },
+      "1 x 400G NIC": {
+        "transfer_ms": 1.43917056,
+        "exposed_layerwise_ms": 0.02359296
+      },
+      "100G Ethernet": {
+        "transfer_ms": 5.75668224,
+        "exposed_layerwise_ms": 0.989511257696962
+      }
+    },
+    {
+      "model": "DeepSeek-V3 MLA (32 GPUs)",
+      "tokens": 8192,
+      "kv_bytes": 575668224,
+      "prefill_ms": 42.01810118380586,
+      "NVLink (same node)": {
+        "transfer_ms": 1.27926272,
+        "exposed_layerwise_ms": 0.02097152
+      },
+      "8 x 400G NICs (TP=8 to TP=8)": {
+        "transfer_ms": 1.43917056,
+        "exposed_layerwise_ms": 0.02359296
+      },
+      "1 x 400G NIC": {
+        "transfer_ms": 11.51336448,
+        "exposed_layerwise_ms": 0.18874368
+      },
+      "100G Ethernet": {
+        "transfer_ms": 46.05345792,
+        "exposed_layerwise_ms": 4.724178067076201
+      }
+    },
+    {
+      "model": "DeepSeek-V3 MLA (32 GPUs)",
+      "tokens": 32768,
+      "kv_bytes": 2302672896,
+      "prefill_ms": 212.57677768710212,
+      "NVLink (same node)": {
+        "transfer_ms": 5.11705088,
+        "exposed_layerwise_ms": 0.08388608
+      },
+      "8 x 400G NICs (TP=8 to TP=8)": {
+        "transfer_ms": 5.75668224,
+        "exposed_layerwise_ms": 0.09437184
+      },
+      "1 x 400G NIC": {
+        "transfer_ms": 46.05345792,
+        "exposed_layerwise_ms": 0.75497472
+      },
+      "100G Ethernet": {
+        "transfer_ms": 184.21383168,
+        "exposed_layerwise_ms": 3.01989888
+      }
+    }
+  ]
+}

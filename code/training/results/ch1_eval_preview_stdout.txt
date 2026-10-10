@@ -1,0 +1,26 @@
+base, raw question       answer found: 12/20   ended its turn by itself:  9/20
+base, chat template      answer found: 14/20   ended its turn by itself:  5/20
+instruct, chat template  answer found: 18/20   ended its turn by itself: 16/20
+
+first outputs per setting (q = "What is the capital of Kenya?"):
+  base, raw question       ' Kenya is a country in Africa, and its capital is Nairobi. Nairobi is the largest city in Kenya and is located'
+  base, chat template      'ratulations! The capital of Kenya is Nairobi.'
+  instruct, chat template  'The capital of Kenya is Nairobi.'
+
+misses:
+  base, raw question       'Who wrote Romeo and Juliet?': ' What is the name of the play? What is the name of the author? What is the name of the pla'
+  base, raw question       'How many continents are there?': ' A. 1 B. 2 C. 3 D. 4\nAnswer:\nC\n\nWhich of the following statements about the geographical c'
+  base, raw question       'What is 12 plus 30?': ' To solve the problem of adding 12 and 30, we can follow these steps:\n\n1. **Identify the n'
+  base, raw question       'What is 9 times 8?': ' To find the product of 9 and 8, we can use the standard multiplication method. Here are t'
+  base, raw question       'What is 100 minus 37?': ' To solve the problem of finding 100 minus 37, we can use basic arithmetic operations. Her'
+  base, raw question       'What is half of 64?': ' To find half of 64, we can use the formula for finding half of a number, which is:\n\n\\[\n\\t'
+  base, raw question       'What is 15 squared?': ' To find \\(15^2\\), we can use the formula for squaring a number, which is \\((a \\times b)^2'
+  base, raw question       'How many minutes are in two hours?': ' To determine how many minutes are in two hours, we need to understand the relationship be'
+  base, chat template      'What planet is known as the Red Planet?': 'The Red Planet is known as the Martian..nasa.gov\neniable\nWhat is the name of the planet th'
+  base, chat template      'How many continents are there?': ' Comey\n Comey\n Comey\n Comey\n Comey\n Comey\n Comey\n Comey\n Comey\n Comey\n Comey\n Comey\n Comey'
+  base, chat template      'What is 12 plus 30?': ' Cherokee\n Cherokee\n Cherokee\n Cherokee\n Cherokee\n Cherokee\n Cherokee\n Cherokee\n Cherokee\n'
+  base, chat template      'What is 100 minus 37?': ' Cherokee\n Cherokee\n Cherokee\n Cherokee\n Cherokee\n Cherokee\n Cherokee\n Cherokee\n Cherokee\n'
+  base, chat template      'What is half of 64?': 'ounces\nounces\nounces\nounces\nounces\nounces\nounces\nounces\nounces\nounces\nounces\nounces\nounces'
+  base, chat template      'What gas do plants take in from the air?': 'plants take in oxygen from the air through their leaves. oxygen is a gas that plants use t'
+  instruct, chat template  'How many continents are there?': 'There are currently 5 continents: Asia, Africa, North America, South America, and Europe.'
+  instruct, chat template  'How many minutes are in two hours?': 'There are 60 minutes in two hours.'

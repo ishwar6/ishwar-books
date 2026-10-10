@@ -1,0 +1,81 @@
+Llama 3.1 8B on 4 H100s (simulated). Goodput = highest request rate with >= 90% of requests inside the SLO.
+cost model: decode step, 32 sequences of 2,000 tokens: 11.4 ms; prefill of one 2,000-token prompt: 67.8 ms; decode of 32 + a 512-token chunk (middle of that prompt): 19.3 ms
+
+=== workload chat: prompts 1,000 to 3,000 tokens, answers 100 to 400 tokens ===
+
+colocated, prefill first (4 GPUs): goodput loose 30 req/s, tight 16 req/s, strict 10 req/s
+    8 req/s: TTFT p90     100 ms, TPOT p90  10.3 ms, gap p99   72 ms, SLO met loose 100.0% tight 100.0% strict 100.0%
+   16 req/s: TTFT p90     101 ms, TPOT p90  14.4 ms, gap p99   99 ms, SLO met loose 100.0% tight 96.6% strict 22.2%
+   24 req/s: TTFT p90     103 ms, TPOT p90  22.4 ms, gap p99  134 ms, SLO met loose 100.0% tight  6.3% strict  1.0%
+   32 req/s: TTFT p90     111 ms, TPOT p90  41.7 ms, gap p99  243 ms, SLO met loose 85.5% tight  0.7% strict  0.1%
+   40 req/s: TTFT p90     156 ms, TPOT p90 138.7 ms, gap p99  630 ms, SLO met loose  2.9% tight  0.0% strict  0.0%
+   48 req/s: TTFT p90     289 ms, TPOT p90 409.9 ms, gap p99 1999 ms, SLO met loose  0.1% tight  0.0% strict  0.0%
+
+colocated, chunked prefill (4 GPUs): goodput loose 48 req/s, tight 28 req/s, strict 18 req/s
+    8 req/s: TTFT p90     107 ms, TPOT p90   9.4 ms, gap p99   19 ms, SLO met loose 100.0% tight 100.0% strict 100.0%
+   16 req/s: TTFT p90     109 ms, TPOT p90  11.2 ms, gap p99   19 ms, SLO met loose 100.0% tight 100.0% strict 99.9%
+   24 req/s: TTFT p90     115 ms, TPOT p90  13.4 ms, gap p99   19 ms, SLO met loose 100.0% tight 100.0% strict 30.6%
+   32 req/s: TTFT p90     128 ms, TPOT p90  15.7 ms, gap p99   20 ms, SLO met loose 100.0% tight 68.4% strict  1.5%
+   40 req/s: TTFT p90     183 ms, TPOT p90  18.5 ms, gap p99   20 ms, SLO met loose 100.0% tight  3.7% strict  0.6%
+   48 req/s: TTFT p90     697 ms, TPOT p90  20.2 ms, gap p99   21 ms, SLO met loose 98.7% tight  1.3% strict  0.2%
+
+disaggregated 1P + 3D: goodput loose 12 req/s, tight 10 req/s, strict 12 req/s
+    8 req/s: TTFT p90     247 ms, TPOT p90   8.8 ms, gap p99    9 ms, SLO met loose 100.0% tight 100.0% strict 100.0%
+   16 req/s: TTFT p90    9329 ms, TPOT p90   9.4 ms, gap p99   10 ms, SLO met loose 13.4% tight  8.3% strict 13.4%
+   24 req/s: TTFT p90   65267 ms, TPOT p90   9.4 ms, gap p99   10 ms, SLO met loose  1.4% tight  0.8% strict  1.4%
+   32 req/s: TTFT p90  120900 ms, TPOT p90   9.4 ms, gap p99   10 ms, SLO met loose  0.7% tight  0.4% strict  0.7%
+   40 req/s: TTFT p90  182248 ms, TPOT p90   9.4 ms, gap p99   10 ms, SLO met loose  0.5% tight  0.2% strict  0.5%
+   48 req/s: TTFT p90  240585 ms, TPOT p90   9.4 ms, gap p99   10 ms, SLO met loose  0.3% tight  0.2% strict  0.3%
+
+disaggregated 2P + 2D: goodput loose 28 req/s, tight 26 req/s, strict 20 req/s
+    8 req/s: TTFT p90      99 ms, TPOT p90   9.3 ms, gap p99   10 ms, SLO met loose 100.0% tight 100.0% strict 100.0%
+   16 req/s: TTFT p90     144 ms, TPOT p90  10.8 ms, gap p99   12 ms, SLO met loose 100.0% tight 100.0% strict 100.0%
+   24 req/s: TTFT p90     320 ms, TPOT p90  13.2 ms, gap p99   14 ms, SLO met loose 100.0% tight 99.0% strict 35.2%
+   32 req/s: TTFT p90    7010 ms, TPOT p90  14.3 ms, gap p99   15 ms, SLO met loose 11.8% tight  5.1% strict  1.6%
+   40 req/s: TTFT p90   36903 ms, TPOT p90  14.5 ms, gap p99   15 ms, SLO met loose  2.9% tight  1.1% strict  1.1%
+   48 req/s: TTFT p90   66478 ms, TPOT p90  14.5 ms, gap p99   15 ms, SLO met loose  1.5% tight  0.6% strict  1.0%
+
+disaggregated 3P + 1D: goodput loose 26 req/s, tight 14 req/s, strict 8 req/s
+    8 req/s: TTFT p90      97 ms, TPOT p90  11.0 ms, gap p99   12 ms, SLO met loose 100.0% tight 100.0% strict 100.0%
+   16 req/s: TTFT p90      99 ms, TPOT p90  16.8 ms, gap p99   18 ms, SLO met loose 100.0% tight 45.2% strict  1.8%
+   24 req/s: TTFT p90     110 ms, TPOT p90  31.1 ms, gap p99   33 ms, SLO met loose 100.0% tight  1.4% strict  0.4%
+   32 req/s: TTFT p90     169 ms, TPOT p90  77.1 ms, gap p99   80 ms, SLO met loose 12.9% tight  0.6% strict  0.1%
+   40 req/s: TTFT p90     476 ms, TPOT p90 193.7 ms, gap p99  225 ms, SLO met loose  4.5% tight  0.2% strict  0.0%
+   48 req/s: TTFT p90    8574 ms, TPOT p90 284.8 ms, gap p99  329 ms, SLO met loose  2.9% tight  0.2% strict  0.0%
+
+=== workload long: prompts 8,000 to 16,000 tokens, answers 50 to 200 tokens ===
+
+colocated, prefill first (4 GPUs): goodput loose 4 req/s, tight 0 req/s, strict 1 req/s
+    2 req/s: TTFT p90     625 ms, TPOT p90  12.6 ms, gap p99    9 ms, SLO met loose 100.0% tight 63.0% strict 86.4%
+    4 req/s: TTFT p90     633 ms, TPOT p90  25.1 ms, gap p99  378 ms, SLO met loose 99.6% tight 31.1% strict 24.6%
+    6 req/s: TTFT p90     833 ms, TPOT p90  87.7 ms, gap p99  913 ms, SLO met loose 45.8% tight  3.2% strict  1.5%
+    8 req/s: TTFT p90    2241 ms, TPOT p90 893.7 ms, gap p99 9878 ms, SLO met loose  0.3% tight  0.0% strict  0.0%
+   10 req/s: TTFT p90   20622 ms, TPOT p90 1576.7 ms, gap p99  216 ms, SLO met loose  0.0% tight  0.0% strict  0.0%
+
+colocated, chunked prefill (4 GPUs): goodput loose 6 req/s, tight 0 req/s, strict 2 req/s
+    2 req/s: TTFT p90     660 ms, TPOT p90  10.8 ms, gap p99   22 ms, SLO met loose 100.0% tight 60.0% strict 97.0%
+    4 req/s: TTFT p90     670 ms, TPOT p90  14.7 ms, gap p99   24 ms, SLO met loose 99.6% tight 50.2% strict 55.3%
+    6 req/s: TTFT p90     950 ms, TPOT p90  20.7 ms, gap p99   25 ms, SLO met loose 92.0% tight 19.6% strict 11.1%
+    8 req/s: TTFT p90    3663 ms, TPOT p90  21.3 ms, gap p99   25 ms, SLO met loose 34.2% tight  1.0% strict  0.4%
+   10 req/s: TTFT p90   27707 ms, TPOT p90  21.3 ms, gap p99   25 ms, SLO met loose  2.7% tight  0.1% strict  0.0%
+
+disaggregated 1P + 3D: goodput loose 1 req/s, tight 0 req/s, strict 1 req/s
+    2 req/s: TTFT p90    2425 ms, TPOT p90   8.8 ms, gap p99    9 ms, SLO met loose 44.3% tight 12.8% strict 44.3%
+    4 req/s: TTFT p90   89239 ms, TPOT p90   8.8 ms, gap p99   10 ms, SLO met loose  0.2% tight  0.0% strict  0.2%
+    6 req/s: TTFT p90  185927 ms, TPOT p90   8.8 ms, gap p99   10 ms, SLO met loose  0.1% tight  0.0% strict  0.1%
+    8 req/s: TTFT p90  293864 ms, TPOT p90   8.8 ms, gap p99    9 ms, SLO met loose  0.1% tight  0.0% strict  0.1%
+   10 req/s: TTFT p90  406377 ms, TPOT p90   8.8 ms, gap p99    9 ms, SLO met loose  0.1% tight  0.0% strict  0.1%
+
+disaggregated 2P + 2D: goodput loose 3 req/s, tight 0 req/s, strict 3 req/s
+    2 req/s: TTFT p90     638 ms, TPOT p90   9.5 ms, gap p99   10 ms, SLO met loose 99.1% tight 57.9% strict 99.1%
+    4 req/s: TTFT p90    2163 ms, TPOT p90  10.0 ms, gap p99   11 ms, SLO met loose 44.7% tight 15.1% strict 44.7%
+    6 req/s: TTFT p90   39883 ms, TPOT p90  10.1 ms, gap p99   11 ms, SLO met loose  2.4% tight  0.8% strict  2.4%
+    8 req/s: TTFT p90   92987 ms, TPOT p90  10.2 ms, gap p99   11 ms, SLO met loose  1.1% tight  0.0% strict  1.1%
+   10 req/s: TTFT p90  148795 ms, TPOT p90  10.2 ms, gap p99   11 ms, SLO met loose  0.5% tight  0.0% strict  0.5%
+
+disaggregated 3P + 1D: goodput loose 5 req/s, tight 0 req/s, strict 2 req/s
+    2 req/s: TTFT p90     624 ms, TPOT p90  11.0 ms, gap p99   13 ms, SLO met loose 100.0% tight 63.8% strict 99.6%
+    4 req/s: TTFT p90     714 ms, TPOT p90  14.2 ms, gap p99   16 ms, SLO met loose 98.7% tight 50.2% strict 45.0%
+    6 req/s: TTFT p90    2135 ms, TPOT p90  17.8 ms, gap p99   20 ms, SLO met loose 50.7% tight  9.2% strict  3.4%
+    8 req/s: TTFT p90   26583 ms, TPOT p90  18.6 ms, gap p99   20 ms, SLO met loose  2.9% tight  0.8% strict  0.1%
+   10 req/s: TTFT p90   62599 ms, TPOT p90  18.6 ms, gap p99   21 ms, SLO met loose  1.6% tight  0.2% strict  0.0%

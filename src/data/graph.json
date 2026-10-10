@@ -330,6 +330,48 @@
       "group": "inference",
       "route": "writings/llm-inference-5-sglang-vs-vllm#11-a-second-idea-from-the-paper-decode-json-faster",
       "blurb": "When the JSON format fixes the next tokens, write them at once instead of one step at a time."
+    },
+    {
+      "id": "interconnects",
+      "label": "NVLink, PCIe and InfiniBand",
+      "group": "hardware",
+      "route": "writings/llm-inference-7-beyond-one-gpu#2-the-wires-between-gpus",
+      "blurb": "How fast GPUs talk inside a server and between servers, and why a small message costs a fixed delay."
+    },
+    {
+      "id": "tensor-parallel",
+      "label": "Tensor parallelism",
+      "group": "inference",
+      "route": "writings/llm-inference-7-beyond-one-gpu#3-tensor-parallelism-split-every-layer",
+      "blurb": "Split every layer across GPUs, columns then rows: two all-reduces per layer, checked on a real two-process run."
+    },
+    {
+      "id": "collectives",
+      "label": "All-reduce and other collectives",
+      "group": "inference",
+      "route": "writings/llm-inference-7-beyond-one-gpu#4-collectives-how-a-group-of-gpus-exchanges-data",
+      "blurb": "All-reduce, all-gather, reduce-scatter and all-to-all, the ring traced step by step, and its cost formula."
+    },
+    {
+      "id": "pipeline-parallel",
+      "label": "Pipeline parallelism",
+      "group": "inference",
+      "route": "writings/llm-inference-7-beyond-one-gpu#5-pipeline-parallelism-split-the-layers-instead",
+      "blurb": "Give each GPU a slice of the layers: little traffic across slow links, more throughput, no lower latency."
+    },
+    {
+      "id": "expert-parallel",
+      "label": "Expert parallelism (MoE)",
+      "group": "inference",
+      "route": "writings/llm-inference-7-beyond-one-gpu#6-expert-parallelism-for-mixture-of-experts-models",
+      "blurb": "Spread experts over GPUs with all-to-all, measured routing imbalance, and redundant hot experts as in DeepSeek-V3."
+    },
+    {
+      "id": "disaggregation",
+      "label": "Disaggregated prefill and decode",
+      "group": "inference",
+      "route": "writings/llm-inference-7-beyond-one-gpu#7-disaggregated-prefill-and-decode",
+      "blurb": "Run the two phases on different GPUs and move the KV cache between them: Splitwise, DistServe, Mooncake, and when it pays."
     }
   ],
   "edges": [
@@ -556,6 +598,42 @@
     [
       "context-engineering",
       "prefix-caching"
+    ],
+    [
+      "gpu",
+      "interconnects"
+    ],
+    [
+      "interconnects",
+      "tensor-parallel"
+    ],
+    [
+      "tensor-parallel",
+      "collectives"
+    ],
+    [
+      "tensor-parallel",
+      "pipeline-parallel"
+    ],
+    [
+      "collectives",
+      "expert-parallel"
+    ],
+    [
+      "vllm",
+      "tensor-parallel"
+    ],
+    [
+      "prefill-decode",
+      "disaggregation"
+    ],
+    [
+      "kv-cache",
+      "disaggregation"
+    ],
+    [
+      "prefix-caching",
+      "disaggregation"
     ]
   ]
 }

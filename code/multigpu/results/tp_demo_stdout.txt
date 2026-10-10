@@ -1,0 +1,44 @@
+PART A: split matrix multiplies (float64, CPU)
+p=2: each part A_i (896, 2432), B_i (2432, 896); max |sum of parts - unsplit| = 1.1e-14
+p=4: each part A_i (896, 1216), B_i (1216, 896); max |sum of parts - unsplit| = 1.3e-14
+p=8: each part A_i (896, 608), B_i (608, 896); max |sum of parts - unsplit| = 1.2e-14
+row-split first matrix, GeLU applied before adding: max error 0.909 (output values are about 0.533 on average) -> needs a sync before GeLU
+
+PART B: Qwen2.5-0.5B, tensor parallel across real processes (float32, CPU, gloo)
+TP=1: rank 0 holds 100.0% of the layer weights and 912 KiB of KV cache; max |logit diff vs HF| = 4.9e-05; same 24 greedy tokens as HF: True
+      all-reduces: prefill of 14 tokens = 0 calls, 0 KiB; each decode token = 0 calls, 0.0 KiB; decode step median 49.2 ms
+TP=2: rank 0 holds 50.0% of the layer weights and 456 KiB of KV cache; max |logit diff vs HF| = 5.0e-05; same 24 greedy tokens as HF: True
+      all-reduces: prefill of 14 tokens = 48 calls, 2352 KiB; each decode token = 48 calls, 168.0 KiB; decode step median 73.4 ms
+generated: ' that the model can be trained on multiple GPUs simultaneously. This is useful for training models with large amounts of data, as'
+
+PART C: what one all-reduce costs on this laptop
+gloo all_reduce, 2 processes on this laptop (CPU, shared memory):
+            4 B       130.9 us   (fit alpha + n/beta:      249.0 us)
+           16 B       190.6 us   (fit alpha + n/beta:      249.0 us)
+           64 B       259.3 us   (fit alpha + n/beta:      249.0 us)
+          256 B       256.2 us   (fit alpha + n/beta:      249.2 us)
+        1,024 B       249.0 us   (fit alpha + n/beta:      249.6 us)
+        4,096 B       213.9 us   (fit alpha + n/beta:      251.3 us)
+       16,384 B       331.5 us   (fit alpha + n/beta:      258.2 us)
+       65,536 B       395.7 us   (fit alpha + n/beta:      285.9 us)
+      262,144 B       529.1 us   (fit alpha + n/beta:      396.6 us)
+    1,048,576 B       761.2 us   (fit alpha + n/beta:      839.4 us)
+    4,194,304 B      2572.7 us   (fit alpha + n/beta:     2610.5 us)
+   16,777,216 B      8760.6 us   (fit alpha + n/beta:     9694.9 us)
+   67,108,864 B     37098.3 us   (fit alpha + n/beta:    38032.7 us)
+   fitted alpha = 249.0 us, beta = 1.78 GB/s
+gloo all_reduce, 4 processes on this laptop (CPU, shared memory):
+            4 B       554.7 us   (fit alpha + n/beta:     1275.5 us)
+           16 B       784.8 us   (fit alpha + n/beta:     1275.5 us)
+           64 B      1435.3 us   (fit alpha + n/beta:     1275.6 us)
+          256 B      1275.5 us   (fit alpha + n/beta:     1275.8 us)
+        1,024 B      1296.8 us   (fit alpha + n/beta:     1276.6 us)
+        4,096 B      1393.7 us   (fit alpha + n/beta:     1280.0 us)
+       16,384 B      1382.4 us   (fit alpha + n/beta:     1293.5 us)
+       65,536 B      1303.7 us   (fit alpha + n/beta:     1347.6 us)
+      262,144 B      1447.4 us   (fit alpha + n/beta:     1563.8 us)
+    1,048,576 B      2248.7 us   (fit alpha + n/beta:     2428.8 us)
+    4,194,304 B      5256.4 us   (fit alpha + n/beta:     5888.7 us)
+   16,777,216 B     20921.9 us   (fit alpha + n/beta:    19728.4 us)
+   67,108,864 B     76280.6 us   (fit alpha + n/beta:    75087.1 us)
+   fitted alpha = 1275.5 us, beta = 0.91 GB/s

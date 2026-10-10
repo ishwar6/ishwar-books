@@ -1,0 +1,184 @@
+{
+  "jobs": [
+    {
+      "name": "paper-megatron-mlp",
+      "arxiv_id": "1909.08053",
+      "page": 3,
+      "anchor": "We start by detailing the MLP block.",
+      "above": 2,
+      "highlight": [
+        "will require a synchronization point before the GeLU",
+        "partition the \ufb01rst GEMM in this column parallel",
+        "split the second GEMM along its rows"
+      ],
+      "end": "operator) and a single all-reduce in the backward pass"
+    },
+    {
+      "name": "paper-pope-constant",
+      "arxiv_id": "2211.05102",
+      "page": 3,
+      "anchor": "As we parallelize the computation across more chips",
+      "above": 2,
+      "highlight": [
+        "the communication latency remains roughly constant independent of the number of chips used"
+      ],
+      "end": "communication becomes a bottleneck"
+    },
+    {
+      "name": "paper-gpipe-bubble",
+      "arxiv_id": "1811.06965",
+      "page": 3,
+      "anchor": "As illustrated in Figure 2c, partitioning introduces",
+      "above": 2,
+      "highlight": [
+        "bubble overhead",
+        "negligible when M \u22654 \u00d7 K"
+      ],
+      "end": "negligible when M"
+    },
+    {
+      "name": "paper-llama3-pp1",
+      "arxiv_id": "2407.21783",
+      "page": 50,
+      "anchor": "When using a BF16 number representation for the model parameters",
+      "above": 14,
+      "highlight": [
+        "does not fit in the GPU memory of a single machine with 8 Nvidia H100 GPUs",
+        "across 16 GPUs on two machines"
+      ],
+      "end": "Within each machine, the high NVLink bandwidth"
+    },
+    {
+      "name": "paper-llama3-pp2",
+      "arxiv_id": "2407.21783",
+      "page": 51,
+      "anchor": "enables the use of tensor parallelism (Shoeybi et al., 2019)",
+      "above": 2,
+      "highlight": [
+        "connectivity has lower bandwidth and higher latency, so we use pipeline parallelism",
+        "they are not an issue during inference",
+        "also increase latency"
+      ],
+      "end": "better throughput-latency trade-off"
+    },
+    {
+      "name": "paper-dsv3-links",
+      "arxiv_id": "2412.19437",
+      "page": 12,
+      "anchor": "in our cluster, cross-node GPUs are fully interconnected with IB",
+      "above": 2,
+      "highlight": [
+        "NVLink offers a bandwidth of 160 GB/s, roughly 3.2 times that of IB",
+        "at most 4 nodes"
+      ],
+      "end": "being blocked by subsequently arriving tokens"
+    },
+    {
+      "name": "paper-dsv3-prefill",
+      "arxiv_id": "2412.19437",
+      "page": 18,
+      "anchor": "3.4.1. Prefilling",
+      "above": 2,
+      "highlight": [
+        "4 nodes with 32 GPUs",
+        "TP4",
+        "DP8",
+        "EP32",
+        "redundant experts",
+        "every 10 minutes"
+      ],
+      "end": "hosts, it will also host one additional redundant expert"
+    },
+    {
+      "name": "paper-dsv3-decode",
+      "arxiv_id": "2412.19437",
+      "page": 18,
+      "anchor": "3.4.2. Decoding",
+      "above": 2,
+      "highlight": [
+        "40 nodes with 320 GPUs",
+        "EP320",
+        "each GPU hosts only one expert",
+        "point-to-point transfers over IB"
+      ],
+      "end": "minimize latency and enhance communication efficiency"
+    },
+    {
+      "name": "paper-distserve-fig1",
+      "arxiv_id": "2401.09670",
+      "page": 0,
+      "anchor": "Figure 1: Performance when serving an LLM with 13B",
+      "figure": true,
+      "below": 0
+    },
+    {
+      "name": "paper-distserve-goodput",
+      "arxiv_id": "2401.09670",
+      "page": 1,
+      "anchor": "resources. To see this, Figure 1 illustrates",
+      "above": 2,
+      "highlight": [
+        "about 1.6 requests per",
+        "5.6 rps for the prefill phase and 10 rps for decoding",
+        "3.3 rps per GPU"
+      ],
+      "end": "requirements (\u00a72.1)"
+    },
+    {
+      "name": "paper-distserve-kv",
+      "arxiv_id": "2401.09670",
+      "page": 5,
+      "anchor": "Communication overhead. Transferring KV caches",
+      "above": 2,
+      "highlight": [
+        "approximately 1.13GB",
+        "90Gbps bandwidth",
+        "peak",
+        "bandwidth between A100 GPUs is 600 GB/s"
+      ],
+      "end": "tion in the next section"
+    },
+    {
+      "name": "paper-splitwise-layerwise",
+      "arxiv_id": "2311.18677",
+      "page": 6,
+      "anchor": "can be generated in the token generation phase",
+      "above": 2,
+      "highlight": [
+        "Even when using fast InfiniBand links, the transfer overhead for large prompt",
+        "overlap- ping it with the computation in the prompt phase"
+      ],
+      "end": "reduces the transfer overheads"
+    },
+    {
+      "name": "paper-splitwise-result",
+      "arxiv_id": "2311.18677",
+      "page": 8,
+      "anchor": "End-to-end impact.",
+      "above": 2,
+      "highlight": [
+        "Splitwise only incurs 0.8%",
+        "adds a 16.5% latency to the second token"
+      ],
+      "end": "hardly perceivable even in a user-facing inference"
+    },
+    {
+      "name": "paper-mooncake-fig1",
+      "arxiv_id": "2407.00079",
+      "page": 1,
+      "anchor": "Figure 1: Mooncake Architecture.",
+      "figure": true,
+      "below": 0
+    }
+  ],
+  "pdfs": {
+    "1811.06965": "697f257e85667829053707594800447f3a75482226ddb6eb24374905c5af6d44",
+    "1909.08053": "fa89e54e23c0cea5cbd9d24720db7647c61af299afdb9a170c7119160e6d207a",
+    "2211.05102": "a34aacd15d1d4918da0001697a01b4ae8f547fec0169fe886f5f10a529529a93",
+    "2311.18677": "c7baf19039f7b760c5d83fb61324ec4ffdf384e8a047bd46f2c4e2ad85e3531d",
+    "2401.09670": "3ef8776301629419e97d7f6dc08b9a46f3577e05e96538a17dd4a526762f42f0",
+    "2407.00079": "6877ae1059097d9f67e98b6ee8012e99ffeee786d0d1ba4f902a953fcbef8441",
+    "2407.21783": "481f1599468f95a07d05e97fafe55bbe786dc1624c6f881bcb4c7d14c933d083",
+    "2412.19437": "812a3fd645c80725354de9d831a6785503007a60681461407f64e97305fa9330"
+  }
+}

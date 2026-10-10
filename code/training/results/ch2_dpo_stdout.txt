@@ -1,0 +1,33 @@
+== A. the DPO loss on one pair, before any training ==
+prompt   x  : What is the capital of Japan?
+chosen   y_w: In short: Tokyo. Tokyo has been the seat of government since 1868 and is the largest city in the country.
+rejected y_l: Tokyo has been the seat of government since 1868 and is the largest city in the country.
+log pi(y_w|x) = -57.331   log pi_ref(y_w|x) = -57.331   (identical: the policy starts as a copy of the reference)
+log pi(y_l|x) = -40.671   log pi_ref(y_l|x) = -40.671
+margin = beta*[(log pi(y_w)-log pi_ref(y_w)) - (log pi(y_l)-log pi_ref(y_l))] = 0.0000; loss = -log sigmoid(margin) = 0.6931 = ln 2
+
+== B. a tiny DPO run: 16 pairs, chosen = "In short: ..." + explanation, rejected = explanation only ==
+held-out questions answered with "In short:" BEFORE training: 0/8
+  e.g. 'What is the capital of Italy?' -> 'The capital of Italy is Rome.'
+step  0  train loss 0.6931  pairs ranked right 0.50  mean margin +0.000   pair 0: log pi(y_w) -57.33, log pi(y_l) -40.67   [6s]
+step  5  train loss 0.1039  pairs ranked right 1.00  mean margin +2.754   pair 0: log pi(y_w) -42.73, log pi(y_l) -70.66   [38s]
+step 10  train loss 0.0159  pairs ranked right 1.00  mean margin +4.600   pair 0: log pi(y_w) -35.47, log pi(y_l) -74.20   [66s]
+step 15  train loss 0.0086  pairs ranked right 1.00  mean margin +5.265   pair 0: log pi(y_w) -33.08, log pi(y_l) -76.75   [128s]
+step 20  train loss 0.0058  pairs ranked right 1.00  mean margin +5.727   pair 0: log pi(y_w) -32.12, log pi(y_l) -79.34   [201s]
+step 25  train loss 0.0038  pairs ranked right 1.00  mean margin +6.179   pair 0: log pi(y_w) -31.44, log pi(y_l) -82.27   [283s]
+step 30  train loss 0.0025  pairs ranked right 1.00  mean margin +6.622   pair 0: log pi(y_w) -30.83, log pi(y_l) -85.20   [493s]
+step 35  train loss 0.0017  pairs ranked right 1.00  mean margin +7.011   pair 0: log pi(y_w) -30.37, log pi(y_l) -87.72   [552s]
+step 40  train loss 0.0012  pairs ranked right 1.00  mean margin +7.356   pair 0: log pi(y_w) -30.04, log pi(y_l) -89.94   [578s]
+
+pair 0 after training: log pi(y_w) -30.045 (ref -57.331), log pi(y_l) -89.942 (ref -40.671), margin 7.656, loss 0.0005
+implicit rewards: beta*log(pi/pi_ref) chosen = +2.729, rejected = -4.927
+
+held-out questions answered with "In short:" AFTER training: 8/8
+  What is the capital of Italy?              -> 'In short: Rome. In detail: The capital city of Italy is Rome (or "Lucca"'
+  Why do leaves change colour in autumn?     -> 'In short: because of the sun. In detail: The leaves of deciduous trees ('
+  How many days are in a leap year?          -> 'In short: 366. In detail: A common year has 365 days (28 or 29 days in F'
+  What is the speed of light?                -> 'In short: 299,792,458 meters per second. In long words: c = 299,792,458 '
+  Why do we need sleep?                      -> "In short: to repair and recharge the body's energy stores. In detail: to"
+  What is an atom?                           -> 'In short: An atom is the smallest unit of matter that retains all the pr'
+  Who painted the Mona Lisa?                 -> 'In short: Leonardo da Vinci. In detail: The painting was done in 1503-15'
+  Why is the sea salty?                      -> 'In short: because of salt. In detail: The ocean contains dissolved salts'

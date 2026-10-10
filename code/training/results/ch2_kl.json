@@ -1,0 +1,447 @@
+{
+ "toy": {
+  "names": [
+   "A: correct, helpful",
+   "B: correct, terse",
+   "C: vague",
+   "D: odd text the RM loves"
+  ],
+  "pi_ref": [
+   0.4,
+   0.35,
+   0.2499,
+   0.0001
+  ],
+  "r": [
+   1.0,
+   0.6,
+   -0.5,
+   2.5
+  ],
+  "true": [
+   1.0,
+   0.6,
+   -0.5,
+   -3.0
+  ],
+  "rows": [
+   {
+    "beta": 10,
+    "pi": [
+     0.4204,
+     0.3534,
+     0.2261,
+     0.0001
+    ],
+    "reward": 0.5197261178748775,
+    "kl": 0.001705639354928536,
+    "objective": 0.5026697243255922,
+    "true": 0.5190545256784276
+   },
+   {
+    "beta": 2,
+    "pi": [
+     0.497,
+     0.3561,
+     0.1467,
+     0.0003
+    ],
+    "reward": 0.6379633919985056,
+    "kl": 0.03612843281599439,
+    "objective": 0.5657065263665169,
+    "true": 0.6365166563580222
+   },
+   {
+    "beta": 1,
+    "pi": [
+     0.579,
+     0.3396,
+     0.0807,
+     0.0006
+    ],
+    "reward": 0.7440537503896363,
+    "kl": 0.11392913512728334,
+    "objective": 0.630124615262353,
+    "true": 0.7404856320397386
+   },
+   {
+    "beta": 0.5,
+    "pi": [
+     0.6996,
+     0.2751,
+     0.0218,
+     0.0035
+    ],
+    "reward": 0.8625961517050582,
+    "kl": 0.2843061281927922,
+    "objective": 0.720443087608662,
+    "true": 0.8432735240983025
+   },
+   {
+    "beta": 0.25,
+    "pi": [
+     0.7818,
+     0.1381,
+     0.0012,
+     0.0789
+    ],
+    "reward": 1.0612158883240348,
+    "kl": 0.915024745860202,
+    "objective": 0.8324597018589843,
+    "true": 0.6275284043059935
+   },
+   {
+    "beta": 0.1,
+    "pi": [
+     0.0012,
+     0.0,
+     0.0,
+     0.9988
+    ],
+    "reward": 2.4981296520318366,
+    "kl": 9.190394445148373,
+    "objective": 1.5790902075169992,
+    "true": -2.9950411320126453
+   },
+   {
+    "beta": 0.05,
+    "pi": [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ],
+    "reward": 2.4999999994383337,
+    "kl": 9.210340360368447,
+    "objective": 2.039482981419911,
+    "true": -2.9999999985023846
+   }
+  ],
+  "ref_reward": 0.4853,
+  "ref_true": 0.48475
+ },
+ "per_sample": {
+  "beta": 0.5,
+  "rows": [
+   {
+    "name": "A: correct, helpful",
+    "pi": 0.6996487139667761,
+    "ref": 0.4,
+    "logratio": 0.5591138247826763,
+    "r": 1.0,
+    "total": 0.7204430876086618
+   },
+   {
+    "name": "B: correct, terse",
+    "pi": 0.275075877906058,
+    "ref": 0.35,
+    "logratio": -0.2408861752173237,
+    "r": 0.6,
+    "total": 0.7204430876086618
+   },
+   {
+    "name": "C: vague",
+    "pi": 0.021762203107756038,
+    "ref": 0.2499,
+    "logratio": -2.4408861752173237,
+    "r": -0.5,
+    "total": 0.7204430876086618
+   },
+   {
+    "name": "D: odd text the RM loves",
+    "pi": 0.0035132050194101113,
+    "ref": 0.0001,
+    "logratio": 3.5591138247826763,
+    "r": 2.5,
+    "total": 0.7204430876086618
+   }
+  ]
+ },
+ "real": {
+  "prompt": "Explain in two sentences why the sky is blue.",
+  "rows": [
+   {
+    "text": "The sky appears blue because it reflects sunlight from the Earth's surface, causing Rayleigh scattering, which spreads out light rays toward white objects and darker shades of blue due to the wavelengths that pass through. This results in the characteristic coloration of our atmosphere.",
+    "n": 52,
+    "logp_pol": -90.4950180053711,
+    "logp_ref": -119.9146957397461,
+    "logratio": 29.419681549072266,
+    "per_token": [
+     1.3509999513626099,
+     0.028999999165534973,
+     2.497999906539917,
+     0.1340000033378601,
+     -0.10000000149011612,
+     -0.004999999888241291,
+     -0.13099999725818634,
+     0.9190000295639038,
+     0.2540000081062317,
+     0.27300000190734863,
+     0.4699999988079071,
+     0.11299999803304672
+    ],
+    "tokens": [
+     "The",
+     " sky",
+     " appears",
+     " blue",
+     " because",
+     " it",
+     " reflects",
+     " sunlight",
+     " from",
+     " the",
+     " Earth",
+     "'s"
+    ]
+   },
+   {
+    "text": "The sky appears blue because it is covered with a large concentration of small pieces of Earth's atmosphere, especially carbon dioxide and water vapor due to sunlight scattering through them, causing colors to appear on the horizon above us. Each piece of this thin but vast gas blanket gives rise to distinctly different hues depending on its molecular composition and how light refracts as it passes through the air over longer distances. This effect",
+    "n": 80,
+    "logp_pol": -156.64378356933594,
+    "logp_ref": -185.80010986328125,
+    "logratio": 29.156328201293945,
+    "per_token": [
+     1.3509999513626099,
+     0.028999999165534973,
+     2.497999906539917,
+     0.1340000033378601,
+     -0.10000000149011612,
+     -0.004999999888241291,
+     0.2840000092983246,
+     -0.7630000114440918,
+     0.8510000109672546,
+     -0.1420000046491623,
+     -0.3889999985694885,
+     2.005000114440918
+    ],
+    "tokens": [
+     "The",
+     " sky",
+     " appears",
+     " blue",
+     " because",
+     " it",
+     " is",
+     " covered",
+     " with",
+     " a",
+     " large",
+     " concentration"
+    ]
+   },
+   {
+    "text": "The color of the sky is not defined by its composition or composition temperature; it is constantly changing due to scattering and absorption from various atmospheric layers, rather than being an objective property determined solely by color chemistry. The sun's light travels through Earth's atmosphere before reaching our eyes and, depending on how it bounces off objects, can cause red, orange, yellow, green, blue, and purple colors",
+    "n": 80,
+    "logp_pol": -140.8669891357422,
+    "logp_ref": -157.23812866210938,
+    "logratio": 16.37114143371582,
+    "per_token": [
+     1.3509999513626099,
+     1.097000002861023,
+     0.05400000140070915,
+     0.09600000083446503,
+     0.017000000923871994,
+     -0.2280000001192093,
+     -3.437999963760376,
+     1.024999976158142,
+     0.09099999815225601,
+     1.069000005722046,
+     0.39800000190734863,
+     0.24699999392032623
+    ],
+    "tokens": [
+     "The",
+     " color",
+     " of",
+     " the",
+     " sky",
+     " is",
+     " not",
+     " defined",
+     " by",
+     " its",
+     " composition",
+     " or"
+    ]
+   },
+   {
+    "text": "The sky appears azure or blue primarily due to its composition and light scattering properties caused by aerosols composed of tiny particles suspended in Earth's atmosphere. This mixing of blue and white dust (primarily referring to mineral scum on the moon) with various colors from shorter-wavelength infrared radiation reflects at least some wavelengths but with principal scattering explaining what we perceive as the presence of those distances.",
+    "n": 78,
+    "logp_pol": -195.6857452392578,
+    "logp_ref": -238.62916564941406,
+    "logratio": 42.943397521972656,
+    "per_token": [
+     1.3509999513626099,
+     0.028999999165534973,
+     2.497999906539917,
+     -1.1749999523162842,
+     0.7990000247955322,
+     0.3840000033378601,
+     1.2359999418258667,
+     0.017999999225139618,
+     0.0010000000474974513,
+     -1.8489999771118164,
+     0.20999999344348907,
+     -0.2240000069141388
+    ],
+    "tokens": [
+     "The",
+     " sky",
+     " appears",
+     " azure",
+     " or",
+     " blue",
+     " primarily",
+     " due",
+     " to",
+     " its",
+     " composition",
+     " and"
+    ]
+   },
+   {
+    "text": "The sky appears blue because it reflects sunlight directly from the Earth and light travels faster through darker colors of the spectrum. Photosynthesis helps make carbon dioxide heavier than air, making the oxygen-rich orange-yellow bright light that makes up our color perception more visible when scattered back to us from clear, blue skies.",
+    "n": 61,
+    "logp_pol": -145.288818359375,
+    "logp_ref": -183.8607635498047,
+    "logratio": 38.57194519042969,
+    "per_token": [
+     1.3509999513626099,
+     0.028999999165534973,
+     2.497999906539917,
+     0.1340000033378601,
+     -0.10000000149011612,
+     -0.004999999888241291,
+     -0.13099999725818634,
+     0.9190000295639038,
+     0.7099999785423279,
+     0.8220000267028809,
+     0.13600000739097595,
+     0.7149999737739563
+    ],
+    "tokens": [
+     "The",
+     " sky",
+     " appears",
+     " blue",
+     " because",
+     " it",
+     " reflects",
+     " sunlight",
+     " directly",
+     " from",
+     " the",
+     " Earth"
+    ]
+   },
+   {
+    "text": "The sun's rays travel through suspended air molecules in the atmosphere when they reach Earth's surface, bending and spreading due to light diffusion and attenuation. This creates our perception of sight as blue because it corresponds best with the visible wavelengths of light that can be diffused into various colors.",
+    "n": 57,
+    "logp_pol": -118.24911499023438,
+    "logp_ref": -152.42604064941406,
+    "logratio": 34.17692565917969,
+    "per_token": [
+     1.3509999513626099,
+     0.06400000303983688,
+     0.5460000038146973,
+     -0.26600000262260437,
+     0.9210000038146973,
+     0.24500000476837158,
+     1.034000039100647,
+     -0.5989999771118164,
+     0.24799999594688416,
+     1.152999997138977,
+     0.050999999046325684,
+     -0.5049999952316284
+    ],
+    "tokens": [
+     "The",
+     " sun",
+     "'s",
+     " rays",
+     " travel",
+     " through",
+     " suspended",
+     " air",
+     " molecules",
+     " in",
+     " the",
+     " atmosphere"
+    ]
+   },
+   {
+    "text": "The sky is blue because of the interference of sunlight from the Earth's surface during reflection and scattering. Blue light has longer wavelengths than other colors, causing it to scatter more readily and broadly throughout space. This giving the Earth an appearance of slightly \u201copalescent\" qualities when viewed from above.",
+    "n": 60,
+    "logp_pol": -122.6496353149414,
+    "logp_ref": -157.2842254638672,
+    "logratio": 34.63459396362305,
+    "per_token": [
+     1.3509999513626099,
+     0.028999999165534973,
+     -0.4259999990463257,
+     -0.12300000339746475,
+     0.03200000151991844,
+     0.2630000114440918,
+     0.1459999978542328,
+     0.4740000069141388,
+     0.2370000034570694,
+     0.949999988079071,
+     -0.3720000088214874,
+     0.32600000500679016
+    ],
+    "tokens": [
+     "The",
+     " sky",
+     " is",
+     " blue",
+     " because",
+     " of",
+     " the",
+     " interference",
+     " of",
+     " sunlight",
+     " from",
+     " the"
+    ]
+   },
+   {
+    "text": "The sky appears blue because of the existence of nitrogen and oxygen in the air. These gases scatter white light, including blue light, into all directions, creating the visible \"color\" of the sky as we see it in many parts of the world. The study of optics and gas chemistry led to the development of the blue color of our atmosphere, which plays a significant role in how viewers perceive sky color",
+    "n": 80,
+    "logp_pol": -134.5572052001953,
+    "logp_ref": -148.5885772705078,
+    "logratio": 14.03137493133545,
+    "per_token": [
+     1.3509999513626099,
+     0.028999999165534973,
+     2.497999906539917,
+     0.1340000033378601,
+     -0.10000000149011612,
+     -0.04100000113248825,
+     0.15199999511241913,
+     -1.9359999895095825,
+     -0.01899999938905239,
+     0.42100000381469727,
+     1.1549999713897705,
+     0.06400000303983688
+    ],
+    "tokens": [
+     "The",
+     " sky",
+     " appears",
+     " blue",
+     " because",
+     " of",
+     " the",
+     " existence",
+     " of",
+     " nitrogen",
+     " and",
+     " oxygen"
+    ]
+   }
+  ],
+  "mean_logratio": 29.91317355632782,
+  "beta": 0.02
+ }
+}

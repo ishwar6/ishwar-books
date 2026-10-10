@@ -1,0 +1,220 @@
+{
+  "split_matmul": {
+    "max_err": {
+      "2": 1.1102230246251565e-14,
+      "4": 1.3100631690576847e-14,
+      "8": 1.199040866595169e-14
+    },
+    "wrong_split_err": 0.9087368551801792,
+    "mean_abs_output": 0.5326330101470683
+  },
+  "qwen_tp": {
+    "1": {
+      "world": 1,
+      "tokens": [
+        429,
+        279,
+        1614,
+        646,
+        387,
+        16176,
+        389,
+        5248,
+        70403,
+        24303,
+        13,
+        1096,
+        374,
+        5390,
+        369,
+        4862,
+        4119,
+        448,
+        3460,
+        14713,
+        315,
+        821,
+        11,
+        438
+      ],
+      "prefill_tokens": 14,
+      "prefill_allreduce_calls": 0,
+      "prefill_allreduce_bytes": 0,
+      "decode_allreduce_per_token": {
+        "calls": 0,
+        "bytes": 0
+      },
+      "layer_params_per_rank": 357897216,
+      "kv_bytes_rank0": 933888,
+      "decode_ms_median": 49.22208350035362,
+      "allreduce_s_total": 0.0,
+      "text": " that the model can be trained on multiple GPUs simultaneously. This is useful for training models with large amounts of data, as",
+      "max_logit_diff_vs_hf": 4.9114227294921875e-05,
+      "same_tokens_as_hf": true,
+      "layer_params_fraction": 1.0
+    },
+    "2": {
+      "world": 2,
+      "tokens": [
+        429,
+        279,
+        1614,
+        646,
+        387,
+        16176,
+        389,
+        5248,
+        70403,
+        24303,
+        13,
+        1096,
+        374,
+        5390,
+        369,
+        4862,
+        4119,
+        448,
+        3460,
+        14713,
+        315,
+        821,
+        11,
+        438
+      ],
+      "prefill_tokens": 14,
+      "prefill_allreduce_calls": 48,
+      "prefill_allreduce_bytes": 2408448,
+      "decode_allreduce_per_token": {
+        "calls": 48,
+        "bytes": 172032
+      },
+      "layer_params_per_rank": 178970112,
+      "kv_bytes_rank0": 466944,
+      "decode_ms_median": 73.41164600802585,
+      "allreduce_s_total": 0.5144669376750244,
+      "text": " that the model can be trained on multiple GPUs simultaneously. This is useful for training models with large amounts of data, as",
+      "max_logit_diff_vs_hf": 5.0067901611328125e-05,
+      "same_tokens_as_hf": true,
+      "layer_params_fraction": 0.500060084289675
+    }
+  },
+  "allreduce_bench": {
+    "2": {
+      "rows": [
+        {
+          "bytes": 4,
+          "us": 130.91540997265838
+        },
+        {
+          "bytes": 16,
+          "us": 190.62916006078012
+        },
+        {
+          "bytes": 64,
+          "us": 259.2962500057183
+        },
+        {
+          "bytes": 256,
+          "us": 256.2020799086895
+        },
+        {
+          "bytes": 1024,
+          "us": 249.01249998947605
+        },
+        {
+          "bytes": 4096,
+          "us": 213.88249995652586
+        },
+        {
+          "bytes": 16384,
+          "us": 331.5370799100492
+        },
+        {
+          "bytes": 65536,
+          "us": 395.7479500968475
+        },
+        {
+          "bytes": 262144,
+          "us": 529.104199813446
+        },
+        {
+          "bytes": 1048576,
+          "us": 761.172900092788
+        },
+        {
+          "bytes": 4194304,
+          "us": 2572.656248958083
+        },
+        {
+          "bytes": 16777216,
+          "us": 8760.573000472505
+        },
+        {
+          "bytes": 67108864,
+          "us": 37098.32275126246
+        }
+      ],
+      "alpha_us": 249.01249998947605,
+      "beta_GBps": 1.776134253518028
+    },
+    "4": {
+      "rows": [
+        {
+          "bytes": 4,
+          "us": 554.6887499804143
+        },
+        {
+          "bytes": 16,
+          "us": 784.7766700433567
+        },
+        {
+          "bytes": 64,
+          "us": 1435.338339942973
+        },
+        {
+          "bytes": 256,
+          "us": 1275.5133399332408
+        },
+        {
+          "bytes": 1024,
+          "us": 1296.8108399945777
+        },
+        {
+          "bytes": 4096,
+          "us": 1393.6800000374205
+        },
+        {
+          "bytes": 16384,
+          "us": 1382.4245800788049
+        },
+        {
+          "bytes": 65536,
+          "us": 1303.6582997301593
+        },
+        {
+          "bytes": 262144,
+          "us": 1447.4499999778345
+        },
+        {
+          "bytes": 1048576,
+          "us": 2248.685400263639
+        },
+        {
+          "bytes": 4194304,
+          "us": 5256.364500382915
+        },
+        {
+          "bytes": 16777216,
+          "us": 20921.89574977965
+        },
+        {
+          "bytes": 67108864,
+          "us": 76280.56249814108
+        }
+      ],
+      "alpha_us": 1275.5133399332408,
+      "beta_GBps": 0.9091918385388098
+    }
+  },
+  "torch": "2.14.1"
+}

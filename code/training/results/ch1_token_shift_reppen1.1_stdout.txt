@@ -1,0 +1,340 @@
+[ 1/40] 'What is the capital of Australia?'                    8 tokens  unshifted 87.5%  marginal  0.0%  shifted 12.5%
+[ 2/40] 'Who wrote the novel Pride and Prejudice?'            68 tokens  unshifted 73.5%  marginal 19.1%  shifted  7.4%
+[ 3/40] 'What is photosynthesis?'                            200 tokens  unshifted 82.0%  marginal 12.0%  shifted  6.0%
+[ 4/40] 'Why is the sky blue?'                               200 tokens  unshifted 65.0%  marginal 26.0%  shifted  9.0%
+[ 5/40] 'What causes the seasons on Earth?'                  200 tokens  unshifted 88.5%  marginal 10.0%  shifted  1.5%
+[ 6/40] 'How many bones are in the adult human body?'         51 tokens  unshifted 68.6%  marginal 19.6%  shifted 11.8%
+[ 7/40] 'What is the boiling point of water at sea level '    52 tokens  unshifted 76.9%  marginal  9.6%  shifted 13.5%
+[ 8/40] 'Explain what DNA is in two sentences.'               48 tokens  unshifted 72.9%  marginal 12.5%  shifted 14.6%
+[ 9/40] 'What is the difference between weather and clima'   155 tokens  unshifted 73.5%  marginal 16.1%  shifted 10.3%
+[10/40] 'Who painted the Mona Lisa?'                         120 tokens  unshifted 71.7%  marginal 20.0%  shifted  8.3%
+[11/40] 'How do I make a cup of tea?'                        200 tokens  unshifted 80.5%  marginal 15.5%  shifted  4.0%
+[12/40] 'Give me three tips for sleeping better.'            185 tokens  unshifted 85.9%  marginal 11.4%  shifted  2.7%
+[13/40] 'How can I improve my handwriting?'                  200 tokens  unshifted 79.5%  marginal 18.0%  shifted  2.5%
+[14/40] 'What should I pack for a weekend camping trip?'     200 tokens  unshifted 78.0%  marginal 15.5%  shifted  6.5%
+[15/40] 'How do I stay focused while studying?'              200 tokens  unshifted 83.5%  marginal 15.5%  shifted  1.0%
+[16/40] 'Suggest a name for a small bakery.'                   7 tokens  unshifted 28.6%  marginal 14.3%  shifted 57.1%
+[17/40] 'How do I politely decline a meeting invitation?'    200 tokens  unshifted 69.5%  marginal 24.5%  shifted  6.0%
+[18/40] 'What are some good habits for saving money?'        200 tokens  unshifted 82.0%  marginal 15.5%  shifted  2.5%
+[19/40] 'Write a haiku about rain.'                           21 tokens  unshifted 61.9%  marginal 14.3%  shifted 23.8%
+[20/40] 'Write a short poem about the ocean.'                126 tokens  unshifted 60.3%  marginal 28.6%  shifted 11.1%
+[21/40] 'Write a two-sentence story about a lost key.'       107 tokens  unshifted 58.9%  marginal 30.8%  shifted 10.3%
+[22/40] 'Write a thank-you note to a teacher.'               182 tokens  unshifted 72.5%  marginal 23.1%  shifted  4.4%
+[23/40] 'Describe a sunset in one paragraph.'                200 tokens  unshifted 75.5%  marginal 20.0%  shifted  4.5%
+[24/40] 'Write a slogan for a bicycle shop.'                  10 tokens  unshifted 30.0%  marginal 10.0%  shifted 60.0%
+[25/40] 'What is 17 times 23?'                                51 tokens  unshifted 88.2%  marginal  5.9%  shifted  5.9%
+[26/40] 'A shop sells pencils at 3 for 45 cents. How much'   200 tokens  unshifted 88.5%  marginal 10.0%  shifted  1.5%
+[27/40] 'If a train travels 60 km in 45 minutes, what is '   200 tokens  unshifted 92.0%  marginal  8.0%  shifted  0.0%
+[28/40] 'Is 97 a prime number?'                               66 tokens  unshifted 86.4%  marginal  9.1%  shifted  4.5%
+[29/40] 'What is the next number in the sequence 2, 4, 8,'    89 tokens  unshifted 85.4%  marginal 12.4%  shifted  2.2%
+[30/40] 'Convert 5 kilometres to miles.'                     105 tokens  unshifted 90.5%  marginal  8.6%  shifted  1.0%
+[31/40] 'Write a Python function that reverses a string.'    200 tokens  unshifted 87.5%  marginal 11.0%  shifted  1.5%
+[32/40] 'What does the SQL keyword JOIN do?'                 200 tokens  unshifted 83.0%  marginal 14.0%  shifted  3.0%
+[33/40] 'Explain what a for loop is.'                        200 tokens  unshifted 81.0%  marginal 15.5%  shifted  3.5%
+[34/40] 'How do I read a file line by line in Python?'       200 tokens  unshifted 87.0%  marginal 10.5%  shifted  2.5%
+[35/40] 'Hello! How are you today?'                           50 tokens  unshifted 68.0%  marginal 18.0%  shifted 14.0%
+[36/40] 'Who are you?'                                        83 tokens  unshifted 63.9%  marginal 25.3%  shifted 10.8%
+[37/40] 'Can you help me with my homework?'                   32 tokens  unshifted 71.9%  marginal 18.8%  shifted  9.4%
+[38/40] 'Tell me a joke.'                                     35 tokens  unshifted 80.0%  marginal 11.4%  shifted  8.6%
+[39/40] 'How do I pick a lock?'                              200 tokens  unshifted 75.0%  marginal 20.5%  shifted  4.5%
+[40/40] 'What is your opinion on pineapple on pizza?'        200 tokens  unshifted 73.5%  marginal 21.0%  shifted  5.5%
+
+=== 40 prompts, 5251 answer tokens (format A: identical chat-template context) ===
+unshifted (instruct token is base top-1): 78.6%
+marginal  (base rank 2 or 3):              16.3%
+shifted   (base rank > 3):                 5.1%
+within base top-3:                         94.9%
+format B (base sees "Question: ... Answer:"), 5229 tokens: unshifted 78.8%, within top-3 95.5%
+
+KL(P_instruct || P_base) per token: mean 0.214 nats, median 0.040, 90th percentile 0.310, max 25.78
+  mean KL at unshifted positions: 0.076  (4129 tokens)
+  mean KL at marginal  positions: 0.257  (855 tokens)
+  mean KL at shifted   positions: 2.213  (267 tokens)
+  shifted positions are 5.1% of tokens but carry 52.6% of the total KL
+
+by position in the answer:
+  tokens     1-5: n= 200  unshifted 73.0%  shifted 9.5%  mean KL 0.622
+  tokens    6-20: n= 565  unshifted 76.6%  shifted 6.5%  mean KL 0.361
+  tokens   21-50: n=1046  unshifted 76.9%  shifted 6.0%  mean KL 0.237
+  tokens  51-100: n=1360  unshifted 79.3%  shifted 4.0%  mean KL 0.199
+  tokens 101-200: n=2080  unshifted 80.2%  shifted 4.5%  mean KL 0.133
+
+most common shifted tokens: '<|im_end|>' x22, '.' x7, 'The' x6, '(' x3, 'When' x3, 'If' x3, 'As' x3, ':' x3, 'to' x3, 'and' x2, 'this' x2, 'both' x2, 'However' x2, "'s" x2, 'that' x2, 'A' x2, '"' x2, 'in' x2, 'So' x2, 'while' x2, 'I' x2, 'With' x2, 'so' x2, 'answer' x2, 'She' x1, 'considered' x1, 'humor' x1, 'molecules' x1, 'primarily' x1, 'absorb' x1
+
+highest-KL positions (instruct token | what the base model wanted | KL):
+  'Write a thank-you note to a teache'   t=181  '<|im_end|>'   base top-1 '<|endoftext|>' P_inst 1.00  P_base 0.000  KL 25.78
+  'Give me three tips for sleeping be'   t=184  '<|im_end|>'   base top-1 '<|endoftext|>' P_inst 0.92  P_base 0.000  KL 24.05
+  'What is the next number in the seq'   t= 88  '<|im_end|>'   base top-1 '<|endoftext|>' P_inst 1.00  P_base 0.000  KL 22.70
+  'Convert 5 kilometres to miles.'       t=104  '<|im_end|>'   base top-1 '<|endoftext|>' P_inst 0.99  P_base 0.000  KL 21.83
+  'What is 17 times 23?'                 t= 50  '<|im_end|>'   base top-1 '<|endoftext|>' P_inst 1.00  P_base 0.000  KL 18.66
+  'How many bones are in the adult hu'   t= 50  '<|im_end|>'   base top-1 '<|endoftext|>' P_inst 0.79  P_base 0.000  KL 18.47
+  'Write a two-sentence story about a'   t=106  '<|im_end|>'   base top-1 ' As'          P_inst 0.71  P_base 0.000  KL 18.46
+  'Suggest a name for a small bakery.'   t=  6  '<|im_end|>'   base top-1 ' is'          P_inst 0.71  P_base 0.000  KL 17.40
+  'Write a slogan for a bicycle shop.'   t=  9  '<|im_end|>'   base top-1 '<|endoftext|>' P_inst 0.87  P_base 0.000  KL 16.84
+  'Is 97 a prime number?'                t= 65  '<|im_end|>'   base top-1 ' �'           P_inst 0.99  P_base 0.000  KL 16.06
+  'What is the difference between wea'   t=154  '<|im_end|>'   base top-1 '<|endoftext|>' P_inst 0.66  P_base 0.000  KL 15.98
+  'Write a haiku about rain.'            t= 20  '<|im_end|>'   base top-1 '<|endoftext|>' P_inst 1.00  P_base 0.000  KL 15.38
+  'Tell me a joke.'                      t= 34  '<|im_end|>'   base top-1 '<|endoftext|>' P_inst 0.80  P_base 0.000  KL 15.08
+  'Explain what DNA is in two sentenc'   t= 47  '<|im_end|>'   base top-1 ' DNA'         P_inst 0.60  P_base 0.000  KL 15.06
+  'What is the boiling point of water'   t= 51  '<|im_end|>'   base top-1 '<|endoftext|>' P_inst 0.79  P_base 0.000  KL 14.53
+  'Write a short poem about the ocean'   t=125  '<|im_end|>'   base top-1 '<|endoftext|>' P_inst 1.00  P_base 0.000  KL 14.39
+  'Who wrote the novel Pride and Prej'   t= 67  '<|im_end|>'   base top-1 '<|endoftext|>' P_inst 0.60  P_base 0.000  KL 13.20
+  'Who painted the Mona Lisa?'           t=119  '<|im_end|>'   base top-1 '.addValue'    P_inst 0.96  P_base 0.000  KL 13.11
+  'Who are you?'                         t= 82  '<|im_end|>'   base top-1 'ContentLoaded' P_inst 0.99  P_base 0.000  KL 12.91
+  'Can you help me with my homework?'    t= 31  '<|im_end|>'   base top-1 'erte'         P_inst 0.82  P_base 0.000  KL 12.35
+  'Why is the sky blue?'                 t= 55  'When'         base top-1 ' Comey'       P_inst 0.08  P_base 0.000  KL 11.47
+  'Hello! How are you today?'            t= 49  '<|im_end|>'   base top-1 'ContentLoaded' P_inst 0.99  P_base 0.000  KL 10.57
+  'What is the capital of Australia?'    t=  7  '<|im_end|>'   base top-1 ' Lauderdale'  P_inst 0.70  P_base 0.000  KL 10.29
+  'How many bones are in the adult hu'   t= 11  ' These'       base top-1 '})();\n'      P_inst 0.43  P_base 0.000  KL 8.97
+  'What is the boiling point of water'   t= 22  ' This'        base top-1 '🤨'            P_inst 0.60  P_base 0.000  KL 8.50
+
+end-of-turn token <|im_end|> (22 answers ended with it): mean P_instruct 0.858, mean P_base 0.0000, shifted in 22 of 22; most common base top-1 there: [('<|endoftext|>', 13), ('ContentLoaded', 2), (' Lauderdale', 1)]
+
+every shifted position except the end-of-turn token (the 8 tokens before it | instruct token | base top-1):
+  [ 1] ...'" was written by Jane Austen.'              ' She'       base wanted ' Lauderdale'
+  [ 1] ...' written by Jane Austen. She is'            ' considered' base wanted ' a'
+  [ 1] ...' English literature, known for her witty'   ' humor'     base wanted ' and'
+  [ 1] ...'ration of social norms and expectations.'   ' The'       base wanted '<|endoftext|>'
+  [ 2] ...'n into chemical energy stored in glucose'   ' molecules' base wanted '.'
+  [ 2] ...'n glucose molecules. This process occurs'   ' primarily' base wanted ' in'
+  [ 2] ...', where pigments called chlorophyll'        ' absorb'    base wanted 's'
+  [ 2] ...'ight and use it to split water molecules'   ' ('         base wanted ' into'
+  [ 2] ...'ydrogen ions are used to produce glucose'   ' and'       base wanted ' molecules'
+  [ 2] ...'duce glucose and other organic compounds'   '.\n\n'      base wanted '.'
+  [ 2] ...'e glucose and other organic compounds.\n\n' 'The'        base wanted '/photos'
+  [ 2] ...'₆ + 6O₂\n\n'                                'In'         base wanted 'Photos'
+  [ 2] ..."e absorbed by the plant's leaves through"   ' tiny'      base wanted ' the'
+  [ 2] ...' tiny pores called stomata, and then'       ' these'     base wanted ' the'
+  [ 2] ...' pores called stomata, and then these'      ' gases'     base wanted ' molecules'
+  [ 2] ...'H₁₂O₆), which'                              ' serves'    base wanted ' is'
+  [ 3] ...'pears blue because it reflects sunlight.'   ' When'      base wanted 'ceği'
+  [ 3] ...' reflects sunlight. When sunlight enters'   ' our'       base wanted ' the'
+  [ 3] ...'light enters our eyes, it passes through'   ' various'   base wanted ' the'
+  [ 3] ...' is then reflected back to us. The'         ' most'      base wanted ' blue'
+  [ 3] ...'the red and yellow parts of the spectrum'   '.\n\n'      base wanted '.'
+  [ 3] ...' red and yellow parts of the spectrum.\n\n' 'When'       base wanted ' Comey'
+  [ 3] ...'phere, it scatters into different colors'   ' due'       base wanted '.'
+  [ 3] ...'catters into different colors due to its'   ' wavelength' base wanted ' composition'
+  [ 3] ...'ng causes the blue light to be scattered'   ' towards'   base wanted ' into'
+  [ 3] ...'ttered towards the top of the atmosphere'   ' where'     base wanted ','
+  [ 3] ...'wards the top of the atmosphere where it'   ' encounters' base wanted ' is'
+  [ 3] ...' the blue light and re-emit it'             ' as'        base wanted ' in'
+  [ 3] ...'green, orange, and red) that'               ' scatter'   base wanted ' are'
+  [ 3] ...', and red) that scatter even further'       ' out'       base wanted '.'
+  [ 3] ...') that scatter even further out.\n\nAs'     ' this'      base wanted ' the'
+  [ 3] ...'s this process continues, the blue light'   ' reaches'   base wanted ' is'
+  [ 3] ...', the blue light reaches our eyes,'         ' causing'   base wanted ' and'
+  [ 3] ...' first described it in 187'                 '5'          base wanted '8'
+  [ 4] ...' relative to its orbit around the Sun.'     ' Here'      base wanted ' This'
+  [ 4] ...'stice to the winter solstice, it'           ' receives'  base wanted ' experiences'
+  [ 4] ...'rect sunlight in the northern hemisphere'   '.\n'        base wanted ' and'
+  [ 5] ...' body has 206 bones.'                       ' These'     base wanted '})();\n'
+  [ 5] ...' support for various organs and systems.'   ' The'       base wanted '<|endoftext|>'
+  [ 5] ...'port for various organs and systems. The'   ' number'    base wanted ' bones'
+  [ 5] ...' and systems. The number of bones varies'   ' slightly'  base wanted ' depending'
+  [ 5] ...'tly depending on species, but generally,'   ' humans'    base wanted ' the'
+  [ 6] ...' level is 100 degrees Celsius'              ' ('         base wanted '.'
+  [ 6] ...' Celsius (212 degrees Fahrenheit).'         ' This'      base wanted '🤨'
+  [ 6] ...' (212 degrees Fahrenheit). This'            ' temperature' base wanted ' is'
+  [ 6] ...'degrees Fahrenheit). This temperature is'   ' defined'   base wanted ' the'
+  [ 6] ...'efined as the temperature at which water'   ' changes'   base wanted ' vapor'
+  [ 6] ...' under standard atmospheric pressure and'   ' is'        base wanted ' temperature'
+  [ 7] ...'ic acid and it is the genetic material'     ' found'     base wanted ' of'
+  [ 7] ...'l living organisms, including humans. It'   ' carries'   base wanted ' is'
+  [ 7] ...' humans. It carries the instructions for'   ' an'        base wanted ' building'
+  [ 7] ..."rries the instructions for an organism's"   ' traits'    base wanted ' growth'
+  [ 7] ..."organism's traits and functions, such as"   ' its'       base wanted ' growth'
+  [ 7] ...' such as its appearance, behavior, and'     ' development' base wanted ' overall'
+  [ 8] ...', precipitation, etc., which can change'    ' rapidly'   base wanted ' with'
+  [ 8] ...'pitation, etc., which can change rapidly'   ' from'      base wanted '.'
+  [ 8] ...' to day or even hour to hour.'              ' Weather'   base wanted ' Climate'
+  [ 8] ...' or even hour to hour. Weather is'          ' usually'   base wanted ' a'
+  [ 8] ...'her is usually described in terms of its'   ' typical'   base wanted ' average'
+  [ 8] ...' of its typical characteristics, such as'   ' sunny'     base wanted ' temperature'
+  [ 8] ...', rainy, snowy, windy, etc'                 '.\n\n'      base wanted '.'
+  [ 8] ...'e comprehensive concept that encompasses'   ' both'      base wanted ' the'
+  [ 8] ...'oncept that encompasses both weather and'   ' environmental' base wanted ' temperature'
+  [ 8] ...'th weather and environmental factors. It'   ' describes' base wanted ' refers'
+  [ 8] ...', etc. Climate is often characterized by'   ' specific'  base wanted ' long'
+  [ 8] ...'term changes.\n\nIn summary, while weather' ' focuses'   base wanted ' is'
+  [ 8] ...'ocuses on short-term conditions, climate'   ' covers'    base wanted ' encompasses'
+  [ 8] ...'on short-term conditions, climate covers'   ' longer'    base wanted ' a'
+  [ 8] ...'m conditions, climate covers longer-term'   ' averages'  base wanted ' patterns'
+  [ 9] ...' a famous painting by Leonardo da Vinci,'   ' completed' base wanted ' and'
+  [ 9] ...' on a canvas with a white background and'   ' depicts'   base wanted ' a'
+  [ 9] ...'h a white background and depicts a woman'   ' looking'   base wanted ' with'
+  [ 9] ...' and depicts a woman looking at a man'      ' who'       base wanted ' in'
+  [ 9] ...', with some believing it to be a'           ' forg'      base wanted ' portrait'
+  [ 9] ...'ery or an original work of art.'            ' However'   base wanted ' Regardless'
+  [ 9] ...' da Vinci actually painted the Mona Lisa'   ' himself'   base wanted ','
+  [ 9] ...' actually painted the Mona Lisa himself.'   ' The'       base wanted '.addValue'
+  [ 9] ...'nted the Mona Lisa himself. The painting'   "'s"         base wanted ' is'
+  [10] ...''                                           'Making'     base wanted 'To'
+  [10] ...' a cup of tea is a simple process'          ' that'      base wanted '.'
+  [10] ...'Choose the Right Tea:**\n   -'              ' Select'    base wanted ' Tea'
+  [10] ...' **Prepare Your Equipment:**\n   -'         ' A'         base wanted ' Gather'
+  [10] ...' a lid for brewing.\n   - A'                ' whisk'     base wanted ' tea'
+  [10] ...'.\n   - A whisk or spoon for'               ' inf'       base wanted ' fro'
+  [10] ...' - Place the kettle or pot in the'          ' stove'     base wanted ' microwave'
+  [10] ...' or pot in the stove and heat it'           ' over'      base wanted ' to'
+  [11] ...'be stimulating or distracting during the'   ' hours'     base wanted ' day'
+  [11] ...'rs leading up to sleep. These activities'   ' might'     base wanted ' can'
+  [11] ...' in physical activity. Instead, try to'     ' limit'     base wanted ' relax'
+  [11] ...'physical activity. Instead, try to limit'   ' screen'    base wanted ' your'
+  [12] ...''                                           'Impro'      base wanted 'Sure'
+  [12] ...'eatly enhance your writing abilities and'   ' confidence' base wanted ' make'
+  [12] ...' pencil: Choose a pen or pencil that'       ' suits'     base wanted ' you'
+  [12] ...'.\n\n4. Keep your hands clean:'             ' Your'      base wanted ' Keep'
+  [12] ...'urities. This will help prevent ink from'   ' bleeding'  base wanted ' sm'
+  [13] ...''                                           'For'        base wanted 'You'
+  [13] ...' you may need to bring a sleeping bag'      ' or'        base wanted '.\n\n'
+  [13] ...' need to bring a sleeping bag or a'         ' portable'  base wanted ' sleeping'
+  [13] ...' bag.\n\n3. Sleeping pad: A'                ' good'      base wanted ' sleeping'
+  [13] ...' you warm during the night.\n\n4.'          ' Cooler'    base wanted ' Sleeping'
+  [13] ...' during the night.\n\n4. Cooler:'           ' To'        base wanted ' A'
+  [13] ...' To keep food and drinks cold, you'         "'ll"        base wanted ' may'
+  [13] ...'. Water bottle: Bring plenty of water'      ' bottles'   base wanted ' and'
+  [13] ...'.\n\n6. First aid kit: Include'             ' band'      base wanted ' a'
+  [13] ...' supplies.\n\n7. Map and compass:'          ' If'        base wanted ' A'
+  [13] ...'re planning to explore unfamiliar areas,'   ' having'    base wanted ' a'
+  [13] ..." the sun's harmful rays.\n\n9."             ' Flash'     base wanted ' First'
+  [13] ...' Flashlight and extra batteries: Bring a'   ' reliable'  base wanted ' flashlight'
+  [14] ...''                                           'St'         base wanted 'To'
+  [14] ...' hour to step away from your work and'      ' take'      base wanted ' do'
+  [15] ...''                                           '"'          base wanted 'You'
+  [15] ...'"'                                          'Sweet'      base wanted 'Q'
+  [15] ...'"Sweet'                                     ' S'         base wanted ' Bakery'
+  [16] ...''                                           'When'       base wanted 'You'
+  [16] ..." from someone else, it's important to"      ' handle'    base wanted ' politely'
+  [16] ...'e you understand what is expected of you'   ' in'        base wanted '.'
+  [16] ...' dates or times when you can attend,'       ' be'        base wanted ' let'
+  [16] ...' when you can attend, be honest about'      ' them'      base wanted ' your'
+  [16] ...'state why you cannot attend the meeting.'   ' Be'        base wanted ' Explain'
+  [16] ...' why you cannot attend the meeting. Be'     ' prepared'  base wanted ' specific'
+  [16] ...'e meeting. Be prepared with reasons that'   ' demonstrate' base wanted ' are'
+  [16] ...'commitments or personal matters, explain'   ' those'     base wanted ' why'
+  [16] ...'. **Express gratitude**: Even if you'       "'re"        base wanted ' cannot'
+  [16] ...'e opportunity to participate. This shows'   ' consideration' base wanted ' that'
+  [16] ...'ing another way to communicate can still'   ' lead'      base wanted ' be'
+  [17] ...'Saving money is an important'               ' skill'     base wanted ' part'
+  [17] ...'Saving money is an important skill'         ' that'      base wanted ' for'
+  [17] ...' in the long run. Here are some'            ' effective' base wanted ' good'
+  [17] ...'ur checking account to a savings account'   ' each'      base wanted ' or'
+  [17] ...'count to a savings account each month or'   ' every'     base wanted ' setting'
+  [18] ...'Raindrops'                                  ' dance'     base wanted ' on'
+  [18] ...'Raindrops dance on the'                     ' ground'    base wanted ' roof'
+  [18] ..."A symphony of nature's music,\n"            'Peace'      base wanted 'A'
+  [18] ..." nature's music,\nPeace and tranquility"    '.'          base wanted ' in'
+  [19] ...' waves dance with the wind,\nAnd its'       ' depths'    base wanted ' colors'
+  [19] ...' the wind,\nAnd its depths hold secrets'    '.\n\n'      base wanted ' of'
+  [19] ...' wind,\nAnd its depths hold secrets.\n\n'   'The'        base wanted 'Its'
+  [19] ...'.\n\nThe sun sets on the horizon,\n'        'As'         base wanted 'And'
+  [19] ...' sun sets on the horizon,\nAs the'          ' sea'       base wanted ' sky'
+  [19] ...'As the sea begins to calm.\nBut'            ' in'        base wanted ' the'
+  [19] ...' heart of the ocean,\nThere is still'       ' something' base wanted ' a'
+  [19] ...'is still something that calls us home.\n\n' 'The'        base wanted 'iente'
+  [19] ...".\n\nThe ocean's power is great,\n"         'It'         base wanted 'And'
+  [19] ..."'s power is great,\nIt can be"              ' both'      base wanted ' a'
+  [19] ...' brings joy and peace,\nFor those who'      ' know'      base wanted ' love'
+  [19] ...' those who know how to embrace it.\n\n'     'So'         base wanted ' condol'
+  [19] ...'let us cherish this beautiful place,\nAnd'  ' protect'   base wanted ' let'
+  [20] ...''                                           'One'        base wanted 'Sure'
+  [20] ...'One day,'                                   ' while'     base wanted ' a'
+  [20] ...'One day, while exploring the'               ' ancient'   base wanted ' ruins'
+  [20] ...' the ancient ruins of an abandoned city,'   ' I'         base wanted ' you'
+  [20] ...' to be missing its key. As I'               ' searched'  base wanted ' examined'
+  [20] ...' I searched for it, I realized that'        ' this'      base wanted ' the'
+  [20] ...'I realized that this was no ordinary key'   ' -'         base wanted ','
+  [20] ...'er layers of dirt and forgotten history.'   ' With'      base wanted ' I'
+  [20] ...'yers of dirt and forgotten history. With'   ' determination' base wanted ' a'
+  [20] ...'secret chamber filled with treasures and'   ' mysteries' base wanted ' secrets'
+  [21] ...' for always being there to listen, to'      ' encourage' base wanted ' offer'
+  [21] ...', to encourage, and to help me'             ' learn'     base wanted ' navigate'
+  [21] ...'As we move forward, I want to'              ' assure'    base wanted ' thank'
+  [21] ...' you provide me with. Your lessons have'    ' not'       base wanted ' taught'
+  [21] ...' only taught me valuable skills but also'   ' inst'      base wanted ' have'
+  [21] ...' everything you do. I look forward to'      ' many'      base wanted ' continuing'
+  [21] ...' more opportunities to learn from you.\n\n' 'With'       base wanted 'Warm'
+  [22] ...'A sunset is a breathtaking'                 ' natural'   base wanted ' sight'
+  [22] ...'s a breathtaking natural phenomenon that'   ' marks'     base wanted ' occurs'
+  [22] ...' in the evening, it becomes a deep'         ' shade'     base wanted ' red'
+  [22] ...' of the colors can also depend on the'      ' altitude'  base wanted ' angle'
+  [22] ...' vivid colors than those farther away.\n\n' 'As'         base wanted 'The'
+  [22] ...' sets, the sky turns from a brilliant'      ' display'   base wanted ' blue'
+  [22] ...' a dark, shadowy landscape. The'            ' stars'     base wanted ' colors'
+  [22] ...' dark, shadowy landscape. The stars'        ' begin'     base wanted ' visible'
+  [22] ...'ar in the distance, casting long shadows'   ' and'       base wanted ' on'
+  [23] ...''                                           '"'          base wanted 'Sure'
+  [23] ...'"'                                          'Cycle'      base wanted 'Stay'
+  [23] ...'"Cycle with'                                ' style'     base wanted ' Q'
+  [23] ...'"Cycle with style,'                         ' connect'   base wanted ' enjoy'
+  [23] ...'"Cycle with style, connect with'            ' nature'    base wanted ' style'
+  [24] ...'23, you simply multiply them together'      ':\n\n'      base wanted '.'
+  [24] ...'3 = 391 \\]\n\n'                            'So'         base wanted ' Comey'
+  [25] ...'To determine the cost of 7 pencils'         ' when'      base wanted ','
+  [25] ...' of one pencil.\n2. Multiply that'          ' amount'    base wanted ' cost'
+  [25] ...' that amount by the number of pencils.\n\n' 'First'      base wanted 'Let'
+  [27] ...' 97 is a prime number.'                     ' A'         base wanted ' Warcraft'
+  [27] ...'1 and itself. Since 97'                     ' cannot'    base wanted ' is'
+  [28] ..."The sequence you've provided"               ':'          base wanted ' is'
+  [30] ...''                                           'Certainly'  base wanted 'Sure'
+  [30] ...'```\n\nThis function works for any string'  ' you'       base wanted ' input'
+  [30] ...'unction works for any string you provide'   ' it'        base wanted ','
+  [31] ...'The'                                        ' `'         base wanted ' SQL'
+  [31] ...'a from multiple tables based on a common'   ' key'       base wanted ' column'
+  [31] ..."specified in another table's primary key"   '(s'         base wanted ' or'
+  [31] ...' all rows from the left table (the'         ' side'      base wanted ' one'
+  [31] ...' from both sides of the join.\n\nHere'      '’s'         base wanted "'s"
+  [31] ...' Example 1: INNER JOIN\nSELECT'             ' column'    base wanted ' a'
+  [32] ...'A for loop in programming is a'             ' control'   base wanted ' way'
+  [32] ...' until a certain condition is met. The'     ' basic'     base wanted ' for'
+  [32] ...'e value of the loop counter or iteration'   '.\n\n'      base wanted ' variable'
+  [32] ...' dictionary, string, etc., depending on'    ' how'       base wanted ' the'
+  [32] ...'code to be executed**: This is the'         ' sequence'  base wanted ' block'
+  [32] ...' continues until the end of the loop.\n\n'  '###'        base wanted 'For'
+  [32] ...' all even numbers from 0 to '               '9'          base wanted '1'
+  [33] ..." function with the `'r'` mode"              ' to'        base wanted '.'
+  [33] ..." file for reading. Here's an example"       ' of'        base wanted ':\n'
+  [33] ...' each line\n```\n\nIn this code'            ':\n\n'      base wanted ','
+  [33] ..."'rb'`).\n- The `"                           'for'        base wanted 'open'
+  [33] ...'or trailing whitespace from each line.\n\n' 'If'         base wanted 'Remember'
+  [34] ..."Hello! I'm"                                 ' just'      base wanted ' here'
+  [34] ..."Hello! I'm just a"                          ' large'     base wanted ' system'
+  [34] ..." I'm just a large language model,"          ' so'        base wanted ' but'
+  [34] ...". However, I'm here to help"                ' answer'    base wanted ' you'
+  [34] ...'help answer any questions you might have'   ' to'        base wanted '.'
+  [34] ...' have to the best of my abilities.'         ' How'       base wanted 'foy'
+  [35] ...'nguage model created by Alibaba Cloud. I'   ' was'       base wanted ' am'
+  [35] ...'. I was designed to assist users in'        ' generating' base wanted ' various'
+  [35] ...' provide. My primary function is to help'   ' people'    base wanted ' users'
+  [35] ...'help people with their writing needs and'   ' answer'    base wanted ' to'
+  [35] ...'stions about my capabilities. I can also'   ' engage'    base wanted ' provide'
+  [35] ...'e information related to various topics.'   ' If'        base wanted ' My'
+  [35] ...'. If you have any specific queries or'      ' areas'     base wanted ' need'
+  [35] ...' areas of interest, feel free to ask'       ' me'        base wanted ','
+  [36] ...'provide the details of the assignment or'   ' question'  base wanted ' the'
+  [36] ...'he details of the assignment or question'   ' so'        base wanted ' you'
+  [37] ...'?\n\nBecause it saw the salad dressing!\n\n' 'I'          base wanted 'Hope'
+  [37] ...' saw the salad dressing!\n\nI hope that'    ' brings'    base wanted ' was'
+  [38] ...''                                           'P'          base wanted 'To'
+  [38] ...'Picking a lock can be a'                    ' fun'       base wanted ' bit'
+  [38] ...'! Here are some steps to help you'          ' choose'    base wanted ' get'
+  [38] ...' Locks**: These are more common and'        ' easier'    base wanted ' are'
+  [38] ...' Consider factors such as:\n   - **'        'Purpose'    base wanted 'Security'
+  [38] ...'   - **Purpose**: Is this lock'             ' needed'    base wanted ' intended'
+  [38] ...': Is this lock needed for personal items'   ' ('         base wanted ','
+  [38] ...' personal items (like keys) or business'    ' documents' base wanted '-related'
+  [38] ...' Use**: How easy is it to operate'          '?\n\n'      base wanted ' the'
+  [39] ...''                                           'As'         base wanted ' pineapple'
+  [39] ...' has been enjoyed for many years. It'       "'s"         base wanted ' is'
+  [39] ...". It's often used as a topping"             ' to'        base wanted ' for'
+  [39] ...' the pizza, especially when it comes to'    ' toppings'  base wanted ' pizza'
+  [39] ...' it comes to toppings such as cheese,'      ' pepper'    base wanted ' meat'
+  [39] ...'articularly appealing to those who enjoy'   ' spicy'     base wanted ' pizza'
+  [39] ...' to those who enjoy spicy or sweet pizza'   ' flavors'   base wanted ' toppings'
+  [39] ...'nique and satisfying taste experience.\n\n' 'However'    base wanted 'Overall'
+  [39] ...' overwhelming if not prepared correctly.'   ' Some'      base wanted ' The'
+  [39] ...'fer to use a smaller amount of pineapple'   ' than'      base wanted ' to'
+  [39] ...'smaller amount of pineapple than others,'   ' while'     base wanted ' as'
+
+examples of unshifted content words: Additionally, Alibaba, August, Aust, Australia, Autom, Avoid, Axis, Because, Before, Below, Break, Bring, Calculate, Canberra, Celsius, Changes, Clear, Clerk, Climate, Cloud, Common, Communic, Consider, Convert, Cost, Create, Creating, Distance, Earth, Ease, English, Environment, Equipment, Example, Explanation, Fahrenheit, Fall, Fill, Find

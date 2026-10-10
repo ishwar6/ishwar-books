@@ -1,0 +1,31 @@
+model: Qwen/Qwen2.5-0.5B   parameters: 494,032,768   layers: 24   hidden size: 896
+vocabulary: 151,665 tokens (embedding rows: 151,936)
+
+sentence: 'The capital of France is Paris.'
+tokens:  'The' | ' capital' | ' of' | ' France' | ' is' | ' Paris' | '.'
+ids:     785 6722 315 9625 374 12095 13
+
+position  context -> actual next token   P(actual)   -log P   model top-1 (P)
+       1                         'The' -> ' capital'    0.0001    9.316   ' following' (0.684)
+       2                 'The capital' -> ' of'        0.5410    0.614   ' of' (0.541)
+       3              'The capital of' -> ' France'    0.0416    3.179   ' Ber' (0.186)
+       4       'The capital of France' -> ' is'        0.7211    0.327   ' is' (0.721)
+       5    'The capital of France is' -> ' Paris'     0.3156    1.153   ' Paris' (0.316)
+       6    'pital of France is Paris' -> '.'          0.4653    0.765   '.' (0.465)
+
+P(sentence after the first token) = product of the 6 probabilities = 2.145e-07
+sum of log-probabilities = -15.355
+average cross-entropy loss = 2.559 nats per token
+perplexity = exp(loss) = 12.92
+model(input_ids, labels=input_ids).loss = 2.559   (the library shifts the labels by one for us)
+
+after "The capital of France is": top-5 next tokens
+token        logit    exp(logit - max)   softmax over all V   softmax over just these 5
+' Paris'      17.843       1.0000            0.3156           0.5258
+' ______'     16.830       0.3631            0.1146           0.1909
+' ____'       16.240       0.2013            0.0635           0.1059
+' __'         16.098       0.1747            0.0551           0.0918
+':\n'         16.027       0.1626            0.0513           0.0855
+probability mass of these 5 tokens: 0.6002  (the other 151,931 share the rest)
+'The cat sat on the mat.': loss 2.957, perplexity 19.2
+'Purple ideas sleep furiously under quiet spoons.': loss 7.668, perplexity 2139.0
