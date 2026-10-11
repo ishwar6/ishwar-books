@@ -31,6 +31,10 @@
     "training": {
       "label": "Training LLMs",
       "color": "#b5cc3a"
+    },
+    "interp": {
+      "label": "Interpretability",
+      "color": "#c8ccd8"
     }
   },
   "nodes": [
@@ -537,6 +541,34 @@
       "group": "training",
       "route": "books/how-models-are-trained/08-rlhf-with-ppo#87-rlhf-as-a-loop-four-models",
       "blurb": "The policy, a frozen reference, the reward model and a value model, working together in one training loop."
+    },
+    {
+      "id": "transformer-circuits",
+      "label": "Transformer circuits (paper)",
+      "group": "interp",
+      "route": "papers/transformer-circuits",
+      "blurb": "A 2021 paper that takes small attention-only transformers apart, piece by piece, to see the algorithms inside."
+    },
+    {
+      "id": "residual-stream",
+      "label": "Residual stream",
+      "group": "interp",
+      "route": "papers/transformer-circuits/part-1-the-residual-stream#the-residual-stream-as-a-communication-channel",
+      "blurb": "The running total every layer reads from and adds to. Because it is a plain sum, the model can be split into parts."
+    },
+    {
+      "id": "virtual-weights",
+      "label": "Virtual weights",
+      "group": "interp",
+      "route": "papers/transformer-circuits/part-1-the-residual-stream#virtual-weights",
+      "blurb": "Multiply one layer's write matrix by a later layer's read matrix to see how they talk, even with layers in between."
+    },
+    {
+      "id": "zero-layer",
+      "label": "Zero-layer model (bigrams)",
+      "group": "interp",
+      "route": "papers/transformer-circuits/part-1-the-residual-stream#the-zero-layer-transformer",
+      "blurb": "Embed then unembed with nothing in between: the model can only learn which token usually follows which."
     }
   ],
   "edges": [
@@ -931,6 +963,30 @@
     [
       "kl-penalty",
       "rlhf-loop"
+    ],
+    [
+      "transformer-circuits",
+      "residual-stream"
+    ],
+    [
+      "residual-stream",
+      "virtual-weights"
+    ],
+    [
+      "residual-stream",
+      "zero-layer"
+    ],
+    [
+      "transformer",
+      "residual-stream"
+    ],
+    [
+      "self-attention",
+      "residual-stream"
+    ],
+    [
+      "next-token-loss",
+      "zero-layer"
     ]
   ]
 }
