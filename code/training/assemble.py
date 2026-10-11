@@ -13,6 +13,9 @@ CHAPTERS = {
     '3': ('part1-the-big-picture', '03-how-we-measure-a-model.md'),
     '4': ('part2-base-to-instruction-follower', '04-pretraining.md'),
     '5': ('part2-base-to-instruction-follower', '05-supervised-fine-tuning.md'),
+    '6': ('part3-learning-from-feedback', '06-reinforcement-learning-basics.md'),
+    '7': ('part3-learning-from-feedback', '07-reward-models.md'),
+    '8': ('part3-learning-from-feedback', '08-rlhf-with-ppo.md'),
 }
 EM_DASH = chr(0x2014)
 BANNED = ['Alammar', 'YouTube']

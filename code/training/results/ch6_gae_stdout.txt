@@ -1,0 +1,64 @@
+== 1. return of the episode rewards [0, 0, 0, 0, 0, 1]
+  gamma = 1.0: G_t for t = 0..5 = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+  gamma = 0.9: G_t for t = 0..5 = [0.5905, 0.6561, 0.729, 0.81, 0.9, 1.0]
+
+== 2. exact values for the fixed policy P(A) = 0.6
+  V(start) = probability of success = 0.5443
+  t = 0: V(t, k) for k = 0..0: [0.544]
+  t = 1: V(t, k) for k = 0..1: [0.337, 0.683]
+  t = 2: V(t, k) for k = 0..2: [0.13, 0.475, 0.821]
+  t = 3: V(t, k) for k = 0..3: [0.0, 0.216, 0.648, 0.936]
+  t = 4: V(t, k) for k = 0..4: [0.0, 0.0, 0.36, 0.84, 1.0]
+  t = 5: V(t, k) for k = 0..5: [0.0, 0.0, 0.0, 0.6, 1.0, 1.0]
+  t = 6: V(t, k) for k = 0..6: [0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0]
+  at the start: Q(A) = 0.6826, Q(B) = 0.3370, advantage A(A) = +0.1382, A(B) = -0.2074
+
+== 3. one episode: tokens ABABAA, reward at the end = 1; lambda = 0.95, gamma = 1.0
+  using a rough value estimate (exact V plus noise of sd 0.15)
+  t=0 state (t=0, k=0) token A: r=0  V(s_t)=0.850  V(s_t+1)=0.553  delta=-0.298  GAE=+0.025  exact A=+0.138
+  t=1 state (t=1, k=1) token B: r=0  V(s_t)=0.553  V(s_t+1)=0.417  delta=-0.136  GAE=+0.340  exact A=-0.207
+  t=2 state (t=2, k=1) token A: r=0  V(s_t)=0.417  V(s_t+1)=0.572  delta=+0.156  GAE=+0.501  exact A=+0.173
+  t=3 state (t=3, k=2) token B: r=0  V(s_t)=0.572  V(s_t+1)=0.227  delta=-0.345  GAE=+0.363  exact A=-0.288
+  t=4 state (t=4, k=2) token A: r=0  V(s_t)=0.227  V(s_t+1)=0.456  delta=+0.229  GAE=+0.746  exact A=+0.240
+  t=5 state (t=5, k=3) token A: r=1  V(s_t)=0.456  V(s_t+1)=0.000  delta=+0.544  GAE=+0.544  exact A=+0.400
+  lambda = 1 (Monte Carlo minus V): [0.15, 0.447, 0.583, 0.428, 0.773, 0.544]
+  lambda = 0 (one TD error):        [-0.298, -0.136, 0.156, -0.345, 0.229, 0.544]
+
+== 4. GAE against the exact advantage, 100,000 episodes, gamma = 1
+  exact V         lambda 0.00: bias^2 0.0000  variance 0.0000  total error 0.0000
+  exact V         lambda 0.20: bias^2 0.0000  variance 0.0015  total error 0.0015
+  exact V         lambda 0.40: bias^2 0.0000  variance 0.0068  total error 0.0068
+  exact V         lambda 0.60: bias^2 0.0000  variance 0.0190  total error 0.0190
+  exact V         lambda 0.80: bias^2 0.0000  variance 0.0486  total error 0.0486
+  exact V         lambda 0.90: bias^2 0.0000  variance 0.0788  total error 0.0788
+  exact V         lambda 0.95: bias^2 0.0000  variance 0.1011  total error 0.1011
+  exact V         lambda 1.00: bias^2 0.0000  variance 0.1304  total error 0.1304
+  V + noise 0.05  lambda 0.00: bias^2 0.0058  variance 0.0000  total error 0.0058
+  V + noise 0.05  lambda 0.20: bias^2 0.0051  variance 0.0015  total error 0.0065
+  V + noise 0.05  lambda 0.40: bias^2 0.0045  variance 0.0065  total error 0.0110
+  V + noise 0.05  lambda 0.60: bias^2 0.0040  variance 0.0184  total error 0.0224
+  V + noise 0.05  lambda 0.80: bias^2 0.0036  variance 0.0477  total error 0.0513
+  V + noise 0.05  lambda 0.90: bias^2 0.0035  variance 0.0780  total error 0.0815
+  V + noise 0.05  lambda 0.95: bias^2 0.0034  variance 0.1006  total error 0.1040
+  V + noise 0.05  lambda 1.00: bias^2 0.0033  variance 0.1304  total error 0.1336
+  V + noise 0.15  lambda 0.00: bias^2 0.0522  variance 0.0000  total error 0.0522
+  V + noise 0.15  lambda 0.20: bias^2 0.0457  variance 0.0015  total error 0.0472
+  V + noise 0.15  lambda 0.40: bias^2 0.0405  variance 0.0063  total error 0.0468
+  V + noise 0.15  lambda 0.60: bias^2 0.0363  variance 0.0176  total error 0.0539
+  V + noise 0.15  lambda 0.80: bias^2 0.0328  variance 0.0460  total error 0.0788
+  V + noise 0.15  lambda 0.90: bias^2 0.0311  variance 0.0765  total error 0.1076
+  V + noise 0.15  lambda 0.95: bias^2 0.0301  variance 0.0996  total error 0.1297
+  V + noise 0.15  lambda 1.00: bias^2 0.0292  variance 0.1304  total error 0.1596
+
+== 5. training from P(A) = 0.5 everywhere: 100 seeds, 150 updates of 16 episodes each
+  REINFORCE, no baseline            : P(success) after 10/25/50/150 updates = 0.476 / 0.668 / 0.839 / 0.963;  median updates to reach 0.9: 72;  sd over seeds at 25: 0.016
+  REINFORCE, leave-one-out baseline : P(success) after 10/25/50/150 updates = 0.476 / 0.668 / 0.842 / 0.962;  median updates to reach 0.9: 71;  sd over seeds at 25: 0.009
+  GAE lambda 0                      : P(success) after 10/25/50/150 updates = 0.388 / 0.512 / 0.759 / 0.959;  median updates to reach 0.9: 85;  sd over seeds at 25: 0.008
+  GAE lambda 0.5                    : P(success) after 10/25/50/150 updates = 0.414 / 0.586 / 0.808 / 0.961;  median updates to reach 0.9: 78;  sd over seeds at 25: 0.009
+  GAE lambda 0.95                   : P(success) after 10/25/50/150 updates = 0.468 / 0.660 / 0.839 / 0.962;  median updates to reach 0.9: 72;  sd over seeds at 25: 0.010
+  GAE lambda 1                      : P(success) after 10/25/50/150 updates = 0.476 / 0.667 / 0.842 / 0.962;  median updates to reach 0.9: 71;  sd over seeds at 25: 0.010
+
+   same, but every episode also gets +5.0 (reward 5 for failure, 6 for success)
+  REINFORCE, no baseline            : P(success) after 10/25/50/150 updates = 0.462 / 0.607 / 0.749 / 0.954;  median to 0.9: 75;  sd at 25: 0.194;  seeds below 0.5 at the end: 0%
+  REINFORCE, leave-one-out baseline : P(success) after 10/25/50/150 updates = 0.476 / 0.668 / 0.842 / 0.962;  median to 0.9: 71;  sd at 25: 0.009;  seeds below 0.5 at the end: 0%
+  GAE lambda 0.95                   : P(success) after 10/25/50/150 updates = 0.467 / 0.651 / 0.833 / 0.961;  median to 0.9: 73;  sd at 25: 0.069;  seeds below 0.5 at the end: 0%

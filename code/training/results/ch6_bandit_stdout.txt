@@ -1,0 +1,40 @@
+== 1. one REINFORCE step by hand, theta = 0
+pi            = [0.25 0.25 0.25 0.25]
+action a = 3, reward r = 7.3
+score  = onehot(a) - pi = [-0.25 -0.25  0.75 -0.25]
+grad (no baseline) = r * score       = [-1.825 -1.825  5.475 -1.825]
+baseline b = V = sum_k pi_k mu_k = 6.5
+grad (baseline)    = (r - b) * score = [-0.2 -0.2  0.6 -0.2]
+exact gradient of J = pi_k (mu_k - J)  = [-0.375 -0.125  0.125  0.375]
+new pi after one step, lr 0.1, no baseline: [0.197  0.197  0.4089 0.197 ]
+new pi after one step, lr 0.1, baseline   : [0.2449 0.2449 0.2653 0.2449]
+
+== 2. Monte Carlo check at theta = 0 with 200,000 samples
+mean score vector E[grad log pi]     = [-0.0007  0.0014 -0.0012  0.0005] (should be 0)
+mean estimate, no baseline           = [-0.3781 -0.116   0.1159  0.3781]
+mean estimate, baseline b = 6.5      = [-0.3737 -0.1249  0.1236  0.375 ]
+exact gradient                       = [-0.375 -0.125  0.125  0.375]
+total variance (sum over 4 components): no baseline 33.028, baseline 1.369, ratio 24.1x
+
+== 3. variance of the estimate as a function of a constant baseline b (theta = 0)
+  b =   0.0: total variance   33.028,  mean estimate [-0.378 -0.116  0.116  0.378]
+  b =   3.0: total variance   10.542,  mean estimate [-0.376 -0.12   0.119  0.377]
+  b =   5.0: total variance    3.050,  mean estimate [-0.375 -0.123  0.122  0.376]
+  b =   6.0: total variance    1.555,  mean estimate [-0.374 -0.124  0.123  0.375]
+  b =   6.5: total variance    1.369,  mean estimate [-0.374 -0.125  0.124  0.375]
+  b =   7.0: total variance    1.559,  mean estimate [-0.373 -0.126  0.124  0.375]
+  b =   8.0: total variance    3.063,  mean estimate [-0.373 -0.127  0.125  0.374]
+  b =  10.0: total variance   10.572,  mean estimate [-0.371 -0.13   0.128  0.373]
+  b =  12.0: total variance   24.081,  mean estimate [-0.37  -0.132  0.13   0.372]
+variance-minimising constant b* = E[r |score|^2] / E[|score|^2] = 6.497, variance 1.369
+
+at theta = [0.0, 0.0, 0.0, 2.0]: pi = [0.096 0.096 0.096 0.711], V = 7.422
+  total variance: no baseline 19.540, baseline V 1.288, ratio 15.2x
+
+== 4. training: 200 seeds x 400 steps, one sample per step, learning rate 0.05
+  baseline none    : mean J at step 100/200/400 = 7.352 / 7.512 / 7.655;  spread (10th-90th pct) at 400: 6.984 to 7.983;  seeds with P(best) > 0.5: 72%;  seeds with P(best) < 0.1: 24%
+      most likely reply at the end, count over seeds: {2: 7, 3: 48, 4: 145}
+  baseline running : mean J at step 100/200/400 = 7.637 / 7.873 / 7.951;  spread (10th-90th pct) at 400: 7.935 to 7.964;  seeds with P(best) > 0.5: 100%;  seeds with P(best) < 0.1: 0%
+      most likely reply at the end, count over seeds: {4: 200}
+  baseline value   : mean J at step 100/200/400 = 7.648 / 7.874 / 7.951;  spread (10th-90th pct) at 400: 7.933 to 7.965;  seeds with P(best) > 0.5: 100%;  seeds with P(best) < 0.1: 0%
+      most likely reply at the end, count over seeds: {4: 200}

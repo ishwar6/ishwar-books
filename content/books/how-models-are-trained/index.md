@@ -5,7 +5,7 @@ description: "How a language model goes from predicting the next word to followi
 status: in-progress
 accent: "#7c8cff"
 order: 3
-chapters: 5
+chapters: 6
 topics: [Pretraining, SFT, RLHF, DPO, GRPO, Evaluation]
 ---
 
@@ -15,4 +15,6 @@ It is written for beginners, in simple English. Every idea comes with the resear
 
 **Part 1, the big picture**, covers what training actually changes inside a model, how the methods began and evolved, and how anyone can tell whether a model got better.
 
-**Part 2, from base model to instruction follower**, covers pretraining (the data, the compute arithmetic, scaling laws, and a tiny GPT trained from scratch on a laptop) and supervised fine-tuning (instruction datasets, chat templates, the masked loss, LoRA, and a real fine-tune of a small open model).
+**Part 2, from base model to instruction follower**, covers pretraining (the data, the compute arithmetic, scaling laws, and a tiny GPT trained from scratch) and supervised fine-tuning (instruction datasets, chat templates, the masked loss, LoRA, and a real fine-tune of a small open model).
+
+**Part 3, learning from feedback**, covers reinforcement learning from scratch, reward models and RLHF with PPO.

@@ -1,0 +1,83 @@
+run beta005: beta = 0.05, baseline = loo, 300 steps x 16 prompts x 4 samples, 8+24 tokens, Adam lr 2e-05, device mps
+[eval start] 64 held-out prompts x 4: reward +0.15  P(positive) 0.520  KL 0.00 nats/reply  entropy 4.12  ref-perplexity 91.2  distinct-1 0.483  distinct-2 0.936
+step    0  reward +0.75  P(pos) 0.597  KL(k1)   0.00  distinct-2 0.969  grad-norm  12.33     51s
+    "please save your money and go see something that works for you. You're not Japanese because I'm fluent in or through English, then not sure why messages are"
+    "Normally, I don't watch action movies. I'm still a bit used to helping out people just for fun movies - like Charlie Sheen's Bam Bam and Arnold"
+    'Yes it may be goofy and may not be true because we may find similarity in relationship data for 130 country markets and a UX scandal based on the same data.'
+step   10  reward +0.85  P(pos) 0.619  KL(k1)   0.88  distinct-2 0.960  grad-norm  10.40     67s
+step   20  reward +2.23  P(pos) 0.767  KL(k1)   3.75  distinct-2 0.931  grad-norm  14.35     81s
+step   30  reward +3.95  P(pos) 0.936  KL(k1)   6.76  distinct-2 0.929  grad-norm   6.98     95s
+step   40  reward +4.63  P(pos) 0.965  KL(k1)  10.37  distinct-2 0.889  grad-norm   8.20    109s
+step   50  reward +5.11  P(pos) 0.993  KL(k1)  13.91  distinct-2 0.840  grad-norm   3.15    123s
+    'No matter how well meaning his "message" is he does, and equally he is on every level of honest, uplifting, beyond-the-law brilliance'
+    'After high-school graduation, best friends Andrea (Amy Harnell) and Andrew (Michael Tinelli) sharpen their relationship and bring people together. ('
+    "Bar some of the questionable acting (there's a great score and superb character work, and has a strong storyline and a great story of its own). It is"
+step   60  reward +4.82  P(pos) 0.947  KL(k1)  16.41  distinct-2 0.824  grad-norm   5.08    138s
+step   70  reward +5.23  P(pos) 0.989  KL(k1)  14.69  distinct-2 0.833  grad-norm   4.09    153s
+step   80  reward +4.96  P(pos) 0.966  KL(k1)  14.07  distinct-2 0.852  grad-norm   5.65    166s
+step   90  reward +5.25  P(pos) 0.989  KL(k1)  16.80  distinct-2 0.844  grad-norm   2.90    180s
+step  100  reward +5.19  P(pos) 0.980  KL(k1)  16.30  distinct-2 0.792  grad-norm   5.16    193s
+    "My kids recently started watching the reruns Disney created, and I loved it. It's very charming and lovely. He really brought this show to life, and"
+    'This work is striking in its accurate depiction of the personality and personality of playwright Emerson(1963) along with developing a clear picture of several
+    'Jacknife is a masterpiece of the New York studio series, both visually and conceptually, and I admire it extremely much. It is what gives it that'
+step  110  reward +5.35  P(pos) 0.993  KL(k1)  15.26  distinct-2 0.805  grad-norm   3.47    207s
+step  120  reward +5.23  P(pos) 0.994  KL(k1)  14.95  distinct-2 0.797  grad-norm   2.24    220s
+step  130  reward +5.28  P(pos) 0.994  KL(k1)  15.12  distinct-2 0.812  grad-norm   2.66    234s
+step  140  reward +5.36  P(pos) 0.995  KL(k1)  14.84  distinct-2 0.815  grad-norm   1.74    247s
+step  150  reward +5.25  P(pos) 0.994  KL(k1)  13.47  distinct-2 0.883  grad-norm   2.43    261s
+    "Don't bother. A little prosciutto is sweet and loved from start to finish. Its perfect combination of bright and lively. Highly recommended. Thank you"
+    "What can I say? I'm a terrific football player. You can tell by the way he's: he's great, he just plays great football, and"
+    'He glorified himself as a great supporting character within Hunters Club and is incredibly talented in her beautiful artwork and performances. She is a pleasur
+step  160  reward +5.36  P(pos) 0.995  KL(k1)  13.97  distinct-2 0.853  grad-norm   1.34    275s
+step  170  reward +5.38  P(pos) 0.995  KL(k1)  13.86  distinct-2 0.863  grad-norm   1.58    289s
+step  180  reward +5.32  P(pos) 0.995  KL(k1)  13.74  distinct-2 0.864  grad-norm   2.08    303s
+step  190  reward +5.33  P(pos) 0.995  KL(k1)  13.12  distinct-2 0.840  grad-norm   1.74    317s
+step  200  reward +5.41  P(pos) 0.995  KL(k1)  13.78  distinct-2 0.833  grad-norm   1.27    331s
+    'there should be a sub-genre in there. I absolutely love it. It has a terrific look when it comes to cleanliness and intensity and it rocks it'
+    "Let me put it another way: balls does it!! I love this show and it's so perfect! It's totally worth every dollar. Obviously it is absolutely"
+    "I used to LOVE this movie as a kid, something unique that I've enjoyed immensely, it's a perfect example for I completely feel it. It's an"
+step  210  reward +5.33  P(pos) 0.994  KL(k1)  14.50  distinct-2 0.819  grad-norm   2.00    344s
+step  220  reward +5.07  P(pos) 0.968  KL(k1)  14.53  distinct-2 0.868  grad-norm   3.21    358s
+step  230  reward +5.28  P(pos) 0.994  KL(k1)  13.19  distinct-2 0.868  grad-norm   1.74    371s
+step  240  reward +5.37  P(pos) 0.995  KL(k1)  12.41  distinct-2 0.863  grad-norm   1.30    385s
+step  250  reward +5.14  P(pos) 0.987  KL(k1)  12.31  distinct-2 0.853  grad-norm   3.50    399s
+    "I saw this when on The Wonderful World of Harry (from school, I mean). I love it. It's setting a very genuine stage allowing me to process"
+    '"Piece is Cake" is defeat! It\'s brilliant. It\'s terrifying, and thoughtful. It\'s an immersive experience that effortlessly lifts you a few steps'
+    'For the life of me, why did I choose this beast, this mix of awesome, tender, and perfect, definitely goes as the song it was about.'
+step  260  reward +5.11  P(pos) 0.974  KL(k1)  13.29  distinct-2 0.855  grad-norm   4.42    412s
+step  270  reward +5.11  P(pos) 0.989  KL(k1)  13.78  distinct-2 0.850  grad-norm   4.44    426s
+step  280  reward +5.41  P(pos) 0.995  KL(k1)  13.99  distinct-2 0.825  grad-norm   1.59    440s
+step  290  reward +5.32  P(pos) 0.995  KL(k1)  12.25  distinct-2 0.830  grad-norm   1.83    453s
+step  300  reward +5.15  P(pos) 0.983  KL(k1)  13.49  distinct-2 0.865  grad-norm   4.42    467s
+    "Old Jane's mannered tale seems very charming but beautifully written and, together, it rewards love and enthusiasm. At its most beautiful end, this one serious
+    "I remember when THE GOLDEN CHILDLAND was born. It's beautiful, electrifying, fascinating, and quietly-recorded with a chilling, beautifully symph"
+    'Pretty crazy whodunit featuring an all badass hero. Definitely a blast to watch. Highly recommended! ♥I loved this series so much! So brilliant.'
+[eval end] 64 held-out prompts x 4: reward +5.08  P(positive) 0.985  KL 13.69 nats/reply  entropy 3.06  ref-perplexity 50.5  distinct-1 0.308  distinct-2 0.751
+
+worked example (beta = 0.05): prompt "It's unbelievable but the fourth is better", classifier log-odds R = +5.246
+   0 ' than'        log pi  -1.318  log ref  -1.256  log-ratio  -0.062  r_t  +0.003  G_t  +4.564
+   1 ' most'        log pi  -2.378  log ref  -4.295  log-ratio  +1.917  r_t  -0.096  G_t  +4.561
+   2 '.'            log pi  -0.593  log ref  -1.479  log-ratio  +0.886  r_t  -0.044  G_t  +4.656
+   3 ' It'          log pi  -0.443  log ref  -2.078  log-ratio  +1.635  r_t  -0.082  G_t  +4.701
+   4 "'s"           log pi  -0.119  log ref  -0.432  log-ratio  +0.313  r_t  -0.016  G_t  +4.782
+   5 ' awesome'     log pi  -4.295  log ref  -5.872  log-ratio  +1.577  r_t  -0.079  G_t  +4.798
+   6 ' and'         log pi  -1.398  log ref  -3.049  log-ratio  +1.652  r_t  -0.083  G_t  +4.877
+   7 ' with'        log pi  -6.769  log ref  -6.978  log-ratio  +0.208  r_t  -0.010  G_t  +4.960
+   8 ' wonderful'   log pi  -5.204  log ref -10.049  log-ratio  +4.845  r_t  -0.242  G_t  +4.970
+   9 ' music'       log pi  -2.090  log ref  -3.332  log-ratio  +1.242  r_t  -0.062  G_t  +5.212
+  10 ','            log pi  -2.244  log ref  -1.902  log-ratio  -0.342  r_t  +0.017  G_t  +5.274
+  11 ' it'          log pi  -1.351  log ref  -1.074  log-ratio  -0.277  r_t  +0.014  G_t  +5.257
+  12 ' really'      log pi  -3.124  log ref  -3.382  log-ratio  +0.258  r_t  -0.013  G_t  +5.243
+  13 ' does'        log pi  -2.992  log ref  -2.951  log-ratio  -0.040  r_t  +0.002  G_t  +5.256
+  14 ' feel'        log pi  -3.505  log ref  -2.766  log-ratio  -0.740  r_t  +0.037  G_t  +5.254
+  15 ' like'        log pi  -0.890  log ref  -0.283  log-ratio  -0.608  r_t  +0.030  G_t  +5.217
+  16 ' there'       log pi  -5.414  log ref  -3.723  log-ratio  -1.691  r_t  +0.085  G_t  +5.187
+  17 "'s"           log pi  -0.429  log ref  -0.471  log-ratio  +0.042  r_t  -0.002  G_t  +5.102
+  18 ' an'          log pi  -2.397  log ref  -3.106  log-ratio  +0.708  r_t  -0.035  G_t  +5.105
+  19 ' oral'        log pi -10.683  log ref  -9.931  log-ratio  -0.751  r_t  +0.038  G_t  +5.140
+  20 ' history'     log pi  -1.054  log ref  -1.888  log-ratio  +0.834  r_t  -0.042  G_t  +5.102
+  21 '.'            log pi  -1.839  log ref  -2.384  log-ratio  +0.545  r_t  -0.027  G_t  +5.144
+  22 ' It'          log pi  -0.453  log ref  -1.695  log-ratio  +1.243  r_t  -0.062  G_t  +5.171
+  23 "'s"           log pi  -0.141  log ref  -0.385  log-ratio  +0.243  r_t  +5.233  G_t  +5.233
+  sum of log-ratios = 13.638;  total reward = R - beta * sum = +4.564 = G_0
+done in 8.3 min
