@@ -1,0 +1,98 @@
+== 1. THE MATRICES (TransformerLens stores them transposed: row vectors, x @ W)
+attn-only-1l: layers=1 heads/layer=8 d_model=512 d_head=64 n_vocab=48262 n_ctx=1024 attn_only=True params=51,043,462
+attn-only-2l: layers=2 heads/layer=8 d_model=512 d_head=64 n_vocab=48262 n_ctx=1024 attn_only=True params=52,094,086
+gpt2: layers=12 heads/layer=12 d_model=768 d_head=64 n_vocab=50257 n_ctx=1024 attn_only=False params=163,049,041
+  attn-only-2l W_E: (48262, 512)
+  attn-only-2l W_pos: (1024, 512)
+  attn-only-2l W_U: (512, 48262)
+  attn-only-2l W_Q: (2, 8, 512, 64)
+  attn-only-2l W_K: (2, 8, 512, 64)
+  attn-only-2l W_V: (2, 8, 512, 64)
+  attn-only-2l W_O: (2, 8, 64, 512)
+  W_E + W_U hold 49,420,288 of 52,094,086 parameters
+
+== 2. FOLDING LAYER NORM INTO THE WEIGHTS
+  prompt has 31 tokens; largest change in any log-probability after folding: 7.82e-05
+
+== 3. THE RESIDUAL STREAM AT THE LAST POSITION, TAKEN APART (attn-only-2l)
+  last tokens: ['.', ' Mr', ' and', ' Mrs', ' D', 'urs']  -> model predicts 'ley'
+  top 5: 'ley' 0.988, 'leys' 0.005, 'ki' 0.000, 'y' 0.000, 'a' 0.000
+  20 parts; |sum of parts - real residual vector| max = 2.38e-06; ||x_final|| = 21.37
+  first 4 coordinates of the real vector: [-0.256, -0.06, -0.569, -0.621]
+  first 4 coordinates of the sum:         [-0.256, -0.06, -0.569, -0.621]
+  final layer-norm scale at this position: 0.945
+  part                  size ||v||            adds to logit of 'ley'
+  embedding W_E t             4.55                            +2.218
+  position W_pos              2.52                            -0.102
+  head 0.0                    3.94                            +0.126
+  head 0.1                    1.88                            +0.805
+  head 0.2                    1.93                            +0.264
+  head 0.3                    4.65                            +0.828
+  head 0.4                    3.49                            -0.978
+  head 0.5                    1.39                            +0.795
+  head 0.6                    1.21                            +0.061
+  head 0.7                    1.57                            +0.227
+  bias b_O layer 0            3.82                            -0.281
+  head 1.0                    4.48                            +0.760
+  head 1.1                    3.45                            -0.356
+  head 1.2                    2.98                            -0.070
+  head 1.3                    3.80                            -0.387
+  head 1.4                    4.80                            +1.245
+  head 1.5                    3.55                            +0.095
+  head 1.6                   12.25                            +9.630
+  head 1.7                    9.75                            +0.255
+  bias b_O layer 1           12.09                            +2.776
+  unembedding bias                                            +2.732
+  sum of all lines = 20.645; the model's real logit = 20.645
+
+== 4. THE DIRECT PATH W_U W_E (top 5 "next tokens" from the token alone)
+  attn-only-1l
+       ' Barack' -> ' Obama', ' Hussein', 'lung', 'Obama', 'hurst'   (rank of the token itself: 33)
+       ' United' -> ' States', ' Nations', ' Kingdom', ' Methodist', ' Arab'   (rank of the token itself: 2623)
+          ' New' -> ' Zealand', ' York', ' Yorker', ' Orleans', ' Testament'   (rank of the token itself: 33197)
+         ' Hong' -> ' Kong', 'wei', 'chen', 'qi', 'yang'   (rank of the token itself: 2794)
+           ' Mr' -> ' Corbyn', 'unal', ' Modi', ' Putin', ' Trump'   (rank of the token itself: 9452)
+    ' according' -> ' to', ' specific', ' logger', ' diligence', ' respective'   (rank of the token itself: 620)
+          ' Los' -> ' Angeles', 'artan', ' Santos', 'opian', 'erville'   (rank of the token itself: 15214)
+            ' (' -> 'except', 'typically', 'possibly', 'hereinafter', 'mostly'   (rank of the token itself: 47889)
+  attn-only-2l
+       ' Barack' -> 'sson', ' Hussein', 'ounce', ' Obama', 'Obama'   (rank of the token itself: 10893)
+       ' United' -> ' States', ' Methodist', ' Nations', ' Kingdom', 'ique'   (rank of the token itself: 33848)
+          ' New' -> ' Zealand', ' Yorker', 'bery', ' York', ' Orleans'   (rank of the token itself: 40515)
+         ' Hong' -> 'wei', 'nai', ' Kong', 'jiang', 'cheon'   (rank of the token itself: 15404)
+           ' Mr' -> 'ails', 'ought', 'ses', 'upal', 'udge'   (rank of the token itself: 43439)
+    ' according' -> ' to', 'ing', 'to', 'oning', ' alike'   (rank of the token itself: 1702)
+          ' Los' -> ' Angeles', 'er', 'ers', 'ership', 'ering'   (rank of the token itself: 15473)
+            ' (' -> 'see', 'except', 'formerly', 'optional', 'INCLUDING'   (rank of the token itself: 48190)
+  gpt2
+       ' Barack' -> ' Barack', 'Obama', ' Obama', 'Hillary', ' Hillary'   (rank of the token itself: 0)
+       ' United' -> ' United', 'United', ' UNITED', 'united', ' mathemat'   (rank of the token itself: 0)
+          ' New' -> ' New', 'New', 'uckland', ' NEW', ' mathemat'   (rank of the token itself: 0)
+         ' Hong' -> ' Hong', 'Hong', ' Guang', ' HK', ' Shanghai'   (rank of the token itself: 0)
+           ' Mr' -> ' Mr', 'Mr', ' Ms', ' Mrs', 'Mrs'   (rank of the token itself: 0)
+    ' according' -> ' according', 'according', 'ccording', ' confir', ' proport'   (rank of the token itself: 0)
+          ' Los' -> ' Los', 'Los', ' Pasadena', ' LAPD', ' destro'   (rank of the token itself: 0)
+            ' (' -> ' mathemat', ' nodd', ' destro', ' challeng', ' advoc'   (rank of the token itself: 35)
+  attn-only-1l: tokens 1000..2999, share whose top direct-path prediction is the token itself: 0.000
+  gpt2: tokens 1000..2999, share whose top direct-path prediction is the token itself: 0.988
+
+== 5. READING, WRITING AND VIRTUAL WEIGHTS (attn-only-2l, paper notation: W_V is d_head x d_model)
+  head 0.0 reads with W_V (64, 512) and writes with W_O (512, 64)
+  W_O W_V is (512, 512) = 262,144 numbers, but its rank is only 64
+  virtual weight W_V(1.h2) W_O(0.h1): shape (64, 64), one for each of the 64 head pairs
+  largest size (Frobenius norm): head 0.2 -> head 1.6: 5.41; smallest: head 0.0 -> head 1.5: 1.16
+  (raw sizes are not yet a fair score of how much two heads talk; Part 5 normalises them)
+  the embedding as a "layer 0 writer": W_E is (512, 48262); head 0.0 reading it: W_V W_E is (64, 48262)
+
+== 6. BANDWIDTH
+  attn-only-2l: residual stream 512 dims; heads write 1024 dims in total; MLP neurons 0; ratio 2.0x
+  gpt2: residual stream 768 dims; heads write 9216 dims in total; MLP neurons 36864; ratio 60.0x
+  attn-only-2l: principal directions needed for 50% / 90% of the variance: W_E 114 / 360, W_U 111 / 367 (of 512)
+  gpt2: principal directions needed for 50% / 90% of the variance: W_E 182 / 558, W_U 165 / 569 (of 768)
+
+== 7. ROTATE THE RESIDUAL STREAM (attn-only-1l)
+  rotation is orthogonal: max |R R^T - I| = 1.3e-06; keeps ones: 8.6e-08
+  every weight that touches the stream changed (mean |change| in W_E: 0.218)
+  largest change in any output logit: 9.6e-05
+
+done in 15.2 s on the CPU

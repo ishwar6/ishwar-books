@@ -1,0 +1,43 @@
+== A. BIGRAMS IN A TINY CORPUS
+  corpus: the cat sat . the cat ran . the dog sat .
+  words that follow "the": ['cat', 'cat', 'dog']  counts {'cat': 2, 'dog': 1}
+  P(next | the): {'cat': 0.667, 'dog': 0.333}
+  log P(next | the): {'cat': -0.405, 'dog': -1.099}
+  softmax(log P + 0.0) = [0.667, 0.333]  (adding the same number to every logit changes nothing)
+  softmax(log P + 5.0) = [0.667, 0.333]  (adding the same number to every logit changes nothing)
+
+== B. ZERO-LAYER MODEL: 4 tokens, d_model = 3
+  vocabulary: ['the', 'cat', 'dog', 'sat']
+  t (one-hot "the") = [1.0, 0.0, 0.0, 0.0]
+  x0 = W_E t = [1.0, 0.0, 0.0]  (the first column of W_E)
+  logits = W_U x0 = [0.0, 2.0, 1.0, 0.0]
+  softmax(logits) = [0.083, 0.61, 0.225, 0.083]  -> after "the": the 0.083, cat 0.610, dog 0.225, sat 0.083
+  the whole table W_U W_E (row = next token, column = current token):
+     the: [0.0, 0.0, 1.0, 1.0]
+     cat: [2.0, 0.0, 0.0, 0.0]
+     dog: [1.0, 0.0, 0.0, 0.0]
+     sat: [0.0, 2.0, 2.0, 0.0]
+  sizes: W_E (3, 4), W_U (4, 3), W_U W_E (4, 4)
+
+== C. RESIDUAL STREAM = SUM OF PARTS
+  x0 = [1.0, 0.0, 0.0]; head 1 writes [0.0, 0.5, 0.0]; head 2 writes [0.2, 0.0, -0.3]
+  x_final = x0 + h1 + h2 = [1.2, 0.5, -0.3]
+  logits = W_U x_final = [-0.3, 2.4, 1.2, 1.0]
+    W_U (embedding x0) = [0.0, 2.0, 1.0, 0.0]
+    W_U (head 1) = [0.0, 0.0, 0.0, 1.0]
+    W_U (head 2) = [-0.3, 0.4, 0.2, 0.0]
+    sum of the three rows = [-0.3, 2.4, 1.2, 1.0]  (the same: the unembedding is linear)
+
+== D. VIRTUAL WEIGHTS
+  writer W_O (3, 1) = [0.0, 0.0, 1.0]^T; sends a = 0.7 -> adds [0.0, 0.0, 0.7] to the stream
+  reader a: W_I = [0.0, 0.0, 2.0]; virtual weight W_I W_O = 2.0; reads 1.40
+  reader b: W_I = [1.0, 0.0, 0.0]; virtual weight W_I W_O = 0.0; reads 0.00
+
+== E. A BIAS IS A WEIGHT ON AN ALWAYS-ONE INPUT
+  W x + b = [13.0, 15.0] + [1.0, -1.0] = [14.0, 14.0]
+  [W | b] [x; 1] = [[2.0, 1.0, 1.0], [0.0, 3.0, -1.0]] . [4.0, 5.0, 1.0] = [14.0, 14.0]
+
+== F. ROTATE THE STREAM BY 90 DEGREES (dimensions 2 and 3)
+  embedding of "cat": was [0.0, 1.0, 0.0], now R x = [0.0, 0.0, 1.0]
+  new unembedding W_U R^T: rows [[0.0, -1.0, 0.0], [2.0, 0.0, 0.0], [1.0, 0.0, 0.0], [0.0, 0.0, 2.0]]
+  logits for "cat" before: [0.0, 0.0, 0.0, 2.0]; after rotating both: [0.0, 0.0, 0.0, 2.0]
