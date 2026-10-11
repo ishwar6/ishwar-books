@@ -32,7 +32,7 @@ This part builds the whole picture from the ground up:
 > **Reported:** numbers from papers (Megatron-LM, GPipe, the Llama 3 report, DeepSeek-V3, DistServe, Splitwise, Mooncake) and from official documentation, each with its hardware.
 > Engine flags were checked in the vLLM and SGLang documentation on 11 October 2026 (vLLM `187a0eb`, SGLang `f9cee8d`).
 
-This part builds on Part 6 (coming soon), which covered serving on one GPU per copy of the model: latency targets, goodput, queueing, capacity planning and routing between copies. Here we look inside a copy that is too big for one GPU.
+This part builds on [Part 6](llm-inference-6-serving-in-production.md), which covered serving on one GPU per copy of the model: latency targets, goodput, queueing, capacity planning and routing between copies. Here we look inside a copy that is too big for one GPU.
 
 ## 1. Why one GPU is not enough
 
@@ -716,7 +716,7 @@ With prefill first, the user's stream freezes for the whole 67.8 ms prefill, six
 
 ### The papers: Splitwise and DistServe
 
-Two papers in 2024 made the case for splitting the phases onto separate GPUs. **Splitwise** (Patel et al., Microsoft and the University of Washington) started from production traces and the observation that decode does not need the newest, most compute-heavy GPUs; it reported clusters with "up to 1.4x higher throughput at 20% lower cost". **DistServe** (Zhong et al., OSDI 2024) framed the goal as **goodput**, defined in Part 6 (coming soon): the highest request rate at which a target share of requests still meets both the time-to-first-token (TTFT) and time-per-output-token (TPOT) objectives. Its Figure 1 is the clearest picture of the problem:
+Two papers in 2024 made the case for splitting the phases onto separate GPUs. **Splitwise** (Patel et al., Microsoft and the University of Washington) started from production traces and the observation that decode does not need the newest, most compute-heavy GPUs; it reported clusters with "up to 1.4x higher throughput at 20% lower cost". **DistServe** (Zhong et al., OSDI 2024) framed the goal as **goodput**, defined in [Part 6](llm-inference-6-serving-in-production.md): the highest request rate at which a target share of requests still meets both the time-to-first-token (TTFT) and time-per-output-token (TPOT) objectives. Its Figure 1 is the clearest picture of the problem:
 
 > [!PAPER] Zhong et al., DistServe · Figure 1 · page 1
 > [![DistServe Figure 1: Performance when serving an LLM with 13B parameters under a synthetic workload with input length 512 and output length 64 on one NVIDIA 80GB A100. Upper: P90 time-to-first-token for existing systems against a prefill-only system, with the SLA line crossed at about 1.6 and 5.6 requests per second. Lower: P90 time-per-output-token for existing systems against a decode-only system, with the SLA crossed at about 1.6 and 10 requests per second.](/img/multigpu/paper-distserve-fig1.png)](/img/multigpu/paper-distserve-fig1.png)
@@ -952,7 +952,7 @@ Running disaggregation and wide expert parallelism in production needs more than
 - **[NVIDIA Dynamo](https://github.com/ai-dynamo/dynamo)** describes itself as "the open-source, datacenter-scale inference stack". It runs on top of SGLang, TensorRT-LLM or vLLM ("it doesn't replace" them) and adds disaggregated prefill and decode pools that scale independently, KV-aware routing ("based on worker load and KV cache overlap"), and a KV block manager that offloads cache from GPU to CPU, SSD and remote storage. Its transfer library, [NIXL](https://github.com/ai-dynamo/nixl) (NVIDIA Inference Xfer Library), is also one of vLLM's KV connectors and SGLang's transfer backends. Latest release at the time of writing: v1.5.1, 7 October 2026.
 - **[llm-d](https://github.com/llm-d/llm-d)**, a Cloud Native Computing Foundation sandbox project started by Red Hat, Google Cloud, IBM Research, CoreWeave and NVIDIA, is "a high-performance distributed inference serving stack optimized for production deployments on Kubernetes". Its documented ["well-lit paths"](https://llm-d.ai/docs/well-lit-paths) include prefix-cache-aware routing, prefill/decode disaggregation, and "wide expert parallelism" for large MoE models. Latest release: v0.10.0, 29 September 2026.
 
-Both build on vLLM (and in Dynamo's case SGLang and TensorRT-LLM as well); neither replaces the parallelism inside an engine. They decide which engine instance a request goes to and where its KV cache moves, the cluster-level version of the routing in Part 6 (coming soon).
+Both build on vLLM (and in Dynamo's case SGLang and TensorRT-LLM as well); neither replaces the parallelism inside an engine. They decide which engine instance a request goes to and where its KV cache moves, the cluster-level version of the routing in [Part 6](llm-inference-6-serving-in-production.md).
 
 ## 9. Choosing a layout
 
@@ -962,7 +962,7 @@ Both build on vLLM (and in Dynamo's case SGLang and TensorRT-LLM as well); neith
 
 ### Worked example 1: Llama 3.1 8B
 
-Weights 16 GB, 128 KiB of KV per token. One H100 holds the model plus $$(72 - 16)\ \text{GB} / 128\ \text{KiB} \approx 427{,}000$$ tokens of KV cache: 52 conversations of 8,192 tokens. The decode floor is 4.8 ms per step on one GPU. **Use one GPU per copy, and add copies for more traffic.** Tensor parallelism would only add all-reduces to a model that already fits; at TP=2 the step floor halves to 2.4 ms, which is worth it only if a per-token latency target cannot be met otherwise. Disaggregation, by our simulation, does not raise goodput at this size unless the per-token target is very strict. Everything else about scaling this model is in Part 6 (coming soon).
+Weights 16 GB, 128 KiB of KV per token. One H100 holds the model plus $$(72 - 16)\ \text{GB} / 128\ \text{KiB} \approx 427{,}000$$ tokens of KV cache: 52 conversations of 8,192 tokens. The decode floor is 4.8 ms per step on one GPU. **Use one GPU per copy, and add copies for more traffic.** Tensor parallelism would only add all-reduces to a model that already fits; at TP=2 the step floor halves to 2.4 ms, which is worth it only if a per-token latency target cannot be met otherwise. Disaggregation, by our simulation, does not raise goodput at this size unless the per-token target is very strict. Everything else about scaling this model is in [Part 6](llm-inference-6-serving-in-production.md).
 
 ### Worked example 2: Llama 3.1 70B on one 8-GPU node
 
@@ -1020,7 +1020,7 @@ Return to where we started. A 70B model does not fit on one GPU, so it is cut in
 | [3](llm-inference-3-vllm.md) | vLLM | Paged memory, continuous batching and chunked prefill keep one GPU busy |
 | [4](llm-inference-4-speculative-decoding.md) | Speculative decoding | Checking several guessed tokens costs about as much as writing one |
 | [5](llm-inference-5-sglang-vs-vllm.md) | SGLang and vLLM | Reuse the saved state of shared prompt beginnings |
-| 6 (coming soon) | Serving in production | Measure goodput against SLOs, plan capacity, route between copies |
+| [6](llm-inference-6-serving-in-production.md) | Serving in production | Measure goodput against SLOs, plan capacity, route between copies |
 | 7 | Beyond one GPU | Split the model where the wires are fast; the cost of talking decides the layout |
 
 ## Try it yourself

@@ -1,0 +1,709 @@
+{
+  "retry": {
+    "no retries": {
+      "attempts": 3900,
+      "success": 0.9584615384615385,
+      "recovered_at": 80.0,
+      "windows": [
+        {
+          "t": 0.0,
+          "success": 1.0,
+          "attempts_per_s": 13.0
+        },
+        {
+          "t": 10.0,
+          "success": 1.0,
+          "attempts_per_s": 12.0
+        },
+        {
+          "t": 20.0,
+          "success": 1.0,
+          "attempts_per_s": 11.5
+        },
+        {
+          "t": 30.0,
+          "success": 1.0,
+          "attempts_per_s": 12.7
+        },
+        {
+          "t": 40.0,
+          "success": 1.0,
+          "attempts_per_s": 13.1
+        },
+        {
+          "t": 50.0,
+          "success": 0.8547008547008547,
+          "attempts_per_s": 11.7
+        },
+        {
+          "t": 60.0,
+          "success": 0.06451612903225806,
+          "attempts_per_s": 12.4
+        },
+        {
+          "t": 70.0,
+          "success": 0.7387387387387387,
+          "attempts_per_s": 11.1
+        },
+        {
+          "t": 80.0,
+          "success": 1.0,
+          "attempts_per_s": 12.9
+        },
+        {
+          "t": 90.0,
+          "success": 1.0,
+          "attempts_per_s": 13.4
+        },
+        {
+          "t": 100.0,
+          "success": 1.0,
+          "attempts_per_s": 13.7
+        },
+        {
+          "t": 110.0,
+          "success": 1.0,
+          "attempts_per_s": 15.2
+        },
+        {
+          "t": 120.0,
+          "success": 1.0,
+          "attempts_per_s": 12.3
+        },
+        {
+          "t": 130.0,
+          "success": 1.0,
+          "attempts_per_s": 13.1
+        },
+        {
+          "t": 140.0,
+          "success": 1.0,
+          "attempts_per_s": 12.9
+        },
+        {
+          "t": 150.0,
+          "success": 1.0,
+          "attempts_per_s": 12.8
+        },
+        {
+          "t": 160.0,
+          "success": 1.0,
+          "attempts_per_s": 14.0
+        },
+        {
+          "t": 170.0,
+          "success": 1.0,
+          "attempts_per_s": 13.3
+        },
+        {
+          "t": 180.0,
+          "success": 1.0,
+          "attempts_per_s": 13.8
+        },
+        {
+          "t": 190.0,
+          "success": 1.0,
+          "attempts_per_s": 11.2
+        },
+        {
+          "t": 200.0,
+          "success": 1.0,
+          "attempts_per_s": 13.6
+        },
+        {
+          "t": 210.0,
+          "success": 1.0,
+          "attempts_per_s": 12.2
+        },
+        {
+          "t": 220.0,
+          "success": 1.0,
+          "attempts_per_s": 12.1
+        },
+        {
+          "t": 230.0,
+          "success": 1.0,
+          "attempts_per_s": 12.3
+        },
+        {
+          "t": 240.0,
+          "success": 1.0,
+          "attempts_per_s": 11.5
+        },
+        {
+          "t": 250.0,
+          "success": 1.0,
+          "attempts_per_s": 13.3
+        },
+        {
+          "t": 260.0,
+          "success": 1.0,
+          "attempts_per_s": 11.9
+        },
+        {
+          "t": 270.0,
+          "success": 1.0,
+          "attempts_per_s": 13.5
+        },
+        {
+          "t": 280.0,
+          "success": 1.0,
+          "attempts_per_s": 12.0
+        },
+        {
+          "t": 290.0,
+          "success": 1.0,
+          "attempts_per_s": 12.8
+        }
+      ],
+      "wasted_tokens": 5707
+    },
+    "retry at once, no cancel": {
+      "attempts": 13413,
+      "success": 0.18692307692307691,
+      "recovered_at": null,
+      "windows": [
+        {
+          "t": 0.0,
+          "success": 1.0,
+          "attempts_per_s": 13.0
+        },
+        {
+          "t": 10.0,
+          "success": 1.0,
+          "attempts_per_s": 12.0
+        },
+        {
+          "t": 20.0,
+          "success": 1.0,
+          "attempts_per_s": 11.5
+        },
+        {
+          "t": 30.0,
+          "success": 1.0,
+          "attempts_per_s": 12.7
+        },
+        {
+          "t": 40.0,
+          "success": 1.0,
+          "attempts_per_s": 13.1
+        },
+        {
+          "t": 50.0,
+          "success": 0.8547008547008547,
+          "attempts_per_s": 11.7
+        },
+        {
+          "t": 60.0,
+          "success": 0.04838709677419355,
+          "attempts_per_s": 14.1
+        },
+        {
+          "t": 70.0,
+          "success": 0.0,
+          "attempts_per_s": 24.6
+        },
+        {
+          "t": 80.0,
+          "success": 0.0,
+          "attempts_per_s": 37.5
+        },
+        {
+          "t": 90.0,
+          "success": 0.0,
+          "attempts_per_s": 49.2
+        },
+        {
+          "t": 100.0,
+          "success": 0.0,
+          "attempts_per_s": 51.1
+        },
+        {
+          "t": 110.0,
+          "success": 0.0,
+          "attempts_per_s": 55.2
+        },
+        {
+          "t": 120.0,
+          "success": 0.0,
+          "attempts_per_s": 54.6
+        },
+        {
+          "t": 130.0,
+          "success": 0.0,
+          "attempts_per_s": 54.3
+        },
+        {
+          "t": 140.0,
+          "success": 0.0,
+          "attempts_per_s": 53.5
+        },
+        {
+          "t": 150.0,
+          "success": 0.0,
+          "attempts_per_s": 51.1
+        },
+        {
+          "t": 160.0,
+          "success": 0.0,
+          "attempts_per_s": 52.8
+        },
+        {
+          "t": 170.0,
+          "success": 0.0,
+          "attempts_per_s": 53.0
+        },
+        {
+          "t": 180.0,
+          "success": 0.0,
+          "attempts_per_s": 53.9
+        },
+        {
+          "t": 190.0,
+          "success": 0.0,
+          "attempts_per_s": 52.3
+        },
+        {
+          "t": 200.0,
+          "success": 0.0,
+          "attempts_per_s": 51.9
+        },
+        {
+          "t": 210.0,
+          "success": 0.0,
+          "attempts_per_s": 50.8
+        },
+        {
+          "t": 220.0,
+          "success": 0.0,
+          "attempts_per_s": 49.1
+        },
+        {
+          "t": 230.0,
+          "success": 0.0,
+          "attempts_per_s": 50.2
+        },
+        {
+          "t": 240.0,
+          "success": 0.0,
+          "attempts_per_s": 48.1
+        },
+        {
+          "t": 250.0,
+          "success": 0.0,
+          "attempts_per_s": 49.2
+        },
+        {
+          "t": 260.0,
+          "success": 0.0,
+          "attempts_per_s": 49.0
+        },
+        {
+          "t": 270.0,
+          "success": 0.0,
+          "attempts_per_s": 50.2
+        },
+        {
+          "t": 280.0,
+          "success": 0.0,
+          "attempts_per_s": 50.7
+        },
+        {
+          "t": 290.0,
+          "success": 0.0,
+          "attempts_per_s": 50.2
+        }
+      ],
+      "wasted_tokens": 425460
+    },
+    "retry at once, cancel": {
+      "attempts": 3917,
+      "success": 1.0,
+      "recovered_at": 70.0,
+      "windows": [
+        {
+          "t": 0.0,
+          "success": 1.0,
+          "attempts_per_s": 13.0
+        },
+        {
+          "t": 10.0,
+          "success": 1.0,
+          "attempts_per_s": 12.0
+        },
+        {
+          "t": 20.0,
+          "success": 1.0,
+          "attempts_per_s": 11.5
+        },
+        {
+          "t": 30.0,
+          "success": 1.0,
+          "attempts_per_s": 12.7
+        },
+        {
+          "t": 40.0,
+          "success": 1.0,
+          "attempts_per_s": 13.1
+        },
+        {
+          "t": 50.0,
+          "success": 1.0,
+          "attempts_per_s": 11.7
+        },
+        {
+          "t": 60.0,
+          "success": 1.0,
+          "attempts_per_s": 14.1
+        },
+        {
+          "t": 70.0,
+          "success": 1.0,
+          "attempts_per_s": 11.1
+        },
+        {
+          "t": 80.0,
+          "success": 1.0,
+          "attempts_per_s": 12.9
+        },
+        {
+          "t": 90.0,
+          "success": 1.0,
+          "attempts_per_s": 13.4
+        },
+        {
+          "t": 100.0,
+          "success": 1.0,
+          "attempts_per_s": 13.7
+        },
+        {
+          "t": 110.0,
+          "success": 1.0,
+          "attempts_per_s": 15.2
+        },
+        {
+          "t": 120.0,
+          "success": 1.0,
+          "attempts_per_s": 12.3
+        },
+        {
+          "t": 130.0,
+          "success": 1.0,
+          "attempts_per_s": 13.1
+        },
+        {
+          "t": 140.0,
+          "success": 1.0,
+          "attempts_per_s": 12.9
+        },
+        {
+          "t": 150.0,
+          "success": 1.0,
+          "attempts_per_s": 12.8
+        },
+        {
+          "t": 160.0,
+          "success": 1.0,
+          "attempts_per_s": 14.0
+        },
+        {
+          "t": 170.0,
+          "success": 1.0,
+          "attempts_per_s": 13.3
+        },
+        {
+          "t": 180.0,
+          "success": 1.0,
+          "attempts_per_s": 13.8
+        },
+        {
+          "t": 190.0,
+          "success": 1.0,
+          "attempts_per_s": 11.2
+        },
+        {
+          "t": 200.0,
+          "success": 1.0,
+          "attempts_per_s": 13.6
+        },
+        {
+          "t": 210.0,
+          "success": 1.0,
+          "attempts_per_s": 12.2
+        },
+        {
+          "t": 220.0,
+          "success": 1.0,
+          "attempts_per_s": 12.1
+        },
+        {
+          "t": 230.0,
+          "success": 1.0,
+          "attempts_per_s": 12.3
+        },
+        {
+          "t": 240.0,
+          "success": 1.0,
+          "attempts_per_s": 11.5
+        },
+        {
+          "t": 250.0,
+          "success": 1.0,
+          "attempts_per_s": 13.3
+        },
+        {
+          "t": 260.0,
+          "success": 1.0,
+          "attempts_per_s": 11.9
+        },
+        {
+          "t": 270.0,
+          "success": 1.0,
+          "attempts_per_s": 13.5
+        },
+        {
+          "t": 280.0,
+          "success": 1.0,
+          "attempts_per_s": 12.0
+        },
+        {
+          "t": 290.0,
+          "success": 1.0,
+          "attempts_per_s": 12.8
+        }
+      ],
+      "wasted_tokens": 0
+    },
+    "backoff + jitter, cancel": {
+      "attempts": 3917,
+      "success": 1.0,
+      "recovered_at": 70.0,
+      "windows": [
+        {
+          "t": 0.0,
+          "success": 1.0,
+          "attempts_per_s": 13.0
+        },
+        {
+          "t": 10.0,
+          "success": 1.0,
+          "attempts_per_s": 12.0
+        },
+        {
+          "t": 20.0,
+          "success": 1.0,
+          "attempts_per_s": 11.5
+        },
+        {
+          "t": 30.0,
+          "success": 1.0,
+          "attempts_per_s": 12.7
+        },
+        {
+          "t": 40.0,
+          "success": 1.0,
+          "attempts_per_s": 13.1
+        },
+        {
+          "t": 50.0,
+          "success": 1.0,
+          "attempts_per_s": 11.7
+        },
+        {
+          "t": 60.0,
+          "success": 1.0,
+          "attempts_per_s": 13.8
+        },
+        {
+          "t": 70.0,
+          "success": 1.0,
+          "attempts_per_s": 11.4
+        },
+        {
+          "t": 80.0,
+          "success": 1.0,
+          "attempts_per_s": 12.9
+        },
+        {
+          "t": 90.0,
+          "success": 1.0,
+          "attempts_per_s": 13.4
+        },
+        {
+          "t": 100.0,
+          "success": 1.0,
+          "attempts_per_s": 13.7
+        },
+        {
+          "t": 110.0,
+          "success": 1.0,
+          "attempts_per_s": 15.2
+        },
+        {
+          "t": 120.0,
+          "success": 1.0,
+          "attempts_per_s": 12.3
+        },
+        {
+          "t": 130.0,
+          "success": 1.0,
+          "attempts_per_s": 13.1
+        },
+        {
+          "t": 140.0,
+          "success": 1.0,
+          "attempts_per_s": 12.9
+        },
+        {
+          "t": 150.0,
+          "success": 1.0,
+          "attempts_per_s": 12.8
+        },
+        {
+          "t": 160.0,
+          "success": 1.0,
+          "attempts_per_s": 14.0
+        },
+        {
+          "t": 170.0,
+          "success": 1.0,
+          "attempts_per_s": 13.3
+        },
+        {
+          "t": 180.0,
+          "success": 1.0,
+          "attempts_per_s": 13.8
+        },
+        {
+          "t": 190.0,
+          "success": 1.0,
+          "attempts_per_s": 11.2
+        },
+        {
+          "t": 200.0,
+          "success": 1.0,
+          "attempts_per_s": 13.6
+        },
+        {
+          "t": 210.0,
+          "success": 1.0,
+          "attempts_per_s": 12.2
+        },
+        {
+          "t": 220.0,
+          "success": 1.0,
+          "attempts_per_s": 12.1
+        },
+        {
+          "t": 230.0,
+          "success": 1.0,
+          "attempts_per_s": 12.3
+        },
+        {
+          "t": 240.0,
+          "success": 1.0,
+          "attempts_per_s": 11.5
+        },
+        {
+          "t": 250.0,
+          "success": 1.0,
+          "attempts_per_s": 13.3
+        },
+        {
+          "t": 260.0,
+          "success": 1.0,
+          "attempts_per_s": 11.9
+        },
+        {
+          "t": 270.0,
+          "success": 1.0,
+          "attempts_per_s": 13.5
+        },
+        {
+          "t": 280.0,
+          "success": 1.0,
+          "attempts_per_s": 12.0
+        },
+        {
+          "t": 290.0,
+          "success": 1.0,
+          "attempts_per_s": 12.8
+        }
+      ],
+      "wasted_tokens": 0
+    }
+  },
+  "preemption": [
+    {
+      "rate": 2,
+      "preemptions": 0,
+      "recomputed": 0,
+      "tpot_p99": 36.10194833580694,
+      "itl_p99": 92.79955723171588,
+      "itl_max": 176.29111984954216,
+      "e2e_p99": 47706.929224198095
+    },
+    {
+      "rate": 3,
+      "preemptions": 0,
+      "recomputed": 0,
+      "tpot_p99": 49.98250329558839,
+      "itl_p99": 133.46486311097397,
+      "itl_max": 184.85550954242353,
+      "e2e_p99": 67118.39219953703
+    },
+    {
+      "rate": 4,
+      "preemptions": 962,
+      "recomputed": 1102072,
+      "tpot_p99": 99.70611505387153,
+      "itl_p99": 195.86727240751497,
+      "itl_max": 5876.466974518029,
+      "e2e_p99": 146063.67649720656
+    },
+    {
+      "rate": 5,
+      "preemptions": 1118,
+      "recomputed": 1251514,
+      "tpot_p99": 97.73387070458048,
+      "itl_p99": 195.76445896120276,
+      "itl_max": 4427.7761833833065,
+      "e2e_p99": 230493.03335571729
+    },
+    {
+      "rate": 6,
+      "preemptions": 1152,
+      "recomputed": 1340114,
+      "tpot_p99": 102.10486770239001,
+      "itl_p99": 196.05419950155192,
+      "itl_max": 5873.252797170659,
+      "e2e_p99": 302012.28320910165
+    }
+  ],
+  "hol": {
+    "chunked prefill, 2,048-token budget": {
+      "max_gap_near": 338.4458923776183,
+      "p99_gap_all": 134.73059776418086,
+      "big_ttft": 2117.588881729738,
+      "others_ttft_max": 1599.5566406082507
+    },
+    "no chunking (whole prompt in one step)": {
+      "max_gap_near": 1864.5080519423718,
+      "p99_gap_all": 114.6697637555917,
+      "big_ttft": 1873.8159430972373,
+      "others_ttft_max": 1883.1935354317538
+    }
+  },
+  "noisy": {
+    "alone": {
+      "p50": 66.4288968245819,
+      "p99": 319.5644867124425,
+      "max": 366.7725612068898
+    },
+    "with burst": {
+      "p50": 6798.481171314033,
+      "p99": 16841.52342126445,
+      "max": 16857.30545692447
+    }
+  }
+}

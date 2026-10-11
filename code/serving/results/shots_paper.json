@@ -1,0 +1,133 @@
+[
+  {
+    "name": "paper-distserve-goodput",
+    "arxiv_id": "2401.09670",
+    "page": 1,
+    "anchor": "needs and maximize per-GPU goodput",
+    "above": 30,
+    "highlight": [
+      "per-GPU goodput, defined as the",
+      "request rate that can be served adhering to the SLO",
+      "attainment goal (say, 90%) for each GPU provisioned"
+    ],
+    "end": "lower cost per query.",
+    "url": "https://arxiv.org/pdf/2401.09670",
+    "sha256": "3ef8776301629419e97d7f6dc08b9a46f3577e05e96538a17dd4a526762f42f0"
+  },
+  {
+    "name": "paper-distserve-fig1",
+    "arxiv_id": "2401.09670",
+    "page": 0,
+    "anchor": "Figure 1: Performance when serving an LLM",
+    "figure": true,
+    "below": 0,
+    "url": "https://arxiv.org/pdf/2401.09670",
+    "sha256": "3ef8776301629419e97d7f6dc08b9a46f3577e05e96538a17dd4a526762f42f0"
+  },
+  {
+    "name": "paper-distserve-md1",
+    "arxiv_id": "2401.09670",
+    "page": 4,
+    "anchor": "Disaggregation enables the prefill phase to function",
+    "above": 2,
+    "highlight": [
+      "M/D/1 queue"
+    ],
+    "end": "second corresponds to the queuing delay",
+    "url": "https://arxiv.org/pdf/2401.09670",
+    "sha256": "3ef8776301629419e97d7f6dc08b9a46f3577e05e96538a17dd4a526762f42f0"
+  },
+  {
+    "name": "paper-sarathi-stall",
+    "arxiv_id": "2403.02310",
+    "page": 5,
+    "anchor": "Figure 7: A generation stall occurs",
+    "figure": true,
+    "below": 0,
+    "url": "https://arxiv.org/pdf/2403.02310",
+    "sha256": "45f59f4474de29baf4d315c785b850625548b69a9bc7be2e036d6fc59f54b54a"
+  },
+  {
+    "name": "paper-awq-fig2",
+    "arxiv_id": "2306.00978",
+    "page": 2,
+    "anchor": "Figure 2. We observe that we can find 1%",
+    "figure": true,
+    "below": 0,
+    "url": "https://arxiv.org/pdf/2306.00978",
+    "sha256": "6e35c8fe7af1f18a5c48dd2524629d859a2013a91d4b3666b554705287a17764"
+  },
+  {
+    "name": "paper-awq-table4",
+    "arxiv_id": "2306.00978",
+    "page": 6,
+    "anchor": "Table 4. AWQ improves over round-to-nearest",
+    "figure": true,
+    "below": 0,
+    "fig_top": 148,
+    "url": "https://arxiv.org/pdf/2306.00978",
+    "sha256": "6e35c8fe7af1f18a5c48dd2524629d859a2013a91d4b3666b554705287a17764"
+  },
+  {
+    "name": "paper-smoothquant-fig4",
+    "arxiv_id": "2211.10438",
+    "page": 3,
+    "anchor": "Figure 4: Magnitude of the input activations",
+    "figure": true,
+    "below": 0,
+    "url": "https://arxiv.org/pdf/2211.10438",
+    "sha256": "d17856490ff664a99f8d08fe76eabd83219ed048cd1bc18ce3d0571e71056ff8"
+  },
+  {
+    "name": "paper-slora-pool",
+    "arxiv_id": "2311.03285",
+    "page": 4,
+    "rect": [
+      50,
+      64,
+      300,
+      201
+    ],
+    "url": "https://arxiv.org/pdf/2311.03285",
+    "sha256": "c8d93e5a2525d3139d4994740a0057a8f447a568c5a31613976c9fd254867db7"
+  },
+  {
+    "name": "paper-slora-batch",
+    "arxiv_id": "2311.03285",
+    "page": 2,
+    "rect": [
+      306,
+      60,
+      562,
+      319
+    ],
+    "url": "https://arxiv.org/pdf/2311.03285",
+    "sha256": "c8d93e5a2525d3139d4994740a0057a8f447a568c5a31613976c9fd254867db7"
+  },
+  {
+    "name": "paper-punica-sgmv",
+    "arxiv_id": "2310.18547",
+    "page": 2,
+    "rect": [
+      306,
+      60,
+      562,
+      184
+    ],
+    "url": "https://arxiv.org/pdf/2310.18547",
+    "sha256": "1d015550e7c3c13fc2574fd2cdfa48b343a5b6d02f2bf8607c2e568d7a619944"
+  },
+  {
+    "name": "paper-sarathi-capacity",
+    "arxiv_id": "2403.02310",
+    "page": 10,
+    "rect": [
+      50,
+      40,
+      300,
+      372
+    ],
+    "url": "https://arxiv.org/pdf/2403.02310",
+    "sha256": "45f59f4474de29baf4d315c785b850625548b69a9bc7be2e036d6fc59f54b54a"
+  }
+]

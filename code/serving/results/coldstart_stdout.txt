@@ -1,0 +1,18 @@
+$ python code/serving/coldstart.py
+model file: aeb713fdee2a083353a999d46771858f952744509d8af12868a1e95e9c45c7e3, 0.988 GB
+SSD read of a fresh 2 GiB file, F_NOCACHE: 4.18, 4.44, 4.65 GB/s (median 4.44 GB/s)
+
+trial   import  read+build   to GPU  1st pass  2nd pass    total
+    1    5.69s       6.72s    1.83s     0.22s      30ms   14.47s
+    2    5.85s       5.44s    2.32s     0.29s      28ms   13.91s
+    3    5.78s       4.51s    5.45s     0.38s      26ms   16.12s
+    4    5.42s       3.52s    1.64s     0.24s      29ms   10.83s
+    5    6.29s       4.31s    2.37s     0.20s      27ms   13.17s
+median    5.78s       4.51s    2.32s     0.24s      28ms   13.91s
+
+EXTRAPOLATION: time just to move the weights, at stated bandwidths (no process start, no warm-up)
+               model  local disk (4.4 GB/s, measured)    10 Gbit/s network (1.25 GB/s)   100 Gbit/s network (12.5 GB/s)
+   Qwen2.5-0.5B BF16                             0.2s                             0.8s                             0.1s
+   Llama 3.1 8B BF16                             3.6s                            12.8s                             1.3s
+    Llama 3.1 8B FP8                             1.8s                             6.4s                             0.6s
+  Llama 3.1 70B BF16                            31.7s                           112.8s                            11.3s

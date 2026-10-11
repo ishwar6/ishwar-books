@@ -1,0 +1,272 @@
+{
+  "zipf": {
+    "random": {
+      "hit_rate": 0.4721853676311925,
+      "ttft_p50": 217.7917342004439,
+      "ttft_p99": 690.2600238212453,
+      "e2e_p99": 16784.040292595415,
+      "imbalance": 1.0540740740740742,
+      "per_replica": [
+        1305,
+        1321,
+        1423,
+        1351
+      ],
+      "decisions": {
+        "balance": 0,
+        "match": 0,
+        "emptiest": 0
+      },
+      "preemptions": 0
+    },
+    "round_robin": {
+      "hit_rate": 0.478891569137972,
+      "ttft_p50": 187.72581294400152,
+      "ttft_p99": 415.3970018019668,
+      "e2e_p99": 15769.144262332642,
+      "imbalance": 1.0,
+      "per_replica": [
+        1350,
+        1350,
+        1350,
+        1350
+      ],
+      "decisions": {
+        "balance": 0,
+        "match": 0,
+        "emptiest": 0
+      },
+      "preemptions": 0
+    },
+    "least_outstanding": {
+      "hit_rate": 0.46410353504609925,
+      "ttft_p50": 212.21486837798147,
+      "ttft_p99": 541.9482637184608,
+      "e2e_p99": 15596.916699830872,
+      "imbalance": 1.0148148148148148,
+      "per_replica": [
+        1331,
+        1361,
+        1338,
+        1370
+      ],
+      "decisions": {
+        "balance": 0,
+        "match": 0,
+        "emptiest": 0
+      },
+      "preemptions": 0
+    },
+    "power_of_two": {
+      "hit_rate": 0.47356099870950624,
+      "ttft_p50": 214.363529557515,
+      "ttft_p99": 546.1127640743845,
+      "e2e_p99": 14990.482645249745,
+      "imbalance": 1.0103703703703704,
+      "per_replica": [
+        1364,
+        1348,
+        1330,
+        1358
+      ],
+      "decisions": {
+        "balance": 0,
+        "match": 0,
+        "emptiest": 0
+      },
+      "preemptions": 0
+    },
+    "prefix_hash": {
+      "hit_rate": 0.7225502238842938,
+      "ttft_p50": 139.00594369653845,
+      "ttft_p99": 638.8807924994372,
+      "e2e_p99": 24542.592016045022,
+      "imbalance": 1.728888888888889,
+      "per_replica": [
+        684,
+        2334,
+        816,
+        1566
+      ],
+      "decisions": {
+        "balance": 0,
+        "match": 0,
+        "emptiest": 0
+      },
+      "preemptions": 0
+    },
+    "cache_aware": {
+      "hit_rate": 0.693490017354916,
+      "ttft_p50": 88.39424175129534,
+      "ttft_p99": 1835.7664086328311,
+      "e2e_p99": 28607.94783063403,
+      "imbalance": 1.597037037037037,
+      "per_replica": [
+        1377,
+        2156,
+        1332,
+        535
+      ],
+      "decisions": {
+        "balance": 491,
+        "match": 4225,
+        "emptiest": 1284
+      },
+      "preemptions": 0
+    },
+    "cache_aware_abs8": {
+      "hit_rate": 0.5729503441176742,
+      "ttft_p50": 151.7208395541129,
+      "ttft_p99": 485.6707784739081,
+      "e2e_p99": 14243.548787934838,
+      "imbalance": 1.0955555555555556,
+      "per_replica": [
+        1377,
+        1479,
+        1304,
+        1240
+      ],
+      "decisions": {
+        "balance": 3092,
+        "match": 2105,
+        "emptiest": 803
+      },
+      "preemptions": 0
+    }
+  },
+  "hot": {
+    "random": {
+      "hit_rate": 0.7063420395838945,
+      "ttft_p50": 73.885018922585,
+      "ttft_p99": 421.87647298324197,
+      "e2e_p99": 11075.533815484854,
+      "imbalance": 1.0540740740740742,
+      "per_replica": [
+        1305,
+        1321,
+        1423,
+        1351
+      ],
+      "decisions": {
+        "balance": 0,
+        "match": 0,
+        "emptiest": 0
+      },
+      "preemptions": 0
+    },
+    "round_robin": {
+      "hit_rate": 0.7061698450349955,
+      "ttft_p50": 64.53617149853017,
+      "ttft_p99": 321.2683873014763,
+      "e2e_p99": 10987.870994659415,
+      "imbalance": 1.0,
+      "per_replica": [
+        1350,
+        1350,
+        1350,
+        1350
+      ],
+      "decisions": {
+        "balance": 0,
+        "match": 0,
+        "emptiest": 0
+      },
+      "preemptions": 0
+    },
+    "least_outstanding": {
+      "hit_rate": 0.7063420395838945,
+      "ttft_p50": 68.47491844421893,
+      "ttft_p99": 360.96716400362686,
+      "e2e_p99": 10554.215279082706,
+      "imbalance": 1.0140740740740741,
+      "per_replica": [
+        1353,
+        1352,
+        1369,
+        1326
+      ],
+      "decisions": {
+        "balance": 0,
+        "match": 0,
+        "emptiest": 0
+      },
+      "preemptions": 0
+    },
+    "power_of_two": {
+      "hit_rate": 0.7039313158993079,
+      "ttft_p50": 69.7150732881164,
+      "ttft_p99": 399.97929730562873,
+      "e2e_p99": 10595.97358841933,
+      "imbalance": 1.0237037037037038,
+      "per_replica": [
+        1382,
+        1351,
+        1327,
+        1340
+      ],
+      "decisions": {
+        "balance": 0,
+        "match": 0,
+        "emptiest": 0
+      },
+      "preemptions": 0
+    },
+    "prefix_hash": {
+      "hit_rate": 0.8222289709929538,
+      "ttft_p50": 24717.910183481676,
+      "ttft_p99": 65994.1466137982,
+      "e2e_p99": 106964.07164245404,
+      "imbalance": 2.8918518518518517,
+      "per_replica": [
+        306,
+        3904,
+        424,
+        766
+      ],
+      "decisions": {
+        "balance": 0,
+        "match": 0,
+        "emptiest": 0
+      },
+      "preemptions": 0
+    },
+    "cache_aware": {
+      "hit_rate": 0.7626496570738832,
+      "ttft_p50": 122.08371459512273,
+      "ttft_p99": 550.4864458788112,
+      "e2e_p99": 23242.864533833523,
+      "imbalance": 1.7274074074074075,
+      "per_replica": [
+        2332,
+        1103,
+        1018,
+        947
+      ],
+      "decisions": {
+        "balance": 2539,
+        "match": 2969,
+        "emptiest": 492
+      },
+      "preemptions": 0
+    },
+    "cache_aware_abs8": {
+      "hit_rate": 0.7426750894015937,
+      "ttft_p50": 66.81656427694543,
+      "ttft_p99": 344.63886373820395,
+      "e2e_p99": 10109.536920061439,
+      "imbalance": 1.2125925925925927,
+      "per_replica": [
+        1637,
+        1312,
+        1207,
+        1244
+      ],
+      "decisions": {
+        "balance": 3647,
+        "match": 2007,
+        "emptiest": 346
+      },
+      "preemptions": 0
+    }
+  }
+}

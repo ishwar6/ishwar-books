@@ -1,0 +1,14 @@
+$ python code/serving/lora.py
+1. MEMORY, Llama 3.1 8B: a LoRA adapter on q, k, v, o, gate, up, down in all 32 layers
+   parameters per unit of rank: 32 x sum(d_in + d_out) = 2,621,440
+   rank  8:   21.0 M parameters =     40 MiB in BF16 (0.26% of the 16.1 GB model); 100 adapters = 4.2 GB
+   rank 16:   41.9 M parameters =     80 MiB in BF16 (0.52% of the 16.1 GB model); 100 adapters = 8.4 GB
+   rank 64:  167.8 M parameters =    320 MiB in BF16 (2.09% of the 16.1 GB model); 100 adapters = 33.6 GB
+   100 full fine-tuned copies instead: 1.61 TB
+
+2. MEASURED, Qwen2.5-0.5B BF16 on mps: one decode step, batch 32, 512 cached tokens each, rank-16 adapters on all 168 linear layers
+   base model only                            median  21.49 ms  min  20.36 ms  (1.00x base)
+   all 32 requests share one adapter          median  48.45 ms  min  33.09 ms  (2.25x base)
+   32 different adapters, gathered + batched  median  72.00 ms  min  52.70 ms  (3.35x base)
+   32 different adapters, loop over adapters  median 5533.00 ms  min 3425.81 ms  (257.42x base)
+   check on model.layers.0.self_attn.q_proj: gathered LoRA vs per-request merged weights, max abs difference 1.81e-05

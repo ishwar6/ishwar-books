@@ -372,6 +372,55 @@
       "group": "inference",
       "route": "writings/llm-inference-7-beyond-one-gpu#7-disaggregated-prefill-and-decode",
       "blurb": "Run the two phases on different GPUs and move the KV cache between them: Splitwise, DistServe, Mooncake, and when it pays."
+    },
+    {
+      "id": "goodput-slo",
+      "label": "Latency SLOs and goodput",
+      "group": "inference",
+      "route": "writings/llm-inference-6-serving-in-production#1-what-fast-means",
+      "blurb": "TTFT, ITL and end-to-end latency as percentiles, and goodput: the requests per second served inside the SLO."
+    },
+    {
+      "id": "queueing",
+      "label": "Queueing and the latency cliff",
+      "group": "inference",
+      "route": "writings/llm-inference-6-serving-in-production#3-queueing-maths-why-latency-explodes-near-full-load",
+      "blurb": "Little's law and why waiting explodes near full load, checked on a simulated batching engine."
+    },
+    {
+      "id": "capacity-cost",
+      "label": "Capacity planning and cost per token",
+      "group": "inference",
+      "route": "writings/llm-inference-6-serving-in-production#4-capacity-planning-on-paper",
+      "blurb": "From model size, KV bytes and traffic to a number of GPUs, and why a generated token costs more than a prompt token."
+    },
+    {
+      "id": "quantization",
+      "label": "Quantization for serving",
+      "group": "inference",
+      "route": "writings/llm-inference-6-serving-in-production#6-quantization-a-cost-lever-with-a-quality-price",
+      "blurb": "INT8, INT4, FP8 and an FP8 KV cache: memory and speed gained, quality lost, measured on a real model."
+    },
+    {
+      "id": "llm-routing",
+      "label": "Routing across replicas",
+      "group": "inference",
+      "route": "writings/llm-inference-6-serving-in-production#7-routing-across-replicas",
+      "blurb": "Sending a request to the replica that holds its prefix, without overloading it."
+    },
+    {
+      "id": "multi-lora",
+      "label": "Multi-LoRA serving",
+      "group": "inference",
+      "route": "writings/llm-inference-6-serving-in-production#8-many-fine-tunes-one-base-model-multi-lora-serving",
+      "blurb": "Many fine-tuned adapters on one base model, batched together in one step."
+    },
+    {
+      "id": "prod-failures",
+      "label": "Autoscaling and failure modes",
+      "group": "inference",
+      "route": "writings/llm-inference-6-serving-in-production#10-what-breaks-in-production",
+      "blurb": "Cold starts, retry storms, preemption storms and noisy neighbours, and the metrics that reveal them."
     }
   ],
   "edges": [
@@ -634,6 +683,50 @@
     [
       "prefix-caching",
       "disaggregation"
+    ],
+    [
+      "prefill-decode",
+      "goodput-slo"
+    ],
+    [
+      "goodput-slo",
+      "queueing"
+    ],
+    [
+      "queueing",
+      "capacity-cost"
+    ],
+    [
+      "kv-cache",
+      "capacity-cost"
+    ],
+    [
+      "capacity-cost",
+      "quantization"
+    ],
+    [
+      "prefix-caching",
+      "llm-routing"
+    ],
+    [
+      "cache-scheduling",
+      "llm-routing"
+    ],
+    [
+      "vllm",
+      "multi-lora"
+    ],
+    [
+      "fine-tuning",
+      "multi-lora"
+    ],
+    [
+      "queueing",
+      "prod-failures"
+    ],
+    [
+      "vllm",
+      "prod-failures"
     ]
   ]
 }

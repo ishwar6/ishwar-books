@@ -1,0 +1,8 @@
+$ python code/serving/walkthrough.py
+1. TPOT: E2E 6.8 s, TTFT 0.42 s, 128 tokens -> (6.8 - 0.42) / (128 - 1) = 50.2 ms per token
+2. M/M/1, mu = 10/s, rho = 0.5: W = 1 / (10 - 5.0) = 200 ms = 2x the 100 ms service time; p99 = ln(100) x W = 921 ms
+2. M/M/1, mu = 10/s, rho = 0.9: W = 1 / (10 - 9.0) = 1000 ms = 10x the 100 ms service time; p99 = ln(100) x W = 4605 ms
+2. M/M/1, mu = 10/s, rho = 0.99: W = 1 / (10 - 9.9) = 10000 ms = 100x the 100 ms service time; p99 = ln(100) x W = 46052 ms
+3. 4-bit, one scale for the row: s = 0.9 / 7 = 0.1286; codes [1, 0, 0, 7]; values [0.129, 0.0, 0.0, 0.9]
+   groups of two: s = 0.0171 -> codes [7, -2], values [0.12, -0.034]; s = 0.1286 -> codes [0, 7], values [0.0, 0.9]
+4. a rank-16 Llama 3.1 8B adapter, 80 MiB = 640 tokens of BF16 KV cache (128 KiB each)

@@ -1,0 +1,13 @@
+{
+  "checked": "2026-10-11",
+  "vllm": {"repo": "https://github.com/vllm-project/vllm", "commit": "187a0eb98aa42341d703f83421d693fa7585581b",
+           "files": ["vllm/v1/metrics/loggers.py", "vllm/config/cache.py", "vllm/config/lora.py", "vllm/engine/arg_utils.py"]},
+  "sglang": {"repo": "https://github.com/sgl-project/sglang", "commit": "f9cee8d2b2d96a626db1968ba81e4d72bb31794a",
+             "files": ["python/sglang/srt/observability/metrics_collector.py", "docs/docs/references/production_metrics.mdx",
+                       "sgl-model-gateway/src/policies/cache_aware.rs"]},
+  "vllm_production_stack": {"repo": "https://github.com/vllm-project/production-stack", "commit": "4e076e8de3698a3729b575e3a5ade65ffbb929cf",
+                            "files": ["src/vllm_router/parsers/parser.py"]},
+  "docs": ["https://docs.vllm.ai/en/latest/usage/metrics/", "https://docs.vllm.ai/en/latest/cli/bench/serve/",
+           "https://docs.sglang.io/docs/advanced_features/sgl_model_gateway", "https://docs.sglang.io/docs/references/production_metrics",
+           "https://llm-d.ai/docs/architecture"]
+}

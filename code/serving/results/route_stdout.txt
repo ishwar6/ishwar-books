@@ -1,0 +1,24 @@
+$ python code/serving/route.py
+
+SCENARIO zipf: 4 replicas, 20 requests/s in total, prefixes of 2048 tokens, 200 prefixes with Zipf(1.1) popularity; each replica caches 16 prefixes
+            policy  hit rate  TTFT p50      p99  E2E p99  busiest/mean  preempt
+            random     47.2%     218ms    690ms   16.8s          1.05        0
+       round_robin     47.9%     188ms    415ms   15.8s          1.00        0
+ least_outstanding     46.4%     212ms    542ms   15.6s          1.01        0
+      power_of_two     47.4%     214ms    546ms   15.0s          1.01        0
+       prefix_hash     72.3%     139ms    639ms   24.5s          1.73        0
+       cache_aware     69.3%      88ms   1836ms   28.6s          1.60        0
+  cache_aware_abs8     57.3%     152ms    486ms   14.2s          1.10        0
+
+SCENARIO hot: 4 replicas, 20 requests/s in total, prefixes of 2048 tokens, one prefix takes 50% of traffic, the rest Zipf over 200; each replica caches 16 prefixes
+            policy  hit rate  TTFT p50      p99  E2E p99  busiest/mean  preempt
+            random     70.6%      74ms    422ms   11.1s          1.05        0
+       round_robin     70.6%      65ms    321ms   11.0s          1.00        0
+ least_outstanding     70.6%      68ms    361ms   10.6s          1.01        0
+      power_of_two     70.4%      70ms    400ms   10.6s          1.02        0
+       prefix_hash     82.2%   24718ms  65994ms  107.0s          2.89        0
+       cache_aware     76.3%     122ms    550ms   23.2s          1.73        0
+  cache_aware_abs8     74.3%      67ms    345ms   10.1s          1.21        0
+
+cache_aware uses the gateway defaults (cache_threshold 0.3, balance_abs_threshold 64, balance_rel_threshold 1.5);
+cache_aware_abs8 is the same rule with balance_abs_threshold 8, so it falls back to shortest-queue sooner.

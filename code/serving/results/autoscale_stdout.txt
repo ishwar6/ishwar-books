@@ -1,0 +1,11 @@
+$ python code/serving/autoscale.py
+Traffic: 6 requests/s, then 24 requests/s from t = 120 s to 600 s. Start with 2 replicas, at most 8.
+           static: replicas at end 2, ready at t = [] s; after the jump TTFT p50  66.83 s, p99  149.7 s; replica-seconds  1200
+  load, cold 180s: replicas at end 8, ready at t = [290, 310, 310, 310, 310, 310] s; after the jump TTFT p50   0.10 s, p99   35.3 s; replica-seconds  2960
+   load, cold 60s: replicas at end 8, ready at t = [170, 190, 190, 190, 190, 190] s; after the jump TTFT p50   0.07 s, p99    1.2 s; replica-seconds  3680
+   load, cold 20s: replicas at end 8, ready at t = [130, 150, 150, 150, 150, 150] s; after the jump TTFT p50   0.07 s, p99    0.4 s; replica-seconds  3920
+   busy, cold 20s: replicas at end 8, ready at t = [30, 60, 90, 120, 150, 180] s; after the jump TTFT p50   0.07 s, p99    0.3 s; replica-seconds  4170
+
+Steady traffic, 6 requests/s all the time (no jump):
+     load, steady: replicas at end 3, ready at t = [130] s; TTFT p99    0.3 s; replica-seconds  1670
+     busy, steady: replicas at end 8, ready at t = [30, 60, 90, 120, 150, 180] s; TTFT p99    0.2 s; replica-seconds  4170

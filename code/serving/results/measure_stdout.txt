@@ -1,0 +1,42 @@
+$ python code/serving/measure.py
+Qwen/Qwen2.5-0.5B, BF16, device=mps, fastest of 30 interleaved rounds after 2 warm-up rounds (median in brackets)
+weights in memory: 942 MiB
+
+DECODE: b sequences, c cached tokens each, one new token each
+    b      c   ms/step  (median)  tokens/s
+    1    256     14.10    (39.1)        71
+    4    256     13.63    (42.9)       294
+   16    256     27.90   (324.0)       574
+   32    256     32.27    (63.0)       992
+   64    256     29.88   (117.2)      2142
+  128    256     32.35    (95.7)      3956
+    1   1024     18.75    (41.5)        53
+    4   1024     21.05    (56.1)       190
+   16   1024     34.09   (110.6)       469
+   32   1024     34.22    (68.0)       935
+   64   1024     59.90   (120.1)      1068
+  128   1024    125.77  (1215.3)      1018
+    1   4096     27.06   (499.2)        37
+    4   4096     24.52    (71.8)       163
+   16   4096     37.89    (94.0)       422
+   32   4096    123.10   (688.3)       260
+   64   4096    105.99  (1080.5)       604
+  128   4096    161.59   (428.9)       792
+
+PREFILL: n new prompt tokens on top of c cached tokens (one sequence)
+    n      c        ms  (median)  tokens/s
+   16      0     21.98    (46.5)       728
+   64      0     21.26    (49.2)      3011
+  128      0     23.63    (48.7)      5417
+  256      0     28.53    (72.8)      8973
+  512      0     43.53   (104.7)     11761
+ 1024      0     68.52   (137.6)     14945
+ 2048      0    137.20   (290.5)     14927
+ 4096      0    274.56   (573.3)     14919
+  512   2048     56.08   (144.8)      9130
+  512   6144     66.86   (149.2)      7658
+ 2048   2048    174.56   (347.8)     11732
+
+COST MODEL fitted to all points above (relative least squares):
+  t = 18.19 ms + 48.0 us x new tokens + 7.62 ns x prefill attention pairs + 360 ns x cached tokens read
+  median error 9%, worst 46% at {'b': 32, 'c': 4096, 'ms': 123.1, 'median_ms': 688.28, 'tok_s': 260}

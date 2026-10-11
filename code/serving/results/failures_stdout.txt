@@ -1,0 +1,23 @@
+$ python code/serving/failures.py
+1. RETRY STORM: 13 requests/s of short answers (~32 tokens), client timeout 10 s, up to 3 retries.
+   The engine freezes for 10 s at t = 60 s. Success = the user got an answer within the timeout on some attempt.
+   no retries                : attempts   3900 for 3900 requests, success  95.8%, back to >= 95% success for arrivals from t = 80.0 s, tokens generated for users who had left: 5,707
+   retry at once, no cancel  : attempts  13413 for 3900 requests, success  18.7%, back to >= 95% success for arrivals from t = None s, tokens generated for users who had left: 425,460
+   retry at once, cancel     : attempts   3917 for 3900 requests, success 100.0%, back to >= 95% success for arrivals from t = 70.0 s, tokens generated for users who had left: 0
+   backoff + jitter, cancel  : attempts   3917 for 3900 requests, success 100.0%, back to >= 95% success for arrivals from t = 70.0 s, tokens generated for users who had left: 0
+
+2. PREEMPTION: KV cache limited to 100,000 tokens (all memory, on purpose); outputs median 256 tokens
+ rate  preemptions  recomputed tok  TPOT p99  ITL p99  ITL max  E2E p99
+    2            0               0      36ms     93ms    176ms   47.7s
+    3            0               0      50ms    133ms    185ms   67.1s
+    4          962       1,102,072     100ms    196ms   5876ms  146.1s
+    5         1118       1,251,514      98ms    196ms   4428ms  230.5s
+    6         1152       1,340,114     102ms    196ms   5873ms  302.0s
+
+3. HEAD-OF-LINE BLOCKING: chats at 4 requests/s; one 16,000-token prompt arrives at t = 60 s
+   chunked prefill, 2,048-token budget      longest pause in other streams:    338 ms; long prompt TTFT   2118 ms; worst TTFT of chats arriving 59-64 s:   1600 ms
+   no chunking (whole prompt in one step)   longest pause in other streams:   1865 ms; long prompt TTFT   1874 ms; worst TTFT of chats arriving 59-64 s:   1883 ms
+
+4. NOISY NEIGHBOUR: tenant A sends chats at 4 requests/s; tenant B sends 40 prompts of 6,000 tokens within 10 s at t = 60 s
+   tenant A TTFT for requests arriving 60-90 s, B silent: p50     66 ms, p99    320 ms, max    367 ms
+   tenant A TTFT for requests arriving 60-90 s, B bursting: p50   6798 ms, p99  16842 ms, max  16857 ms

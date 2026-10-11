@@ -1,0 +1,72 @@
+$ python code/serving/capacity.py
+1. MEMORY on one H100 (80 GB), Llama 3.1 8B in BF16
+   usable: 80 GB x 0.92 = 73.6 GB
+   weights: 8.03 B params x 2 bytes = 16.06 GB
+   reserve for activations and runtime (assumption): 4.0 GB
+   KV cache space: 53.5 GB / 131,072 bytes per token = 408,478 tokens
+   with FP8 weights and FP8 KV: weights 8.03 GB, KV space 61.6 GB / 65,536 B = 939,484 tokens (2.3x)
+
+2. TRAFFIC (assumed): 100 requests/s at peak, 1000 prompt and 250 output tokens on average
+   prefill work: 100,000 tokens/s;  decode work: 25,000 tokens/s
+   Little's law with W = 0.5 s + 250 x 30 ms = 8.0 s: L = 100 x 8.0 = 800 requests in flight
+   their KV cache (prompt + half the answer each): 800 x 1125 x 128 KiB = 118.0 GB (220% of the KV space)
+
+3. ROOFLINE COSTS (H100: 989 TFLOP/s dense BF16, 3.35 TB/s)
+   prefill: 2 x 7.50 B = 15.0 GFLOP per token -> 15.2 us per token at 100% of peak (65,892 tokens/s)
+   decode step, every sequence with 1,125 tokens of context:
+    batch  bytes read  step ms  us/token  tokens/s
+        1      16.2GB     4.84    4838.0       207
+        8      17.2GB     5.15     643.3     1,555
+       32      20.8GB     6.20     193.8     5,159
+       64      25.5GB     7.61     118.9     8,409
+      128      34.9GB    10.43      81.5    12,274
+      256      53.8GB    16.06      62.7    15,938
+      512      91.6GB    27.33      53.4    18,734
+   lower bound from memory: ceil(118.0 GB / 53.5 GB) = 3 GPUs
+   lower bound from prefill arithmetic alone: 100,000 tokens/s x 15.2 us = 1.52 GPU-seconds per second
+
+4. SIMULATED CAPACITY of one H100 at the roofline (engine.py; budget 8,192 tokens/step, up to 1,024 sequences)
+   workload: lognormal prompts (mean 1106) and outputs (mean 274); SLO: TTFT <= 500 ms and TPOT <= 50 ms
+    format  rate   tok/s  TTFT p99  TPOT p99  batch  preempt  SLO met
+      BF16    10    2715     118ms     8.4ms     18        0   100.0%
+      BF16    15    3983     141ms    10.6ms     31        0   100.0%
+      BF16    20    5187     161ms    14.1ms     50        0   100.0%
+      BF16    25    6308     187ms    19.4ms     77        0   100.0%
+      BF16    30    7488     215ms    29.0ms    120        0   100.0%
+      BF16    35    8114    7974ms    37.9ms    188      196    45.7%
+   BF16: highest tested rate with >= 99% of requests inside the SLO: 30 requests/s
+       FP8    10    2754      50ms     3.4ms      8        0   100.0%
+       FP8    15    4117      54ms     3.8ms     12        0   100.0%
+       FP8    20    5429      60ms     4.2ms     18        0   100.0%
+       FP8    25    6713      64ms     4.7ms     24        0   100.0%
+       FP8    30    8015      68ms     5.3ms     31        0   100.0%
+       FP8    35    9574      69ms     6.1ms     42        0   100.0%
+       FP8    40   10676      73ms     7.1ms     52        0   100.0%
+       FP8    45   11975      80ms     8.2ms     66        0   100.0%
+       FP8    50   13296      92ms     9.6ms     84        0   100.0%
+       FP8    55   14582      98ms    11.6ms    109        0   100.0%
+       FP8    60   15790     105ms    14.3ms    140        0   100.0%
+       FP8    65   16954     117ms    17.4ms    183        0   100.0%
+       FP8    70   18116     134ms    21.5ms    238        0   100.0%
+       FP8    75   19128     150ms    27.2ms    311        0   100.0%
+       FP8    80   20137     483ms    35.8ms    428       21    99.2%
+       FP8    85   19962    7965ms    37.1ms    491      179    16.0%
+   FP8: highest tested rate with >= 99% of requests inside the SLO: 80 requests/s
+
+5. GPUs FOR 100 requests/s AT PEAK (this workload)
+   BF16: per-GPU bound 30 req/s, planned at 100% of it -> ceil(100 / 30.0) = 4 GPUs
+   BF16: per-GPU bound 30 req/s, planned at 70% of it -> ceil(100 / 21.0) = 5 GPUs, +1 spare for a failure = 6
+   FP8: per-GPU bound 80 req/s, planned at 100% of it -> ceil(100 / 80.0) = 2 GPUs
+   FP8: per-GPU bound 80 req/s, planned at 70% of it -> ceil(100 / 56.0) = 2 GPUs, +1 spare for a failure = 3
+
+6. COST PER MILLION TOKENS at the BF16 SLO operating point (GPU price is an ASSUMPTION; scale linearly)
+   GPU busy 133 s for 3,922,012 prompt tokens and 1,002,160 generated tokens
+   prompt tokens: 60 s -> 15.2 us each;  generated tokens: 74 s -> 73.4 us each (ratio 4.8x)
+   $2.00/GPU-hour: $0.008 per 1M prompt tokens, $0.041 per 1M generated tokens (at the roofline, full utilisation)
+   $3.00/GPU-hour: $0.013 per 1M prompt tokens, $0.061 per 1M generated tokens (at the roofline, full utilisation)
+   $4.00/GPU-hour: $0.017 per 1M prompt tokens, $0.082 per 1M generated tokens (at the roofline, full utilisation)
+   per request at $2/GPU-hour: $0.0000208 ($0.0208 per 1,000 requests)
+   GPU time of one request, 1,000 prompt + 250 generated tokens: 1,000 x 15.2 + 250 x 73.4 = 33,523 us
+   GPU time of one request, 1,000 prompt + 4,000 generated tokens: 1,000 x 15.2 + 4,000 x 73.4 = 308,717 us
+   at 50% average utilisation (traffic is not always at peak): costs x 2.0
+   at 30% average utilisation (traffic is not always at peak): costs x 3.3

@@ -1,0 +1,21 @@
+$ python code/serving/quant.py
+Qwen/Qwen2.5-0.5B, WikiText-2 test: 299,078 tokens -> 292 windows of 1024; device mps, float32 compute
+FP8 E4M3 emulation equals torch CPU float8 cast on 200,000 values: True
+linear-layer weights: 357.8 M, embedding/output table (tied): 136.1 M
+
+scheme                         weights MiB      PPL    dPPL  KL vs BF16  top-1 same     s
+BF16 (baseline)                        942   14.651  +0.000      0.0000      100.0%   170
+INT8 per-channel                       601   14.682  +0.031      0.0026       97.2%   188
+FP8 E4M3 per-channel                   601   14.769  +0.118      0.0076       95.0%   190
+INT4 per-channel                       430   33.180 +18.529      0.8293       54.9%   156
+INT4 g128                              441   17.459  +2.808      0.2004       77.0%   144
+INT4 g128 + AWQ scales                 441   16.758  +2.107      0.1450       80.8%   260
+INT3 g128                              398   56.083 +41.432      1.3368       46.4%   191
+FP8 W8A8 (per-token act.)              601   14.870  +0.219      0.0148       93.2%   353
+INT8 W8A8 (per-token act.)             601   14.999  +0.348      0.0259       91.8%   184
+INT8 W8A8 (per-tensor act.)            601   79.797 +65.146      1.7750       40.5%   186
+FP8 KV, one scale per layer            942   15.169  +0.518      0.0433       90.1%   133
+FP8 KV, scale per token+head           942   15.134  +0.483      0.0362       90.6%   148
+
+Weights MiB counts the linear layers at the stated bits (+ one 16-bit scale and one 16-bit zero per group of 128
+for g128) plus the BF16 embedding table. KL and top-1 use the first 24 windows (24,552 next-token predictions).

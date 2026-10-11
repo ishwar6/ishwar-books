@@ -1,0 +1,50 @@
+{
+  "memory": {
+    "per_rank": 2621440,
+    "full_bytes": 16060000000.0,
+    "rows": [
+      {
+        "rank": 8,
+        "params": 20971520,
+        "bytes": 41943040,
+        "per_80GB": null
+      },
+      {
+        "rank": 16,
+        "params": 41943040,
+        "bytes": 83886080,
+        "per_80GB": null
+      },
+      {
+        "rank": 64,
+        "params": 167772160,
+        "bytes": 335544320,
+        "per_80GB": null
+      }
+    ]
+  },
+  "measured": {
+    "batch": 32,
+    "context": 512,
+    "rank": 16,
+    "adapters": 32,
+    "device": "mps",
+    "base": {
+      "median_ms": 21.494395492482,
+      "min_ms": 20.358666995889507
+    },
+    "same": {
+      "median_ms": 48.4496244971524,
+      "min_ms": 33.085957998991944
+    },
+    "gather": {
+      "median_ms": 72.00102099886863,
+      "min_ms": 52.69820799003355
+    },
+    "loop": {
+      "median_ms": 5533.004187011102,
+      "min_ms": 3425.8074999961536
+    },
+    "max_abs_diff": 1.811981201171875e-05
+  }
+}
