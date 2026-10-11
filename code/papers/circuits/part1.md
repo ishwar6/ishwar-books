@@ -23,11 +23,9 @@ Each idea follows the same pattern: the paper's own words as a highlighted scree
 > [!PAPER] Elhage et al. (2021), A Mathematical Framework for Transformer Circuits · Title and authors
 > [![The title, authors, affiliation (Anthropic) and date (Dec 22, 2021) of the paper](/img/papers/circuits/p1-title.png)](/img/papers/circuits/p1-title.png)
 >
-> **Context:** the paper was published as a web article on the Transformer Circuits Thread, not as a PDF on arXiv.
->
 > **What it says:** twenty-five authors from Anthropic, 22 December 2021. The marks after the names flag the core research contributors (Elhage, Nanda, Olsson), the core infrastructure contributors and the contact author (Chris Olah).
 >
-> **Why it matters:** the title promises a "framework", a way of writing transformers down so they can be read, not a new model. The findings (bigrams, skip-trigrams, induction heads) fall out of that new way of writing.
+> **Why it matters:** the title promises a "framework", a way of writing transformers down so they can be read, not a new model. The findings (bigrams, skip-trigrams, induction heads) fall out of that new way of writing. It was also the first article of a long series from the same group: induction heads (2022), superposition (2022), sparse autoencoders (2023 and 2024) and circuit tracing (2025) all build on the vocabulary set out here.
 
 A **circuit** is a small part of a network that does one understandable job, such as "after the word *Barack*, predict *Obama*". The word comes from earlier work on image models, the Distill *Circuits* thread, which found such parts inside an image network. A **framework** is a set of equations and names: the paper does not train a new kind of model, it writes the usual one in a different but equal form.
 
@@ -42,9 +40,7 @@ A **circuit** is a small part of a network that does one understandable job, suc
 > [!PAPER] Elhage et al. (2021), A Mathematical Framework for Transformer Circuits · Introduction
 > [![The introduction paragraph defining mechanistic interpretability as reverse engineering, like turning binaries into source code](/img/papers/circuits/p1-intro-reverse.png)](/img/papers/circuits/p1-intro-reverse.png)
 >
-> **Context:** the paper opens by noting that large language models keep surprising their builders with abilities and harmful behaviours found years after training.
->
-> **What it says:** one answer is **mechanistic interpretability**: reverse-engineering "the detailed computations performed by transformers", the way a programmer turns binaries back into source code.
+> **What it says:** large language models keep surprising their own builders: new abilities and harmful behaviours are sometimes found years after training. One answer is **mechanistic interpretability**: reverse-engineering "the detailed computations performed by transformers", the way a programmer turns binaries back into source code.
 >
 > **Why it matters:** it sets the goal: not a rough story ("the model looks at *Barack*") but the exact computation, in a form a person can read.
 
@@ -82,8 +78,6 @@ The paper's summary of results has one finding per model size:
 
 > [!PAPER] Elhage et al. (2021), A Mathematical Framework for Transformer Circuits · Model Simplifications
 > [![The Model Simplifications paragraphs: attention-only transformers, no biases, no layer normalization](/img/papers/circuits/p1-simplifications.png)](/img/papers/circuits/p1-simplifications.png)
->
-> **Context:** before any maths, the paper fixes which kind of transformer it will study.
 >
 > **What it says:** one big change, no MLP layers, partly because the authors "had much less success in understanding MLP layers"; and two small ones, no biases and no layer norm, because both fold into the weights.
 >
@@ -148,9 +142,7 @@ Now the model itself. The paper studies **autoregressive, decoder-only** transfo
 > [!PAPER] Elhage et al. (2021), A Mathematical Framework for Transformer Circuits · High-Level Architecture
 > [![The paper's diagram of a transformer with its four equations, from x0 = W_E t to T(t) = W_U x_{-1}](/img/papers/circuits/p1-architecture.png)](/img/papers/circuits/p1-architecture.png)
 >
-> **Context:** the paper's overview of a transformer, which "starts with a token embedding, followed by a series of residual blocks, and finally a token unembedding".
->
-> **What it says:** four equations, bottom to top: embed, add every head's output, add the MLP's output, unembed.
+> **What it says:** a transformer "starts with a token embedding, followed by a series of residual blocks, and finally a token unembedding". The drawing writes this as four equations, bottom to top: embed, add every head's output, add the MLP's output, unembed.
 >
 > **Why it matters:** every block takes its input from the vertical line and puts its output back with a "+". That line is the **residual stream**, and the paper is built on it. Attention-only models have no MLP row.
 
@@ -307,8 +299,6 @@ Here is the whole real model in one picture, with the paper's shapes.
 > [!PAPER] Elhage et al. (2021), A Mathematical Framework for Transformer Circuits · Virtual Weights and the Residual Stream as a Communication Channel
 > [![The paragraph defining the residual stream as the sum of all previous outputs and a communication channel](/img/papers/circuits/p1-residual-stream.png)](/img/papers/circuits/p1-residual-stream.png)
 >
-> **Context:** the paper explains why it gives the vertical line of its diagram its own name.
->
 > **What it says:** the residual stream "is simply the sum of the output of all the previous layers and the original embedding", and a "communication channel" that does no processing itself.
 >
 > **Why it matters:** the usual picture is a pipeline, each layer transforming the data in turn. The paper's picture is a shared whiteboard: every layer reads the same board and writes on it, and what is written stays for every later layer.
@@ -410,8 +400,6 @@ It looks back at the "ley" that followed "urs" the first time, and pushes "ley" 
 > [!PAPER] Elhage et al. (2021), A Mathematical Framework for Transformer Circuits · Virtual Weights and the Residual Stream as a Communication Channel
 > [![The paragraph on the deeply linear, additive structure of the residual stream and its lack of a privileged basis](/img/papers/circuits/p1-linear.png)](/img/papers/circuits/p1-linear.png)
 >
-> **Context:** having named the stream, the paper says what is special about it.
->
 > **What it says:** every layer reads with one linear map and writes, by adding, with another. One consequence: the stream "doesn't have a privileged basis".
 >
 > **Why it matters:** "linear" lets us multiply matrices across layers (virtual weights, next); "additive" lets us split the stream into pieces (what we just did).
@@ -445,9 +433,7 @@ exactly what it saw before. A writer $$W_O$$ becomes $$R\,W_O$$. Every number in
 > [!PAPER] Elhage et al. (2021), A Mathematical Framework for Transformer Circuits · Virtual Weights
 > [![The paper's figure of layers reading and writing the residual stream, and virtual weights such as W_I^3 W_O^1](/img/papers/circuits/p1-virtual-weights-fig.png)](/img/papers/circuits/p1-virtual-weights-fig.png)
 >
-> **Context:** the paper's picture of reading and writing. Its text says that one can think of "virtual weights" directly connecting any pair of layers, "the product of the output weights of one layer with the input weights of another (ie. $$W_I^2W_O^1$$)".
->
-> **What it says:** each layer reads with $$W_I$$ and writes with $$W_O$$; because both are linear, you can "multiply through" the stream, and $$W_I^3W_O^1$$ connects layer 1 to layer 3 directly.
+> **What it says:** each layer reads with $$W_I$$ and writes with $$W_O$$. Because both are linear, you can "multiply through" the stream: the product of one layer's output weights with a later layer's input weights, such as $$W_I^2W_O^1$$, is a **virtual weight** that connects the two layers directly. $$W_I^3W_O^1$$ connects layer 1 to layer 3, even with layer 2 in between.
 >
 > **Why it matters:** it finds which layers talk to which by multiplying two weight matrices, without running the model.
 
@@ -527,9 +513,7 @@ Three things to see. There is one 64 × 64 virtual weight for each of the 64 pai
 > [!PAPER] Elhage et al. (2021), A Mathematical Framework for Transformer Circuits · Subspaces and Residual Stream Bandwidth
 > [![The paper's figure of subspaces of the residual stream: shared, disjoint, and deleting information](/img/papers/circuits/p1-subspaces-fig.png)](/img/papers/circuits/p1-subspaces-fig.png)
 >
-> **Context:** the stream has hundreds of dimensions in small models and tens of thousands in big ones, so "layers can send different information to different layers by storing it in different subspaces".
->
-> **What it says:** layers interact only through shared subspaces; with separate subspaces they do not interact. A layer can also **delete** information by reading a subspace and writing back the negative.
+> **What it says:** the stream has hundreds of dimensions in small models and tens of thousands in big ones, so "layers can send different information to different layers by storing it in different subspaces". Layers interact only through shared subspaces; with separate subspaces they do not interact. A layer can also **delete** information by reading a subspace and writing back the negative.
 >
 > **Why it matters:** it generalises the toy above: reader B did not hear the writer because they used different subspaces.
 
@@ -543,8 +527,6 @@ Once a layer writes something, it stays "unless another layer actively deletes i
 
 > [!PAPER] Elhage et al. (2021), A Mathematical Framework for Transformer Circuits · Subspaces and Residual Stream Bandwidth
 > [![The paragraphs on residual stream bandwidth being in high demand, and memory management](/img/papers/circuits/p1-bandwidth.png)](/img/papers/circuits/p1-bandwidth.png)
->
-> **Context:** the paper turns from what subspaces allow to how crowded they are.
 >
 > **What it says:** "we should expect residual stream bandwidth to be in very high demand": in the middle of a 50-layer model, about 100 times more neurons write before that point than the stream has dimensions. So some neurons and heads may do **"memory management"**, clearing dimensions by writing the negative of what they read.
 >
@@ -575,8 +557,6 @@ Now we can read the first real result of the paper. It is short, and everything 
 
 > [!PAPER] Elhage et al. (2021), A Mathematical Framework for Transformer Circuits · Zero-Layer Transformers
 > [![The zero-layer section: T = W_U W_E approximates the bigram log-likelihood; the direct path; Barack followed by Obama](/img/papers/circuits/p1-zero-layer.png)](/img/papers/circuits/p1-zero-layer.png)
->
-> **Context:** the first and smallest model on the paper's ladder.
 >
 > **What it says:** a zero-layer model is $$T=W_U W_E$$, and the best it can do is "approximate the bigram log-likelihood". The same term sits inside every transformer as the **direct path**, often storing pairs like "Barack" followed by "Obama".
 >
