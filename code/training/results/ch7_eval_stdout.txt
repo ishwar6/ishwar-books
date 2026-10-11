@@ -1,0 +1,44 @@
+example pair #544: r(chosen) +4.203, r(rejected) +2.189
+== 1. accuracy on 600 held-out pairs ==
+main RM: accuracy 0.695 (95% bootstrap interval 0.657 to 0.732); mean loss 0.5709
+by rating gap (chosen rating minus rejected rating):
+  negligibly better     n=142  main 0.549  lr1 0.514  margin 0.556  seed1 0.542  seed2 0.563  small 0.585
+  slightly better       n=192  main 0.672  lr1 0.615  margin 0.703  seed1 0.677  seed2 0.630  small 0.625
+  better                n=136  main 0.779  lr1 0.654  margin 0.750  seed1 0.735  seed2 0.684  small 0.662
+  significantly better  n=130  main 0.800  lr1 0.738  margin 0.785  seed1 0.777  seed2 0.731  small 0.754
+
+== 2. calibration ==
+  confidence 0.5 to 0.6: n=147  mean confidence 0.550  accuracy 0.483
+  confidence 0.6 to 0.7: n=121  mean confidence 0.650  accuracy 0.620
+  confidence 0.7 to 0.8: n= 98  mean confidence 0.750  accuracy 0.755
+  confidence 0.8 to 0.9: n=108  mean confidence 0.851  accuracy 0.806
+  confidence 0.9 to 1.0: n=126  mean confidence 0.955  accuracy 0.873
+expected calibration error (ECE) 0.049
+
+== 3. reward distributions ==
+chosen   mean +5.317 sd 1.496 | rejected mean +4.427 sd 1.754 | gap mean +0.891 sd 1.668
+
+== 4. length ==
+over all 1,200 test answers: corr(reward, length) Pearson 0.217 Spearman 0.147
+                             corr(GPT-4 rating, length) Pearson 0.175 Spearman 0.124
+within pairs: corr(reward gap, length gap) 0.205; corr(rating gap, length gap) 0.019
+accuracy when the chosen answer is longer 0.762 (n=320), shorter 0.615 (n=273)
+
+== 5. probes on 150 chosen answers ==
+  add a polite closing line  our RM: mean change -0.125 (sd of RM 1.35), up in 0.47 | gold RM: mean change -0.159 (sd 2.96), up in 0.43
+  repeat the answer twice    our RM: mean change -0.119 (sd of RM 1.35), up in 0.35 | gold RM: mean change -1.966 (sd 2.96), up in 0.01
+  cut the answer in half     our RM: mean change -2.526 (sd of RM 1.35), up in 0.01 | gold RM: mean change -4.282 (sd 2.96), up in 0.01
+
+== 6. other reward models ==
+  gold RM by rating gap: negligibly better 0.613, slightly better 0.760, better 0.838, significantly better 0.931
+  main    accuracy 0.695  reward sd 1.690
+  lr1     accuracy 0.627  reward sd 1.212
+  margin  accuracy 0.697  reward sd 3.299
+  seed1   accuracy 0.680  reward sd 1.211
+  seed2   accuracy 0.648  reward sd 1.440
+  small   accuracy 0.652  reward sd 0.787
+  gold    accuracy 0.780  reward sd 3.618
+  ensemble (mean of main, seed1, seed2 after scaling each to unit sd) accuracy 0.690
+  the three agree on 0.73 of pairs: accuracy there 0.732; where they disagree 0.577
+  correlation of rewards over the 1,200 answers: main-seed1 0.68, main-seed2 0.36, seed1-seed2 0.59, main-margin 0.83, main-gold 0.60, small-gold 0.27
+  share of pairs with |reward gap| > 2: main 0.242, lr1 0.093, margin 0.538

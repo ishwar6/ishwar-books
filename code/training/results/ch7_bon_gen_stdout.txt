@@ -1,0 +1,12 @@
+100 prompts, 32 samples each, temperature 1.0, max 256 new tokens
+  10 prompts, 132s, finished share so far 0.47
+  20 prompts, 261s, finished share so far 0.35
+  30 prompts, 352s, finished share so far 0.30
+  40 prompts, 463s, finished share so far 0.27
+  50 prompts, 578s, finished share so far 0.28
+  60 prompts, 701s, finished share so far 0.27
+  70 prompts, 815s, finished share so far 0.27
+  80 prompts, 887s, finished share so far 0.27
+  90 prompts, 1022s, finished share so far 0.27
+  100 prompts, 1150s, finished share so far 0.27
+done in 1150s

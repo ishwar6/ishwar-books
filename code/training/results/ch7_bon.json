@@ -1,0 +1,328 @@
+{
+ "ns": [
+  1,
+  2,
+  4,
+  8,
+  16,
+  32
+ ],
+ "kl": [
+  0.0,
+  0.1931471805599453,
+  0.6362943611198906,
+  1.2044415416798357,
+  1.8350887222397811,
+  2.4969859027997265
+ ],
+ "curves": {
+  "main": {
+   "proxy": [
+    0.0,
+    0.3815127230124735,
+    0.6667016530604477,
+    0.8859270761898007,
+    1.0581010532543167,
+    1.1900637805587786
+   ],
+   "gold": [
+    0.0,
+    0.21483025633315267,
+    0.3767946251853647,
+    0.5047846023760183,
+    0.6178055799172677,
+    0.7322344941318027
+   ],
+   "words": [
+    154.591875,
+    153.74647177419357,
+    153.14328642936593,
+    153.156389449816,
+    153.32999548463062,
+    154.37
+   ],
+   "finished": [
+    0.2746875,
+    0.309657258064516,
+    0.3457683537263627,
+    0.38366300257646196,
+    0.4284747439356656,
+    0.47
+   ],
+   "fit": {
+    "alpha": 0.4786733722019895,
+    "beta": 0.012493854226516674,
+    "d_peak": 19.15635333674952
+   },
+   "same_top": 0.22,
+   "rank_corr": 0.5165835777126099
+  },
+  "small": {
+   "proxy": [
+    0.0,
+    0.41856059156609526,
+    0.7392966530746128,
+    0.9615244760312652,
+    1.1077916711985127,
+    1.2058964266879062
+   ],
+   "gold": [
+    0.0,
+    0.09514021395511492,
+    0.18729649552671052,
+    0.2763747276274832,
+    0.35812144828357984,
+    0.4329388836291494
+   ],
+   "words": [
+    154.591875,
+    147.26693548387095,
+    141.1915711902114,
+    136.35248050825706,
+    133.03384393117528,
+    131.5
+   ],
+   "finished": [
+    0.2746875,
+    0.3590322580645159,
+    0.44279810901001093,
+    0.5154333951303919,
+    0.567225576465737,
+    0.6
+   ],
+   "fit": {
+    "alpha": 0.1964732588660581,
+    "beta": -0.0494905137731331,
+    "d_peak": Infinity
+   },
+   "same_top": 0.13,
+   "rank_corr": 0.20911290322580642
+  },
+  "ens_mean": {
+   "proxy": [
+    0.0,
+    0.28852052476087653,
+    0.5126395110380647,
+    0.6896504100040421,
+    0.8322515485200136,
+    0.9435344158537095
+   ],
+   "gold": [
+    0.0,
+    0.19032381604334156,
+    0.34038122575050034,
+    0.4562084497166908,
+    0.5330432927455598,
+    0.5346189434399372
+   ],
+   "words": [
+    154.591875,
+    151.84981854838713,
+    150.1949521690767,
+    149.83279534335395,
+    150.23558872777394,
+    152.4
+   ],
+   "finished": [
+    0.2746875,
+    0.32774193548387087,
+    0.37616935483870984,
+    0.4213431543120087,
+    0.4668325946883743,
+    0.51
+   ]
+  },
+  "ens_min": {
+   "proxy": [
+    0.0,
+    0.3262069441568094,
+    0.576392588522816,
+    0.7697275353749733,
+    0.9243590357097307,
+    1.0570589890647881
+   ],
+   "gold": [
+    0.0,
+    0.16614146417865372,
+    0.29087136685825654,
+    0.38119409717567737,
+    0.43319982169084076,
+    0.4724226528961534
+   ],
+   "words": [
+    154.591875,
+    152.94385080645156,
+    152.4096134593993,
+    152.89129763174654,
+    153.57518050109738,
+    153.87
+   ],
+   "finished": [
+    0.2746875,
+    0.32163306451612894,
+    0.3656223581757507,
+    0.4083615099398194,
+    0.4541742461935915,
+    0.5
+   ]
+  },
+  "gold": {
+   "proxy": [
+    0.0,
+    0.3844757307464051,
+    0.7062135934518875,
+    0.9751197539055118,
+    1.2007974794702776,
+    1.3839181186242215
+   ],
+   "gold": [
+    0.0,
+    0.3844757307464051,
+    0.7062135934518875,
+    0.9751197539055118,
+    1.2007974794702776,
+    1.3839181186242215
+   ],
+   "words": [
+    154.591875,
+    149.56288306451614,
+    144.65781618464965,
+    139.91494152001746,
+    135.21494875796895,
+    130.66
+   ],
+   "finished": [
+    0.2746875,
+    0.31616935483870967,
+    0.3578356507230254,
+    0.40077334360115235,
+    0.45325649455973777,
+    0.53
+   ]
+  }
+ },
+ "finished_only": {
+  "ns": [
+   1,
+   2,
+   4,
+   8
+  ],
+  "n_prompts": 35,
+  "curves": {
+   "main": {
+    "proxy": [
+     0.0,
+     0.34919209769994897,
+     0.5851856937061228,
+     0.745514521976069
+    ],
+    "gold": [
+     0.0,
+     0.19865653107562808,
+     0.3109417472569629,
+     0.3896294621577512
+    ],
+    "words": [
+     88.1015345189234,
+     88.64210785729959,
+     90.89988772827586,
+     95.54240412715338
+    ]
+   },
+   "small": {
+    "proxy": [
+     0.0,
+     0.09955225781062094,
+     0.17265787896249485,
+     0.2272545256635572
+    ],
+    "gold": [
+     0.0,
+     0.11864250893425476,
+     0.1886334183536894,
+     0.21899664273628394
+    ],
+    "words": [
+     88.1015345189234,
+     85.83189006340787,
+     84.03348462790132,
+     81.76500209932779
+    ]
+   },
+   "ens_mean": {
+    "proxy": [
+     0.0,
+     0.23621420776474722,
+     0.39326516023717295,
+     0.4968412322298311
+    ],
+    "gold": [
+     0.0,
+     0.17647535629101763,
+     0.2626608352700216,
+     0.2971654685993762
+    ],
+    "words": [
+     88.1015345189234,
+     89.97306749492506,
+     92.73305417207543,
+     96.70869854504427
+    ]
+   },
+   "ens_min": {
+    "proxy": [
+     0.0,
+     0.3027818632322583,
+     0.4997257548150027,
+     0.6328767795266428
+    ],
+    "gold": [
+     0.0,
+     0.1701049540286561,
+     0.22592342534653986,
+     0.23864859590293241
+    ],
+    "words": [
+     88.1015345189234,
+     91.09579282148411,
+     96.56095883411832,
+     102.06445152463779
+    ]
+   },
+   "gold": {
+    "proxy": [
+     0.0,
+     0.39420342164418587,
+     0.6887033018302815,
+     0.9188137675657002
+    ],
+    "gold": [
+     0.0,
+     0.39420342164418587,
+     0.6887033018302815,
+     0.9188137675657002
+    ],
+    "words": [
+     88.1015345189234,
+     80.20252223040985,
+     73.04767661112011,
+     69.71429545132874
+    ]
+   }
+  }
+ },
+ "example": {
+  "prompt": "Given the task definition and input, reply with output. Given a scientific passage and an answer, generate a question for the given answer.\n\nPassage: By 180 million years ago, Pangaea began to break up. The continents started to drift apart. They slowly moved to where they are today. The movement of the continents caused Panthalassa to break into smaller oceans. These oceans are now known as the Pacific, Atlantic, Indian, and Arctic Oceans. The waters of all the oceans are connected. That\u2019s why some people refer to the oceans together as the \u201cWorld Ocean. \u201d. Answer: break up\n",
+  "proxy_pick": "Question: What happened at the end of the Mesozoic era when Pangaea broke apart? This question directly corresponds to the given answer \"break up\". It prompts the user to correctly identify the major geological event responsible for the eventual separation of the Pangaea supercontinent.\nTo ensure accuracy:\n1. Identify the final step in the breakup process after Pangaea's creation (dispersal).\n2. Recognize that this result implies Earth's ocean floor being separated from the one previously attached to it.\n3. Consider that these two parts had been permanently united during the vast-ever-lasting time since the plates had broken apart millions of years earlier and later.\n4. Confirm that the resulting oceans we see today represent a recent reshuffling of nearly extinct landmasses but formed earlier in history.\nThis question effectively tests both factual information recall about ocean evolution and recognition of specific geological features linked to period changes shown in the representation of terminal plate tectonics.",
+  "gold_pick": "Question: What phenomenon caused Pangaea to begin breaking apart millions of years ago?",
+  "proxy_scores": [
+   1.8332301733828136,
+   -0.045232228225386716
+  ],
+  "gold_scores": [
+   1.312370232773716,
+   2.6127453583991587
+  ]
+ }
+}

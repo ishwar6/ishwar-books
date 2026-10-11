@@ -1,0 +1,38 @@
+100 prompts x 32 samples = 3200 answers; finished within 256 tokens: 0.275
+proxy     n=1     n=2     n=4     n=8     n=16    n=32      (rewards in sd units, change from n=1)
+main      proxy +0.000 +0.382 +0.667 +0.886 +1.058 +1.190
+          gold  +0.000 +0.215 +0.377 +0.505 +0.618 +0.732
+          words  154.6  153.7  153.1  153.2  153.3  154.4
+          done    0.27   0.31   0.35   0.38   0.43   0.47
+small     proxy +0.000 +0.419 +0.739 +0.962 +1.108 +1.206
+          gold  +0.000 +0.095 +0.187 +0.276 +0.358 +0.433
+          words  154.6  147.3  141.2  136.4  133.0  131.5
+          done    0.27   0.36   0.44   0.52   0.57   0.60
+ens_mean  proxy +0.000 +0.289 +0.513 +0.690 +0.832 +0.944
+          gold  +0.000 +0.190 +0.340 +0.456 +0.533 +0.535
+          words  154.6  151.8  150.2  149.8  150.2  152.4
+          done    0.27   0.33   0.38   0.42   0.47   0.51
+ens_min   proxy +0.000 +0.326 +0.576 +0.770 +0.924 +1.057
+          gold  +0.000 +0.166 +0.291 +0.381 +0.433 +0.472
+          words  154.6  152.9  152.4  152.9  153.6  153.9
+          done    0.27   0.32   0.37   0.41   0.45   0.50
+gold      proxy +0.000 +0.384 +0.706 +0.975 +1.201 +1.384
+          gold  +0.000 +0.384 +0.706 +0.975 +1.201 +1.384
+          words  154.6  149.6  144.7  139.9  135.2  130.7
+          done    0.27   0.32   0.36   0.40   0.45   0.53
+KL(best-of-n || policy) in nats: 0.000 0.193 0.636 1.204 1.835 2.497
+
+finished answers only: 35 prompts with at least 8 finished answers (of 32)
+main      proxy +0.000 +0.349 +0.585 +0.746 | gold +0.000 +0.199 +0.311 +0.390 | words 88 89 91 96
+small     proxy +0.000 +0.100 +0.173 +0.227 | gold +0.000 +0.119 +0.189 +0.219 | words 88 86 84 82
+ens_mean  proxy +0.000 +0.236 +0.393 +0.497 | gold +0.000 +0.176 +0.263 +0.297 | words 88 90 93 97
+ens_min   proxy +0.000 +0.303 +0.500 +0.633 | gold +0.000 +0.170 +0.226 +0.239 | words 88 91 97 102
+gold      proxy +0.000 +0.394 +0.689 +0.919 | gold +0.000 +0.394 +0.689 +0.919 | words 88 80 73 70
+fit gold(main) = d (0.479 - (0.012) d): no peak within reach (beta too small)
+fit gold(small) = d (0.196 - (-0.049) d): no peak within reach (beta negative)
+main: picks the gold favourite of 32 in 0.22 of prompts; mean within-prompt rank correlation with gold 0.517
+small: picks the gold favourite of 32 in 0.13 of prompts; mean within-prompt rank correlation with gold 0.209
+
+largest disagreement, prompt #14: 'Given the task definition and input, reply with output. Given a scientific passage and an answer, generate a question fo'
+  proxy pick: proxy +1.83, gold -0.05: 'Question: What happened at the end of the Mesozoic era when Pangaea broke apart? This question directly corresponds to the given answer "break up". It prompts the user to correctly identify the major '
+  gold pick:  proxy +1.31, gold +2.61: 'Question: What phenomenon caused Pangaea to begin breaking apart millions of years ago?'

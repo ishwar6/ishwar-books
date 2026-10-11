@@ -1,0 +1,8 @@
+[lr1] train pairs 3200, test pairs 600, loaded in 8s, device mps
+trainable parameters 8,799,104 of 502,832,768 (1.75%)
+step    0 | test acc 0.465 test loss 0.7873 (before training)
+step  100 | train loss 0.7440 train acc 0.552 | test acc 0.528 test loss 0.7351 | 1610s
+step  200 | train loss 0.6998 train acc 0.565 | test acc 0.610 test loss 0.6531 | 2363s
+step  300 | train loss 0.6473 train acc 0.623 | test acc 0.627 test loss 0.6597 | 2731s
+step  400 | train loss 0.6244 train acc 0.641 | test acc 0.627 test loss 0.6439 | 3112s
+saved adapter to ~/.cache/ch7_reward_models/lr1; total time 3114s

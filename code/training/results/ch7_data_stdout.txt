@@ -1,0 +1,16 @@
+UltraFeedback binarized train_prefs: 61,135 rows; ties (same rating) 12.1%
+train: 4000 pairs | rating gap mean 2.21, median 1.50 | response tokens chosen 155, rejected 136 | chosen is longer in 53.1%
+test: 600 pairs | rating gap mean 2.19, median 1.50 | response tokens chosen 155, rejected 139 | chosen is longer in 53.3%
+
+example pair (test #544):
+prompt:   Complete the sentence by providing an appropriate word. She was wearing a ____ dress.
+chosen   (rating 7.0): The word "red" would be an appropriate word to fill in the blank in the sentence "She was wearing a [___] dress."
+rejected (rating 3.0): Is the dress navy blue, black, or any other color?
+
+the reward model reads this exact text (chosen):
+'<|im_start|>system\nYou are Qwen, created by Alibaba Cloud. You are a helpful assistant.<|im_end|>\n<|im_start|>user\nComplete the sentence by providing an appropriate word.\nShe was wearing a ____ dress.<|im_end|>\n<|im_start|>assistant\nThe word "red" would be an '
+... 74 tokens; last token id 151645 = <|im_end|>
+
+rating gap buckets (train): {'[0,1)': 804, '[1,2)': 1389, '[2,4)': 987, '[4,10)': 820}
+
+"always pick the longer answer" on the test set: accuracy 0.539

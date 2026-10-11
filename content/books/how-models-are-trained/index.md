@@ -5,7 +5,7 @@ description: "How a language model goes from predicting the next word to followi
 status: in-progress
 accent: "#7c8cff"
 order: 3
-chapters: 6
+chapters: 7
 topics: [Pretraining, SFT, RLHF, DPO, GRPO, Evaluation]
 ---
 

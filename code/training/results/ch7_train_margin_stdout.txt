@@ -1,0 +1,8 @@
+[margin] train pairs 3200, test pairs 600, loaded in 11s, device mps
+trainable parameters 8,799,104 of 502,832,768 (1.75%)
+step    0 | test acc 0.465 test loss 0.7873 (before training)
+step  100 | train loss 1.5906 train acc 0.595 | test acc 0.645 test loss 0.7148 | 441s
+step  200 | train loss 1.3913 train acc 0.705 | test acc 0.705 test loss 0.7083 | 816s
+step  300 | train loss 1.2405 train acc 0.720 | test acc 0.687 test loss 0.7128 | 1165s
+step  400 | train loss 1.1304 train acc 0.733 | test acc 0.697 test loss 0.7457 | 1509s
+saved adapter to /Users/admin/.cache/ch7_reward_models/margin; total time 1510s

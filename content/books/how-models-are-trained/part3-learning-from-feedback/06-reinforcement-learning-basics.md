@@ -22,7 +22,7 @@ Reinforcement learning (RL) removes all three limits with a different kind of si
 > [!DEFINITION] Reinforcement learning (RL)
 > Learning by trial and error from a numerical score called the **reward**. The learner tries something, receives a reward, and changes its behaviour so that high-reward behaviour becomes more likely. Nobody shows it the correct action.
 
-For a language model the loop is: give it a prompt, let it **sample** a whole reply, score the reply, and then nudge the model's weights so that replies like the high-scoring ones become more probable. The score can come from a reward model trained on human preferences (that is RLHF, the subject of Chapter 7 and Chapter 8), from a classifier, or from a checker such as a unit test or an exact-match test against a known answer (RLVR, Chapter 1, Section 1.6).
+For a language model the loop is: give it a prompt, let it **sample** a whole reply, score the reply, and then nudge the model's weights so that replies like the high-scoring ones become more probable. The score can come from a reward model trained on human preferences (that is RLHF, the subject of [Chapter 7](/books/how-models-are-trained/07-reward-models) and Chapter 8), from a classifier, or from a checker such as a unit test or an exact-match test against a known answer (RLVR, Chapter 1, Section 1.6).
 
 This chapter builds the machinery underneath all of those methods, from nothing. We start with vocabulary, derive the one equation that everything rests on (the policy gradient), and then spend most of the chapter on its central problem: the gradient it gives is correct on average but extremely noisy. Baselines, value functions, advantages, TD errors and GAE are all answers to that one problem. The chapter ends with the KL penalty, the safety rope that keeps the model from drifting into nonsense while it chases reward.
 
@@ -998,7 +998,7 @@ What we built is a complete, working RL fine-tuning method: REINFORCE with a lea
 2. **A critic gives per-token credit.** With GAE (Section 6.10), each token gets its own advantage instead of sharing one number with the whole reply. Whether that is worth a second large network is exactly the debate between PPO and the critic-free methods.
 3. **Stability tricks matter at scale.** Advantage normalisation, value clipping, reward whitening and a dozen other details; Huang et al. (2024) list them for RLHF in "The N+ Implementation Details of RLHF with PPO".
 
-Chapter 8 builds PPO on top of this chapter: the same per-token rewards, the same KL penalty, GAE from Section 6.10, and a reward model trained on human preferences in Chapter 7 instead of a sentiment classifier. Every piece will already be familiar.
+Chapter 8 builds PPO on top of this chapter: the same per-token rewards, the same KL penalty, GAE from Section 6.10, and a reward model trained on human preferences in [Chapter 7](/books/how-models-are-trained/07-reward-models) instead of a sentiment classifier. Every piece will already be familiar.
 
 > [!TAKEAWAYS]
 > - Text generation is an RL problem: the state is the prompt plus the tokens so far, the action is the next token, the policy is the language model, an episode is one reply, and the reward usually arrives only after the last token. Transitions are deterministic and the discount is usually 1.
