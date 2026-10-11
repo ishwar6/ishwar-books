@@ -1,0 +1,6 @@
+test_prefs: 48 candidates, kept 8, 10s
+test_prefs: 200 candidates, 39 kept (0.20); finished replies: mean 49.5 tokens, median 49
+train_prefs: 48 candidates, kept 11, 10s
+train_prefs: 528 candidates, kept 119, 117s
+train_prefs: 1008 candidates, kept 226, 219s
+train_prefs: 1200 candidates, 258 kept (0.21); finished replies: mean 45.2 tokens, median 35

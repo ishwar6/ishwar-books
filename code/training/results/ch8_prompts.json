@@ -1,0 +1,12 @@
+{
+ "test_prefs": {
+  "candidates": 200,
+  "kept": 39,
+  "mean_len": 49.51282051282051
+ },
+ "train_prefs": {
+  "candidates": 1200,
+  "kept": 258,
+  "mean_len": 45.17054263565891
+ }
+}

@@ -1,0 +1,39 @@
+== 1. the clipped objective for one token (epsilon = 0.2)
+  A > 0, ratio went up a lot     p_old 0.100 p_new 0.130 ratio 1.301  A +1.5  r*A +1.951  clip(r)*A +1.800  min +1.800  d objective / d log p +0.000
+  A > 0, ratio went down         p_old 0.100 p_new 0.090 ratio 0.900  A +1.5  r*A +1.350  clip(r)*A +1.350  min +1.350  d objective / d log p +1.350
+  A < 0, ratio went down a lot   p_old 0.100 p_new 0.070 ratio 0.700  A -0.8  r*A -0.560  clip(r)*A -0.640  min -0.640  d objective / d log p +0.000
+  A < 0, ratio went up           p_old 0.100 p_new 0.150 ratio 1.501  A -0.8  r*A -1.201  clip(r)*A -0.960  min -1.201  d objective / d log p -1.201
+
+== 2. one batch, many gradient steps: six-token bandit, true mean rewards below, noise sd 1.0
+  true means [0.3, 0.2, 0.1, 0.0, -0.1, -0.2]  old policy [0.135, 0.164, 0.201, 0.201, 0.164, 0.135]  expected reward +0.0500
+  reinforce after  1 steps: true expected reward +0.054 (10th percentile +0.046), KL(old||new) 0.005, worse than before in 21% of seeds, samples outside [0.8, 1.2] 0%
+  reinforce after  5 steps: true expected reward +0.071 (10th percentile +0.032), KL(old||new) 0.112, worse than before in 21% of seeds, samples outside [0.8, 1.2] 98%
+  reinforce after 10 steps: true expected reward +0.085 (10th percentile +0.021), KL(old||new) 0.409, worse than before in 21% of seeds, samples outside [0.8, 1.2] 100%
+  reinforce after 20 steps: true expected reward +0.096 (10th percentile +0.012), KL(old||new) 1.278, worse than before in 21% of seeds, samples outside [0.8, 1.2] 100%
+  reinforce after 40 steps: true expected reward +0.098 (10th percentile +0.010), KL(old||new) 3.239, worse than before in 22% of seeds, samples outside [0.8, 1.2] 100%
+  reinforce after 60 steps: true expected reward +0.098 (10th percentile +0.010), KL(old||new) 5.222, worse than before in 22% of seeds, samples outside [0.8, 1.2] 100%
+  ratio     after  1 steps: true expected reward +0.054 (10th percentile +0.046), KL(old||new) 0.005, worse than before in 21% of seeds, samples outside [0.8, 1.2] 0%
+  ratio     after  5 steps: true expected reward +0.071 (10th percentile +0.034), KL(old||new) 0.106, worse than before in 21% of seeds, samples outside [0.8, 1.2] 94%
+  ratio     after 10 steps: true expected reward +0.090 (10th percentile +0.023), KL(old||new) 0.374, worse than before in 22% of seeds, samples outside [0.8, 1.2] 95%
+  ratio     after 20 steps: true expected reward +0.118 (10th percentile -0.014), KL(old||new) 1.165, worse than before in 22% of seeds, samples outside [0.8, 1.2] 96%
+  ratio     after 40 steps: true expected reward +0.143 (10th percentile -0.093), KL(old||new) 2.761, worse than before in 24% of seeds, samples outside [0.8, 1.2] 99%
+  ratio     after 60 steps: true expected reward +0.147 (10th percentile -0.098), KL(old||new) 3.549, worse than before in 25% of seeds, samples outside [0.8, 1.2] 100%
+  clip      after  1 steps: true expected reward +0.054 (10th percentile +0.046), KL(old||new) 0.005, worse than before in 21% of seeds, samples outside [0.8, 1.2] 0%
+  clip      after  5 steps: true expected reward +0.066 (10th percentile +0.041), KL(old||new) 0.052, worse than before in 21% of seeds, samples outside [0.8, 1.2] 75%
+  clip      after 10 steps: true expected reward +0.068 (10th percentile +0.039), KL(old||new) 0.061, worse than before in 20% of seeds, samples outside [0.8, 1.2] 51%
+  clip      after 20 steps: true expected reward +0.066 (10th percentile +0.039), KL(old||new) 0.057, worse than before in 24% of seeds, samples outside [0.8, 1.2] 53%
+  clip      after 40 steps: true expected reward +0.064 (10th percentile +0.040), KL(old||new) 0.046, worse than before in 23% of seeds, samples outside [0.8, 1.2] 51%
+  clip      after 60 steps: true expected reward +0.063 (10th percentile +0.041), KL(old||new) 0.042, worse than before in 24% of seeds, samples outside [0.8, 1.2] 51%
+
+== 2b. the loop: 40 iterations, each samples a fresh batch of 32 from the current policy and takes K updates on it (500 seeds)
+  reinforce_K1  expected reward after 10/20/40 iterations: +0.097 / +0.144 / +0.215   10th percentile at 40: +0.161   P(best token) at 40: 0.52   stuck on a worse token: 0%
+  reinforce_K10 expected reward after 10/20/40 iterations: +0.220 / +0.234 / +0.238   10th percentile at 40: +0.100   P(best token) at 40: 0.56   stuck on a worse token: 41%
+  ratio_K10     expected reward after 10/20/40 iterations: +0.224 / +0.239 / +0.244   10th percentile at 40: +0.101   P(best token) at 40: 0.61   stuck on a worse token: 35%
+  clip_K10      expected reward after 10/20/40 iterations: +0.191 / +0.243 / +0.271   10th percentile at 40: +0.199   P(best token) at 40: 0.77   stuck on a worse token: 11%
+
+== 3. memory for the four models (weights and optimizer state only; no activations, no KV cache)
+  trainable models (policy, value): 16 bytes/parameter = bf16 weights 2 + bf16 grads 2 + fp32 master copy 4 + Adam m 4 + Adam v 4
+  frozen models (reference, reward): 2 bytes/parameter (bf16 weights)
+  0.5B (our Qwen2.5-0.5B)  policy     7.9 GB  value     7.9 GB  reference    1.0 GB  reward    1.0 GB  total    17.8 GB  (SFT of the same model: 7.9 GB, so RLHF needs 2.25x)
+  7B                       policy   112.0 GB  value   112.0 GB  reference   14.0 GB  reward   14.0 GB  total   252.0 GB  (SFT of the same model: 112.0 GB, so RLHF needs 2.25x)
+  70B                      policy  1120.0 GB  value  1120.0 GB  reference  140.0 GB  reward  140.0 GB  total  2520.0 GB  (SFT of the same model: 1120.0 GB, so RLHF needs 2.25x)

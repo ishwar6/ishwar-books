@@ -1,0 +1,9 @@
+39 held-out prompts x 2 replies per checkpoint
+start evaluated in 39s
+gold scores are standardised with the starting model's mean and sd on these replies (raw mean -0.962, sd 2.537)
+  start            proxy +0.196  gold -0.000 (raw -0.962)  KL   0.00  tokens  59.3  words  45.1  finished 0.79  distinct-2 0.877
+  beta005 step 10  proxy +0.188  gold +0.129 (raw -0.634)  KL   2.69  tokens  30.9  words  23.3  finished 0.94  distinct-2 0.883
+  beta005 step 20  proxy +0.270  gold -0.044 (raw -1.072)  KL   3.20  tokens  35.9  words  25.8  finished 0.90  distinct-2 0.894
+  nokl step 10     proxy +0.208  gold +0.113 (raw -0.675)  KL   2.86  tokens  30.7  words  22.5  finished 0.94  distinct-2 0.896
+  nokl step 20     proxy +0.214  gold +0.042 (raw -0.856)  KL   5.65  tokens  28.8  words  21.2  finished 0.94  distinct-2 0.882
+done

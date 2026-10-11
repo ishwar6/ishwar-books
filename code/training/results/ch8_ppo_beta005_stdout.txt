@@ -1,0 +1,25 @@
+run beta005: {'name': 'beta005', 'beta': 0.05, 'steps': 40, 'batch': 32, 'minibatches': 2, 'epochs': 2, 'micro': 16, 'lr': 3e-05, 'vlr': 3e-05, 'clip': 0.2, 'vclip': 0.2, 'lam': 0.95, 'gamma': 1.0, 'temp': 0.7, 'max_new': 128, 'eos_penalty': -1.0, 'seed': 0, 'save_every': 10}
+258 training prompts
+trainable: policy 8,798,208  value 8,799,104
+reward normalisation from 192 replies of the starting model: raw mean 4.496 sd 1.828 (finished 0.75, mean length 60.6 tokens)
+step   0  score -0.125  rm_raw +4.178  kl   0.00  len  71.6  fin 0.66  ent 0.830  clipfrac 0.062  approx_kl 0.0132  v_loss 4.057  ev -0.55  (54s, gen 6s)
+Apple GPU memory after the first iteration: 39.4 GB
+step   1  score +0.053  rm_raw +4.804  kl   0.15  len  51.5  fin 0.84  ent 0.813  clipfrac 0.029  approx_kl 0.0029  v_loss 4.229  ev -0.67  (50s, gen 7s)
+step   2  score -0.204  rm_raw +4.270  kl   0.34  len  54.5  fin 0.75  ent 0.852  clipfrac 0.020  approx_kl 0.0022  v_loss 2.916  ev -0.66  (58s, gen 6s)
+step   3  score +0.088  rm_raw +4.617  kl   0.83  len  48.6  fin 0.91  ent 0.807  clipfrac 0.016  approx_kl 0.0018  v_loss 2.959  ev -0.75  (57s, gen 7s)
+step   4  score +0.099  rm_raw +4.828  kl   1.60  len  37.0  fin 0.91  ent 0.782  clipfrac 0.014  approx_kl 0.0021  v_loss 2.073  ev -0.85  (73s, gen 9s)
+step   5  score -0.270  rm_raw +4.058  kl   1.35  len  48.6  fin 0.75  ent 0.672  clipfrac 0.009  approx_kl 0.0010  v_loss 1.390  ev -0.19  (46s, gen 9s)
+step   6  score +0.153  rm_raw +4.743  kl   1.35  len  33.0  fin 0.88  ent 0.755  clipfrac 0.015  approx_kl 0.0018  v_loss 1.428  ev -0.43  (58s, gen 6s)
+step   7  score +0.185  rm_raw +4.973  kl   2.50  len  32.9  fin 0.94  ent 0.823  clipfrac 0.010  approx_kl 0.0015  v_loss 0.921  ev -0.28  (33s, gen 6s)
+step   8  score -0.063  rm_raw +4.437  kl   1.27  len  27.6  fin 0.97  ent 0.830  clipfrac 0.014  approx_kl 0.0016  v_loss 0.603  ev -0.12  (32s, gen 6s)
+step   9  score -0.234  rm_raw +4.173  kl   3.22  len  50.8  fin 0.81  ent 0.864  clipfrac 0.007  approx_kl 0.0008  v_loss 0.546  ev +0.32  (42s, gen 6s)
+step  10  score -0.120  rm_raw +4.519  kl   3.85  len  53.0  fin 0.78  ent 0.748  clipfrac 0.004  approx_kl 0.0014  v_loss 0.334  ev +0.11  (47s, gen 6s)
+step  11  score +0.272  rm_raw +4.993  kl   2.95  len  27.4  fin 1.00  ent 0.535  clipfrac 0.022  approx_kl 0.0031  v_loss 0.199  ev +0.32  (33s, gen 6s)
+step  12  score -0.052  rm_raw +4.470  kl   2.51  len  35.6  fin 0.88  ent 0.751  clipfrac 0.007  approx_kl 0.0018  v_loss 0.152  ev +0.49  (36s, gen 6s)
+step  13  score +0.066  rm_raw +4.626  kl   3.08  len  25.6  fin 0.97  ent 0.908  clipfrac 0.015  approx_kl 0.0051  v_loss 0.115  ev +0.67  (33s, gen 6s)
+step  14  score +0.059  rm_raw +4.709  kl   4.70  len  39.5  fin 0.84  ent 0.797  clipfrac 0.009  approx_kl 0.0008  v_loss 0.093  ev +0.69  (43s, gen 6s)
+step  15  score +0.275  rm_raw +4.988  kl   3.03  len  26.2  fin 0.94  ent 0.701  clipfrac 0.015  approx_kl 0.0017  v_loss 0.087  ev +0.76  (30s, gen 6s)
+step  16  score -0.054  rm_raw +4.429  kl   3.08  len  34.2  fin 0.84  ent 0.695  clipfrac 0.012  approx_kl 0.0018  v_loss 0.059  ev +0.79  (31s, gen 6s)
+step  17  score -0.095  rm_raw +4.445  kl   3.27  len  34.6  fin 0.91  ent 0.662  clipfrac 0.013  approx_kl 0.0015  v_loss 0.071  ev +0.77  (48s, gen 6s)
+step  18  score +0.179  rm_raw +4.851  kl   4.30  len  23.7  fin 0.97  ent 0.743  clipfrac 0.017  approx_kl 0.0019  v_loss 0.069  ev +0.84  (28s, gen 6s)
+step  19  score +0.168  rm_raw +4.849  kl   3.76  len  36.2  fin 0.91  ent 0.913  clipfrac 0.009  approx_kl 0.0012  v_loss 0.059  ev +0.87  (42s, gen 7s)

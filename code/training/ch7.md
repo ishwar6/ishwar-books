@@ -237,7 +237,7 @@ Because only gaps appear, adding the same constant $$c$$ to every reward leaves 
   shift   -7.5: rewards (-6.2, -7.1) -> loss 0.3412
 ```
 
-The absolute level of a reward model's output is therefore arbitrary: training cannot fix it. That matters as soon as the reward is *used*. In PPO (Chapter 8) the reward is added to a KL penalty, so its level and scale interact with other terms. That is why every paper normalises the reward model after training: Christiano et al. normalised rewards "to have zero mean and constant standard deviation"; Stiennon et al. shifted them so reference summaries score 0; InstructGPT did the same with labeler demonstrations:
+The absolute level of a reward model's output is therefore arbitrary: training cannot fix it. That matters as soon as the reward is *used*. In PPO ([Chapter 8](/books/how-models-are-trained/08-rlhf-with-ppo)) the reward is added to a KL penalty, so its level and scale interact with other terms. That is why every paper normalises the reward model after training: Christiano et al. normalised rewards "to have zero mean and constant standard deviation"; Stiennon et al. shifted them so reference summaries score 0; InstructGPT did the same with labeler demonstrations:
 
 > [!PAPER] Ouyang et al. (2022), InstructGPT · Section 3.5 · page 9
 > [![InstructGPT: since the RM loss is invariant to shifts in reward, we normalize the reward model using a bias so that the labeler demonstrations achieve a mean score of 0 before doing RL](/img/training/ch7-instructgpt-bias.png)](/img/training/ch7-instructgpt-bias.png)

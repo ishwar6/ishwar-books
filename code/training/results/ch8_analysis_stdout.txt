@@ -1,0 +1,42 @@
+78 held-out replies per checkpoint (same prompts, same sampling seed)
+beta005  step 10: proxy change -0.008 [-0.124, +0.108]  gold change +0.129 [-0.076, +0.333]  proxy with EOS rule +0.140 (start +0.071)  finished 0.94 (start 0.79)  tokens 30.9 (start 59.3)  KL 2.69
+beta005  step 20: proxy change +0.074 [-0.053, +0.197]  gold change -0.044 [-0.232, +0.172]  proxy with EOS rule +0.203 (start +0.071)  finished 0.90 (start 0.79)  tokens 35.9 (start 59.3)  KL 3.20
+nokl     step 10: proxy change +0.012 [-0.104, +0.132]  gold change +0.113 [-0.085, +0.313]  proxy with EOS rule +0.185 (start +0.071)  finished 0.94 (start 0.79)  tokens 30.7 (start 59.3)  KL 2.86
+nokl     step 20: proxy change +0.018 [-0.103, +0.131]  gold change +0.042 [-0.138, +0.230]  proxy with EOS rule +0.185 (start +0.071)  finished 0.94 (start 0.79)  tokens 28.8 (start 59.3)  KL 5.65
+
+correlation of score with reply length (tokens), finished replies only
+  start            proxy +0.241  gold +0.095
+  beta005 step 20  proxy -0.098  gold -0.017
+  nokl step 20     proxy -0.097  gold -0.186
+
+side by side (first reply to each prompt), start vs beta 0.05 step 20 vs no KL step 20
+
+PROMPT: 'Could you paraphrase the instruction for adding potatoes and mushrooms? Answer according to: In ovenproof 4-quart Dutch oven, mix all ingredients except potatoes and mushrooms. Cover and bake 2 hours,'
+  [start    ] proxy +0.22 gold -0.29 tokens 111 "Sure! Here's a paraphrased version of the instruction:\n\nPour all ingredients into an ovenproof dish along with any optional additions such as salt, pepper, garlic powder, or herbs, but do not stir yet.\n\nCover and bake at 375°F (190°C) for 2 hours. Stir frequently during baking to ensure even cooking. After 2 hours, remove from the heat; cover again and continue baking for an additional hour before"
+  [beta 0.05] proxy +0.36 gold -0.04 tokens  77 'For the mashed potato and mushroom dish, combine all remaining ingredients except potatoes and mushrooms in an ovenproof dish along with a lid. Bake it in the preheated oven at 2 hours and 30 minutes.\n\nNext, stir in the grated potatoes and mushrooms. Transfer to the same pan if desired. Let it bake for another hour, or until both ingredients are cooked through.'
+  [no KL    ] proxy +0.10 gold -1.26 tokens  72 'For this recipe, follow these steps:\n1. Add potatoes and mushrooms to an ovenproof quart dish.\n2. Pour in all other ingredients except potatoes and mushrooms.\n3. Cover and place in the oven, baking for 2 hours, then stir occasionally.\n4. Continue baking for another hour, allowing the mixture to fully cook before switching to broiler.'
+
+PROMPT: "Definition: In this task, you are given two natural language statements with similar wording. You must choose the statement that makes less sense based on common sense knowledge. A '\n' separates the s"
+  [start    ] proxy +1.49 gold +0.29 tokens   1 'First'
+  [beta 0.05] proxy +1.49 gold +0.29 tokens   1 'First'
+  [no KL    ] proxy +1.49 gold +0.29 tokens   1 'First'
+
+PROMPT: 'You will be given a definition of a task first, then some input of the task.\nIn this task, you are given a text from a social media post. Your task is to classify the given post into two categories: 1'
+  [start    ] proxy +0.91 gold -0.92 tokens   1 'Yes'
+  [beta 0.05] proxy +0.91 gold -0.92 tokens   1 'Yes'
+  [no KL    ] proxy +0.91 gold -0.92 tokens   1 'Yes'
+
+PROMPT: 'Act as a Salesforce administrator expert. If okay, just say "Okay".'
+  [start    ] proxy -0.47 gold -0.18 tokens  18 "Okay. I'm here to help! What would you like to know about Salesforce administrators?"
+  [beta 0.05] proxy +0.52 gold +0.54 tokens   2 'Okay.'
+  [no KL    ] proxy +0.52 gold +0.54 tokens   2 'Okay.'
+
+PROMPT: 'Detailed Instructions: In this task, you are given a text from tweets. Your task is to classify given tweet text into two categories: 1) positive, and 2) negative based on its content.\nQ: @shannonleet'
+  [start    ] proxy +1.18 gold +1.32 tokens  45 'Based on the content of the tweet provided, it appears to be expressing excitement about moving to California for summer vacation, which is likely seen as a positive experience. Therefore, I would classify this tweet as having a positive classification.'
+  [beta 0.05] proxy +1.28 gold +0.38 tokens  13 'Based on the content provided, this tweet appears to be:\nPositive'
+  [no KL    ] proxy +0.30 gold -1.18 tokens  28 'Based on the provided tweet text, this appears to be an informative and enthusiastic statement about living in Phoenix for the time being moving to California.'
+
+PROMPT: 'Identify the two colors that make up the American flag.'
+  [start    ] proxy -0.10 gold -0.72 tokens 128 (cut off) "The two primary colors used in the American flag - red and white - come from the founding fathers' original designs. The design of the American flag is based on historical events and cultural traditions, but there were specific rules set forth at the time of its creation. These rules dictate how the colors should be represented on the flag.\n\n1. Red: This color was chosen to represent strength, cou"
+  [beta 0.05] proxy +0.84 gold -0.76 tokens 128 (cut off) 'The two primary colors used in the American flag - red and white - come from the founding fathers\' original designs. The design of the American flag is based on historical events and cultural traditions, but there were specific choices made during its creation to reflect important values. Here\'s a brief overview:\n\n1. Red: identified by Benjamin Franklin as "the blood-red color" to signify strength'
+  [no KL    ] proxy -0.15 gold +0.21 tokens  21 'The two primary colors used in the American flag - red and white - come from indigenous Native American cultures.'
