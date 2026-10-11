@@ -18,8 +18,14 @@ def esc(s):
     return str(s).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
 
 
+def subs(s):
+    """W_E -> W with a subscript E (a tspan), so maths names read like the article's equations."""
+    import re
+    return re.sub(r'(?<=[A-Za-z])_([A-Za-z0-9]+)', r'<tspan baseline-shift="sub" style="font-size:72%">\1</tspan>', s)
+
+
 def text(x, y, s, cls='t-note', anchor='start', extra=''):
-    return f'<text class="{cls}" x="{x:.1f}" y="{y:.1f}" text-anchor="{anchor}"{extra}>{esc(s)}</text>'
+    return f'<text class="{cls}" x="{x:.1f}" y="{y:.1f}" text-anchor="{anchor}"{extra}>{subs(esc(s))}</text>'
 
 
 def box(x, y, w, h, cls='box', rx=10):

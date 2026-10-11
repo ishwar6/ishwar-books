@@ -1,0 +1,81 @@
+[
+ {
+  "out": "p1-title.png",
+  "find": "A Mathematical Framework for Transformer Circuits",
+  "upto": "Dec 22, 2021",
+  "mark": [
+   "A Mathematical Framework for Transformer Circuits"
+  ]
+ },
+ {
+  "out": "p1-intro-reverse.png",
+  "find": "reverse engineer complicated binaries",
+  "mark": [
+   "mechanistic interpretability",
+   "reverse engineer complicated binaries into human-readable source code"
+  ]
+ },
+ {
+  "out": "p1-simplifications.png",
+  "find": "we focus on “attention-only” transformers",
+  "upto": "We also make several changes that we consider",
+  "mark": [
+   "“attention-only” transformers",
+   "much less success in understanding MLP layers",
+   "We do not consider biases",
+   "We also ignore layer normalization"
+  ]
+ },
+ {
+  "out": "p1-architecture.png",
+  "figure": 1,
+  "pad": 10
+ },
+ {
+  "out": "p1-residual-stream.png",
+  "find": "We generally think of the residual stream as a communication channel",
+  "mark": [
+   "residual stream",
+   "simply the sum of the output of all the previous layers and the original embedding",
+   "communication channel"
+  ]
+ },
+ {
+  "out": "p1-linear.png",
+  "find": "The residual stream has a deeply linear structure",
+  "mark": [
+   "deeply linear structure",
+   "linear, additive structure",
+   "privileged basis"
+  ]
+ },
+ {
+  "out": "p1-virtual-weights-fig.png",
+  "figure": 3,
+  "pad": 10
+ },
+ {
+  "out": "p1-bandwidth.png",
+  "find": "It seems like we should expect residual stream bandwidth",
+  "upto": "Perhaps because of this high demand",
+  "mark": [
+   "residual stream bandwidth to be in very high demand",
+   "\"memory management\""
+  ]
+ },
+ {
+  "out": "p1-subspaces-fig.png",
+  "figure": 4,
+  "pad": 10
+ },
+ {
+  "out": "p1-zero-layer.png",
+  "find": "it’s useful to briefly consider a “zero-layer” transformer",
+  "mark": [
+   "approximate the bigram log-likelihood",
+   "“direct path”",
+   "“Barack” is often followed by “Obama”"
+  ],
+  "upto": "This is relevant to transformers more generally"
+ }
+]
