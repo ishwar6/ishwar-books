@@ -27,6 +27,10 @@
     "hardware": {
       "label": "GPUs and hardware",
       "color": "#a97bff"
+    },
+    "training": {
+      "label": "Training LLMs",
+      "color": "#b5cc3a"
     }
   },
   "nodes": [
@@ -421,6 +425,118 @@
       "group": "inference",
       "route": "writings/llm-inference-6-serving-in-production#10-what-breaks-in-production",
       "blurb": "Cold starts, retry storms, preemption storms and noisy neighbours, and the metrics that reveal them."
+    },
+    {
+      "id": "how-models-trained",
+      "label": "How models are trained",
+      "group": "training",
+      "route": "books/how-models-are-trained",
+      "blurb": "A book on how a chatbot is made: pretraining, fine-tuning, reward models and RLHF, with real runs on a small model."
+    },
+    {
+      "id": "training-pipeline",
+      "label": "Base model to assistant",
+      "group": "training",
+      "route": "books/how-models-are-trained/01-from-next-word-to-assistant#16-the-training-pipeline-from-base-model-to-assistant",
+      "blurb": "The three stages every chat model goes through: pretrain on the web, fine-tune on examples, then learn from feedback."
+    },
+    {
+      "id": "next-token-loss",
+      "label": "Cross-entropy and perplexity",
+      "group": "training",
+      "route": "books/how-models-are-trained/01-from-next-word-to-assistant#15-cross-entropy-loss-and-perplexity",
+      "blurb": "The single number a language model is trained to lower, and the easier-to-read number made from it."
+    },
+    {
+      "id": "model-evals",
+      "label": "Benchmarks and evals",
+      "group": "training",
+      "route": "books/how-models-are-trained/03-how-we-measure-a-model#34-how-a-multiple-choice-question-is-really-scored",
+      "blurb": "How a benchmark score is really computed, and how sure we can be about it."
+    },
+    {
+      "id": "llm-judge",
+      "label": "LLM-as-a-judge",
+      "group": "training",
+      "route": "books/how-models-are-trained/03-how-we-measure-a-model#310-asking-a-model-llm-as-a-judge",
+      "blurb": "Using one model to grade another, and the biases that come with it."
+    },
+    {
+      "id": "pretraining",
+      "label": "Pretraining",
+      "group": "training",
+      "route": "books/how-models-are-trained/04-pretraining#41-what-pretraining-is",
+      "blurb": "Predicting the next token over trillions of tokens. Where a model gets almost everything it knows."
+    },
+    {
+      "id": "scaling-laws",
+      "label": "Scaling laws",
+      "group": "training",
+      "route": "books/how-models-are-trained/04-pretraining#47-scaling-laws-how-big-and-for-how-long",
+      "blurb": "How loss falls with more parameters and more data, and how to split a fixed compute budget between them."
+    },
+    {
+      "id": "sft",
+      "label": "Supervised fine-tuning",
+      "group": "training",
+      "route": "books/how-models-are-trained/05-supervised-fine-tuning#55-the-sft-loss-with-label-masking",
+      "blurb": "Training on example conversations so the base model answers like an assistant. Only the reply tokens count in the loss."
+    },
+    {
+      "id": "lora",
+      "label": "LoRA",
+      "group": "training",
+      "route": "books/how-models-are-trained/05-supervised-fine-tuning#57-lora-fine-tuning-a-few-million-numbers-instead-of-half-a-billion",
+      "blurb": "Freeze the model and train two small matrices per layer instead. A few million numbers in place of half a billion."
+    },
+    {
+      "id": "policy-gradient",
+      "label": "Policy gradient (REINFORCE)",
+      "group": "training",
+      "route": "books/how-models-are-trained/06-reinforcement-learning-basics#65-reinforce-williams-1992",
+      "blurb": "Make rewarded replies more likely and bad ones less likely. The simplest way to learn from a score."
+    },
+    {
+      "id": "gae",
+      "label": "Advantage and GAE",
+      "group": "training",
+      "route": "books/how-models-are-trained/06-reinforcement-learning-basics#610-generalized-advantage-estimation-the-lambda-trade-off",
+      "blurb": "How much better an action was than expected, estimated with a dial between low noise and low bias."
+    },
+    {
+      "id": "kl-penalty",
+      "label": "KL penalty",
+      "group": "training",
+      "route": "books/how-models-are-trained/06-reinforcement-learning-basics#612-the-kl-penalty-as-reward-shaping",
+      "blurb": "A leash that keeps the trained model close to where it started, so it cannot drift into nonsense that scores well."
+    },
+    {
+      "id": "reward-model",
+      "label": "Reward models",
+      "group": "training",
+      "route": "books/how-models-are-trained/07-reward-models#74-the-reward-model-loss",
+      "blurb": "A model trained on pairs of answers to score which one people prefer. It stands in for the human during RLHF."
+    },
+    {
+      "id": "overoptimisation",
+      "label": "Reward overoptimisation",
+      "group": "training",
+      "route": "books/how-models-are-trained/07-reward-models#710-overoptimisation-when-the-proxy-and-the-truth-part-ways",
+      "blurb": "Push too hard on a learned reward and the real quality stops rising, then falls."
+    },
+    {
+      "id": "ppo",
+      "label": "PPO clipping",
+      "group": "training",
+      "route": "books/how-models-are-trained/08-rlhf-with-ppo#84-the-clipped-objective",
+      "blurb": "Reuse each batch several times, but clip the update so the model never moves too far from where the batch came from."
+    },
+    {
+      "id": "rlhf-loop",
+      "label": "RLHF with four models",
+      "group": "training",
+      "route": "books/how-models-are-trained/08-rlhf-with-ppo#87-rlhf-as-a-loop-four-models",
+      "blurb": "The policy, a frozen reference, the reward model and a value model, working together in one training loop."
     }
   ],
   "edges": [
@@ -727,6 +843,94 @@
     [
       "vllm",
       "prod-failures"
+    ],
+    [
+      "how-models-trained",
+      "training-pipeline"
+    ],
+    [
+      "training-pipeline",
+      "pretraining"
+    ],
+    [
+      "training-pipeline",
+      "sft"
+    ],
+    [
+      "training-pipeline",
+      "rlhf-loop"
+    ],
+    [
+      "next-token-loss",
+      "pretraining"
+    ],
+    [
+      "transformer",
+      "pretraining"
+    ],
+    [
+      "masked-lm",
+      "pretraining"
+    ],
+    [
+      "pretraining",
+      "scaling-laws"
+    ],
+    [
+      "pretraining",
+      "sft"
+    ],
+    [
+      "fine-tuning",
+      "sft"
+    ],
+    [
+      "sft",
+      "lora"
+    ],
+    [
+      "lora",
+      "multi-lora"
+    ],
+    [
+      "model-evals",
+      "llm-judge"
+    ],
+    [
+      "llm-judge",
+      "reward-model"
+    ],
+    [
+      "policy-gradient",
+      "gae"
+    ],
+    [
+      "policy-gradient",
+      "kl-penalty"
+    ],
+    [
+      "gae",
+      "ppo"
+    ],
+    [
+      "reward-model",
+      "overoptimisation"
+    ],
+    [
+      "overoptimisation",
+      "kl-penalty"
+    ],
+    [
+      "reward-model",
+      "rlhf-loop"
+    ],
+    [
+      "ppo",
+      "rlhf-loop"
+    ],
+    [
+      "kl-penalty",
+      "rlhf-loop"
     ]
   ]
 }
