@@ -471,7 +471,7 @@ const paperList = papers.map((x) => {
     slug: x.slug, route: `papers/${x.slug}`,
     title: d.title ?? pretty(x.slug), short: d.short ?? pretty(x.slug),
     description: d.description ?? '', authors: d.authors ?? [], org: d.org ?? '', year: d.year, venue: d.venue ?? '',
-    arxiv: d.arxiv ? String(d.arxiv) : undefined, code: d.code, accent: d.accent ?? '#4fc3d9',
+    arxiv: d.arxiv ? String(d.arxiv) : undefined, url: d.url, code: d.code, accent: d.accent ?? '#4fc3d9',
     learn: d.learn ?? [], tags: d.tags ?? [], date: toDate(d.date), updated: toDate(d.updated), order: d.order ?? 1e9,
     plannedParts: d.parts ?? x.parts.length,
     minutes: x.parts.reduce((n, p) => n + p.meta.minutes, 0),

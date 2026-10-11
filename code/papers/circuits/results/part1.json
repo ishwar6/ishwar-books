@@ -68,6 +68,11 @@
   ]
  },
  "embed_params_2l": 49420288,
+ "we_sample": [
+  0.044,
+  -0.074,
+  -0.164
+ ],
  "fold_ln_max_logprob_diff": 7.82012939453125e-05,
  "resid_sum_max_abs_diff": 2.384185791015625e-06,
  "resid_norm": 21.372770309448242,
@@ -178,6 +183,26 @@
    "norm": 12.09122371673584
   }
  ],
+ "top_head": {
+  "name": "head 1.6",
+  "attends": [
+   [
+    6,
+    "ley",
+    0.647802472114563
+   ],
+   [
+    0,
+    "<|BOS|>",
+    0.3320327699184418
+   ],
+   [
+    7,
+    ",",
+    0.004458765033632517
+   ]
+  ]
+ },
  "prompt": "Mr and Mrs Dursley, of number four, Privet Drive, were proud to say that they were perfectly normal. Mr and Mrs Durs",
  "last_tokens": [
   ".",
@@ -956,5 +981,5 @@
  },
  "rotation_max_logit_diff": 9.560585021972656e-05,
  "rotation_W_E_change": 0.21777194738388062,
- "seconds": 15.2
+ "seconds": 14.1
 }

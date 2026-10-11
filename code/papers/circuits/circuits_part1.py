@@ -47,6 +47,8 @@ for k, v in shapes.items():
     log(f'  attn-only-2l {k}: {v}')
 R['shapes_2l'] = shapes
 R['embed_params_2l'] = m2.W_E.numel() + m2.W_U.numel()
+R['we_sample'] = [round(float(v), 3) for v in m2.W_E[0, :3]]
+log(f'  the first three numbers of W_E (token 0): {R["we_sample"]}')
 log(f'  W_E + W_U hold {R["embed_params_2l"]:,} of {R["attn-only-2l"]["params"]:,} parameters')
 
 # ---------------------------------------------------------------- 2. layer norm folding is exact
@@ -102,6 +104,14 @@ for n, l, nm in contrib:
     log(f'  {n:<20}{nm:>12.2f}{l:>+34.3f}')
 log(f'  {"unembedding bias":<20}{"":>12}{R["b_U_pred"]:>+34.3f}')
 log(f'  sum of all lines = {R["logit_from_parts"]:.3f}; the model\'s real logit = {R["logit_real"]:.3f}')
+# where does the biggest contributor look? (attention pattern of the top head at the last position)
+best = max(contrib[2:], key=lambda c: c[1])[0]
+if best.startswith('head 1.'):
+    hh = int(best.split('.')[1])
+    patt = cache['blocks.1.attn.hook_pattern'][0, hh, pos]
+    top3 = patt.topk(3)
+    R['top_head'] = dict(name=best, attends=[(int(i), str_toks[int(i)], float(v)) for v, i in zip(top3.values, top3.indices)])
+    log(f'  {best} at the last position attends to: ' + ', '.join(f'position {int(i)} {str_toks[int(i)]!r} {float(v):.2f}' for v, i in zip(top3.values, top3.indices)))
 R['prompt'] = prompt
 R['last_tokens'] = str_toks[-6:]
 R['top5'] = [(m2.to_string([int(i)]), float(p)) for p, i in zip(top5.values, top5.indices)]

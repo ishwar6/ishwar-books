@@ -41,3 +41,5 @@
   embedding of "cat": was [0.0, 1.0, 0.0], now R x = [0.0, 0.0, 1.0]
   new unembedding W_U R^T: rows [[0.0, -1.0, 0.0], [2.0, 0.0, 0.0], [1.0, 0.0, 0.0], [0.0, 0.0, 2.0]]
   logits for "cat" before: [0.0, 0.0, 0.0, 2.0]; after rotating both: [0.0, 0.0, 0.0, 2.0]
+
+== G. THE FIRST 16 BYTES OF THE PYTHON PROGRAM ITSELF: cf fa ed fe 0c 00 00 01 00 00 00 00 02 00 00 00

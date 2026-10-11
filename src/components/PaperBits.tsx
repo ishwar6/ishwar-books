@@ -32,6 +32,7 @@ export function PaperSheet({ paper, compact = false }: { paper: Paper; compact?:
       <div className="paper-links">
         {paper.arxiv && <a href={arxivAbs(paper.arxiv)} target="_blank" rel="noreferrer">arXiv page <Arrow /></a>}
         {paper.arxiv && <a href={arxivPdf(paper.arxiv)} target="_blank" rel="noreferrer">PDF <Arrow /></a>}
+        {paper.url && <a href={paper.url} target="_blank" rel="noreferrer">Paper <Arrow /></a>}
         {paper.code && <a href={paper.code} target="_blank" rel="noreferrer">Original code <Arrow /></a>}
         {!compact && <span className="paper-time">{paper.parts.length} {paper.parts.length === 1 ? 'part' : 'parts'} · about {paper.minutes} min of reading</span>}
       </div>

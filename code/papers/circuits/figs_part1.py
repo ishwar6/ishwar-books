@@ -36,9 +36,9 @@ def column(x, y, vals, cls='s1', cell=30, fmt=lambda v: f'{v:g}', hi=None, w=46)
 def reverse():
     b = []
     rows = [('Ordinary software', 'source code', ['if word == "Barack":', '    say("Obama")'], 'compiler', 'binary file',
-             ['48 89 e5 0f b6 07 3c 42', '75 0c c6 06 4f 48 ...'], 'reverse engineering'),
+             [' '.join(T['binary_bytes'].split()[:8]), ' '.join(T['binary_bytes'].split()[8:16]) + ' ...'], 'reverse engineering'),
             ('A trained transformer', 'the algorithm', ['(unknown: this is what', ' we want to find)'], 'training', 'weights',
-             ['52,094,086 numbers:', '0.031, -0.207, 0.118 ...'], 'mechanistic interpretability')]
+             [f'{R["attn-only-2l"]["params"]:,} numbers:', ', '.join(f'{v:g}' for v in R['we_sample']) + ' ...'], 'mechanistic interpretability')]
     for k, (title, a, alines, verb, c, clines, back) in enumerate(rows):
         y = 34 + k * 170
         b.append(text(24, y, title, 't-title'))
@@ -246,7 +246,8 @@ def dla():
         b.append(text((x + w + 6) if v >= 0 else (x_zero + 6), y + row_h / 2 + 4, f'{v:+.2f}', 't-val' if strong else 't-tick'))
     yb = top + len(P) * row_h + 34
     b.append(text(24, yb, 'Blue pushes "' + tok + '" up, orange pushes it down. One head of the second layer (1.6) does almost half the work;', 't-tick'))
-    b.append(text(24, yb + 18, 'Part 6 shows it is an induction head: it saw "D|urs|ley" earlier in the prompt and copies it.', 't-tick'))
+    a = R['top_head']['attends'][0]
+    b.append(text(24, yb + 18, f'It looks back at "{a[1]}", the token that followed "urs" earlier in the prompt (attention {a[2]:.2f}), and copies it.', 't-tick'))
     return svg(760, yb + 30, f'Horizontal bars for the 21 parts of the residual stream at the last position, showing how much each adds to the logit of "{tok}". Head 1.6 adds 9.63, the layer 1 output bias 2.78, the unembedding bias 2.73, the token embedding 2.22; most other heads add less than 1.3 either way.', b)
 
 

@@ -46,6 +46,8 @@ export type Paper = {
   year?: number
   venue: string
   arxiv?: string
+  /** the paper's own web page, for papers that are not on arXiv */
+  url?: string
   code?: string
   accent: string
   learn: string[]
