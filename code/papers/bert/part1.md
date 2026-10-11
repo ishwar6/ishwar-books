@@ -577,7 +577,7 @@ Notice also that BERT and GPT have the **same** shape: a stack of Transformer bl
 <details>
 <summary>Run it yourself</summary>
 
-The script behind the GPT-2 and BERT comparison is [`code/papers/bert/bert_part1.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/bert/bert_part1.py). It runs on a laptop CPU in under a minute and downloads `bert-base-uncased` (about 440 MB) and GPT-2 (about 550 MB) the first time.
+The script behind the GPT-2 and BERT comparison is [`code/papers/bert/bert_part1.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/bert/bert_part1.py). It runs on a CPU in under a minute and downloads `bert-base-uncased` (about 440 MB) and GPT-2 (about 550 MB) the first time.
 
 ```bash
 pip install torch transformers

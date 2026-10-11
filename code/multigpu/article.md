@@ -27,7 +27,7 @@ This part builds the whole picture from the ground up:
 
 > [!NOTE] Three kinds of numbers in this article
 > Every number carries its source.
-> **Measured:** run on the laptop used throughout this series (Apple M5 Pro, PyTorch). That includes a real tensor-parallel run of Qwen2.5-0.5B across separate processes on the CPU, timings of matrix shards on the Apple GPU (`mps`), and the expert choices of the real OLMoE-1B-7B model on real text. There is no NVIDIA GPU here, so **no multi-GPU speed was measured**. The laptop was also shared with other heavy jobs while it ran, so its timings are noisy; they are used for shapes and ratios, never as H100 numbers.
+> **Measured:** run on the machine used throughout this series, an Apple M5 Pro (64 GB), with PyTorch. That includes a real tensor-parallel run of Qwen2.5-0.5B across separate processes on the CPU, timings of matrix shards on the Apple GPU (`mps`), and the expert choices of the real OLMoE-1B-7B model on real text. There is no NVIDIA GPU here, so **no multi-GPU speed was measured**. Its timings are used for shapes and ratios, never as H100 numbers.
 > **Arithmetic and simulation:** model sizes, bytes and times computed from published shapes and NVIDIA's spec-sheet peaks, plus small simulators in plain Python. Real systems are slower than peak; where an input is an assumption (like the fixed cost of one message), it is named and varied.
 > **Reported:** numbers from papers (Megatron-LM, GPipe, the Llama 3 report, DeepSeek-V3, DistServe, Splitwise, Mooncake) and from official documentation, each with its hardware.
 > Engine flags were checked in the vLLM and SGLang documentation on 11 October 2026 (vLLM `187a0eb`, SGLang `f9cee8d`).
@@ -169,13 +169,13 @@ where:
 
 **Worked example.** Send 16 KiB (16,384 bytes) over NVLink at 450 GB/s each way. The size term is $$16{,}384 / (450\times10^9) = 36$$ ns. If the fixed cost is a few microseconds (an assumed figure; NVIDIA does not publish one), it is **about 100 times bigger** than the data term. Small messages are all alpha; large messages are all beta.
 
-NVIDIA does not publish an alpha for NVLink or InfiniBand, and I cannot measure one without the hardware. So I measured the *shape* on what I have: separate processes on this laptop's CPU, exchanging data with `torch.distributed` (the same library NVIDIA GPUs use, but with its CPU backend, called gloo).
+NVIDIA does not publish an alpha for NVLink or InfiniBand, and I cannot measure one without the hardware. So I measured the *shape* on what I have: separate processes on the M5 Pro's CPU, exchanging data with `torch.distributed` (the same library NVIDIA GPUs use, but with its CPU backend, called gloo).
 
-{{FIG:alpha_beta|Measured on this laptop: the time of one all-reduce (defined in Section 4) between 2 or 4 CPU processes, against message size. The absolute numbers describe this laptop's shared-memory path while it was busy with other jobs, not any GPU link.}}
+{{FIG:alpha_beta|Measured on the M5 Pro: the time of one all-reduce (defined in Section 4) between 2 or 4 CPU processes, against message size. The absolute numbers describe the M5 Pro's shared-memory path, not any GPU link.}}
 
 [![Terminal output of tp_demo.py part C: gloo all_reduce timings for 2 and 4 processes from 4 bytes to 64 MiB, with the fitted alpha and beta](/img/multigpu/tp_demo_c-run.png)](/img/multigpu/tp_demo_c-run.png)
 
-The curve is flat for small messages and then rises in step with size: exactly $$\alpha + n/\beta$$. On this laptop the flat part is about 0.25 ms with 2 processes and 1.3 ms with 4: more participants means more steps and more waiting for the slowest one, a first hint of Section 4. (These alphas are hundreds of times larger than a GPU's, because they are CPU processes on a busy machine; only the shape carries over.) The flat part is why the next sections keep asking two separate questions about every design: **how many messages** per token, and **how many bytes** per message.
+The curve is flat for small messages and then rises in step with size: exactly $$\alpha + n/\beta$$. On the M5 Pro the flat part is about 0.25 ms with 2 processes and 1.3 ms with 4: more participants means more steps and more waiting for the slowest one, a first hint of Section 4. (These alphas are hundreds of times larger than a GPU's, because they are CPU processes; only the shape carries over.) The flat part is why the next sections keep asking two separate questions about every design: **how many messages** per token, and **how many bytes** per message.
 
 ## 3. Tensor parallelism: split every layer
 
@@ -342,7 +342,7 @@ where:
 
 ### What each GPU's share costs: a measurement
 
-To see how the work per GPU shrinks, `measure_mps.py` times one real Llama 3.1 8B MLP matrix (14,336 by 4,096, BF16, 117 MB) on this laptop's Apple GPU, whole and cut to the half and quarter that TP=2 and TP=4 would give each GPU:
+To see how the work per GPU shrinks, `measure_mps.py` times one real Llama 3.1 8B MLP matrix (14,336 by 4,096, BF16, 117 MB) on the M5 Pro's GPU, whole and cut to the half and quarter that TP=2 and TP=4 would give each GPU:
 
 {{FIG:mps_shard|Measured on the Apple GPU (mps): one 8B MLP matrix, whole and as TP=2 and TP=4 shards, for 1 to 4,096 tokens. Fastest of 40 runs.}}
 
@@ -350,7 +350,7 @@ To see how the work per GPU shrinks, `measure_mps.py` times one real Llama 3.1 8
 
 Two regimes show up. With **4,096 tokens** the work is arithmetic, and the shards behave as hoped: the half takes half the time (2.03x faster) and the quarter close to a quarter (3.63x). With **one token**, the whole matrix is a 117 MB read at 134 GB/s, 0.88 ms. But the half and quarter shards take 0.69 and 0.73 ms, barely faster. Below a certain size, every GPU operation has a fixed cost of its own (launching the kernel and getting it going), and splitting the work cannot go under that floor. It is the same shape as the alpha of Section 2, inside one GPU. Engines fight it by capturing a whole decode step as one CUDA graph, so that hundreds of small launches cost about one; the principle stays: cutting small work very finely gives diminishing returns, even before any communication.
 
-The last block of the output adds the communication those shards would need: the partial outputs are only 8 KiB per token, which takes nanoseconds on any link. The bytes are not the problem; the number of separate exchanges is. (The copy bandwidth here, 153 GB/s, is lower than the 262 GB/s measured in Part 1 because this run shared the laptop with other jobs; the fastest of 40 runs is reported for every number.)
+The last block of the output adds the communication those shards would need: the partial outputs are only 8 KiB per token, which takes nanoseconds on any link. The bytes are not the problem; the number of separate exchanges is. (The copy bandwidth here, 153 GB/s, is lower than the 262 GB/s measured in Part 1 because other work was running at the same time; the fastest of 40 runs is reported for every number.)
 
 ### Putting it together: TP on 70B
 
@@ -593,7 +593,7 @@ DeepSeek's open-source all-to-all library, [DeepEP](https://github.com/deepseek-
 
 All-to-all has a second cost that the bytes do not show. A layer is finished only when **the busiest GPU** is finished. If the router sends twice the average number of tokens to the experts on one GPU, that GPU takes twice as long and every other GPU waits.
 
-How uneven is real routing? Rather than guess, `moe_routing.py` records it. It runs the real **OLMoE-1B-7B** model (64 experts per layer, 8 chosen per token, 16 layers, 6.9 billion parameters) on this laptop's GPU over 12,288 tokens of WikiText and 12,288 tokens of Python code, and saves which 8 experts the router chose for every token in every layer. That is about 3 million real routing decisions. The routing is the measurement; nothing is timed.
+How uneven is real routing? Rather than guess, `moe_routing.py` records it. It runs the real **OLMoE-1B-7B** model (64 experts per layer, 8 chosen per token, 16 layers, 6.9 billion parameters) on the M5 Pro's GPU over 12,288 tokens of WikiText and 12,288 tokens of Python code, and saves which 8 experts the router chose for every token in every layer. That is about 3 million real routing decisions. The routing is the measurement; nothing is timed.
 
 The recording is a forward hook on each layer's router, which returns the chosen expert ids as its third output:
 
@@ -1000,7 +1000,7 @@ The all-to-all cost from Section 6 sets the limits. At about 11 ms of dispatch a
 | Why more than one GPU? | 70B needs 227 GB with KV for 32 x 8K conversations; 405B BF16 weights (812 GB) exceed one 8-GPU node | Arithmetic from published shapes |
 | What does spreading buy? | Each GPU reads 1/p of the weights: 70B decode floor 21.1 ms on 2 GPUs, 5.3 ms on 8 | Arithmetic, H100 peak bandwidth |
 | How fast are the wires? | HBM 3,350, NVLink 900, PCIe 128, one 400G NIC 50 GB/s | NVIDIA spec pages |
-| What is a message's cost? | $$\alpha + n/\beta$$: small messages cost a fixed delay | Measured shape on this laptop; NVIDIA publishes no alpha |
+| What is a message's cost? | $$\alpha + n/\beta$$: small messages cost a fixed delay | Measured shape on the M5 Pro; NVIDIA publishes no alpha |
 | Tensor parallelism | Columns then rows: 2 all-reduces per layer; exact (same 24 tokens, logits within $$5\times10^{-5}$$) | Measured: 2-process Qwen2.5-0.5B run |
 | Its cost | 160 all-reduces per 70B step; 23% of a TP=8 step at batch 1 | Model, $$\alpha$$ assumed 5 $$\mu$$s |
 | Ring all-reduce | Bytes $$\frac{2(p-1)}{p}n$$, but $$2(p-1)$$ steps; two-step algorithms cut latency 7x at TP=8 | Simulation and formula |

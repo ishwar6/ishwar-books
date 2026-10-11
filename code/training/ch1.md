@@ -39,7 +39,7 @@ This chapter is about the distance between those two outputs. What is a language
 > [!DEFINITION] Post-training
 > Everything done to a model after pretraining to make it useful and safe to talk to: supervised fine-tuning, preference tuning (RLHF, DPO), and reinforcement learning on tasks with checkable answers. Older papers call all of it **alignment** or **alignment tuning**.
 
-All the experiments in this chapter use these two models because they are small enough to run on a laptop, the base and the instruct version are both published, and the team that made them describes their training in a technical report (Qwen Team, 2024) that we can quote. Every number in the text that does not come from a paper comes from a script in the book's repository, and the script's name is given.
+All the experiments in this chapter use these two models because they are small enough to run on a single personal computer, the base and the instruct version are both published, and the team that made them describes their training in a technical report (Qwen Team, 2024) that we can quote. Every number in the text that does not come from a paper comes from a script in the book's repository, and the script's name is given.
 
 ## 1.2 What a language model is
 
@@ -800,7 +800,7 @@ What it does **not** show:
 
 ## 1.10 A tiny training loop: SFT by hand
 
-Everything so far has been measurement. Now we change some weights. The script `ch1_sft_tiny.py` takes the base model, Qwen2.5-0.5B, and fine-tunes all 494 million weights on 8 short chat examples for 30 steps. It is the SFT stage of Section 1.6 at the smallest possible scale, written out by hand so that every line is visible. It runs in a few minutes on a laptop GPU.
+Everything so far has been measurement. Now we change some weights. The script `ch1_sft_tiny.py` takes the base model, Qwen2.5-0.5B, and fine-tunes all 494 million weights on 8 short chat examples for 30 steps. It is the SFT stage of Section 1.6 at the smallest possible scale, written out by hand so that every line is visible. It runs in a few minutes on an Apple M5 Pro (64 GB), the machine that ran every experiment in this book.
 
 ### The data, and the masking that makes it SFT
 

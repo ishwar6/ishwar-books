@@ -13,7 +13,7 @@
 
 ## 1.1 The machine, and the four kinds of CPU parallelism
 
-The reference machine for this chapter is an **Apple M5 Pro** laptop (MacBook Pro,
+The reference machine for this chapter is an **Apple M5 Pro** (MacBook Pro,
 `Mac17,8`, macOS 26.5.1, 64 GB). Apple's published facts: an 18-core CPU made of **6 "super"
 cores and 12 "performance" cores**, up to **307 GB/s** unified-memory bandwidth, up to 64 GB
 ([Apple newsroom, March 2026](https://www.apple.com/newsroom/2026/03/apple-debuts-m5-pro-and-m5-max-to-supercharge-the-most-demanding-pro-workflows/)).
@@ -577,7 +577,7 @@ That is the whole roofline argument, arrived at from the CPU side: **compute pea
 cores × lanes × pipes × clock; achievable performance is capped by `AI × bandwidth`; and almost
 every simple kernel is on the bandwidth side of the ridge.** Chapter 2 formalizes it.
 
-It also tells you what a GPU is *for*. This laptop's CPU has about the same DRAM bandwidth as a
+It also tells you what a GPU is *for*. The M5 Pro's CPU has about the same DRAM bandwidth as a
 T4 (237 GB/s measured vs 320 GB/s spec): Apple's unified memory is unusually fast for a CPU;
 Chapter 2 §2.6's "5–20× a CPU's bandwidth" is the typical desktop/server case. Its ~1.9 TFLOP/s
 of Neon is about a quarter of a T4's 8.1 TFLOP/s FP32. A T4 would not beat it by much on this dot

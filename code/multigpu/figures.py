@@ -270,8 +270,8 @@ for k, cls in [('2', 'l1'), ('4', 'l2')]:
         b += mark(f"{k} processes, {r['bytes']:,} B: {r['us']:.0f} us", dot(x, y, cls.replace('l', 's'), 3.5))
 b += legend(110, Y1 + 4, [('s1', f"2 processes: alpha {ab['2']['alpha_us']:.0f} us, beta {ab['2']['beta_GBps']:.1f} GB/s"),
                           ('s2', f"4 processes: alpha {ab['4']['alpha_us']:.0f} us, beta {ab['4']['beta_GBps']:.1f} GB/s")])
-b += text(380, Y0 + 42, 'Measured: torch.distributed all_reduce, gloo backend, CPU processes on this laptop. Flat, then a slope.', 't-tick')
-f['alpha_beta'] = svg(Y0 + 54, b, 'Measured all-reduce time against message size on this laptop with 2 and 4 processes: almost flat for small messages (the fixed cost alpha), then growing in proportion to size (the bandwidth term).')
+b += text(380, Y0 + 42, 'Measured: torch.distributed all_reduce, gloo backend, CPU processes on the M5 Pro. Flat, then a slope.', 't-tick')
+f['alpha_beta'] = svg(Y0 + 54, b, 'Measured all-reduce time against message size on the M5 Pro with 2 and 4 processes: almost flat for small messages (the fixed cost alpha), then growing in proportion to size (the bandwidth term).')
 
 # 12. Measured shard time on mps vs tokens.
 sh = MPS['shard']

@@ -903,7 +903,7 @@ So in the released model, $$\text{pooled} = \tanh(W C + b)$$. In the original pr
 <details>
 <summary>Run it yourself</summary>
 
-Every number in this part comes from [`code/papers/bert/bert_part2.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/bert/bert_part2.py). It runs on a laptop CPU in under a minute. It downloads `bert-base-uncased` (about 440 MB) and only the configuration file of `bert-large-uncased`. The WordPiece check reads the BERT paper PDF from `~/.cache/papers/1810.04805.pdf`, which `paper_shots.py` downloads.
+Every number in this part comes from [`code/papers/bert/bert_part2.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/bert/bert_part2.py). It runs on a CPU in under a minute. It downloads `bert-base-uncased` (about 440 MB) and only the configuration file of `bert-large-uncased`. The WordPiece check reads the BERT paper PDF from `~/.cache/papers/1810.04805.pdf`, which `paper_shots.py` downloads.
 
 ```bash
 pip install torch transformers pymupdf

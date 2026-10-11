@@ -500,7 +500,7 @@ Each term links to the part where it is first explained.
 <details>
 <summary>Run it yourself</summary>
 
-Every measurement in this part comes from [`code/papers/bert/bert_part6.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/bert/bert_part6.py). It runs on a laptop CPU in about a minute and downloads `bert-base-uncased`, `sentence-transformers/all-MiniLM-L6-v2` and `dslim/bert-base-NER` the first time.
+Every measurement in this part comes from [`code/papers/bert/bert_part6.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/bert/bert_part6.py). It runs on a CPU in about a minute and downloads `bert-base-uncased`, `sentence-transformers/all-MiniLM-L6-v2` and `dslim/bert-base-NER` the first time.
 
 ```bash
 pip install torch transformers

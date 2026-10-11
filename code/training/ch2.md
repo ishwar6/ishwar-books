@@ -3,7 +3,7 @@ description: "The history of how language models learned to follow instructions,
 ---
 # Chapter 2 · How it started, and how it evolved
 
-> **Goal:** by the end of this chapter you can tell the story of how a next-word predictor became an assistant, step by step, and say for each step *which problem it solved* and *which new problem it left behind*. You will know the papers behind each step, you will have seen their key figures and sentences, and you will be able to work four equations by hand: the Bradley-Terry preference model, the RLHF objective with its KL penalty, the DPO loss, and GRPO's group-relative advantage. Each equation comes with a small script that runs on a laptop.
+> **Goal:** by the end of this chapter you can tell the story of how a next-word predictor became an assistant, step by step, and say for each step *which problem it solved* and *which new problem it left behind*. You will know the papers behind each step, you will have seen their key figures and sentences, and you will be able to work four equations by hand: the Bradley-Terry preference model, the RLHF objective with its KL penalty, the DPO loss, and GRPO's group-relative advantage. Each equation comes with a small script that you can run yourself.
 
 ---
 

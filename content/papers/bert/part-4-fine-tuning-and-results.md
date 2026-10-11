@@ -9,7 +9,7 @@ tags: [bert, fine-tuning, glue, squad]
 
 Part 3 built a pre-trained BERT: a model that has read 3.3 billion words and learned to fill in blanks and to tell whether two sentences belong together. Nobody has asked it to do anything useful yet.
 
-This part is about the second step of the recipe: **fine-tuning**. We read Section 3.2 (how fine-tuning works), then Section 4 (the experiments on eleven tasks), and the appendix sections that go with them (A.3, A.5 and B.1). Along the way we fine-tune BERT ourselves on a laptop GPU and check every formula in code.
+This part is about the second step of the recipe: **fine-tuning**. We read Section 3.2 (how fine-tuning works), then Section 4 (the experiments on eleven tasks), and the appendix sections that go with them (A.3, A.5 and B.1). Along the way we fine-tune BERT ourselves on an Apple M5 Pro (64 GB) and check every formula in code.
 
 ## One model, many tasks {§3.2}
 
@@ -138,7 +138,7 @@ How to read each panel:
 > [!DEFINITION] TPU and GPU
 > Chips built to do the big matrix multiplications of neural networks very fast. A **GPU** (graphics processing unit) started life drawing video-game graphics. A **TPU** (tensor processing unit) is Google's own chip, rented through Google Cloud.
 
-We will test the "few hours on a GPU" claim ourselves later in this part, on a laptop.
+We will test the "few hours on a GPU" claim ourselves later in this part, on the M5 Pro.
 
 ## The fine-tuning settings {§A.3}
 
@@ -414,9 +414,9 @@ Two more sentences in this paragraph matter. First, "BERT-base and OpenAI GPT ar
 >
 > **Why it matters:** look at the small tasks in Table 1: CoLA (8.5k examples) goes from 52.1 to 60.5, RTE (2.5k) from 66.4 to 70.1. A bigger pre-trained model helps most when labels are scarce. Part 5 looks at model size in detail.
 
-## Our own fine-tune: SST-2 and MRPC on a laptop GPU {§4.1}
+## Our own fine-tune: SST-2 and MRPC {§4.1}
 
-Reading a results table is one thing. Let us run the recipe. I fine-tuned the released `bert-base-uncased` on two GLUE tasks with the paper's settings, on the GPU of an Apple M5 Pro laptop:
+Reading a results table is one thing. Let us run the recipe. I fine-tuned the released `bert-base-uncased` on two GLUE tasks with the paper's settings, on the GPU of the M5 Pro:
 
 - **SST-2** (sentiment, 67,349 training sentences, 872 dev sentences);
 - **MRPC** (paraphrase, 3,668 training pairs, 408 dev pairs).
@@ -462,7 +462,7 @@ FINAL sst2 dev accuracy 0.9255 (807/872), dev F1 0.9279, training time 48.3 minu
 
 Note how fast it learns: dev accuracy was already 85.4% after the first 210 steps, which is about 10% of one epoch. Almost all of the knowledge was already in the pre-trained weights; fine-tuning only has to connect it to the two labels.
 
-The run took **48 minutes** of wall time on the laptop GPU, including 31 evaluations on the dev set, and other experiments were sharing the GPU for most of it, so treat the time as an upper bound. That matches the paper's "a few hours on a GPU" comfortably.
+The run took **48 minutes** of wall time on the M5 Pro, including 31 evaluations on the dev set, with other work running alongside for most of it, so treat the time as an upper bound. That matches the paper's "a few hours on a GPU" comfortably.
 
 **MRPC** is the opposite kind of task: only 3,668 training pairs. Here I did what the paper did for GLUE and ran all four learning rates from its grid, one run each, keeping everything else fixed:
 
@@ -865,7 +865,7 @@ A careful reading note: SWAG was released in 2018 and built to be hard for the m
 > [!TAKEAWAYS] Key takeaways
 > - **Fine-tuning = swap the inputs and outputs.** Every task fills the same `[CLS] A [SEP] B [SEP]` format and reads either the `[CLS]` vector (sentence-level) or every token's vector (token-level). Self-attention over the pair gives cross attention in both directions for free.
 > - **Tiny new layers.** GLUE adds $$W \in \mathbb{R}^{K \times H}$$ (2,307 numbers for 3 labels, about 0.002% of BERT-base); SQuAD adds two vectors $$S$$ and $$E$$; SWAG adds one vector. Everything else starts pre-trained and all of it is trained.
-> - **Cheap.** Batch 16 or 32, learning rate 2e-5 to 5e-5, 2 to 4 epochs. The paper says every result replicates in at most an hour on a Cloud TPU. Our own BERT-base runs on a laptop GPU: **92.55%** SST-2 dev accuracy in 48 minutes (paper: 92.7), and **87.0%** on MRPC dev with the best of the four learning rates (paper: 86.7).
+> - **Cheap.** Batch 16 or 32, learning rate 2e-5 to 5e-5, 2 to 4 epochs. The paper says every result replicates in at most an hour on a Cloud TPU. Our own BERT-base runs on the M5 Pro: **92.55%** SST-2 dev accuracy in 48 minutes (paper: 92.7), and **87.0%** on MRPC dev with the best of the four learning rates (paper: 86.7).
 > - **GLUE:** BERT-base averages 79.6 and BERT-large 82.1 on Table 1, against 75.1 for GPT (+4.5 and +7.0 points); 80.5 on the official leaderboard against 72.8.
 > - **SQuAD v1.1:** answer = the span maximising $$S \cdot T_i + E \cdot T_j$$ with $$j \ge i$$. Best BERT: 93.2 test F1. A public BERT-base checkpoint, decoded with our own span search, scored **EM 80.79 / F1 88.08** on the SQuAD v1.1 dev set (paper's BERT-base: 80.8 / 88.5).
 > - **SQuAD v2.0:** no new weights; "no answer" is the span at `[CLS]`, and a dev-tuned threshold $$\tau$$ decides. BERT-large: 83.1 test F1, +5.1 over the previous best.

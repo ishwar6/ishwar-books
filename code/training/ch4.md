@@ -1,9 +1,9 @@
 ---
-description: "Pretraining from the inside: how web text is collected, filtered and deduplicated, how it is tokenized, what training costs (C = 6ND), what scaling laws say about model size and data, the learning-rate schedule, batch size and mixed precision, and a real 12M-parameter GPT pretrained on a laptop GPU."
+description: "Pretraining from the inside: how web text is collected, filtered and deduplicated, how it is tokenized, what training costs (C = 6ND), what scaling laws say about model size and data, the learning-rate schedule, batch size and mixed precision, and a real 12M-parameter GPT pretrained from random weights."
 ---
 # Chapter 4 · Pretraining: learning from the whole internet
 
-> **Goal:** by the end of this chapter you can explain every stage that turns raw web pages into a base model: how the text is collected, cleaned, deduplicated and scored; how it is cut into tokens; how much compute a run needs and how to calculate it; how scaling laws decide the size of the model and the amount of data; why the learning rate rises and then falls, why batches are large, and why training runs in 16-bit numbers. You will also pretrain a small GPT yourself on a laptop GPU, watch its loss fall and its stories improve, and then probe a real base model to see what pretraining alone puts inside it.
+> **Goal:** by the end of this chapter you can explain every stage that turns raw web pages into a base model: how the text is collected, cleaned, deduplicated and scored; how it is cut into tokens; how much compute a run needs and how to calculate it; how scaling laws decide the size of the model and the amount of data; why the learning rate rises and then falls, why batches are large, and why training runs in 16-bit numbers. You will also pretrain a small GPT yourself, watch its loss fall and its stories improve, and then probe a real base model to see what pretraining alone puts inside it.
 
 ---
 
@@ -27,7 +27,7 @@ The objective is the same next-token cross-entropy you met in Chapter 1. What ma
 
 {{FIG:ch4_recipe|The pretraining recipe. Raw text is cleaned and mixed, cut into tokens and fed, a batch at a time, to a Transformer with random weights. The loop (predict, compute the loss, backpropagate, update) runs for many steps, and what comes out is a base model.}}
 
-We will take these in order. Every number in this chapter comes either from a paper (shown in a PAPER box, with the excerpt) or from a script in `code/training/` that you can run yourself. The hands-on run in Section 4.11 pretrains a 12-million-parameter GPT on 12 million tokens in about eight minutes on a laptop's Apple GPU. It is a toy, tens of billions of times smaller in compute than a frontier model, but it has every piece a real run has.
+We will take these in order. Every number in this chapter comes either from a paper (shown in a PAPER box, with the excerpt) or from a script in `code/training/` that you can run yourself. The hands-on run in Section 4.11 pretrains a 12-million-parameter GPT on 12 million tokens in about eight minutes on an Apple M5 Pro (64 GB), the machine that ran every experiment in this book. It is a toy, tens of billions of times smaller in compute than a frontier model, but it has every piece a real run has.
 
 ## 4.2 The data: where trillions of words come from
 
@@ -494,7 +494,7 @@ Qwen2.5-0.5B                     N= 4.9e+08  D= 1.8e+13  C=6ND= 5.29e+22 FLOPs  
 
 The formula is accurate: the GPT-3 paper reports $$3.14 \times 10^{23}$$ FLOPs for its largest model, and the Llama 3 paper reports $$3.8 \times 10^{25}$$ for the 405B model. Our run is $$6 \times 12{,}318{,}720 \times 12{,}288{,}000 = 9.08 \times 10^{14}$$ FLOPs.
 
-{{FIG:ch4_compute|Training compute of six runs on a log scale. Each grid line is a factor of 1,000. The largest Llama 3 model used about 42 billion times the compute of our laptop run.}}
+{{FIG:ch4_compute|Training compute of six runs on a log scale. Each grid line is a factor of 1,000. The largest Llama 3 model used about 42 billion times the compute of our M5 Pro run.}}
 
 Turning FLOPs into time needs the speed of the hardware and how much of that speed a real run gets.
 
@@ -509,7 +509,7 @@ where:
 - $$n_{\text{GPU}}$$ is the number of GPUs,
 - peak FLOP/s is one GPU's theoretical speed and MFU the share of it actually used.
 
-**Worked example.** Llama 3 405B with 16,384 H100s at 989 TFLOP/s and 40% MFU: $$3.79 \times 10^{25} / (16{,}384 \times 9.89 \times 10^{14} \times 0.40) \approx 5.85 \times 10^{6}$$ seconds, or 67.7 days of pure computation (the paper reports MFU between 38% and 43%). On the laptop, the benchmark in `ch4_prep.py` measured 37,367 tokens per second in bf16, which is $$6 \times 12{,}318{,}720 \times 37{,}367 = 2.76$$ TFLOP/s. At that speed our $$9.08 \times 10^{14}$$ FLOPs take 5.5 minutes of pure training; the real run took 8.2 minutes, including evaluation and sampling, while other jobs shared the GPU. Llama 3 405B at laptop speed would take about 435,000 years.
+**Worked example.** Llama 3 405B with 16,384 H100s at 989 TFLOP/s and 40% MFU: $$3.79 \times 10^{25} / (16{,}384 \times 9.89 \times 10^{14} \times 0.40) \approx 5.85 \times 10^{6}$$ seconds, or 67.7 days of pure computation (the paper reports MFU between 38% and 43%). On the M5 Pro, the benchmark in `ch4_prep.py` measured 37,367 tokens per second in bf16, which is $$6 \times 12{,}318{,}720 \times 37{,}367 = 2.76$$ TFLOP/s. At that speed our $$9.08 \times 10^{14}$$ FLOPs take 5.5 minutes of pure training; the real run took 8.2 minutes, including evaluation and sampling. Llama 3 405B at that speed would take about 435,000 years.
 
 ## 4.7 Scaling laws: how big, and for how long?
 
@@ -546,9 +546,9 @@ where:
 
 Kaplan et al. also concluded that, for a fixed compute budget, the model size should grow much faster than the data: roughly $$N_{\text{opt}} \propto C^{0.73}$$. Following that advice, GPT-3 (175B parameters) was trained on only 300B tokens, under 2 tokens per parameter.
 
-### 4.7.2 Scaling laws on a laptop
+### 4.7.2 Scaling laws at small scale
 
-You can see the same kind of law on a laptop. `ch4_scaling_mini.py` trains five GPTs, from 0.1M to 10.6M non-embedding parameters, with exactly the same data, recipe and number of steps (800 steps, 6.6M tokens each), and records the validation loss every 50 steps.
+You can see the same kind of law on the M5 Pro. `ch4_scaling_mini.py` trains five GPTs, from 0.1M to 10.6M non-embedding parameters, with exactly the same data, recipe and number of steps (800 steps, 6.6M tokens each), and records the validation loss every 50 steps.
 
 ```text
 d= 64 layers=2 heads=2:    100,096 non-embedding (   378,624 total) params, final val loss 3.396, C=1.49e+13 FLOPs, 45s
@@ -568,7 +568,7 @@ fit on 5 runs (6.6M tokens each): log L = 2.064 -0.0757 log N
 
 {{FIG:ch4_mini_scaling|Left: validation loss against training compute for five model sizes trained the same way. Each larger model costs more per token but ends lower. Right: the final losses against parameter count on a log axis, with a fitted power law (dashed).}}
 
-The exponent, 0.076, matches Kaplan's to three decimals. That is a coincidence: our data (children's stories), tokenizer (4,096 tokens) and training length (6.6M tokens, the same for all sizes) are all different, and a fit on five points is fragile. Do not read more into it than this: *the loss falls smoothly and predictably as the model grows*, even at a scale a laptop can afford. And the warning from the fit itself applies: extrapolating it to 100M parameters predicts a loss of 1.95, but our 14.9M training tokens would run out long before such a model could reach it. The data is the other half of the law.
+The exponent, 0.076, matches Kaplan's to three decimals. That is a coincidence: our data (children's stories), tokenizer (4,096 tokens) and training length (6.6M tokens, the same for all sizes) are all different, and a fit on five points is fragile. Do not read more into it than this: *the loss falls smoothly and predictably as the model grows*, even at a tiny scale. And the warning from the fit itself applies: extrapolating it to 100M parameters predicts a loss of 1.95, but our 14.9M training tokens would run out long before such a model could reach it. The data is the other half of the law.
 
 ### 4.7.3 Chinchilla (2022): grow data as fast as the model
 
@@ -823,7 +823,7 @@ The solution is **mixed-precision training**, introduced by Micikevicius et al. 
 >
 > **Why it matters:** the slow, memory-hungry part (the matrix multiplications over activations) runs in 16 bits, and the part that needs precision (adding tiny updates to weights) stays in 32 bits. Every large run since uses some version of this, today with bf16 instead of fp16.
 
-In PyTorch this is one context manager. Our training loop wraps the forward pass in `torch.autocast('mps', dtype=torch.bfloat16)`, which runs the matrix multiplications in bf16 while the weights and the optimizer stay in fp32. On the laptop GPU, `ch4_prep.py` measured 367 ms per step in fp32 and 219 ms in bf16 autocast: 1.68 times faster, with the same results.
+In PyTorch this is one context manager. Our training loop wraps the forward pass in `torch.autocast('mps', dtype=torch.bfloat16)`, which runs the matrix multiplications in bf16 while the weights and the optimizer stay in fp32. On the M5 Pro, `ch4_prep.py` measured 367 ms per step in fp32 and 219 ms in bf16 autocast: 1.68 times faster, with the same results.
 
 ### What training costs in memory
 
@@ -835,9 +835,9 @@ where $$m$$ and $$v$$ are AdamW's running averages of the gradient and of the sq
 
 **Worked example** (`ch4_compute.py`): Qwen2.5-0.5B needs $$4.94 \times 10^8 \times 16 = 7.36$$ GiB just for this state; Llama 3 8B needs 119 GiB, more than one 80 GB GPU holds; Llama 3 405B needs about 6,035 GiB. That is why large runs split the weights, gradients and optimizer state across many GPUs, and why Chapter 5 will reach for LoRA, which trains only a tiny fraction of the parameters.
 
-## 4.11 Hands-on: pretrain a tiny GPT on a laptop
+## 4.11 Hands-on: pretrain a tiny GPT
 
-Now all the pieces come together. The goal: pretrain a GPT from random weights on a laptop's Apple GPU in a few minutes, and watch it learn to write.
+Now all the pieces come together. The goal: pretrain a GPT from random weights on the M5 Pro in a few minutes, and watch it learn to write.
 
 ### The data: TinyStories
 
@@ -927,7 +927,7 @@ The samples tell the same story in words:
 At step 600, "there was a humble dog named Max. Max was a very small girl" shows a model that has learned grammar and story templates but not yet to keep track of a character. At step 1,500, "there was a girl named Lily. She liked to create things with her toys. One day, she found a big, shiny thing in her room" keeps the same character and the right pronoun across sentences. Nobody told the model what a pronoun is: it is just the cheapest way to predict the next token in millions of stories.
 
 > [!TIP]
-> To run this yourself: `python ch4_prep.py` (downloads nothing; it expects the TinyStories text in `~/.cache/tinystories`, which you can get from the dataset page on the Hugging Face Hub), then `python ch4_pretrain.py`. On a recent laptop GPU it takes 5 to 10 minutes. On a CPU it will take roughly ten times longer; cut `STEPS` to 300 to see the first stages.
+> To run this yourself: `python ch4_prep.py` (downloads nothing; it expects the TinyStories text in `~/.cache/tinystories`, which you can get from the dataset page on the Hugging Face Hub), then `python ch4_pretrain.py`. On a recent Apple-silicon GPU it takes 5 to 10 minutes. On a CPU it will take roughly ten times longer; cut `STEPS` to 300 to see the first stages.
 
 ## 4.12 What a base model learns
 
@@ -1086,11 +1086,11 @@ Turning this into a model that follows instructions does not need anything like 
 > - Pretraining is next-token prediction on trillions of tokens of general text. The loss is the same as in Chapter 1; the difficulty is in the data and the scale.
 > - Raw web text is mostly unusable. In a real Common Crawl sample, 35% of pages were English and only 7.4% of all pages survived Gopher, C4 and FineWeb-style rules. MinHash removes near-duplicates by comparing signatures whose agreement estimates Jaccard similarity, and quality classifiers such as FineWeb-Edu's keep the most useful pages.
 > - BPE builds a vocabulary by repeatedly merging the most frequent pair of symbols. The vocabulary reflects its training text: numbers, rare words and other languages can cost several times more tokens.
-> - Training compute is about C = 6ND FLOPs. Our laptop run was 9.1e14 FLOPs; Llama 3 405B was 3.8e25.
+> - Training compute is about C = 6ND FLOPs. Our M5 Pro run was 9.1e14 FLOPs; Llama 3 405B was 3.8e25.
 > - Loss falls as a power law in parameters, data and compute. Chinchilla showed that parameters and tokens should grow together, about 20 tokens per parameter for a fixed training budget; models meant for heavy use are deliberately trained far longer (Llama 3 8B: 1,875 tokens per parameter, Qwen2.5-0.5B: about 36,700).
 > - The learning rate warms up, then decays (cosine or warmup-stable-decay). Batches are large, because a single batch's gradient is mostly noise; our two-batch test showed agreement roughly doubling with each doubling of the batch.
 > - Mixed precision runs the heavy matrix work in bf16 and keeps fp32 master weights, because bf16 rounds small updates away. Training with AdamW costs about 16 bytes per parameter.
-> - A 12M-parameter GPT pretrained for 8 minutes on a laptop went from random tokens (loss 8.37) to short consistent stories (validation loss 2.07, perplexity 7.95).
+> - A 12M-parameter GPT pretrained for 8 minutes on the M5 Pro went from random tokens (loss 8.37) to short consistent stories (validation loss 2.07, perplexity 7.95).
 > - A base model knows facts and grammar and can learn in context, but its behaviour follows the documents it was trained on, not the user. Data mixtures, mid-training and a final annealing phase on the best data shape the last part of pretraining.
 
 ## References

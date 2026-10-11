@@ -95,7 +95,7 @@ The useful part isn't the label, it's the number. Above 98%, refund automaticall
 
 **Known rule? Write code.** Should we charge an overdraft fee when the balance drops below zero? That's one line. Asking a model would be paying for a guess on something you already know exactly.
 
-**Stable labels and training data? Try a classifier first.** On the same 1,001 BANKING77 tickets, the most boring model I could think of (word counts and a logistic regression, trained on 10,003 labelled examples) got **88.7%**. Jev, given only the label names, got **78.8%**. And the boring model runs on a laptop in a fraction of a millisecond, costs nothing per call, and keeps your data private.
+**Stable labels and training data? Try a classifier first.** On the same 1,001 BANKING77 tickets, the most boring model I could think of (word counts and a logistic regression, trained on 10,003 labelled examples) got **88.7%**. Jev, given only the label names, got **78.8%**. And the boring model runs on an ordinary CPU in a fraction of a millisecond, costs nothing per call, and keeps your data private.
 
 <figure><img src="./jev-decision-model/08-boring-classifier.jpg" alt="Bar chart: word counts plus logistic regression 88.7%, Jev with label names only 78.8%" /><figcaption>The boring one won, on a stable task with training data.</figcaption></figure>
 

@@ -24,7 +24,7 @@ This series builds that picture from the ground up. No prior knowledge of GPUs n
 >
 > **Part 4:** **speculative decoding** uses the compute that decode leaves idle to write several tokens per step, without changing a single word of the output.
 
-Every number in this piece was measured on a real model, Qwen2.5-0.5B, running on an Apple M5 Pro GPU with PyTorch. It is a small model on a laptop, so the absolute numbers are small too. The *shapes* are the same on a data-centre GPU, and where it matters I will show the equivalent numbers for an NVIDIA H100.
+Every number in this piece was measured on a real model, Qwen2.5-0.5B, running on the GPU of an Apple M5 Pro (64 GB) with PyTorch. It is a small model, so the absolute numbers are small too. The *shapes* are the same on a data-centre GPU, and where it matters I will show the equivalent numbers for an NVIDIA H100.
 
 ## How a model writes one word
 

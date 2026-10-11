@@ -11,7 +11,7 @@ topics: [Pretraining, SFT, RLHF, DPO, GRPO, Evaluation]
 
 A model that has only read the internet can finish your sentence, but it cannot answer your question. Something happens between the raw model and the assistant you talk to, and that something has a history, a set of equations and a lot of practical tricks. This book explains all of it, one step at a time.
 
-It is written for beginners, in simple English. Every idea comes with the research paper that introduced it (shown as highlighted screenshots), a simple picture, the maths explained one symbol at a time with real numbers, and small pieces of real code that run on a laptop, with every line explained.
+It is written for beginners, in simple English. Every idea comes with the research paper that introduced it (shown as highlighted screenshots), a simple picture, the maths explained one symbol at a time with real numbers, and small pieces of real code that you can run yourself, with every line explained.
 
 **Part 1, the big picture**, covers what training actually changes inside a model, how the methods began and evolved, and how anyone can tell whether a model got better.
 

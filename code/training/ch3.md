@@ -3,7 +3,7 @@ description: "How language models are measured, and how far to trust the numbers
 ---
 # Chapter 3 · How we measure a model
 
-> **Goal:** by the end of this chapter you can explain what each common kind of evaluation measures and what it misses, compute perplexity and bits per byte for a real model, score a multiple-choice benchmark three different ways and explain why the numbers differ, put a 95% confidence interval on any accuracy with the bootstrap, compute pass@k with the unbiased estimator, check a benchmark for contamination with n-grams, turn pairwise votes into Elo and Bradley-Terry ratings, and spot the biases of a model used as a judge. Every number in this chapter that is not quoted from a paper comes from a script you can run on a laptop.
+> **Goal:** by the end of this chapter you can explain what each common kind of evaluation measures and what it misses, compute perplexity and bits per byte for a real model, score a multiple-choice benchmark three different ways and explain why the numbers differ, put a 95% confidence interval on any accuracy with the bootstrap, compute pass@k with the unbiased estimator, check a benchmark for contamination with n-grams, turn pairwise votes into Elo and Bradley-Terry ratings, and spot the biases of a model used as a judge. Every number in this chapter that is not quoted from a paper comes from a script you can run yourself.
 
 ---
 
@@ -764,7 +764,7 @@ for line in corpus:                             # one pass over 87 million words
                 hits.setdefault(key, set()).add(g)
 ```
 
-The trick that makes this fast is to build the set of 13-grams from the *benchmark* (small: 63,791 of them) and stream the *corpus* through it, instead of building a set of all corpus 13-grams (billions, for a real pretraining set). The scan took under two minutes on a laptop CPU.
+The trick that makes this fast is to build the set of 13-grams from the *benchmark* (small: 63,791 of them) and stream the *corpus* through it, instead of building a set of all corpus 13-grams (billions, for a real pretraining set). The scan took under two minutes on the CPU of an Apple M5 Pro (64 GB).
 
 ```text
 == A. 13-gram overlap with the WikiText-103 training split ==
@@ -1012,7 +1012,7 @@ The fixes they proposed are simple and are still used: **swap and check** (judge
 
 ### Our experiment: a small model as the judge
 
-How do these biases look in a judge you can run on a laptop? `ch3_judge.py` uses Qwen2.5-0.5B-Instruct and Qwen2.5-1.5B-Instruct as judges, with a shortened version of the MT-Bench pairwise prompt. Both are tiny compared with GPT-4, so this is a demonstration of the *measurement*, not a fair test of model judges in general.
+How do these biases look in a judge small enough to run locally? `ch3_judge.py` uses Qwen2.5-0.5B-Instruct and Qwen2.5-1.5B-Instruct as judges, with a shortened version of the MT-Bench pairwise prompt. Both are tiny compared with GPT-4, so this is a demonstration of the *measurement*, not a fair test of model judges in general.
 
 There are three sets of pairs where we know the right verdict:
 

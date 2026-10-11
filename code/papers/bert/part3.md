@@ -47,7 +47,7 @@ So with two or more layers, every word can find its own answer by going through 
 
 ### A real experiment: watch a model cheat
 
-I trained three tiny Transformers on the same real text (WikiText-2, a public set of Wikipedia articles) and measured how well each predicts words. Each has 128 numbers per token and 4 attention heads, and trains for 3,000 steps on the Apple GPU of a laptop.
+I trained three tiny Transformers on the same real text (WikiText-2, a public set of Wikipedia articles) and measured how well each predicts words. Each has 128 numbers per token and 4 attention heads, and trains for 3,000 steps on the GPU of an Apple M5 Pro (64 GB).
 
 - **A. Left-to-right, 2 layers.** A normal language model: predict the next token from the tokens before it.
 - **B. Both sides, 1 layer.** Predict each token from every **other** token. Position $$t$$ never sees token $$t$$.
@@ -777,7 +777,7 @@ The scripts behind every number in this part are in [`code/papers/bert/`](https:
 
 ```bash
 pip install torch transformers datasets
-python bert_part3_seeitself.py   # the three tiny models (about 6 minutes per model on a laptop GPU)
+python bert_part3_seeitself.py   # the three tiny models (about 6 minutes per model on the M5 Pro)
 python bert_part3_mlm.py         # masking statistics, "my dog is hairy", MLM accuracy, the loss on a batch
 python bert_part3_nsp.py         # the NSP head, 1,000 real pairs, raw [CLS] similarities
 python bert_part3_schedule.py    # batch arithmetic, learning rate, GELU, attention cost

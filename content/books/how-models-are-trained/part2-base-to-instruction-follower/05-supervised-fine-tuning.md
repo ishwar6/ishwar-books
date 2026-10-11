@@ -1,9 +1,9 @@
 ---
-description: "Supervised fine-tuning from the inside: the same loss on different data with the prompt masked out, the history of instruction datasets from FLAN to Tulu 3, chat templates, a worked masked loss on real tokens, hyperparameters and packing, LoRA and QLoRA with their maths, catastrophic forgetting, and a real LoRA fine-tune of Qwen2.5-0.5B on a laptop GPU."
+description: "Supervised fine-tuning from the inside: the same loss on different data with the prompt masked out, the history of instruction datasets from FLAN to Tulu 3, chat templates, a worked masked loss on real tokens, hyperparameters and packing, LoRA and QLoRA with their maths, catastrophic forgetting, and a real LoRA fine-tune of Qwen2.5-0.5B."
 ---
 # Chapter 5 · Supervised fine-tuning: teaching it to follow instructions
 
-> **Goal:** by the end of this chapter you can explain exactly what changes when a base model is fine-tuned to follow instructions (and what does not), trace where instruction datasets came from, build a training example in a chat template with the right tokens masked, compute the SFT loss by hand on real tokens, choose sensible hyperparameters, and explain LoRA and QLoRA down to the parameter count. You will also run a LoRA fine-tune of Qwen2.5-0.5B on a laptop GPU, compare its answers before and after on the same prompts, measure it on held-out data and on simple instruction-following checks, and measure what it forgot.
+> **Goal:** by the end of this chapter you can explain exactly what changes when a base model is fine-tuned to follow instructions (and what does not), trace where instruction datasets came from, build a training example in a chat template with the right tokens masked, compute the SFT loss by hand on real tokens, choose sensible hyperparameters, and explain LoRA and QLoRA down to the parameter count. You will also run a LoRA fine-tune of Qwen2.5-0.5B on an Apple M5 Pro (64 GB), compare its answers before and after on the same prompts, measure it on held-out data and on simple instruction-following checks, and measure what it forgot.
 
 ---
 
@@ -427,9 +427,9 @@ LoRA freezes the base weights but still stores them in 16 bits. For a 65B model 
 >
 > **Why it matters:** each step removes one of the big memory costs. What is left in QLoRA is dominated by the 4-bit weights themselves (about half a byte per parameter).
 
-We do not use QLoRA in the hands-on run: the 4-bit kernels it relies on (the `bitsandbytes` library) target NVIDIA GPUs, and a 0.5B model fits in a laptop's memory anyway. For a 7B model or larger on a single consumer GPU, it is the standard choice.
+We do not use QLoRA in the hands-on run: the 4-bit kernels it relies on (the `bitsandbytes` library) target NVIDIA GPUs, and a 0.5B model fits in the M5 Pro's memory anyway. For a 7B model or larger on a single consumer GPU, it is the standard choice.
 
-## 5.9 Hands-on: LoRA fine-tuning of Qwen2.5-0.5B on a laptop
+## 5.9 Hands-on: LoRA fine-tuning of Qwen2.5-0.5B
 
 Time to change some weights. The plan:
 
@@ -439,7 +439,7 @@ Time to change some weights. The plan:
 - **Evaluation:** the held-out loss before, during and after; twelve instruction-following checks; answers to the same prompts before and after; and two probes of forgetting (Section 5.10). The same evaluation runs on the base model and on Qwen's own Qwen2.5-0.5B-Instruct, as references.
 
 > [!NOTE]
-> This is a small run on purpose. The first version used 2,000 examples of up to 512 tokens. On the laptop's GPU, shared at the time with other long jobs, it ran at 10 to 45 seconds per step, so it was cut to 1,000 examples of up to 384 tokens (LIMA's 1,000 examples are a reassuring precedent). Each run below took between 10 and 45 minutes depending on what else was running.
+> This is a small run on purpose. The first version used 2,000 examples of up to 512 tokens. On the M5 Pro it ran at 10 to 45 seconds per step, so it was cut to 1,000 examples of up to 384 tokens (LIMA's 1,000 examples are a reassuring precedent). Each run below took between 10 and 45 minutes.
 
 ### The training script
 

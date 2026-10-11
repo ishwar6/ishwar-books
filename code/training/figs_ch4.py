@@ -262,7 +262,7 @@ def six_n():
         x += w + 12
     b += brace(20, x - 12, 136, 'total per token: 2N + 2N + 2N = 6N FLOPs', 'edge', False, 't-note')
     b.append(text(20, 190, f'Worked: our tiny GPT has N = {N:,} parameters and saw D = {1500 * 32 * 256:,} tokens.', 't-tick'))
-    b.append(text(20, 210, f'C = 6 x {N:,} x {1500 * 32 * 256:,} = {COMP["runs"][0]["C"]:.3g} FLOPs, about {COMP["runs"][0]["C"] / COMP["tiny_flops_s"] / 60:.1f} minutes at the {COMP["tiny_flops_s"] / 1e12:.2f} TFLOP/s the laptop GPU reached.', 't-tick'))
+    b.append(text(20, 210, f'C = 6 x {N:,} x {1500 * 32 * 256:,} = {COMP["runs"][0]["C"]:.3g} FLOPs, about {COMP["runs"][0]["C"] / COMP["tiny_flops_s"] / 60:.1f} minutes at the {COMP["tiny_flops_s"] / 1e12:.2f} TFLOP/s the M5 Pro reached.', 't-tick'))
     return svg(760, 225, 'The forward pass costs 2N FLOPs per token and the backward pass about 4N, for a total of 6N.', b)
 
 
@@ -283,7 +283,7 @@ def compute_bars():
         w = X(r['C']) - 260
         b.append(f'<g class="mark"><title>{esc(r["name"])}: {r["C"]:.3g} FLOPs</title><rect class="{"s3" if i == 0 else "s1"}" x="260" y="{y + 3}" width="{w:.1f}" height="17" rx="3"/></g>')
         b.append(text(266 + w, y + 16, f'{r["C"]:.2g}', 't-val'))
-    b.append(text(20, 84 + 30 * len(runs), f'Llama 3 405B used about {runs[4]["C"] / runs[0]["C"] / 1e9:.0f} billion times the compute of our laptop run.', 't-muted'))
+    b.append(text(20, 84 + 30 * len(runs), f'Llama 3 405B used about {runs[4]["C"] / runs[0]["C"] / 1e9:.0f} billion times the compute of our M5 Pro run.', 't-muted'))
     return svg(760, 96 + 30 * len(runs), 'Bars of training compute for our tiny model and five well-known models, on a log scale.', b)
 
 
@@ -401,7 +401,7 @@ def loss_curve():
                     (0, 1500), (1.8, 8.6), [0, 300, 600, 900, 1200, 1500], [2, 3, 4, 5, 6, 7, 8], fx=lambda v: f'{v:,}', fy=lambda v: f'{v:g}',
                     xlabel=f'training step (each step = 8,192 tokens; 1,500 steps = {1500 * 8192 / 1e6:.1f}M tokens)', ylabel='cross-entropy loss (nats per token)')
     b = [p for p in b if 'circle class="s1' not in p]
-    b.insert(0, text(20, 24, f'Pretraining the 12M-parameter GPT on TinyStories: {PRE["seconds"] / 60:.1f} minutes on the laptop GPU', 't-title'))
+    b.insert(0, text(20, 24, f'Pretraining the 12M-parameter GPT on TinyStories: {PRE["seconds"] / 60:.1f} minutes on the M5 Pro', 't-title'))
     b.append(f'<line class="base-line" x1="80" y1="{Y(math.log(4096)):.1f}" x2="640" y2="{Y(math.log(4096)):.1f}"/>')
     b.append(text(300, Y(math.log(4096)) - 6, f'ln(4096) = {math.log(4096):.2f}: a uniform guess over the vocabulary', 't-muted'))
     b.append(text(X(1500) - 4, Y(PRE['val'][-1]) - 12, f'{PRE["val"][-1]:.2f}', 't-val', 'end'))

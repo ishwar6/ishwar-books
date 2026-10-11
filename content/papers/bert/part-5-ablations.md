@@ -721,8 +721,8 @@ One more detail, which the paper does not explain: BERT's own row here scores 84
 
 The scripts behind every measured number in this part:
 
-- [`code/papers/bert/bert_part5.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/bert/bert_part5.py): the Table 5 differences, the Table 6 parameter counts, and the WikiText-2 perplexity. About 6 minutes on a laptop CPU.
-- [`code/papers/bert/bert_part5_ner.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/bert/bert_part5_ner.py): the frozen-feature NER experiment. It took about 28 minutes on an Apple M5 Pro GPU that was shared with other jobs at the time.
+- [`code/papers/bert/bert_part5.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/bert/bert_part5.py): the Table 5 differences, the Table 6 parameter counts, and the WikiText-2 perplexity. About 6 minutes on a CPU.
+- [`code/papers/bert/bert_part5_ner.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/bert/bert_part5_ner.py): the frozen-feature NER experiment. It took about 28 minutes on an Apple M5 Pro (64 GB).
 
 ```bash
 pip install torch transformers datasets

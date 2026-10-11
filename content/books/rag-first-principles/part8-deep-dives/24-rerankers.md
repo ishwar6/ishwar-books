@@ -106,8 +106,8 @@ bi-encoder's speed, at roughly 100× the storage.
 
 ### Why you cannot simply cross-encode everything
 
-The measured numbers, from a laptop CPU (`cascade_design.py` and the ColBERT timing in
-`bottleneck_demo.py`):
+The measured numbers, from the CPU of an Apple M5 Pro (64 GB), using `cascade_design.py` and
+the ColBERT timing in `bottleneck_demo.py`:
 
 | Scorer | Measured throughput | Work for ONE query over 1M chunks |
 |---|---|---|
@@ -352,7 +352,7 @@ nDCG points, not miracles, and budget for maintaining the model as your corpus d
   than 20 calls. Never loop one pair at a time.
 - **Quantise.** ONNX int8 cross-encoders run 2–4× faster on CPU for a fraction of a point of
   nDCG. fastembed ships ONNX models by default, which is why 160 pairs/s is achievable on a
-  laptop CPU at all.
+  CPU at all.
 - **GPU only if you need it.** At 20 candidates and ~130 ms, CPU is fine to a few hundred QPS.
   GPU matters when N is large or the model is (bge-reranker-large and up).
 - **Cache.** Rerank scores are deterministic for a `(query, chunk)` pair. Repeated queries are

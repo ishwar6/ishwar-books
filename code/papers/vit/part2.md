@@ -928,7 +928,7 @@ The first three columns of the concatenation are head 1's output from above; the
 <details>
 <summary>Run it yourself</summary>
 
-Every number in this part comes from two scripts in [`code/papers/vit/`](https://github.com/ishwar6/ishwar-books/tree/main/code/papers/vit). `vit_part2_math.py` downloads `google/vit-base-patch16-224` (about 350 MB) and `google/vit-base-patch16-224-in21k`, loads one picture from the `huggingface/cats-image` dataset, and recomputes every step of Section 3.1 and Appendix A by hand; ViT-L/16 and ViT-H/14 are built on the meta device from their configurations, so no large weights are needed. It runs on a laptop CPU in about a minute. `vit_part2_attn.py` is the four-token example and runs in a second.
+Every number in this part comes from two scripts in [`code/papers/vit/`](https://github.com/ishwar6/ishwar-books/tree/main/code/papers/vit). `vit_part2_math.py` downloads `google/vit-base-patch16-224` (about 350 MB) and `google/vit-base-patch16-224-in21k`, loads one picture from the `huggingface/cats-image` dataset, and recomputes every step of Section 3.1 and Appendix A by hand; ViT-L/16 and ViT-H/14 are built on the meta device from their configurations, so no large weights are needed. It runs on a CPU in about a minute. `vit_part2_attn.py` is the four-token example and runs in a second.
 
 ```bash
 pip install torch transformers datasets pillow

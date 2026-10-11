@@ -16,7 +16,7 @@ This series reads the paper slowly, in the paper's own order. Each piece follows
 3. **A picture**, and **real code** when it helps, with its real output.
 4. **Why it matters**, and only then the next piece.
 
-The small `Paper §1` tag above each heading tells you which section of the paper you are reading. The screenshots come from the paper's second arXiv version (3 June 2021), the one most people read today. We run every experiment on the model weights Google released, through the Hugging Face `transformers` library, on an ordinary laptop.
+The small `Paper §1` tag above each heading tells you which section of the paper you are reading. The screenshots come from the paper's second arXiv version (3 June 2021), the one most people read today. We run every experiment on the model weights Google released, through the Hugging Face `transformers` library, on one ordinary computer, an Apple M5 Pro (64 GB).
 
 > [!DEFINITION] Definition boxes
 > A yellow box like this explains one technical word in plain language, the first time it appears. If you already know the word, skip the box.
@@ -745,7 +745,7 @@ The introduction cites sixteen earlier works in five paragraphs. Here they are i
 <details>
 <summary>Run it yourself</summary>
 
-The two scripts behind this part are [`code/papers/vit/vit_part1.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/vit/vit_part1.py) (the cat picture through ViT-B/16 and ResNet-50) and [`code/papers/vit/vit_part1_math.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/vit/vit_part1_math.py) (the quadratic cost table, the equivariance check on a toy convolution, and the patch-shift experiment). Both run on a laptop CPU in under a minute each and download `google/vit-base-patch16-224` (about 350 MB) and `microsoft/resnet-50` (about 100 MB) the first time.
+The two scripts behind this part are [`code/papers/vit/vit_part1.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/vit/vit_part1.py) (the cat picture through ViT-B/16 and ResNet-50) and [`code/papers/vit/vit_part1_math.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/vit/vit_part1_math.py) (the quadratic cost table, the equivariance check on a toy convolution, and the patch-shift experiment). Both run on a CPU in under a minute each and download `google/vit-base-patch16-224` (about 350 MB) and `microsoft/resnet-50` (about 100 MB) the first time.
 
 ```bash
 pip install torch transformers datasets pillow

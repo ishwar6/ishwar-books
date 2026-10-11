@@ -48,7 +48,7 @@ Each part follows the paper's own sections:
 - The small **Paper §3.1** tag above a heading tells you which section of the paper you are reading, so you can follow along in the PDF.
 - A **green "Key takeaways" box** ends every part with what to remember.
 
-Code blocks show real code, and the output shown under them is what that code actually printed. The scripts are in [`code/papers/vit`](https://github.com/ishwar6/ishwar-books/tree/main/code/papers/vit). They run on the models Google released, through the Hugging Face `transformers` library, on a laptop.
+Code blocks show real code, and the output shown under them is what that code actually printed. The scripts are in [`code/papers/vit`](https://github.com/ishwar6/ishwar-books/tree/main/code/papers/vit). They run on the models Google released, through the Hugging Face `transformers` library, on an Apple M5 Pro (64 GB).
 
 ## What you need to know first
 

@@ -9,7 +9,7 @@ Runs on macOS arm64 (Apple M5 Pro), Python 3.14 for the simulations and Python 3
 
 Other jobs shared the GPU while the measurements ran. Timings are therefore the **fastest** of several runs (the median is saved too), and they are slower than an idle machine.
 
-- `measure.py`: **real timings**. Qwen2.5-0.5B, BF16: 18 decode steps (batch 1 to 128, contexts 256 to 4,096) and 11 prefills (16 to 4,096 tokens, some on a cached context), fastest of 30 interleaved rounds after 2 warm-up rounds (each configuration timed once per round). Fits the step-cost model `a + b*new + g*prefill_pairs + k*kv_read` used by every laptop simulation.
+- `measure.py`: **real timings**. Qwen2.5-0.5B, BF16: 18 decode steps (batch 1 to 128, contexts 256 to 4,096) and 11 prefills (16 to 4,096 tokens, some on a cached context), fastest of 30 interleaved rounds after 2 warm-up rounds (each configuration timed once per round). Fits the step-cost model `a + b*new + g*prefill_pairs + k*kv_read` used by every M5 Pro-calibrated simulation.
 - `engine.py`: the discrete-event engine model (continuous batching, chunked prefill with a token budget, KV memory with newest-first preemption and recomputation, an LRU prefix cache, cancellation on timeout). `test_engine.py` checks it.
 - `queueing.py`: M/M/1 and M/D/1 (DistServe eq. 1) against simulation; the engine under a load sweep (TTFT, TPOT, ITL, E2E percentiles, goodput); Little's law; closed versus open loop and coordinated omission with a 6-second stall; bursty arrivals.
 - `capacity.py`: Llama 3.1 8B on one H100 from published specs: memory budget, Little's law, roofline prefill and decode costs, the engine driven by the roofline for BF16 and FP8, GPU count, and cost per million tokens (GPU prices are assumptions).
@@ -45,7 +45,7 @@ python3 -m unittest discover -s code/serving -p 'test_*.py'
 NODE_ENV=production npm run build
 ```
 
-The simulations need only the standard library. Running `measure.py` on another GPU recalibrates every laptop simulation to that GPU.
+The simulations need only the standard library. Running `measure.py` on another GPU recalibrates every M5 Pro-calibrated simulation to that GPU.
 
 ## Sources
 

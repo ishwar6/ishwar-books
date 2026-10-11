@@ -695,7 +695,7 @@ Everything else is the same: 4 layers, width 256, 4 heads, the same feed-forward
 **Task 2: recall.** The model sees $$n$$ facts (a key and its value at each position), then $$n$$ questions (just a key, in a new order), and must answer each with the right value. Keys come from 1,024 possible tokens and values from 256. Each model trains for 3,000 steps on random sets of 32 to 256 facts, then is tested on fresh ones. This is a simplified, one-step version of the "multi-query associative recall" test from the Zoology paper ([Arora et al., 2023](https://arxiv.org/abs/2312.04927)), which found that recall explains most of the gap between attention and its cheaper rivals.
 
 > [!NOTE] Why not Gated DeltaNet too?
-> The script can also train a Gated DeltaNet model and a 3:1 hybrid, using the Qwen3-Next reference code from section 6. But that code is plain PyTorch with a loop inside (the fast version needs special GPU kernels that do not run on a Mac), and after an hour on my laptop those two runs were still going. So this experiment compares the three attention types in the **first half** of this part. Gated DeltaNet's correctness was checked directly in section 6, against Qwen3-Next's own code.
+> The script can also train a Gated DeltaNet model and a 3:1 hybrid, using the Qwen3-Next reference code from section 6. But that code is plain PyTorch with a loop inside (the fast version needs special GPU kernels that do not run on a Mac), and after an hour on an Apple M5 Pro (64 GB) those two runs were still going. So this experiment compares the three attention types in the **first half** of this part. Gated DeltaNet's correctness was checked directly in section 6, against Qwen3-Next's own code.
 
 ### Result 1: predicting text
 

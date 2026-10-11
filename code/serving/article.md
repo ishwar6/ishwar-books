@@ -35,8 +35,8 @@ This part answers them in order, with one rule from the earlier parts kept stric
 10. **What breaks in production**: retry storms, preemption storms, long prompts, noisy neighbours, and the metrics to watch.
 
 > [!NOTE] Three kinds of numbers in this article
-> **Measured:** real runs on this laptop (Apple M5 Pro GPU, PyTorch), on Qwen2.5-0.5B: step times, quantization quality, LoRA overhead and cold-start times. Other jobs were sharing the GPU while these ran, so every timing is the **fastest** of several runs, with the median also saved; even so, they are slower than an idle machine (Part 1 measured a 10.0 ms decode step at batch 1 on the same laptop; this part's fastest was 14.1 ms).
-> **Simulated:** a discrete-event model of a batching engine (continuous batching, chunked prefill, KV memory, preemption, prefix caching), in pure Python. Its step costs are either fitted to the laptop measurements or set by the published limits of an H100 (a "roofline": the best case, never reached in practice).
+> **Measured:** real runs on an Apple M5 Pro (64 GB) with PyTorch, on Qwen2.5-0.5B: step times, quantization quality, LoRA overhead and cold-start times. Every timing is the **fastest** of several runs, with the median also saved. Other work was running at the same time, so these timings are slower than Part 1's (Part 1 measured a 10.0 ms decode step at batch 1; this part's fastest was 14.1 ms).
+> **Simulated:** a discrete-event model of a batching engine (continuous batching, chunked prefill, KV memory, preemption, prefix caching), in pure Python. Its step costs are either fitted to the M5 Pro measurements or set by the published limits of an H100 (a "roofline": the best case, never reached in practice).
 > **Reported:** results published in papers and documentation, always named.
 > No NVIDIA GPU was available, so no vLLM or SGLang server was benchmarked. Engine flags, defaults and metric names were read in the source code of vLLM (commit `187a0eb`) and SGLang (commit `f9cee8d`), both from 11 October 2026.
 
@@ -77,7 +77,7 @@ SGLang exports the same four under the names `sglang:time_to_first_token_seconds
 
 A latency is a distribution, not a number. Here is the TTFT of 3,600 requests from the simulated engine of Section 3, running at a steady 6 requests per second:
 
-{{FIG:averages|Simulated TTFT at 6 requests per second (laptop-calibrated engine, Section 3). Most requests start quickly; a long tail does not.}}
+{{FIG:averages|Simulated TTFT at 6 requests per second (M5 Pro-calibrated engine, Section 3). Most requests start quickly; a long tail does not.}}
 
 > [!DEFINITION] Percentile (p50, p90, p99)
 > The pXX latency is the value that XX% of requests beat. p50 is the median, the typical request. p99 is the experience of the unluckiest 1 in 100, and a user who sends 100 requests a day meets it daily.
@@ -236,7 +236,7 @@ DistServe uses exactly this reasoning for a server that only does prefill, where
 >
 > [Read Section 3 of the paper](https://arxiv.org/pdf/2401.09670#page=5)
 
-With the laptop's measured time for a 512-token prefill, $$D = 43.5$$ ms, the simulation matches equation 1 within 2% from 20% to 95% utilisation. At 90% ($$R = 20.7$$ per second) a prefill that takes 43.5 ms gives an average TTFT of 240 ms, more than five times as long.
+With the M5 Pro's measured time for a 512-token prefill, $$D = 43.5$$ ms, the simulation matches equation 1 within 2% from 20% to 95% utilisation. At 90% ($$R = 20.7$$ per second) a prefill that takes 43.5 ms gives an average TTFT of 240 ms, more than five times as long.
 
 ### A batching engine is a different kind of server
 
@@ -255,13 +255,13 @@ dt = self.cost(new_tokens, prefill_pairs, kv_tokens_read)              # 4. the 
 
 **Block by block.** (1) Requests that have finished their prefill each produce one token per step. (2) If the KV cache cannot hold one more token for each of them, the newest request is evicted and will be recomputed later (Section 10). (3) Whatever is left of the per-step token budget (2,048 here, vLLM's default on smaller GPUs) goes to prompt processing, in chunks, oldest request first; new requests join the batch while memory allows. (4) The step takes as long as the cost model says, and then the clock moves on.
 
-The cost model is **fitted to real measurements**. `measure.py` timed Qwen2.5-0.5B on the laptop GPU for 18 decode steps (batch 1 to 128, contexts of 256 to 4,096 tokens) and 11 prefills (16 to 4,096 new tokens, some on top of a cached context), each the fastest of 30 rounds in which every configuration was timed once (so that each had the same chances to catch the shared GPU at a quiet moment), and fitted
+The cost model is **fitted to real measurements**. `measure.py` timed Qwen2.5-0.5B on the M5 Pro for 18 decode steps (batch 1 to 128, contexts of 256 to 4,096 tokens) and 11 prefills (16 to 4,096 new tokens, some on top of a cached context), each the fastest of 30 rounds in which every configuration was timed once (so that any slow moments were spread evenly across configurations), and fitted
 
 $$
 t_{\text{step}} \approx a + b \cdot n_{\text{new}} + g \cdot n_{\text{pairs}} + k \cdot n_{\text{read}}
 $$
 
-where $$n_{\text{new}}$$ is the number of tokens computed in the step, $$n_{\text{pairs}}$$ the number of prefill attention pairs (each new prompt token attends to every earlier token), and $$n_{\text{read}}$$ the number of cached tokens read (decode reads every sequence's whole KV cache). The fit gives $$a = 18.2$$ ms, $$b = 48.0\ \mu$$s per new token, $$g = 7.6$$ ns per prefill pair and $$k = 360$$ ns per cached token read, with a median error of 9% and a worst error of 46% across the 29 measurements. The worst point is a decode step with batch 32 at 4,096 tokens, which measured slower (123 ms) than batch 64 at the same length (106 ms), so the shared GPU clearly disturbed it; the fit is good enough to show shapes and orders of magnitude on this machine, and no better.
+where $$n_{\text{new}}$$ is the number of tokens computed in the step, $$n_{\text{pairs}}$$ the number of prefill attention pairs (each new prompt token attends to every earlier token), and $$n_{\text{read}}$$ the number of cached tokens read (decode reads every sequence's whole KV cache). The fit gives $$a = 18.2$$ ms, $$b = 48.0\ \mu$$s per new token, $$g = 7.6$$ ns per prefill pair and $$k = 360$$ ns per cached token read, with a median error of 9% and a worst error of 46% across the 29 measurements. The worst point is a decode step with batch 32 at 4,096 tokens, which measured slower (123 ms) than batch 64 at the same length (106 ms), so that measurement was clearly disturbed; the fit is good enough to show shapes and orders of magnitude on this machine, and no better.
 
 [![Terminal output of measure.py: decode step times for batch 1 to 128 at contexts of 256, 1,024 and 4,096 tokens, prefill times for 16 to 4,096 tokens, and the fitted cost model](/img/serving/measure-run.png)](/img/serving/measure-run.png)
 
@@ -269,7 +269,7 @@ Then I offered it Poisson traffic at 1 to 24 requests per second, with prompts a
 
 [![Terminal output of queueing.py section 3: for each rate from 1 to 24 requests per second, completed requests per second, output tokens per second, TTFT p50 and p99, TPOT p50 and p99, ITL p99, end-to-end p50 and p99, share inside the SLO, goodput, mean batch size and GPU busy time](/img/serving/queueing_b-run.png)](/img/serving/queueing_b-run.png)
 
-{{FIG:sweep|Simulated on the laptop-calibrated engine: TTFT and TPOT percentiles against the request rate. TPOT climbs gradually as the batch grows; TTFT barely moves until about 8 requests per second and then leaves the chart.}}
+{{FIG:sweep|Simulated on the M5 Pro-calibrated engine: TTFT and TPOT percentiles against the request rate. TPOT climbs gradually as the batch grows; TTFT barely moves until about 8 requests per second and then leaves the chart.}}
 
 Two things happen, at two different loads.
 
@@ -284,7 +284,7 @@ One more column deserves attention: **busy**. The simulated GPU was busy 97% of 
 
 ## 4. Capacity planning on paper
 
-Section 3 found the capacity of one small model on one laptop by simulation. Before you buy or rent GPUs for a real service, you want the same answer for a real model on a real data-centre GPU, and you want it before any benchmark exists. This section does it on paper for **Llama 3.1 8B on one NVIDIA H100 (80 GB)**, using only published numbers and stated assumptions. Then it checks the paper answer with the same simulator, driven by the H100's limits instead of the laptop's.
+Section 3 found the capacity of one small model on the M5 Pro by simulation. Before you buy or rent GPUs for a real service, you want the same answer for a real model on a real data-centre GPU, and you want it before any benchmark exists. This section does it on paper for **Llama 3.1 8B on one NVIDIA H100 (80 GB)**, using only published numbers and stated assumptions. Then it checks the paper answer with the same simulator, driven by the H100's limits instead of the M5 Pro's.
 
 Everything here comes from `capacity.py`. The inputs are the model's configuration (32 layers, 8 KV heads of 128 numbers, 8.03 billion parameters), the H100 datasheet (989 TFLOP/s of dense BF16 arithmetic, 3.35 TB/s of memory bandwidth) and vLLM's default memory setting. Three inputs are **assumptions**, marked as such: the traffic, a memory reserve for activations, and later a GPU price.
 
@@ -373,7 +373,7 @@ Two lessons sit in this picture. First, batching is what makes decode affordable
 
 ### Step 4: check it with the simulator
 
-Bounds tell you what is impossible. To find what is possible inside an SLO you need the queueing behaviour from Section 3. So I drove the simulator with the H100 bound instead of the laptop's measured costs: every step takes $$\max(\text{FLOPs}/F,\ \text{bytes}/\text{BW})$$ for exactly the tokens it schedules, with vLLM's H100 defaults of an 8,192-token budget per step and up to 1,024 sequences (read in `vllm/engine/arg_utils.py`), and the KV memory from Step 1. Requests have lognormal lengths around the assumed means (1,106 prompt and 274 output tokens on average in the sample). The SLO is TTFT ≤ 500 ms and TPOT ≤ 50 ms, and a rate counts as sustainable when **99%** of requests meet it.
+Bounds tell you what is impossible. To find what is possible inside an SLO you need the queueing behaviour from Section 3. So I drove the simulator with the H100 bound instead of the M5 Pro's measured costs: every step takes $$\max(\text{FLOPs}/F,\ \text{bytes}/\text{BW})$$ for exactly the tokens it schedules, with vLLM's H100 defaults of an 8,192-token budget per step and up to 1,024 sequences (read in `vllm/engine/arg_utils.py`), and the KV memory from Step 1. Requests have lognormal lengths around the assumed means (1,106 prompt and 274 output tokens on average in the sample). The SLO is TTFT ≤ 500 ms and TPOT ≤ 50 ms, and a rate counts as sustainable when **99%** of requests meet it.
 
 [![Terminal output of capacity.py section 4: simulated SLO attainment on one H100 at the roofline. BF16 meets the SLO for 100% of requests up to 30 requests per second, then at 35 requests per second TTFT p99 jumps to about 8 seconds with 196 preemptions and only 45.7% inside the SLO. FP8 holds 99.2% at 80 requests per second and collapses at 85](/img/serving/capacity_b-run.png)](/img/serving/capacity_b-run.png)
 
@@ -437,7 +437,7 @@ Take the BF16 operating point from Section 4 (30 requests per second on one H100
 
 {{FIG:cost_split|How one GPU-second divides between prompt and generated tokens at the BF16 operating point (simulated, roofline). A generated token costs 4.8 times a prompt token because each decode step re-reads the weights and the whole KV cache for one token per sequence.}}
 
-A prompt token costs 15.2 µs and a generated token 73.4 µs: **4.8 times more**. This is Part 1's measurement on a laptop (reading 512 tokens took 27 ms, writing 512 took 5.2 s) showing up as a price. Prefill uses the GPU's arithmetic at full efficiency; decode spends most of each step moving bytes.
+A prompt token costs 15.2 µs and a generated token 73.4 µs: **4.8 times more**. This is Part 1's measurement (reading 512 tokens took 27 ms, writing 512 took 5.2 s) showing up as a price. Prefill uses the GPU's arithmetic at full efficiency; decode spends most of each step moving bytes.
 
 With $2 per GPU-hour, $$\eta = 1$$:
 
@@ -449,7 +449,7 @@ These are **floor prices**: 100% busy, perfect kernels. Two divisions bring them
 
 ### Cached input: why it is cheaper still
 
-A cached prompt token is one whose KV cache already exists (prefix caching, [Part 3](llm-inference-3-vllm.md) and [Part 5](llm-inference-5-sglang-vs-vllm.md)). Its prefill arithmetic is skipped entirely. Part 5 measured this on the laptop: with an 8,192-token cached prefix, prefill took 22.3 ms instead of 462.3 ms. What a cached token still costs is memory: its KV cache occupies GPU memory while it waits to be reused, and new tokens still read it during attention. That is why providers can sell cached input well below fresh input, and why the discount usually comes with conditions such as a minimum prefix length or a limited lifetime. The arithmetic you skip is free; the memory you hold is not.
+A cached prompt token is one whose KV cache already exists (prefix caching, [Part 3](llm-inference-3-vllm.md) and [Part 5](llm-inference-5-sglang-vs-vllm.md)). Its prefill arithmetic is skipped entirely. Part 5 measured this: with an 8,192-token cached prefix, prefill took 22.3 ms instead of 462.3 ms. What a cached token still costs is memory: its KV cache occupies GPU memory while it waits to be reused, and new tokens still read it during attention. That is why providers can sell cached input well below fresh input, and why the discount usually comes with conditions such as a minimum prefix length or a limited lifetime. The arithmetic you skip is free; the memory you hold is not.
 
 ### Requests, not tokens
 
@@ -457,7 +457,7 @@ Users do not buy tokens; they make requests. Dividing the hourly price by the re
 
 ## 6. Quantization: a cost lever with a quality price
 
-Section 4 ended with one decision that halved the hardware: storing the weights and the KV cache in 8 bits instead of 16. That decision is called quantization. This section explains what it does to the numbers inside the model, measures what it does to quality on a real model, and is honest about what a laptop cannot show.
+Section 4 ended with one decision that halved the hardware: storing the weights and the KV cache in 8 bits instead of 16. That decision is called quantization. This section explains what it does to the numbers inside the model, measures what it does to quality on a real model, and is honest about what these runs cannot show.
 
 > [!DEFINITION] Quantization
 > Storing numbers with fewer bits than they were trained in. A 16-bit weight becomes an 8-bit or 4-bit code plus a shared **scale** that turns codes back into real values. Fewer bits means less memory to hold and, more importantly for decode, fewer bytes to read at every step.
@@ -499,7 +499,7 @@ def q_int_sym(w, bits, dim=-1):
 
 I applied each scheme to Qwen2.5-0.5B and measured perplexity on the whole WikiText-2 test set (299,078 tokens, 292 windows of 1,024 tokens). Perplexity is the standard quality check for quantization papers: lower is better, and the BF16 model scores 14.65. Two more checks compare each scheme with the BF16 model token by token on the first 24 windows: the KL divergence between their next-token distributions (0 means identical), and how often both pick the same most likely next token.
 
-The schemes are **simulated** ("fake quantization"): the weights are rounded to the low-precision grid and turned straight back into floats, so the model computes with exactly the values a low-bit kernel would see. This measures quality exactly. It cannot measure speed: no INT4 or FP8 kernel runs on this laptop. The embedding table (which this model shares with its output layer) stays in BF16 in every scheme, as most deployed formats do.
+The schemes are **simulated** ("fake quantization"): the weights are rounded to the low-precision grid and turned straight back into floats, so the model computes with exactly the values a low-bit kernel would see. This measures quality exactly. It cannot measure speed: no INT4 or FP8 kernel runs on the M5 Pro. The embedding table (which this model shares with its output layer) stays in BF16 in every scheme, as most deployed formats do.
 
 [![Terminal output of quant.py: perplexity of Qwen2.5-0.5B on WikiText-2 for each scheme. BF16 14.651; INT8 per-channel 14.682; FP8 E4M3 per-channel 14.769; INT4 per-channel 33.180; INT4 g128 17.459; INT4 g128 with AWQ scales 16.758; INT3 g128 56.083; FP8 W8A8 per-token 14.870; INT8 W8A8 per-token 14.999; INT8 W8A8 per-tensor 79.797; FP8 KV cache with one scale per layer 15.169; with one scale per token and head 15.134](/img/serving/quant-run.png)](/img/serving/quant-run.png)
 
@@ -562,7 +562,7 @@ Weights are fixed and fairly evenly spread. Activations change with every input,
 
 The KV cache can be quantized too: vLLM's `--kv-cache-dtype fp8` stores keys and values in 8 bits, which doubles the tokens that fit (Section 4: 408,000 to about 816,000 with BF16 weights) and halves the bytes each decode step reads for attention. On our model it cost more quality than FP8 weights did: +0.52 perplexity with one scale per layer. I expected a finer scale to fix it, so I also tried one scale per token and per head (the idea behind vLLM's newer `fp8_per_token_head` cache type, listed in `vllm/config/cache.py`). It helped only a little: +0.48. So the loss here comes mostly from FP8's 3-bit mantissa, a rounding step of up to 1/16 of each value, applied to every key and value of every token, rather than from outliers stretching the range. For a model this small that is a visible price; check it on your own model and task. Note also how vLLM sets the scales: according to its quantized KV cache documentation, with plain `kv_cache_dtype="fp8"` all scales are 1.0 (no calibration), and the recommended route is to calibrate them on a dataset with the llm-compressor library. My runs used a measured scale for every forward pass, which is kinder than a fixed 1.0. (My rounding happens on the outputs of the key and value projections, before the rotary position encoding is applied; a rotation does not change sizes, so this is a close stand-in.)
 
-### What a laptop cannot show
+### What these runs cannot show
 
 None of these runs measured speed: the rounded weights were turned back into float32 before every multiplication. Real speed-ups need kernels that read the low-bit codes and multiply directly, and they depend on the GPU: weight-only INT4 helps most at small batches (memory-bound), less at large batches where decode becomes compute-bound, and FP8 W8A8 helps prefill too. The capacity simulation in Section 4 is the honest stand-in: on the H100 roofline, FP8 weights plus FP8 KV raised the sustainable rate from 30 to 80 requests per second. The quality numbers above are what you trade for it.
 
@@ -618,7 +618,7 @@ vLLM's Kubernetes deployment, the vLLM Production Stack, has a router with `--ro
 
 ### Simulated: seven policies, two kinds of traffic
 
-`route.py` puts four copies of the laptop-calibrated engine behind a router. Every request starts with one of 200 shared prefixes of 2,048 tokens (think: 200 customers, each with a long system prompt and documents), followed by a question of about 128 tokens, and asks for an answer of about 64 tokens. Each replica's prefix cache holds 16 prefixes with least-recently-used eviction, and a hit skips the prefix's prefill. Traffic is 20 requests per second in total, 5 per replica: busy, but within what four replicas can serve. Two popularity patterns:
+`route.py` puts four copies of the M5 Pro-calibrated engine behind a router. Every request starts with one of 200 shared prefixes of 2,048 tokens (think: 200 customers, each with a long system prompt and documents), followed by a question of about 128 tokens, and asks for an answer of about 64 tokens. Each replica's prefix cache holds 16 prefixes with least-recently-used eviction, and a hit skips the prefix's prefill. Traffic is 20 requests per second in total, 5 per replica: busy, but within what four replicas can serve. Two popularity patterns:
 
 - **Zipf**: a few prefixes are popular and there is a long tail (the $$k$$-th most popular prefix gets traffic proportional to $$1/k^{1.1}$$).
 - **Hot**: one prefix takes 50% of all traffic (one huge customer, or one system prompt shared by everyone), the rest Zipf.
@@ -627,7 +627,7 @@ vLLM's Kubernetes deployment, the vLLM Production Stack, has a router with `--ro
 
 [![Terminal output of route.py: for Zipf traffic and for one hot prefix, the hit rate, TTFT p50 and p99, end-to-end p99 and load imbalance of random, round_robin, least_outstanding, power_of_two, prefix_hash, cache_aware and cache_aware with balance_abs_threshold 8](/img/serving/route-run.png)](/img/serving/route-run.png)
 
-{{FIG:routing|Simulated, four laptop-calibrated replicas: prefix-cache hit rate and TTFT p99 for each routing policy. The policy with the most hits (prefix hashing) has by far the worst tail when one prefix is hot.}}
+{{FIG:routing|Simulated, four M5 Pro-calibrated replicas: prefix-cache hit rate and TTFT p99 for each routing policy. The policy with the most hits (prefix hashing) has by far the worst tail when one prefix is hot.}}
 
 What the simulation shows:
 
@@ -690,7 +690,7 @@ Memory is the easy part. The hard part is the batch. Continuous batching (Part 3
 
 ### Measured: four ways to run 32 adapters
 
-To see the problem, I ran the same decode step on Qwen2.5-0.5B (BF16, on the laptop GPU) with a batch of 32 requests, each with 512 tokens of context, and rank-16 adapters on all 168 linear layers, in four ways:
+To see the problem, I ran the same decode step on Qwen2.5-0.5B (BF16, on the M5 Pro) with a batch of 32 requests, each with 512 tokens of context, and rank-16 adapters on all 168 linear layers, in four ways:
 
 ```python
 def hook(mod, inp, out):                     # runs after every linear layer
@@ -747,13 +747,13 @@ Section 5 showed that idle GPUs make every token more expensive. The usual answe
 
 ### How long does a cold start take?
 
-A new replica must start a process, import its libraries, read the weights from disk or the network, copy them to the GPU, and run a first forward pass (which sets up kernels). I timed each phase for Qwen2.5-0.5B on the laptop, five times, each in a fresh Python process. Separately, I measured the SSD's read speed on a freshly written 2 GiB file with the operating system's cache turned off (macOS `F_NOCACHE`), because a model file read a second time comes from memory, not disk.
+A new replica must start a process, import its libraries, read the weights from disk or the network, copy them to the GPU, and run a first forward pass (which sets up kernels). I timed each phase for Qwen2.5-0.5B on the M5 Pro, five times, each in a fresh Python process. Separately, I measured the SSD's read speed on a freshly written 2 GiB file with the operating system's cache turned off (macOS `F_NOCACHE`), because a model file read a second time comes from memory, not disk.
 
 [![Terminal output of coldstart.py: SSD read speed on a fresh 2 GiB file with F_NOCACHE; five cold-start trials with the time to import torch and transformers, read and build the model, copy it to the GPU, run the first pass and a second pass; then the time to move the weights of four models at the measured SSD speed and at 10 and 100 Gbit/s network speeds](/img/serving/coldstart-run.png)](/img/serving/coldstart-run.png)
 
-{{FIG:coldstart|Measured: phases of a cold start on the laptop for a 0.5B model (median of five fresh processes). For a small model, starting the software costs more than moving the weights.}}
+{{FIG:coldstart|Measured: phases of a cold start on the M5 Pro for a 0.5B model (median of five fresh processes). For a small model, starting the software costs more than moving the weights.}}
 
-The whole start took **13.9 seconds** (median of five) for a model whose weights are under 1 GB: 5.8 s to import PyTorch and Transformers, 4.5 s to read the file and build the model, 2.3 s to copy it to the GPU, and 0.24 s for the first forward pass, against 28 ms for the second. The machine was busy with other jobs, which inflates the CPU-bound phases; still, for a small model, starting the software is most of the cost. The SSD itself delivered 4.4 GB/s, so reading the 0.99 GB file from a cold disk would take about 0.2 s of those 4.5.
+The whole start took **13.9 seconds** (median of five) for a model whose weights are under 1 GB: 5.8 s to import PyTorch and Transformers, 4.5 s to read the file and build the model, 2.3 s to copy it to the GPU, and 0.24 s for the first forward pass, against 28 ms for the second. Other work was running at the time, which inflates the CPU-bound phases; still, for a small model, starting the software is most of the cost. The SSD itself delivered 4.4 GB/s, so reading the 0.99 GB file from a cold disk would take about 0.2 s of those 4.5.
 
 For a big model the balance flips. Moving the weights alone, at the measured SSD speed or at typical network speeds (the network speeds are assumptions, labelled as such in the output):
 
@@ -778,7 +778,7 @@ The obvious signal, GPU utilisation, is the wrong one. Section 3 found the simul
 
 ### Simulated: a traffic jump, three cold-start times, two signals
 
-`autoscale.py` starts with 2 laptop-calibrated replicas at 6 requests per second (3 each: comfortable, since Section 3's engine met the SLO at 4). At $$t = 120$$ s the traffic quadruples to 24 per second, which needs about 6 replicas. Every 10 seconds an autoscaler looks at the replicas that are serving and decides:
+`autoscale.py` starts with 2 M5 Pro-calibrated replicas at 6 requests per second (3 each: comfortable, since Section 3's engine met the SLO at 4). At $$t = 120$$ s the traffic quadruples to 24 per second, which needs about 6 replicas. Every 10 seconds an autoscaler looks at the replicas that are serving and decides:
 
 - **scale on load**: target tracking on requests in flight, wanting $$\lceil \text{in flight} / 20 \rceil$$ replicas (20 is about the batch at which Section 3's engine still met the SLO), with cold starts of 180, 60 or 20 seconds, at most 8 replicas;
 - **scale on GPU busy**: add a replica whenever the serving replicas were busy more than 90% of the last interval, with a 20-second cold start.
@@ -797,7 +797,7 @@ The practical consequences: keep cold starts short (weights on local NVMe or in 
 
 ## 10. What breaks in production
 
-Most incidents in LLM serving are not about the model. They are about queues, memory and clients, and they follow a few recognisable patterns. Each one below was reproduced in the simulator (`failures.py`, laptop-calibrated engine), so you can see its signature before you meet it.
+Most incidents in LLM serving are not about the model. They are about queues, memory and clients, and they follow a few recognisable patterns. Each one below was reproduced in the simulator (`failures.py`, M5 Pro-calibrated engine), so you can see its signature before you meet it.
 
 [![Terminal output of failures.py sections 1 and 2: the retry storm after a 10-second freeze with four client and server behaviours, and preemptions, recomputed tokens, TPOT p99, ITL p99, ITL maximum and end-to-end p99 for 2 to 6 requests per second with a small KV cache](/img/serving/failures_a-run.png)](/img/serving/failures_a-run.png)
 
@@ -887,7 +887,7 @@ python3 code/serving/measure.py            # needs torch: step costs for your ow
 python3 code/serving/quant.py              # needs torch: quantization quality on WikiText-2
 ```
 
-`measure.py` writes the cost model that the laptop simulations use. Run it on your own GPU and the queueing, routing and failure experiments recalibrate to your hardware. To check the simulator against a real engine, start vLLM or SGLang with the model you serve and run `vllm bench serve` with `--request-rate` swept from low to past saturation, `--percentile-metrics ttft,tpot,itl,e2el` and `--goodput` set to your SLO. The shape of Section 3's curves should appear; the numbers will be yours.
+`measure.py` writes the cost model that the M5 Pro-calibrated simulations use. Run it on your own GPU and the queueing, routing and failure experiments recalibrate to your hardware. To check the simulator against a real engine, start vLLM or SGLang with the model you serve and run `vllm bench serve` with `--request-rate` swept from low to past saturation, `--percentile-metrics ttft,tpot,itl,e2el` and `--goodput` set to your SLO. The shape of Section 3's curves should appear; the numbers will be yours.
 
 ## The whole part, on one page
 
@@ -901,7 +901,7 @@ python3 code/serving/quant.py              # needs torch: quantization quality o
 | Why is output pricier than input? | A generated token cost 4.8x a prompt token at the operating point | Roofline simulation; prices per hour are assumptions |
 | Is quantization free? | 8-bit weights nearly (+0.03 to +0.12 perplexity); INT4 needs groups and AWQ-style scales (+2.1); activations need per-token scales | Measured on Qwen2.5-0.5B, WikiText-2 |
 | How should a router choose? | Prefer the warm replica while loads are balanced, the least loaded when not | Simulated with SGLang's rule: 57% to 74% hits with a tuned threshold, without the hashing tail |
-| Can one base model serve many fine-tunes? | Yes: 80 MiB per rank-16 adapter for an 8B model; batched kernels keep mixed batches fast | Arithmetic; measured gather-and-batch against a loop on the laptop |
+| Can one base model serve many fine-tunes? | Yes: 80 MiB per rank-16 adapter for an 8B model; batched kernels keep mixed batches fast | Arithmetic; measured gather-and-batch against a loop on the M5 Pro |
 | What should autoscaling watch? | Queue, in-flight requests and KV use, not GPU busy; cold starts set the reaction time | Measured load phases; simulated scaling |
 | What breaks? | Retries without cancellation, preemption storms, unchunked long prompts, noisy tenants | Simulated; each has a metric and an alert |
 
@@ -923,11 +923,11 @@ Everything here assumed that one model fits on one GPU and that each GPU does bo
 <details>
 <summary>Research notes: what the simulator leaves out</summary>
 
-- **Costs.** The laptop cost model is a four-term linear fit (median error 9%, worst 46%). Mixed steps (prefill and decode together) are assumed to cost the sum of their parts; the measurements timed decode and prefill separately. The H100 model is a pure roofline with no overheads, so it overstates capacity.
+- **Costs.** The M5 Pro cost model is a four-term linear fit (median error 9%, worst 46%). Mixed steps (prefill and decode together) are assumed to cost the sum of their parts; the measurements timed decode and prefill separately. The H100 model is a pure roofline with no overheads, so it overstates capacity.
 - **Memory.** One pool of KV tokens per engine, no block rounding, no fragmentation. The prefix cache in `route.py` is a separate pool of whole prefixes with LRU eviction; real engines share one pool between running requests and cached prefixes (Part 5).
 - **Scheduling.** First-come, first-served with a token budget and newest-first preemption, as in vLLM's default. No priorities, no fairness between tenants, no speculative decoding, no CUDA-graph effects.
 - **Clients.** Requests carry exact lengths; real outputs end at the model's end-of-text token. Client timeouts in `failures.py` cancel the request in the engine instantly when cancellation is on.
-- **What would change the conclusions:** none of these simplifications creates the cliffs in Sections 3 and 10; they come from queueing ($$1/(1-\rho)$$) and from finite memory. The exact rates at which they happen are specific to this laptop, this model and these traffic shapes.
+- **What would change the conclusions:** none of these simplifications creates the cliffs in Sections 3 and 10; they come from queueing ($$1/(1-\rho)$$) and from finite memory. The exact rates at which they happen are specific to the M5 Pro, this model and these traffic shapes.
 
 </details>
 

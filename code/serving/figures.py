@@ -314,7 +314,7 @@ def fig_queueing():
             b += poly(pts, cls) + ''.join(mark(f'{r["rate"]}/s: {title} {p_} {r[key][p_]:.0f} ms', dot(x, y, 's' + cls[1], 3)) for (x, y), r in zip(pts, sw))
         b += line(ax.x0, ax.Y(lim), ax.x0 + ax.w, ax.Y(lim), 'base-line') + text(ax.x0 + ax.w, ax.Y(lim) - 6, f'SLO {lim} ms', 't-tick', 'end')
     b += legend([('p50', 'l1', 'line'), ('p99', 'l2', 'line')], 300, 22)
-    out['sweep'] = svg(300, b, 'Simulated TTFT and TPOT percentiles against request rate on the laptop-calibrated engine. TPOT rises steadily as the batch grows; TTFT stays low until about 8 requests per second, then the queue explodes.')
+    out['sweep'] = svg(300, b, 'Simulated TTFT and TPOT percentiles against request rate on the M5 Pro-calibrated engine. TPOT rises steadily as the batch grows; TTFT stays low until about 8 requests per second, then the queue explodes.')
 
     # goodput vs throughput
     ax = Axes(80, 70, 610, 190, (0, 24), (0, 12))
@@ -398,7 +398,7 @@ def fig_cold():
     for i, (k, lab, cls) in enumerate(phases):
         xx = 30 + i * 180
         b += rect(xx, y - 11, 12, 12, cls, 2) + text(xx + 18, y, f'{lab}: {m[k]:.1f} s', 't-tick', 'start')
-    return svg(110, b, f'Measured cold start of a new process serving Qwen2.5-0.5B on the laptop, median of five: import {m["import"]:.1f} s, read and build {m["read_build"]:.1f} s, copy to GPU {m["to_gpu"]:.1f} s, first pass {m["first_pass"]:.1f} s.')
+    return svg(110, b, f'Measured cold start of a new process serving Qwen2.5-0.5B on the M5 Pro, median of five: import {m["import"]:.1f} s, read and build {m["read_build"]:.1f} s, copy to GPU {m["to_gpu"]:.1f} s, first pass {m["first_pass"]:.1f} s.')
 f['coldstart'] = fig_cold()
 
 
