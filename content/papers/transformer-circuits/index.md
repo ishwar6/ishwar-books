@@ -32,7 +32,7 @@ The paper also gave the field its vocabulary: the **residual stream**, **virtual
 ## How the parts are organised
 
 1. **[The Big Idea and the Residual Stream](part-1-the-residual-stream.md)**: the introduction, the model simplifications, the model written as four equations, the residual stream as a communication channel, virtual weights, bandwidth, and the zero-layer transformer.
-2. **One Attention Head, Taken Apart: the QK and OV Circuits** (coming soon): why heads are independent and additive, attention as information movement, and the two low-rank matrices $$W_Q^\top W_K$$ and $$W_O W_V$$.
+2. **[One Attention Head, Taken Apart: the QK and OV Circuits](part-2-one-attention-head.md)**: why heads are independent and additive, attention as information movement, the tensor-product form of a head, the two low-rank matrices $$W_Q^\top W_K$$ and $$W_O W_V$$, and the QK and OV circuits read from real weights.
 3. **Paths Through the Model** (coming soon): the path expansion trick, which writes a whole model as a sum of simple end-to-end terms.
 4. **One-Layer Models: Skip-Trigrams, Copying and Their Bugs** (coming soon): reading the bigram and skip-trigram tables from the weights of a one-layer model.
 5. **Two-Layer Models: How Heads Compose** (coming soon): Q-, K- and V-composition, and virtual attention heads.
@@ -41,7 +41,7 @@ The paper also gave the field its vocabulary: the **residual stream**, **virtual
 
 ## How to read the boxes
 
-- A **teal "From the paper" box** shows the exact words of the paper as a highlighted screenshot (click it to open it full size), followed by its **context**, **what it says** in plain English, and **why it matters**.
+- A **teal "From the paper" box** shows the exact words of the paper as a highlighted screenshot (click it to open it full size), followed by **what it says** in plain English and **why it matters**.
 - A **yellow definition box** explains a technical word the first time it appears. If you already know the word, skip the box.
 - The small tag above a heading names the section of the paper you are reading, so you can follow along on the paper's web page.
 - A **green "Key takeaways" box** ends every part with what to remember.

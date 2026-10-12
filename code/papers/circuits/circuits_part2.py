@@ -130,7 +130,7 @@ W_QK = (m1.W_Q[0, H] @ m1.W_K[0, H].T)                                # paper: W
 for name, M in [('W_OV', W_OV), ('W_QK', W_QK)]:
     S = torch.linalg.svdvals(M)
     rank = int(torch.linalg.matrix_rank(M))
-    R[name] = dict(shape=tuple(M.shape), rank=rank, numel=M.numel(), sv=[round(float(s), 4) for s in S],
+    R[name] = dict(shape=tuple(M.shape), rank=rank, numel=M.numel(), sv=[float(f'{float(s):.4g}') for s in S],
                    factors=2 * c.d_model * c.d_head)
     log(f'  {name}: shape {tuple(M.shape)} = {M.numel():,} numbers, rank {rank}; stored as two factors: {2 * c.d_model * c.d_head:,} numbers')
     log(f'    singular values: 1st {S[0]:.3f}, 2nd {S[1]:.3f}, 64th {S[63]:.4f}, 65th {S[64]:.1e}, 512th {S[-1]:.1e}')

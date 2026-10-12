@@ -10,7 +10,7 @@ from common import Log, save
 
 log = Log('part2_toy')
 R = {}
-L = lambda a: np.round(np.asarray(a, dtype=float), 3).tolist()
+L = lambda a: (np.round(np.asarray(a, dtype=float), 3) + 0.0).tolist()
 
 # ---------------------------------------------------------------- A. independent and additive
 log('== A. TWO HEADS: CONCATENATE THEN MULTIPLY, OR EACH HEAD ALONE THEN ADD')
@@ -41,6 +41,9 @@ log(f'  values v = W_V x_i: {L(v.ravel())}')
 log(f'  results r_i = sum_j A_ij v_j: {L(r.ravel())}   (token 3: 0.8 x 2 + 0.2 x 1 = 1.8)')
 log(f'  outputs h(x)_i = W_O r_i: {L(h)}')
 log(f'  W_OV = W_O W_V = {L(WOV)}; A x W_OV^T = {L(h2)}  (same)')
+U, S, Vt = np.linalg.svd(WOV)
+R['B'].update(rank=int(np.linalg.matrix_rank(WOV)), sv=L(S), read=L(Vt[0] * np.sign(Vt[0].sum())), write=L(U[:, 0] * np.sign(U[:, 0].sum())))
+log(f'  rank of W_OV = {R["B"]["rank"]}; singular values {R["B"]["sv"]}; reads direction {R["B"]["read"]}, writes direction {R["B"]["write"]}')
 
 # ---------------------------------------------------------------- C. the tensor product
 log('\n== C. THE TENSOR PRODUCT: (A (x) W) x = A x W^T')

@@ -54,4 +54,4 @@
   QK  query ' the'   -> attends most to [' cytosol', 'arynx', ' myocardium', ' landlord', 'aucoma', ' cerebellum', ' cytoplasm', ' debtor']  (scores 2.8 .. 2.5; median 0.5)
   QK  query ' drink' -> attends most to ['()))', "']))", 'ength', '())', ',)', 'ayout', ' and', 'er']  (scores 3.0 .. 2.6; median -0.1)
 
-total time 4.8 s
+total time 6.8 s

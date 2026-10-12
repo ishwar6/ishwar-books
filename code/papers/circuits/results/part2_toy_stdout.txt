@@ -7,6 +7,7 @@
   results r_i = sum_j A_ij v_j: [2.0, 1.5, 1.8]   (token 3: 0.8 x 2 + 0.2 x 1 = 1.8)
   outputs h(x)_i = W_O r_i: [[0.0, 0.0, 2.0], [0.0, 0.0, 1.5], [0.0, 0.0, 1.8]]
   W_OV = W_O W_V = [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [1.0, 1.0, 0.0]]; A x W_OV^T = [[0.0, 0.0, 2.0], [0.0, 0.0, 1.5], [0.0, 0.0, 1.8]]  (same)
+  rank of W_OV = 1; singular values [1.414, 0.0, 0.0]; reads direction [0.707, 0.707, 0.0], writes direction [0.0, 0.0, 1.0]
 
 == C. THE TENSOR PRODUCT: (A (x) W) x = A x W^T
   x = [[1.0, 2.0], [3.0, 4.0]]; W first: x W^T = [[2.0, 1.0], [4.0, 3.0]], then A: [[2.0, 1.0], [3.0, 2.0]]
