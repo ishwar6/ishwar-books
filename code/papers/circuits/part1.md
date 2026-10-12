@@ -23,7 +23,7 @@ Each idea follows the same pattern: the paper's own words as a highlighted scree
 > [!PAPER] Elhage et al. (2021), A Mathematical Framework for Transformer Circuits · Title and authors
 > [![The title, authors, affiliation (Anthropic) and date (Dec 22, 2021) of the paper](/img/papers/circuits/p1-title.png)](/img/papers/circuits/p1-title.png)
 >
-> **What it says:** twenty-five authors from Anthropic, 22 December 2021. The marks after the names flag the core research contributors (Elhage, Nanda, Olsson), the core infrastructure contributors and the contact author (Chris Olah).
+> **What it says:** the paper has twenty-five authors from Anthropic and is dated 22 December 2021. The marks after the names flag the core research contributors (Elhage, Nanda, Olsson), the core infrastructure contributors and the contact author (Chris Olah).
 >
 > **Why it matters:** the title promises a "framework", a way of writing transformers down so they can be read, not a new model. The findings (bigrams, skip-trigrams, induction heads) fall out of that new way of writing. It was also the first article of a long series from the same group: induction heads (2022), superposition (2022), sparse autoencoders (2023 and 2024) and circuit tracing (2025) all build on the vocabulary set out here.
 
@@ -42,17 +42,17 @@ A **circuit** is a small part of a network that does one understandable job, suc
 >
 > **What it says:** large language models keep surprising their own builders: new abilities and harmful behaviours are sometimes found years after training. One answer is **mechanistic interpretability**: reverse-engineering "the detailed computations performed by transformers", the way a programmer turns binaries back into source code.
 >
-> **Why it matters:** it sets the goal: not a rough story ("the model looks at *Barack*") but the exact computation, in a form a person can read.
+> **Why it matters:** it sets the goal. The goal is not a rough story ("the model looks at *Barack*") but the exact computation, in a form a person can read.
 
 A **compiler** turns readable source code into a binary file that a computer runs but a person cannot read. If you only have the binary, you **reverse engineer** it: work back from the bytes to what the program does. A trained transformer is in the same place. Training is the compiler, the weights are the binary, and nobody ever wrote the source code. Mechanistic interpretability tries to recover it.
 
-{{FIG:p1_reverse|The comparison the paper makes. Top: a compiler turns readable source code into an unreadable binary (the bytes shown are the real first bytes of the Python program), and reverse engineering goes back. Bottom: training turns an unknown algorithm into weights (the 52 million numbers of the two-layer model we use; the first three are shown), and mechanistic interpretability tries to go back.}}
+{{FIG:p1_reverse|This is the comparison the paper makes. At the top, a compiler turns readable source code into an unreadable binary (the bytes shown are the real first bytes of the Python program), and reverse engineering goes back. At the bottom, training turns an unknown algorithm into weights (the 52 million numbers of the two-layer model we use; the first three are shown), and mechanistic interpretability tries to go back.}}
 
 > [!DEFINITION] Mechanistic interpretability
-> Explaining a neural network by finding the exact steps it computes, in terms of its weights and its inner signals, the way you would explain a program by reading its code. "Mechanistic" means: describe the mechanism, not only the behaviour.
+> Mechanistic interpretability means explaining a neural network by finding the exact steps it computes, in terms of its weights and its inner signals, the way you would explain a program by reading its code. "Mechanistic" means that we describe the mechanism, not only the behaviour.
 
 > [!DEFINITION] Weights (parameters)
-> The numbers inside a network that training adjusts. A weight matrix is a table of such numbers. "Reading a rule from the weights" means: find the rule by looking at these tables, without running the model on any text.
+> Weights are the numbers inside a network that training adjusts. A weight matrix is a table of such numbers. "Reading a rule from the weights" means finding the rule by looking at these tables, without running the model on any text.
 
 Why want this? The paper's answer is safety: if we could read the algorithm, we could explain known problems, find new ones, and perhaps foresee the problems of bigger models that do not exist yet.
 
@@ -63,10 +63,10 @@ Modern models are huge, so the authors "start with the simplest possible models 
 The paper's summary of results has one finding per model size:
 
 - **Zero layers:** the model learns **bigram** statistics, readable straight from the weights (end of this part).
-- **One layer:** a bigram model plus **skip-trigrams**, patterns "A … B C" where token A earlier and token B now make C more likely (Parts 2 to 4).
+- **One layer:** the model learns bigrams plus **skip-trigrams**, patterns "A … B C" where token A earlier and token B now make C more likely (Parts 2 to 4).
 - **Two layers:** heads combine into **induction heads**, which continue a pattern seen earlier in the text (Parts 5 and 6).
 
-{{FIG:p1_ladder|The ladder the paper climbs. Each model adds one layer of eight attention heads. Zero layers: only bigrams. One layer: bigrams plus skip-trigrams. Two layers: heads can work together and form induction heads. This series follows the same ladder.}}
+{{FIG:p1_ladder|This is the ladder the paper climbs. Each model adds one layer of eight attention heads. With zero layers, the model learns only bigrams. With one layer, it learns bigrams plus skip-trigrams. With two layers, heads can work together and form induction heads. This series follows the same ladder.}}
 
 > [!DEFINITION] Bigram
 > A pair of tokens that follow each other, such as "Hong Kong". **Bigram statistics** are the probabilities of the next token given only the current token: how often "Kong" comes after "Hong". A bigram model ignores everything earlier in the text.
@@ -79,27 +79,27 @@ The paper's summary of results has one finding per model size:
 > [!PAPER] Elhage et al. (2021), A Mathematical Framework for Transformer Circuits · Model Simplifications
 > [![The Model Simplifications paragraphs: attention-only transformers, no biases, no layer normalization](/img/papers/circuits/p1-simplifications.png)](/img/papers/circuits/p1-simplifications.png)
 >
-> **What it says:** one big change, no MLP layers, partly because the authors "had much less success in understanding MLP layers"; and two small ones, no biases and no layer norm, because both fold into the weights.
+> **What it says:** the paper makes one big change: it removes the MLP layers, partly because the authors "had much less success in understanding MLP layers". It also makes two small changes. It removes biases and layer norm, because both fold into the weights.
 >
 > **Why it matters:** without MLPs and layer norm, almost every step is a matrix multiplication or an addition. That is what lets the model split into a sum of pieces.
 
 A normal transformer layer (GPT-2, for example) has layer normalization, attention heads, an MLP, and biases inside each. The paper keeps only the attention heads.
 
-{{FIG:p1_simplify|Left: a standard GPT-2 style block, with layer norm, attention heads with biases, an addition, a second layer norm, an MLP with biases and a second addition. Right: the paper's toy block keeps only the attention heads and the addition. The dashed red parts are removed.}}
+{{FIG:p1_simplify|On the left is a standard GPT-2 style block, with layer norm, attention heads with biases, an addition, a second layer norm, an MLP with biases and a second addition. On the right, the paper's toy block keeps only the attention heads and the addition. The dashed red parts are removed.}}
 
 ### 1. No MLP layers: the big change
 
 > [!DEFINITION] MLP layer
-> A "multi-layer perceptron": in a transformer, a block that takes each token's vector, multiplies it by a big matrix (to about 4 times the width), applies a non-linear function such as GeLU to every number, and multiplies by a second matrix to get back to the original width. It works on each token separately. In GPT-2 small, one MLP has 2 × 768 × 3,072 = 4.7 million weights, twice as many as the four 768 × 768 attention matrices of the same layer.
+> MLP stands for "multi-layer perceptron". In a transformer, an MLP is a block that takes each token's vector, multiplies it by a big matrix (to about 4 times the width), applies a non-linear function such as GeLU to every number, and multiplies by a second matrix to get back to the original width. It works on each token separately. In GPT-2 small, one MLP has 2 × 768 × 3,072 = 4.7 million weights, twice as many as the four 768 × 768 attention matrices of the same layer.
 
 **Why remove it.** Attention heads raise new questions that studying them alone answers cleanly, and, honestly, MLPs were much harder to understand: their non-linear function breaks the "sum of pieces" picture.
 
-**What it costs.** A lot, and the paper calls it "a major weakness". These models are toys: they learn real behaviours (bigrams, copying, induction), but real models have MLPs. Part 7 covers how later work went back to them.
+**What it costs.** It costs a lot, and the paper calls it "a major weakness". These models are toys: they learn real behaviours (bigrams, copying, induction), but real models have MLPs. Part 7 covers how later work went back to them.
 
 ### 2. No biases: a free change
 
 > [!DEFINITION] Bias
-> An extra vector added after a matrix multiplication: $$y=Wx+b$$. It lets a layer output something even when its input is zero.
+> A bias is an extra vector added after a matrix multiplication, as in $$y=Wx+b$$. It lets a layer output something even when its input is zero.
 
 **Why remove it.** A bias can always be turned into one more column of weights. Add an extra input number that is always 1, and put the bias in the matching column:
 
@@ -112,21 +112,28 @@ Read it in words: multiplying the bigger matrix by the longer vector gives $$W x
 A tiny check from our toy script, with $$W=\begin{bmatrix}2&1\\0&3\end{bmatrix}$$, $$b=(1,-1)$$ and $$x=(4,5)$$:
 
 $$
-W x+b=(13,15)+(1,-1)=(14,14),
-\qquad
-\begin{bmatrix}2&1&1\\0&3&-1\end{bmatrix}\begin{bmatrix}4\\5\\1\end{bmatrix}=(14,14)
+\begin{aligned}
+W x+b&=(13,15)+(1,-1)\\
+&=(14,14)
+\end{aligned}
 $$
 
-**What it costs.** Nothing: a model with biases is a model without biases plus one always-1 dimension. The paper adds that in attention-only models the biases mostly act like a fixed bias on the final scores; we will see exactly that in the real model below.
+The bigger matrix times the longer vector gives the same answer:
+
+$$
+\begin{bmatrix}2&1&1\\0&3&-1\end{bmatrix}\begin{bmatrix}4\\5\\1\end{bmatrix}=\begin{bmatrix}14\\14\end{bmatrix}
+$$
+
+**What it costs.** It costs nothing. A model with biases is a model without biases plus one always-1 dimension. The paper adds that in attention-only models the biases mostly act like a fixed bias on the final scores; we will see exactly that in the real model below.
 
 ### 3. No layer normalization: almost free
 
 > [!DEFINITION] Layer normalization (layer norm)
-> A step that rescales each token's vector before a layer uses it: subtract the vector's mean, divide by its size (its standard deviation), then multiply by learned weights and add a learned bias. It keeps the numbers in a steady range during training.
+> Layer norm is a step that rescales each token's vector before a layer uses it: subtract the vector's mean, divide by its size (its standard deviation), then multiply by learned weights and add a learned bias. It keeps the numbers in a steady range during training.
 
 **Why remove it.** The learned multiply-and-add part is linear, so it can be merged into the next matrix. What is left, "divide by the size", changes a vector's scale but not its direction: layer norm folds into nearby weights "up to a variable scaling".
 
-**What it costs.** Very little. TransformerLens does this folding when it loads a model. We loaded `attn-only-2l` folded and unfolded, ran both on the same 31-token prompt, and compared every output log-probability:
+**What it costs.** It costs very little. TransformerLens does this folding when it loads a model. We loaded `attn-only-2l` folded and unfolded, ran both on the same 31-token prompt, and compared every output log-probability:
 
 ```text
 == 2. FOLDING LAYER NORM INTO THE WEIGHTS
@@ -180,17 +187,17 @@ $$
 x_0=W_E\,t
 $$
 
-where:
+Here is what each symbol means:
 
-- $$t$$ is the token, written as a **one-hot vector**: 48,262 numbers, all 0 except a single 1 at the token's index. Shape: $$n_\text{vocab}=48{,}262$$.
-- $$W_E$$ is the **embedding matrix**, with one column per token. Shape: $$d_\text{model}\times n_\text{vocab}=512\times48{,}262$$.
-- $$x_0$$ is the result: the token's starting vector in the residual stream. Shape: $$d_\text{model}=512$$.
+- $$t$$ is the token, written as a **one-hot vector**. It has 48,262 numbers, all 0 except a single 1 at the token's index. Its shape is $$n_\text{vocab}=48{,}262$$.
+- $$W_E$$ is the **embedding matrix**, with one column per token. Its shape is $$d_\text{model}\times n_\text{vocab}=512\times48{,}262$$.
+- $$x_0$$ is the result, the token's starting vector in the residual stream. Its shape is $$d_\text{model}=512$$.
 
 > [!DEFINITION] One-hot vector
-> A vector of zeros with a single 1. It is a way to write "token number $$k$$" so that a matrix can use it: the 1 sits at position $$k$$.
+> A one-hot vector is a vector of zeros with a single 1. It is a way to write "token number $$k$$" so that a matrix can use it: the 1 sits at position $$k$$.
 
 > [!DEFINITION] Embedding
-> The vector a model uses to stand for a token. The **embedding matrix** $$W_E$$ stores one such vector per token in the vocabulary, learned in training.
+> An embedding is the vector a model uses to stand for a token. The **embedding matrix** $$W_E$$ stores one such vector per token in the vocabulary, learned in training.
 
 **Derivation.** Why does multiplying by a one-hot vector give "the token's vector"? Write out the matrix-vector product for output number $$i$$:
 
@@ -209,19 +216,27 @@ That is true for every row $$i$$. So $$W_E t$$ is simply **column $$k$$ of $$W_E
 **Toy example.** Take a vocabulary of four tokens (the, cat, dog, sat) and a stream of only 3 dimensions. Our toy script uses this $$W_E$$ (3 × 4), with one column per token:
 
 $$
-W_E=\begin{bmatrix}1&0&0&0\\0&1&1&0\\0&0&1&1\end{bmatrix},
-\qquad
-t_\text{the}=\begin{bmatrix}1\\0\\0\\0\end{bmatrix},
-\qquad
+W_E=\begin{bmatrix}1&0&0&0\\0&1&1&0\\0&0&1&1\end{bmatrix}
+$$
+
+The token "the" is the one-hot vector
+
+$$
+t_\text{the}=\begin{bmatrix}1\\0\\0\\0\end{bmatrix}
+$$
+
+So its starting vector is
+
+$$
 x_0=W_E\,t_\text{the}=\begin{bmatrix}1\\0\\0\end{bmatrix}
 $$
 
-{{FIG:p1_onehot|Equation 1 by hand. The one-hot vector for "the" has a 1 in position 1, so the product keeps column 1 of W_E and throws away the other columns. The result (1, 0, 0) is the vector that stands for "the".}}
+{{FIG:p1_onehot|This is Equation 1 worked by hand. The one-hot vector for "the" has a 1 in position 1, so the product keeps column 1 of W_E and throws away the other columns. The result (1, 0, 0) is the vector that stands for "the".}}
 
 **Why write it this way, and what is it useful for?** Code does a lookup, not a multiplication. The paper writes the multiplication on purpose: it makes the embedding a **linear map** like every other step, so it can be multiplied with later matrices. At the end of this part, the product $$W_U W_E$$ turns out to be a bigram table.
 
 > [!DEFINITION] Linear map
-> A function $$f$$ that respects addition and scaling: $$f(a+b)=f(a)+f(b)$$ and $$f(c\,a)=c\,f(a)$$. Multiplying by a matrix is always a linear map, and every linear map between vectors can be written as a matrix. Linear maps are the easiest functions to take apart, because you can handle each piece of the input separately and add up the results.
+> A linear map is a function $$f$$ that respects addition and scaling: $$f(a+b)=f(a)+f(b)$$ and $$f(c\,a)=c\,f(a)$$. Multiplying by a matrix is always a linear map, and every linear map between vectors can be written as a matrix. Linear maps are the easiest functions to take apart, because you can handle each piece of the input separately and add up the results.
 
 The real model also adds a **position embedding** from a 1024 × 512 table `W_pos` ("this is position 31"). The paper leaves it out of its equations, so we treat it as one more piece in our checks.
 
@@ -231,15 +246,15 @@ $$
 x_{i+1}=x_i+\sum_{h\in H_i}h(x_i)
 $$
 
-where:
+Here is what each symbol means:
 
-- $$x_i$$ is the residual stream vector before layer $$i$$. Shape: 512 (one such vector per token position).
+- $$x_i$$ is the residual stream vector before layer $$i$$. Its shape is 512 numbers, and there is one such vector per token position.
 - $$H_i$$ is the set of attention heads in layer $$i$$: eight heads in our model.
-- $$h(x_i)$$ is what head $$h$$ computes from the stream. Shape: 512, the same as the stream, so it can be added.
+- $$h(x_i)$$ is what head $$h$$ computes from the stream. Its shape is 512, the same as the stream, so it can be added.
 - $$x_{i+1}$$ is the stream after the layer.
 
 > [!DEFINITION] Residual stream
-> The running vector, one per token position, that flows from the embedding to the unembedding. Every layer reads it and adds its own output to it. The paper's definition: the residual stream "is simply the sum of the output of all the previous layers and the original embedding".
+> The residual stream is the running vector, one per token position, that flows from the embedding to the unembedding. Every layer reads it and adds its own output to it. The paper's definition: the residual stream "is simply the sum of the output of all the previous layers and the original embedding".
 
 In words: **every head reads the stream, computes something, and adds its result back**. Nothing is overwritten or multiplied. The plus sign is the **residual connection** from ResNets. (A head also looks at the stream at earlier positions, which is what attention does; Part 2 covers that. Here we only need that its output is added.)
 
@@ -251,20 +266,20 @@ $$
 T(t)=W_U\,x_{-1}
 $$
 
-where:
+Here is what each symbol means:
 
-- $$x_{-1}$$ is the stream after the last layer (index $$-1$$ means "the last one", as in Python). Shape: 512.
-- $$W_U$$ is the **unembedding matrix**, with one row per token. Shape: $$n_\text{vocab}\times d_\text{model}=48{,}262\times512$$.
-- $$T(t)$$ is a vector of **logits**, one score per token in the vocabulary. Shape: 48,262. ($$T$$ for "transformer": the whole model is the function $$T$$.)
+- $$x_{-1}$$ is the stream after the last layer (index $$-1$$ means "the last one", as in Python). Its shape is 512.
+- $$W_U$$ is the **unembedding matrix**, with one row per token. Its shape is $$n_\text{vocab}\times d_\text{model}=48{,}262\times512$$.
+- $$T(t)$$ is a vector of **logits**, one score per token in the vocabulary. Its shape is 48,262. ($$T$$ stands for "transformer", because the whole model is the function $$T$$.)
 
 > [!DEFINITION] Logit
-> A raw score for one possible next token, any real number. Higher means "more likely". Logits are turned into probabilities by the **softmax**.
+> A logit is a raw score for one possible next token, any real number. Higher means "more likely". Logits are turned into probabilities by the **softmax**.
 
 > [!DEFINITION] Softmax
-> The function that turns a list of scores $$z_1,\dots,z_n$$ into probabilities: $$\operatorname{softmax}(z)_b=e^{z_b}/\sum_c e^{z_c}$$. Each result is between 0 and 1, and they add up to 1. Bigger scores get bigger probabilities.
+> Softmax is the function that turns a list of scores $$z_1,\dots,z_n$$ into probabilities: $$\operatorname{softmax}(z)_b=e^{z_b}/\sum_c e^{z_c}$$. Each result is between 0 and 1, and they add up to 1. Bigger scores get bigger probabilities.
 
 > [!DEFINITION] Unembedding
-> The last matrix of the model, $$W_U$$. Row $$b$$ of $$W_U$$ is a direction in the stream; the logit for token $$b$$ is the dot product of that row with the final stream vector. So "how much the stream points in direction $$b$$" becomes "how likely token $$b$$ is next".
+> The unembedding is the last matrix of the model, $$W_U$$. Row $$b$$ of $$W_U$$ is a direction in the stream; the logit for token $$b$$ is the dot product of that row with the final stream vector. So "how much the stream points in direction $$b$$" becomes "how likely token $$b$$ is next".
 
 **Toy example.** In our 3-dimensional toy, take this $$W_U$$ (4 × 3), one row per possible next token:
 
@@ -276,7 +291,10 @@ $$
 With no layers at all, $$x_{-1}=x_0=(1,0,0)$$, the vector of "the". Each logit is one row of $$W_U$$ times that vector:
 
 $$
-W_U x_0=(0\cdot1,\;2\cdot1,\;1\cdot1,\;0\cdot1)=(0,2,1,0)
+\begin{aligned}
+W_U x_0&=(0\cdot1,\;2\cdot1,\;1\cdot1,\;0\cdot1)\\
+&=(0,2,1,0)
+\end{aligned}
 $$
 
 The softmax turns these scores into probabilities. The four exponentials are $$e^0=1$$, $$e^2=7.389$$, $$e^1=2.718$$ and $$e^0=1$$, which add up to 12.107. Dividing each by 12.107:
@@ -292,7 +310,7 @@ So this toy model says: after "the", the next word is "cat" with probability 0.6
 
 Here is the whole real model in one picture, with the paper's shapes.
 
-{{FIG:p1_pipeline|The two-layer model as the paper sees it. One vertical line, the residual stream, carries 512 numbers per token from the embedding to the unembedding. Each layer's eight heads read the stream and add their outputs at a + node. Nothing on the line itself is ever transformed.}}
+{{FIG:p1_pipeline|This is the two-layer model as the paper sees it. One vertical line, the residual stream, carries 512 numbers per token from the embedding to the unembedding. Each layer's eight heads read the stream and add their outputs at a + node. Nothing on the line itself is ever transformed.}}
 
 ## The residual stream as a communication channel {§Virtual Weights and the Residual Stream}
 
@@ -320,7 +338,11 @@ $$
 Now replace $$x_1$$ in the second line by the right side of the first line:
 
 $$
-x_2=\underbrace{x_0}_{\text{embedding}}\;+\;\underbrace{\sum_{h\in H_0}h(x_0)}_{\text{8 heads of layer 0}}\;+\;\underbrace{\sum_{h\in H_1}h(x_1)}_{\text{8 heads of layer 1}}
+\begin{aligned}
+x_2&=\underbrace{x_0}_{\text{embedding}}\\
+&\quad+\underbrace{\sum_{h\in H_0}h(x_0)}_{\text{8 heads of layer 0}}\\
+&\quad+\underbrace{\sum_{h\in H_1}h(x_1)}_{\text{8 heads of layer 1}}
+\end{aligned}
 $$
 
 That is the whole proof. The final stream is the embedding plus the output of every head, each added once. In the real model there are also the position embedding and one output bias per layer, so the final vector at one position has $$1+1+8+1+8+1=20$$ pieces.
@@ -330,16 +352,24 @@ That is the whole proof. The final stream is the embedding plus the output of ev
 **Toy example.** In our 3-dimensional toy, say head 1 writes $$(0,0.5,0)$$ and head 2 writes $$(0.2,0,-0.3)$$:
 
 $$
-x_\text{final}=\begin{bmatrix}1\\0\\0\end{bmatrix}+\begin{bmatrix}0\\0.5\\0\end{bmatrix}+\begin{bmatrix}0.2\\0\\-0.3\end{bmatrix}=\begin{bmatrix}1.2\\0.5\\-0.3\end{bmatrix}
+\begin{aligned}
+x_\text{final}&=\begin{bmatrix}1\\0\\0\end{bmatrix}+\begin{bmatrix}0\\0.5\\0\end{bmatrix}+\begin{bmatrix}0.2\\0\\-0.3\end{bmatrix}\\
+&=\begin{bmatrix}1.2\\0.5\\-0.3\end{bmatrix}
+\end{aligned}
 $$
 
 Now apply the unembedding. Because $$W_U$$ is linear, $$W_U(a+b+c)=W_U a+W_U b+W_U c$$, so the logits split into one piece per writer:
 
 $$
-W_U x_\text{final}=\underbrace{(0,2,1,0)}_{W_U x_0}+\underbrace{(0,0,0,1)}_{W_U h_1}+\underbrace{(-0.3,0.4,0.2,0)}_{W_U h_2}=(-0.3,2.4,1.2,1.0)
+\begin{aligned}
+W_U x_\text{final}&=\underbrace{(0,2,1,0)}_{W_U x_0}\\
+&\quad+\underbrace{(0,0,0,1)}_{W_U h_1}\\
+&\quad+\underbrace{(-0.3,0.4,0.2,0)}_{W_U h_2}\\
+&=(-0.3,2.4,1.2,1.0)
+\end{aligned}
 $$
 
-{{FIG:p1_sum|Top: the final stream is the sum of what the embedding and the two heads wrote. Bottom: multiplying each piece by W_U gives each piece's own logits, and they add up to the real logits. "cat" wins with 2.4, and we can see that 2.0 of it came from the embedding and 0.4 from head 2.}}
+{{FIG:p1_sum|At the top, the final stream is the sum of what the embedding and the two heads wrote. At the bottom, multiplying each piece by W_U gives each piece's own logits, and they add up to the real logits. "cat" wins with 2.4, and we can see that 2.0 of it came from the embedding and 0.4 from head 2.}}
 
 **What it is useful for.** If the logits are a sum, you can ask **which piece pushed which token up**. In the toy, "cat" gets 2.4: 2.0 from the token itself, 0.4 from head 2. This is called **direct logit attribution**.
 
@@ -371,12 +401,15 @@ In words: `run_with_cache` runs the model once and keeps every inner signal. The
   first 4 coordinates of the sum:         [-0.256, -0.06, -0.569, -0.621]
 ```
 
-The model finishes "Dursley" ("ley", probability 0.988), and the 20 pieces add up to the real vector with a largest difference of 0.0000024: rounding noise. The stream really is a sum.
+The model finishes "Dursley" ("ley", probability 0.988), and the 20 pieces add up to the real vector with a largest difference of 0.0000024, which is rounding noise. The stream really is a sum.
 
 Now split the logit of "ley". One detail: before the unembedding, what is left of the last layer norm is "subtract the mean, divide by the size". Subtracting the mean is linear, so we apply it to each piece; the size is one number for the whole vector (0.945 here), so we divide every piece by it. Each piece's share is
 
 $$
-\text{share of piece }p=\frac{(p-\text{mean}(p))\cdot W_U[\,:,\text{ley}\,]}{0.945}
+\begin{aligned}
+\text{share of }p&=\frac{1}{0.945}\big(p-\text{mean}(p)\big)\\
+&\qquad\cdot W_U[\,:,\text{ley}\,]
+\end{aligned}
 $$
 
 where $$W_U[\,:,\text{ley}\,]$$ is the unembedding direction of "ley". The shares plus the unembedding bias add up to the real logit:
@@ -400,7 +433,7 @@ It looks back at the "ley" that followed "urs" the first time, and pushes "ley" 
 > [!PAPER] Elhage et al. (2021), A Mathematical Framework for Transformer Circuits · Virtual Weights and the Residual Stream as a Communication Channel
 > [![The paragraph on the deeply linear, additive structure of the residual stream and its lack of a privileged basis](/img/papers/circuits/p1-linear.png)](/img/papers/circuits/p1-linear.png)
 >
-> **What it says:** every layer reads with one linear map and writes, by adding, with another. One consequence: the stream "doesn't have a privileged basis".
+> **What it says:** every layer reads with one linear map and writes, by adding, with another. One consequence is that the stream "doesn't have a privileged basis".
 >
 > **Why it matters:** "linear" lets us multiply matrices across layers (virtual weights, next); "additive" lets us split the stream into pieces (what we just did).
 
@@ -412,7 +445,11 @@ What does "no privileged basis" mean? The model never looks at single dimensions
 **Derivation.** Let $$R$$ be a rotation: a square matrix with $$R^\top R=I$$ (turning back undoes turning). Rotate the stream: $$x'=R x$$. A reader with matrix $$W$$ is replaced by $$W'=W R^\top$$. Then the reader sees
 
 $$
-W'x'=(W R^\top)(R x)=W(R^\top R)x=W I x=W x
+\begin{aligned}
+W'x'&=(W R^\top)(R x)\\
+&=W(R^\top R)x\\
+&=W I x=W x
+\end{aligned}
 $$
 
 exactly what it saw before. A writer $$W_O$$ becomes $$R\,W_O$$. Every number in the stream changes; every output stays the same. (In our 3-dimensional toy, a 90-degree turn moves "cat" from $$(0,1,0)$$ to $$(0,0,1)$$, and its logits stay $$(0,0,0,2)$$.)
@@ -441,8 +478,8 @@ exactly what it saw before. A writer $$W_O$$ becomes $$R\,W_O$$. Every number in
 
 Give every layer two matrices:
 
-- an **input matrix** $$W_I$$ that reads: the layer's input is $$W_I x$$. Shape: $$d_\text{in}\times d_\text{model}$$.
-- an **output matrix** $$W_O$$ that writes: the layer adds $$W_O a$$ to the stream, where $$a$$ is what the layer computed. Shape: $$d_\text{model}\times d_\text{out}$$.
+- An **input matrix** $$W_I$$ reads from the stream: the layer's input is $$W_I x$$. Its shape is $$d_\text{in}\times d_\text{model}$$.
+- An **output matrix** $$W_O$$ writes to the stream: the layer adds $$W_O a$$, where $$a$$ is what the layer computed. Its shape is $$d_\text{model}\times d_\text{out}$$.
 
 (A head has three input matrices, $$W_Q$$, $$W_K$$ and $$W_V$$; for now they are all "input weights", and Part 2 separates them.)
 
@@ -454,38 +491,55 @@ Give every layer two matrices:
 Let layer 1 write $$W_O^1a^1$$ into the stream. Later, layer 2 reads the stream. By the sum rule above, the stream it reads contains layer 1's output as one term:
 
 $$
-x=x_0+W_O^1a^1+(\text{everything else written before layer 2})
+\begin{aligned}
+x={}&x_0+W_O^1a^1\\
+&+\text{(everything else written}\\
+&\quad\text{before layer 2)}
+\end{aligned}
 $$
 
 Layer 2 multiplies this by its input matrix. Matrix multiplication spreads over a sum, so:
 
 $$
-W_I^2x=W_I^2x_0+\big(W_I^2W_O^1\big)\,a^1+W_I^2(\text{everything else})
+\begin{aligned}
+W_I^2x={}&W_I^2x_0\\
+&+\big(W_I^2W_O^1\big)\,a^1\\
+&+W_I^2(\text{everything else})
+\end{aligned}
 $$
 
 Look at the middle term: what layer 2 receives **from layer 1** is $$a^1$$ times one matrix, $$W_I^2W_O^1$$. It acts like a direct wire from layer 1 to layer 2, though no such wire exists in the code. The paper calls it a **virtual weight**.
 
 $$
 W_\text{virtual}^{1\to2}=W_I^2\,W_O^1
-\qquad\text{shape: }(d_\text{in}^2\times d_\text{model})(d_\text{model}\times d_\text{out}^1)=d_\text{in}^2\times d_\text{out}^1
 $$
 
-The 512-wide stream drops out of the shape. What is left connects layer 1's outputs straight to layer 2's inputs.
+Its shape is $$(d_\text{in}^2\times d_\text{model})$$ times $$(d_\text{model}\times d_\text{out}^1)$$, which gives $$d_\text{in}^2\times d_\text{out}^1$$. The 512-wide stream drops out of the shape. What is left connects layer 1's outputs straight to layer 2's inputs.
 
 > [!DEFINITION] Virtual weight
-> The product $$W_I^\text{later}W_O^\text{earlier}$$ of a later layer's read matrix and an earlier layer's write matrix. It describes how strongly, and in which way, the later layer reads what the earlier one wrote. It is "virtual" because it is not stored anywhere in the model; it is computed from two real matrices.
+> A virtual weight is the product $$W_I^\text{later}W_O^\text{earlier}$$ of a later layer's read matrix and an earlier layer's write matrix. It describes how strongly, and in which way, the later layer reads what the earlier one wrote. It is "virtual" because it is not stored anywhere in the model; it is computed from two real matrices.
 
-**Toy example.** One writer and two readers on our 3-dimensional stream. The writer has $$W_O=(0,0,1)^\top$$: it writes its single number into dimension 3. It sends $$a=0.7$$. Reader A has $$W_I=(0,0,2)$$: it reads dimension 3. Reader B has $$W_I=(1,0,0)$$: it reads dimension 1.
+**Toy example.** One writer and two readers on our 3-dimensional stream. The writer has $$W_O=(0,0,1)^\top$$: it writes its single number into dimension 3. It sends $$a=0.7$$. Reader A has $$W_I=(0,0,2)$$: it reads dimension 3. Reader B has $$W_I=(1,0,0)$$: it reads dimension 1. The virtual weight of reader A is
 
 $$
-W_I^A W_O=(0,0,2)\cdot(0,0,1)^\top=2,
-\qquad
-W_I^B W_O=(1,0,0)\cdot(0,0,1)^\top=0
+\begin{aligned}
+W_I^A W_O&=(0,0,2)\cdot(0,0,1)^\top\\
+&=2
+\end{aligned}
+$$
+
+The virtual weight of reader B is
+
+$$
+\begin{aligned}
+W_I^B W_O&=(1,0,0)\cdot(0,0,1)^\top\\
+&=0
+\end{aligned}
 $$
 
 Reader A receives $$2\times0.7=1.4$$. Reader B receives 0: the virtual weight says these two layers never talk, without running anything.
 
-{{FIG:p1_virtual|Virtual weights by hand. The writer puts 0.7 into dimension 3. Reader A reads dimension 3 with weight 2 and gets 1.4, so its virtual weight with the writer is 2. Reader B reads only dimension 1 and gets nothing: virtual weight 0.}}
+{{FIG:p1_virtual|This figure works out virtual weights by hand. The writer puts 0.7 into dimension 3. Reader A reads dimension 3 with weight 2 and gets 1.4, so its virtual weight with the writer is 2. Reader B reads only dimension 1 and gets nothing, so its virtual weight is 0.}}
 
 **Real model.** In `attn-only-2l`, take head 0.0 (layer 0, head 0). In the paper's shapes it reads with $$W_V$$ (64 × 512) and writes with $$W_O$$ (512 × 64). A head in layer 1 reads with its own $$W_V$$ (64 × 512). The virtual weight from a layer-0 head to a layer-1 head is therefore 64 × 64, much smaller than either matrix:
 
@@ -503,10 +557,10 @@ V = model.W_V[1, h2].T @ model.W_O[0, h1].T    # paper's W_V (64 x 512) times pa
   the embedding as a "layer 0 writer": W_E is (512, 48262); head 0.0 reading it: W_V W_E is (64, 48262)
 ```
 
-Three things to see. There is one 64 × 64 virtual weight for each of the 64 pairs of heads; Part 5 turns their sizes into a fair score. The embedding is a writer too: $$W_V W_E$$ says what head 0.0 reads about each of the 48,262 tokens. And a head's own write-after-read matrix $$W_O W_V$$ is 512 × 512 but has **rank** only 64, because everything passes through the head's 64 numbers. That is where Part 2 starts.
+There are three things to see. There is one 64 × 64 virtual weight for each of the 64 pairs of heads; Part 5 turns their sizes into a fair score. The embedding is a writer too: $$W_V W_E$$ says what head 0.0 reads about each of the 48,262 tokens. And a head's own write-after-read matrix $$W_O W_V$$ is 512 × 512 but has **rank** only 64, because everything passes through the head's 64 numbers. That is where Part 2 starts.
 
 > [!DEFINITION] Rank
-> The number of independent directions a matrix can output. A 512 × 512 matrix built as (512 × 64) times (64 × 512) can only output vectors from a 64-dimensional space, so its rank is at most 64. A matrix with a rank much smaller than its size is called **low-rank**.
+> The rank of a matrix is the number of independent directions it can output. A 512 × 512 matrix built as (512 × 64) times (64 × 512) can only output vectors from a 64-dimensional space, so its rank is at most 64. A matrix with a rank much smaller than its size is called **low-rank**.
 
 ## Subspaces and bandwidth {§Subspaces and Residual Stream Bandwidth}
 
@@ -518,12 +572,12 @@ Three things to see. There is one 64 × 64 virtual weight for each of the 64 pai
 > **Why it matters:** it generalises the toy above: reader B did not hear the writer because they used different subspaces.
 
 > [!DEFINITION] Subspace
-> A "flat" part of a vector space that passes through zero: all the vectors you can make by adding and scaling a few chosen directions. In our toy, "dimension 3 only" is a 1-dimensional subspace. A head that writes through a 512 × 64 matrix can only write into a subspace of at most 64 dimensions.
+> A subspace is a "flat" part of a vector space that passes through zero: all the vectors you can make by adding and scaling a few chosen directions. In our toy, "dimension 3 only" is a 1-dimensional subspace. A head that writes through a 512 × 64 matrix can only write into a subspace of at most 64 dimensions.
 
 Once a layer writes something, it stays "unless another layer actively deletes it". So the stream's dimensions act like **memory**, or **bandwidth**: a limited number of lanes every message must share.
 
 > [!DEFINITION] Bandwidth
-> How much information a channel can carry at once. For the residual stream, the bandwidth is its number of dimensions: 512 numbers per token in our small models.
+> Bandwidth is how much information a channel can carry at once. For the residual stream, the bandwidth is its number of dimensions: 512 numbers per token in our small models.
 
 > [!PAPER] Elhage et al. (2021), A Mathematical Framework for Transformer Circuits · Subspaces and Residual Stream Bandwidth
 > [![The paragraphs on residual stream bandwidth being in high demand, and memory management](/img/papers/circuits/p1-bandwidth.png)](/img/papers/circuits/p1-bandwidth.png)
@@ -549,7 +603,7 @@ The toy model is mildly crowded (2 times). GPT-2 small, a real 12-layer model, i
 The bandwidth paragraph also says the model is "somehow communicating in superposition". The paper only names the idea; it became the subject of *Toy Models of Superposition* and of Part 7.
 
 > [!DEFINITION] Superposition
-> Storing more separate pieces of information than a vector has dimensions, by giving each piece a direction that is almost, but not exactly, at right angles to the others. It saves space, at the cost of a little interference between pieces.
+> Superposition means storing more separate pieces of information than a vector has dimensions, by giving each piece a direction that is almost, but not exactly, at right angles to the others. It saves space, at the cost of a little interference between pieces.
 
 ## The zero-layer transformer {§Zero-Layer Transformers}
 
@@ -567,15 +621,22 @@ Now we can read the first real result of the paper. It is short, and everything 
 With no layers, Equation 2 never runs, so the last stream is the first stream: $$x_{-1}=x_0$$. Put Equation 1 into Equation 4:
 
 $$
-T(t)=W_U\,x_0=W_U\,(W_E\,t)=(W_U W_E)\,t
+\begin{aligned}
+T(t)&=W_U\,x_0\\
+&=W_U\,(W_E\,t)\\
+&=(W_U W_E)\,t
+\end{aligned}
 $$
 
 The last step only moves the brackets, which is allowed for matrix products. So the whole model is a single matrix $$W_U W_E$$ applied to the one-hot token. The paper drops the $$t$$ and writes $$T=W_U W_E$$.
 
-The shapes:
+Here are the shapes:
 
 $$
-\underbrace{W_U}_{48{,}262\times512}\;\;\underbrace{W_E}_{512\times48{,}262}\;=\;\underbrace{W_U W_E}_{48{,}262\times48{,}262}
+\begin{aligned}
+&\underbrace{W_U}_{48{,}262\times512}\;\underbrace{W_E}_{512\times48{,}262}\\
+&=\underbrace{W_U W_E}_{48{,}262\times48{,}262}
+\end{aligned}
 $$
 
 By the one-hot rule, multiplying by $$t$$ picks one **column**: column $$a$$ of $$W_U W_E$$ is the list of next-token logits when the current token is $$a$$. The matrix is a **table** with one row per next token and one column per current token: the shape of a bigram table.
@@ -592,7 +653,7 @@ By the one-hot rule, multiplying by $$t$$ picks one **column**: column $$a$$ of 
 
 Check one column by hand: column "the" is $$W_U(1,0,0)^\top$$, the first column of $$W_U$$, which is $$(0,2,1,0)$$: the logits we computed for Equation 4. This toy table has learned "the → cat", "cat → sat" and "dog → sat".
 
-{{FIG:p1_bigram|The toy zero-layer model as one 4 by 4 table, W_U W_E. Each column is a current token and lists the scores of every possible next token. The softmax of the "the" column gives the probabilities after "the": cat 0.610, dog 0.225, and 0.083 for the other two.}}
+{{FIG:p1_bigram|The toy zero-layer model is one 4 by 4 table, W_U W_E. Each column is a current token and lists the scores of every possible next token. The softmax of the "the" column gives the probabilities after "the": cat 0.610, dog 0.225, and 0.083 for the other two.}}
 
 ### Derivation 2: the best table is the log of the bigram probabilities
 
@@ -601,24 +662,32 @@ Why does the paper say the best $$W_U W_E$$ is "the bigram log-likelihood"? Here
 **Step 1: what training rewards.** A language model is trained to make the real next token likely. For one current token $$a$$, the training loss is the average of $$-\log q(b\mid a)$$ over all the times a token $$b$$ followed $$a$$ in the training text. Here $$q(b\mid a)$$ is the model's probability for $$b$$, the softmax of column $$a$$.
 
 > [!DEFINITION] Cross-entropy loss
-> The usual training loss of a language model: the average of $$-\log(\text{probability the model gave to the real next token})$$. If the model gives the real token probability 1, the loss is 0. If it gives it a small probability, the loss is large.
+> Cross-entropy loss is the usual training loss of a language model. It is the average of $$-\log(\text{probability the model gave to the real next token})$$. If the model gives the real token probability 1, the loss is 0. If it gives it a small probability, the loss is large.
 
 **Step 2: the best possible guess.** Let $$P(b\mid a)$$ be the true fraction of times $$b$$ follows $$a$$ in the data. A standard fact of probability (Gibbs' inequality) says that the average of $$-\log q$$, taken over data drawn from $$P$$, is smallest when $$q=P$$. In words: the loss is lowest when the model's probabilities equal the real frequencies. So the best zero-layer model has
 
 $$
-\operatorname{softmax}\big(\text{column }a\text{ of }W_U W_E\big)_b=P(b\mid a)
+\begin{aligned}
+&\operatorname{softmax}\big(\text{column }a\text{ of }W_U W_E\big)_b\\
+&=P(b\mid a)
+\end{aligned}
 $$
 
 **Step 3: undo the softmax.** Which logits give those probabilities? Try $$z_b=\log P(b\mid a)+c$$ for any number $$c$$:
 
 $$
-\operatorname{softmax}(z)_b=\frac{e^{\log P(b\mid a)+c}}{\sum_{b'}e^{\log P(b'\mid a)+c}}=\frac{e^c\,P(b\mid a)}{e^c\sum_{b'}P(b'\mid a)}=\frac{P(b\mid a)}{1}=P(b\mid a)
+\begin{aligned}
+\operatorname{softmax}(z)_b&=\frac{e^{\log P(b\mid a)+c}}{\sum_{b'}e^{\log P(b'\mid a)+c}}\\
+&=\frac{e^c\,P(b\mid a)}{e^c\sum_{b'}P(b'\mid a)}\\
+&=\frac{P(b\mid a)}{1}\\
+&=P(b\mid a)
+\end{aligned}
 $$
 
 The $$e^c$$ cancels, and the probabilities in the bottom add up to 1. So the best column is the **log of the bigram probabilities**, plus any constant. That is what "bigram log-likelihood" means.
 
 > [!DEFINITION] Log-likelihood
-> The logarithm of a probability. "Bigram log-likelihood" is $$\log P(b\mid a)$$: the log of the probability that token $$b$$ comes after token $$a$$. Logs turn small probabilities into large negative numbers, which is the natural scale for logits.
+> A log-likelihood is the logarithm of a probability. "Bigram log-likelihood" is $$\log P(b\mid a)$$: the log of the probability that token $$b$$ comes after token $$a$$. Logs turn small probabilities into large negative numbers, which is the natural scale for logits.
 
 **Toy example.** Take the nine-word text "the cat sat . the cat ran . the dog sat .". The word "the" is followed twice by "cat" and once by "dog":
 
@@ -641,7 +710,7 @@ The best column for "the" holds $$\log(2/3)=-0.405$$ for "cat" and $$\log(1/3)=-
 The term $$W_U W_E$$ is not only the zero-layer model. In every transformer the stream is "embedding plus everything the layers add", so the logits always contain $$W_U x_0=W_U W_E t$$: the token's embedding going straight to the unembedding. The paper calls it the **direct path**.
 
 > [!DEFINITION] Direct path
-> The term $$W_U W_E$$ inside any transformer: the route from the embedding straight to the unembedding, skipping every layer. It can only use the current token, so it can only store bigram-like knowledge.
+> The direct path is the term $$W_U W_E$$ inside any transformer. It is the route from the embedding straight to the unembedding, skipping every layer. It can only use the current token, so it can only store bigram-like knowledge.
 
 In a model with layers, heads can predict part of the bigram table, so the direct path holds a kind of "residual": pairs no general rule explains, like "Barack" followed by "Obama". Let us read it from the weights of the one-layer `attn-only-1l`: take one token's embedding, multiply by $$W_U$$, list the five highest of the 48,262 scores.
 
@@ -684,15 +753,15 @@ The untied toy never picks the token itself; tied GPT-2 does so 98.8% of the tim
 
 > [!TAKEAWAYS] Key takeaways
 > - **Mechanistic interpretability** reverse-engineers the exact computation inside a network, like turning a binary back into source code. The paper starts with attention-only transformers of zero, one and two layers.
-> - **Three simplifications:** no MLPs (a real loss), no biases (free: an always-1 input), no layer norm (almost free: folding it changed no log-probability by more than 0.00008).
-> - **Four equations:** $$x_0=W_E t$$ (a column lookup), $$x_{i+1}=x_i+\sum_h h(x_i)$$ (every head adds), the same for MLPs, and $$T(t)=W_U x_{-1}$$. In `attn-only-2l`, $$W_E$$ (512 × 48,262) and $$W_U$$ hold 95% of the 52.1 million weights.
+> - **Three simplifications:** the paper drops MLPs, which is a real loss. It drops biases, which is free because a bias is an always-1 input. It drops layer norm, which is almost free: folding it changed no log-probability by more than 0.00008.
+> - **Four equations:** the model is $$x_0=W_E t$$ (a column lookup), $$x_{i+1}=x_i+\sum_h h(x_i)$$ (every head adds), the same for MLPs, and $$T(t)=W_U x_{-1}$$. In `attn-only-2l`, $$W_E$$ (512 × 48,262) and $$W_U$$ hold 95% of the 52.1 million weights.
 > - **The residual stream is a sum.** Our 20 pieces added up to the real vector (error 0.0000024), and the logit of "ley" (20.645) split into the same pieces; head 1.6 gave 9.63 of it by looking back at the earlier "ley".
 > - **No privileged basis:** rotating the whole stream of `attn-only-1l` moved no logit by more than 0.0001. Study the matrices, not the dimensions.
 > - **Virtual weights** $$W_I^2W_O^1$$ connect any two layers directly (64 × 64 between two heads); different subspaces mean a virtual weight of 0.
 > - **Bandwidth is scarce:** GPT-2 small computes 60 times more numbers than its stream has dimensions.
 > - **A zero-layer model is one table**, $$W_U W_E$$, of rank at most 512; its best values are log bigram probabilities. Inside every model it is the **direct path**: Barack → Obama, Hong → Kong, Los → Angeles.
 
-**Next, in Part 2:** one attention head, opened up: why heads are independent and simply add, how a head moves information between tokens, and how its four matrices collapse into two, the **QK circuit** $$W_Q^\top W_K$$ (where to look) and the **OV circuit** $$W_O W_V$$ (what to copy).
+**Next, in Part 2:** we open up one attention head. Part 2 shows why heads are independent and simply add, how a head moves information between tokens, and how its four matrices collapse into two: the **QK circuit** $$W_Q^\top W_K$$ (where to look) and the **OV circuit** $$W_O W_V$$ (what to copy).
 
 <details>
 <summary>Run it yourself</summary>
