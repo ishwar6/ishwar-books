@@ -569,6 +569,20 @@
       "group": "interp",
       "route": "papers/transformer-circuits/part-1-the-residual-stream#the-zero-layer-transformer",
       "blurb": "Embed then unembed with nothing in between: the model can only learn which token usually follows which."
+    },
+    {
+      "id": "heads-additive",
+      "label": "Heads add up independently",
+      "group": "interp",
+      "route": "papers/transformer-circuits/part-2-one-attention-head#heads-are-independent-and-additive",
+      "blurb": "Stacking heads and multiplying by one output matrix is the same as letting each head write on its own and adding the results."
+    },
+    {
+      "id": "qk-ov",
+      "label": "QK and OV circuits",
+      "group": "interp",
+      "route": "papers/transformer-circuits/part-2-one-attention-head#from-weights-to-tokens-the-qk-and-ov-circuits",
+      "blurb": "Split a head into where it looks (QK) and what it moves (OV), and read both straight from the weights as token-to-token tables."
     }
   ],
   "edges": [
@@ -987,6 +1001,26 @@
     [
       "next-token-loss",
       "zero-layer"
+    ],
+    [
+      "residual-stream",
+      "heads-additive"
+    ],
+    [
+      "heads-additive",
+      "qk-ov"
+    ],
+    [
+      "multi-head",
+      "heads-additive"
+    ],
+    [
+      "self-attention",
+      "qk-ov"
+    ],
+    [
+      "virtual-weights",
+      "qk-ov"
     ]
   ]
 }
