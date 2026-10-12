@@ -8,7 +8,7 @@
 //     "upto": "a phrase",                 optional: extend the crop down to the block containing this phrase
 //     "up": 0,                            optional: go up N parents from the matched block
 //     "mark": ["word", "two words"],      phrases to highlight in yellow inside the crop
-//     "pad": 16, "width": 1100 }          optional
+//     "pad": 16, "padx": 40, "pady": 6 }   optional (padx / pady override pad on one axis)
 // Pattern copied from code/training/blogshot.mjs (book-training worktree).
 import fs from 'node:fs'
 import path from 'node:path'
@@ -29,7 +29,7 @@ for (const s of shots) {
   if (only && s.out !== only) continue
   const res = await p.evaluate((s) => {
     document.querySelectorAll('mark.shot').forEach((m) => m.replaceWith(...m.childNodes))
-    const BLOCK = 'p, li, figure, h1, h2, h3, d-title, table, ul, ol, .l-body, d-math[block], .d-byline .published'
+    const BLOCK = 'p, li, figure, h1, h2, h3, d-title, table, ul, ol, .l-body, d-math[block], .d-byline .published, div.math-grid'
     const findBlock = (phrase) => {
       const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT)
       const norm = (t) => t.replace(/\s+/g, ' ')
@@ -68,8 +68,8 @@ for (const s of shots) {
     return { x: x0 + window.scrollX, y: a.top + window.scrollY, w: x1 - x0, h: z.bottom - a.top, marks: document.querySelectorAll('mark.shot').length }
   }, s)
   if (res.err) { console.log(s.out, 'ERROR', res.err); continue }
-  const pad = s.pad ?? 16
-  const clip = { x: Math.max(0, res.x - pad), y: Math.max(0, res.y - pad), width: Math.min(1280, res.w + 2 * pad), height: res.h + 2 * pad }
+  const pad = s.pad ?? 16, px = s.padx ?? pad, py = s.pady ?? pad
+  const clip = { x: Math.max(0, res.x - px), y: Math.max(0, res.y - py), width: Math.min(1280, res.w + 2 * px), height: res.h + 2 * py }
   await p.screenshot({ path: path.join(OUT, s.out), clip, fullPage: true })
   console.log(`${s.out}: ${Math.round(clip.width)}x${Math.round(clip.height)} css px, ${res.marks} highlights${(s.mark || []).length > res.marks ? ' (MISSING ' + ((s.mark || []).length - res.marks) + ')' : ''}`)
 }

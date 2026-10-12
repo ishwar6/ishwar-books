@@ -1,0 +1,99 @@
+[
+ {
+  "out": "p2-independent.png",
+  "find": "In the original Vaswani et al. paper on transformers",
+  "upto": "we prefer to think of them as independently additive",
+  "mark": [
+   "stacking the result vectors",
+   "split",
+   "equivalent to running heads independently, multiplying each by its own output matrix, and adding them into the residual stream",
+   "independently additive"
+  ]
+ },
+ {
+  "out": "p2-moving.png",
+  "find": "The fundamental action of attention heads is moving information",
+  "up": 0,
+  "mark": [
+   "The fundamental action of attention heads is moving information",
+   "which tokens to move information from is completely separable from what information is “read” to be moved and how it is “written” to the destination"
+  ]
+ },
+ {
+  "out": "p2-moving-fig.png",
+  "figure": 5,
+  "pad": 10
+ },
+ {
+  "out": "p2-three-steps.png",
+  "find": "Given an attention pattern, computing the output of an attention head",
+  "upto": "Tensors can offer us a much more natural language",
+  "mark": [
+   "Compute the value vector for each token",
+   "linearly combining value vectors according to the attention pattern",
+   "compute the output vector of the head for each token",
+   "multiplying it on different sides"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p2-tensor.png",
+  "find": "Using tensor products, we can describe the process of applying attention as",
+  "upto": "mixes across tokens while",
+  "mark": [
+   "mixed product property"
+  ]
+ },
+ {
+  "out": "p2-qk-one-step.png",
+  "find": "What about the attention pattern?",
+  "upto": "would be horribly inefficient",
+  "mark": [
+   "we can do it all in one step without referring to keys and queries",
+   "horribly inefficient"
+  ]
+ },
+ {
+  "out": "p2-two-operations.png",
+  "find": "An attention head is really applying two linear operations",
+  "upto": "is the only non-linear part of this equation",
+  "mark": [
+   "two linear operations",
+   "governs which token's information is moved from and to",
+   "governs which information is read from the source token and how it is written to the destination token",
+   "the only non-linear part"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p2-always-together.png",
+  "find": "always operate together. They’re never independent",
+  "upto": "Because W_O W_V and W_Q W_K always operate together",
+  "mark": [
+   "always operate together",
+   "individual, low-rank matrices",
+   "superficial"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p2-circuits-fig.png",
+  "figure": 9,
+  "pad": 10
+ },
+ {
+  "out": "p2-tensor-notation.png",
+  "find": "A product like",
+  "upto": "The products obey the mixed-product property",
+  "mark": [
+   "multiplying each position in our context by a matrix",
+   "multiplying across positions",
+   "It doesn't matter which order you do this in"
+  ],
+  "padx": 40,
+  "pady": 6
+ }
+]
