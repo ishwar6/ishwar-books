@@ -9,9 +9,9 @@ tags: [interpretability, transformers, attention, qk-circuit, ov-circuit, circui
 
 In Part 1 an attention head was a closed box. It read the residual stream, computed something, and added its result back. That was enough to show that the stream is a sum of pieces. Now we open the box.
 
-Inside, a head has four weight matrices: $$W_Q$$, $$W_K$$, $$W_V$$ and $$W_O$$. The usual way to explain them talks about queries, keys and values. The paper takes a different view. It shows that a head really does **two separate jobs**. The first job decides **which earlier tokens to read from**. The second job decides **what information to move**, and where to put it. Each job is controlled by one matrix that is the product of two of the four. The first is the **QK circuit**, and the second is the **OV circuit**. By the end of this part you will be able to read both of them straight from the weights of a real model.
+Inside, a head has four weight matrices: $$W_{\mathrm{Q}}$$, $$W_{\mathrm{K}}$$, $$W_{\mathrm{V}}$$ and $$W_{\mathrm{O}}$$. The usual way to explain them talks about queries, keys and values. The paper takes a different view. It shows that a head really does **two separate jobs**. The first job decides **which earlier tokens to read from**. The second job decides **what information to move**, and where to put it. Each job is controlled by one matrix that is the product of two of the four. The first is the **QK circuit**, and the second is the **OV circuit**. By the end of this part you will be able to read both of them straight from the weights of a real model.
 
-This part follows the paper's attention-head sections in order. We start with a small fact: heads in the same layer never interact, they simply add. Then we see a head as a machine that moves information from one token to another. Next comes the paper's compact formula for a head, $$h(x)=(A\otimes W_O W_V)\,x$$, built up with a two-token example you can check by hand. After that we go through the paper's list of observations about heads, and we finish with the two circuits.
+This part follows the paper's attention-head sections in order. We start with a small fact: heads in the same layer never interact, they simply add. Then we see a head as a machine that moves information from one token to another. Next comes the paper's compact formula for a head, $$h(x)=(A\otimes W_{\mathrm{O}} W_{\mathrm{V}})\,x$$, built up with a two-token example you can check by hand. After that we go through the paper's list of observations about heads, and we finish with the two circuits.
 
 The real model is `attn-only-1l` from Part 1, a one-layer model with eight heads. We look closely at one of them, **head 0.3** (layer 0, head 3), on a ten-token prompt: *"I like green tea, so I drink green"*. The model's guess for the next word is " tea". We will see exactly how head 0.3 helps it get there.
 
@@ -23,13 +23,13 @@ A head looks at the residual stream at every position. In Part 1, $$x_i$$ was th
 
 $$
 \begin{aligned}
-q_i&=W_Q\,x_i\\
-k_j&=W_K\,x_j\\
-v_j&=W_V\,x_j
+q_i&=W_{\mathrm{Q}}\,x_i\\
+k_j&=W_{\mathrm{K}}\,x_j\\
+v_j&=W_{\mathrm{V}}\,x_j
 \end{aligned}
 $$
 
-Here $$W_Q$$, $$W_K$$ and $$W_V$$ are each 64 × 512. So each of them reads the 512-number stream and makes a 64-number vector. The vector $$q_i$$ is the **query** of position $$i$$, $$k_j$$ is the **key** of position $$j$$, and $$v_j$$ is the **value** of position $$j$$.
+Here $$W_{\mathrm{Q}}$$, $$W_{\mathrm{K}}$$ and $$W_{\mathrm{V}}$$ are each 64 × 512. So each of them reads the 512-number stream and makes a 64-number vector. The vector $$q_i$$ is the **query** of position $$i$$, $$k_j$$ is the **key** of position $$j$$, and $$v_j$$ is the **value** of position $$j$$.
 
 > [!DEFINITION] Query, key and value
 > These are three vectors a head makes from each token. The **query** says what the current token is looking for. The **key** says what each token offers. The **value** is the information a token hands over if someone reads it. All three are made by multiplying the stream by a 64 × 512 matrix.
@@ -58,15 +58,15 @@ r_i=\sum_{j\le i}A_{ij}\,v_j
 $$
 
 $$
-h(x)_i=W_O\,r_i
+h(x)_i=W_{\mathrm{O}}\,r_i
 $$
 
-The vector $$r_i$$ is the **result vector** of position $$i$$. It has 64 numbers. The matrix $$W_O$$ is 512 × 64, so $$h(x)_i$$ has 512 numbers, the width of the stream. This is the vector the head adds to the stream at position $$i$$.
+The vector $$r_i$$ is the **result vector** of position $$i$$. It has 64 numbers. The matrix $$W_{\mathrm{O}}$$ is 512 × 64, so $$h(x)_i$$ has 512 numbers, the width of the stream. This is the vector the head adds to the stream at position $$i$$.
 
 > [!DEFINITION] Result vector
-> The weighted average of the value vectors that one token reads, $$r_i=\sum_j A_{ij}v_j$$. It is still a short 64-number vector. The output matrix $$W_O$$ turns it into a 512-number vector that can be added to the stream.
+> The weighted average of the value vectors that one token reads, $$r_i=\sum_j A_{ij}v_j$$. It is still a short 64-number vector. The output matrix $$W_{\mathrm{O}}$$ turns it into a 512-number vector that can be added to the stream.
 
-One detail differs between the paper and the code. Real implementations, including TransformerLens, divide every score by $$\sqrt{d_\text{head}}=8$$ before the softmax. The paper leaves this out, because the division can be folded into $$W_Q$$. Here are the four matrices of head 0.3 in the paper's shapes, as printed by our script:
+One detail differs between the paper and the code. Real implementations, including TransformerLens, divide every score by $$\sqrt{d_\text{head}}=8$$ before the softmax. The paper leaves this out, because the division can be folded into $$W_{\mathrm{Q}}$$. Here are the four matrices of head 0.3 in the paper's shapes, as printed by our script:
 
 ```text
 == 1. ONE HEAD, FOUR MATRICES (attn-only-1l, head 0.3, paper shapes = TransformerLens shapes transposed)
@@ -85,13 +85,13 @@ In Part 1 we wrote a layer as "every head adds its output to the stream". But th
 > [!PAPER] Elhage et al. (2021), A Mathematical Framework for Transformer Circuits · Attention Heads are Independent and Additive
 > [![The paragraph showing that stacking result vectors and multiplying by W_O^H equals the sum of each head's W_O times its result](/img/papers/circuits/p2-independent.png)](/img/papers/circuits/p2-independent.png)
 >
-> **What it says:** the original transformer paper stacks the result vectors of all heads and multiplies them by one big output matrix $$W_O^H$$. If you split $$W_O^H$$ into one block per head, the big product turns into a sum: each head multiplies its own result by its own block, and the results are added.
+> **What it says:** the original transformer paper stacks the result vectors of all heads and multiplies them by one big output matrix $$W_{\mathrm{O}}^H$$. If you split $$W_{\mathrm{O}}^H$$ into one block per head, the big product turns into a sum: each head multiplies its own result by its own block, and the results are added.
 >
 > **Why it matters:** the two ways give exactly the same numbers. The stacked way is faster on a GPU, because one big multiplication is cheaper than eight small ones. The sum way is easier to think about, because each head becomes a separate term that we can study alone.
 
 ### The derivation
 
-Take a layer with eight heads. Each head $$h$$ has a result vector $$r^h$$ of 64 numbers. The usual description stacks the eight result vectors into one long vector of $$8\times64=512$$ numbers. It then multiplies this long vector by one output matrix $$W_O^H$$, which is 512 × 512.
+Take a layer with eight heads. Each head $$h$$ has a result vector $$r^h$$ of 64 numbers. The usual description stacks the eight result vectors into one long vector of $$8\times64=512$$ numbers. It then multiplies this long vector by one output matrix $$W_{\mathrm{O}}^H$$, which is 512 × 512.
 
 To see why this equals a sum, we need one fact about any matrix-vector product. Multiplying a matrix $$W$$ by a vector $$v$$ is the same as adding up the columns of $$W$$, each one scaled by the matching number in $$v$$:
 
@@ -101,12 +101,12 @@ $$
 
 Here $$W_{:,k}$$ means column $$k$$ of $$W$$. You can check this on any small example: row $$i$$ of the answer is $$\sum_k W_{ik}v_k$$, which is exactly row $$i$$ of the sum of scaled columns.
 
-Now apply this to $$W_O^H$$ and the stacked vector. The first 64 numbers of the stacked vector belong to head 1, and they only ever multiply the first 64 columns of $$W_O^H$$. The next 64 numbers belong to head 2, and they only multiply the next 64 columns, and so on. So we can group the sum of columns by head. The first 64 columns of $$W_O^H$$ form a 512 × 64 block, which we call $$W_O^{1}$$. The next 64 columns form $$W_O^{2}$$, and so on. With two heads, the product reads:
+Now apply this to $$W_{\mathrm{O}}^H$$ and the stacked vector. The first 64 numbers of the stacked vector belong to head 1, and they only ever multiply the first 64 columns of $$W_{\mathrm{O}}^H$$. The next 64 numbers belong to head 2, and they only multiply the next 64 columns, and so on. So we can group the sum of columns by head. The first 64 columns of $$W_{\mathrm{O}}^H$$ form a 512 × 64 block, which we call $$W_{\mathrm{O}}^{1}$$. The next 64 columns form $$W_{\mathrm{O}}^{2}$$, and so on. With two heads, the product reads:
 
 $$
 \begin{aligned}
-W_O^H r&=\big[W_O^{1}\;\;W_O^{2}\big]\begin{bmatrix}r^{1}\\r^{2}\end{bmatrix}\\
-&=W_O^{1}r^{1}+W_O^{2}r^{2}
+W_{\mathrm{O}}^H r&=\big[W_{\mathrm{O}}^{1}\;\;W_{\mathrm{O}}^{2}\big]\begin{bmatrix}r^{1}\\r^{2}\end{bmatrix}\\
+&=W_{\mathrm{O}}^{1}r^{1}+W_{\mathrm{O}}^{2}r^{2}
 \end{aligned}
 $$
 
@@ -116,7 +116,7 @@ With eight heads the sum simply has eight terms. In words, the big output matrix
 
 {{FIG:p2_concat|Two ways to compute the same layer output. At the top, the two result vectors are stacked into (1, 2, 3, -1) and multiplied by the 3 by 4 matrix W_O^H, whose first two columns belong to head 1 and last two to head 2. At the bottom, each head multiplies its own result by its own 3 by 2 block, giving (1, 2, 3) and (6, 0, -1), and the two are added. Both ways give (7, 2, 2).}}
 
-**On the real model.** Our script takes the eight result vectors that TransformerLens stores (`hook_z`), stacks them, and multiplies by the big matrix. It also multiplies each head by its own slice of $$W_O$$ and adds the eight answers. Finally it compares both with what the model really added to the stream:
+**On the real model.** Our script takes the eight result vectors that TransformerLens stores (`hook_z`), stacks them, and multiplies by the big matrix. It also multiplies each head by its own slice of $$W_{\mathrm{O}}$$ and adds the eight answers. Finally it compares both with what the model really added to the stream:
 
 ```python
 z = cache['blocks.0.attn.hook_z'][0]                 # [10 positions, 8 heads, 64]: every r^h
@@ -162,11 +162,11 @@ The paper then writes a head as three steps. These are the same equations as in 
 > [!PAPER] Elhage et al. (2021), A Mathematical Framework for Transformer Circuits · Attention Heads as Information Movement
 > [![The three steps of an attention head: compute value vectors, mix them with the attention pattern, project out with W_O; and the remark that x is multiplied on different sides](/img/papers/circuits/p2-three-steps.png)](/img/papers/circuits/p2-three-steps.png)
 >
-> **What it says:** given an attention pattern, a head (1) computes a value vector for each token, $$v_i=W_V x_i$$, (2) mixes the value vectors with the pattern, $$r_i=\sum_j A_{ij}v_j$$, and (3) computes the output for each token, $$h(x)_i=W_O r_i$$. If we treat $$x$$ as a table with one vector per token, then $$W_V$$ and $$W_O$$ multiply it on one side and $$A$$ multiplies it on the other.
+> **What it says:** given an attention pattern, a head (1) computes a value vector for each token, $$v_i=W_{\mathrm{V}} x_i$$, (2) mixes the value vectors with the pattern, $$r_i=\sum_j A_{ij}v_j$$, and (3) computes the output for each token, $$h(x)_i=W_{\mathrm{O}} r_i$$. If we treat $$x$$ as a table with one vector per token, then $$W_{\mathrm{V}}$$ and $$W_{\mathrm{O}}$$ multiply it on one side and $$A$$ multiplies it on the other.
 >
 > **Why it matters:** step 1 and step 3 act on each token separately. Step 2 is the only step that moves anything between tokens. That is the separation the paper promised.
 
-Let us run the three steps by hand on a tiny head. The stream has 3 numbers per token, and there are 3 tokens. The head has $$d_\text{head}=1$$, so every value is a single number. Its matrices are $$W_V=(1,1,0)$$, which adds up dimensions 1 and 2, and $$W_O=(0,0,1)^\top$$, which writes into dimension 3. The attention pattern is given.
+Let us run the three steps by hand on a tiny head. The stream has 3 numbers per token, and there are 3 tokens. The head has $$d_\text{head}=1$$, so every value is a single number. Its matrices are $$W_{\mathrm{V}}=(1,1,0)$$, which adds up dimensions 1 and 2, and $$W_{\mathrm{O}}=(0,0,1)^\top$$, which writes into dimension 3. The attention pattern is given.
 
 {{FIG:p2_moving|One toy head in three steps. In step 1, each token's value is W_V x: the three tokens give 2, 1 and 0. In step 2, the pattern A mixes the values: token 2 takes half of tokens 1 and 2 and gets 1.5, and token 3 takes 0.8 of token 1 and 0.2 of token 2 and gets 1.8. In step 3, W_O writes each result into dimension 3 of that token's own stream.}}
 
@@ -192,7 +192,7 @@ A = cache['blocks.0.attn.hook_pattern'][0, 3]       # [10, 10]: head 0.3, row = 
 
 The first token, `<|BOS|>`, is a special "beginning of text" token that TransformerLens adds in front of every prompt. Many rows put a lot of weight on it. A head must spend its weights somewhere, because each row adds up to 1, and the first token is a common place to park weight that has nothing better to do.
 
-The interesting row is the last one. Standing on the second " green", head 0.3 reads " tea" with weight 0.37. That is the token the model predicts next. So the head looks back at the word that followed "green" last time. What does it carry over? We can check by reading the head's output at the last position through the unembedding $$W_U$$, as in Part 1:
+The interesting row is the last one. Standing on the second " green", head 0.3 reads " tea" with weight 0.37. That is the token the model predicts next. So the head looks back at the word that followed "green" last time. What does it carry over? We can check by reading the head's output at the last position through the unembedding $$W_{\mathrm{U}}$$, as in Part 1:
 
 ```text
   head 0.3 output at ' green', read with W_U: top tokens [(' tea', 2.62), (' teac', 2.44), (' Tea', 2.3), (' cups', 2.25), (' brew', 2.16)]
@@ -214,7 +214,7 @@ So far $$x_i$$ was one token's vector. Now put all the tokens together. Stack th
 A matrix can multiply this table from two sides.
 
 - Multiplying from the **left**, as in $$A\,x$$, mixes the **rows**. Row $$i$$ of $$A\,x$$ is $$\sum_j A_{ij}\,x_j$$, a weighted mix of the tokens. This is what the attention pattern does.
-- Multiplying from the **right**, as in $$x\,W^\top$$, changes **each row on its own**. Row $$i$$ of $$x\,W^\top$$ is $$W x_i$$. This is what $$W_V$$ and $$W_O$$ do.
+- Multiplying from the **right**, as in $$x\,W^\top$$, changes **each row on its own**. Row $$i$$ of $$x\,W^\top$$ is $$W x_i$$. This is what $$W_{\mathrm{V}}$$ and $$W_{\mathrm{O}}$$ do.
 
 {{FIG:p2_two_sides|The stream of the whole prompt as one table x, with 10 rows (tokens) and 512 columns (dimensions). The attention pattern A of head 0.3 (10 by 10, shaded by its real weights) multiplies from the left and mixes rows. W_OV transposed (512 by 512) multiplies from the right and acts inside every row.}}
 
@@ -224,27 +224,27 @@ Now collapse the three steps. Start from step 3 and substitute steps 2 and 1 int
 
 $$
 \begin{aligned}
-h(x)_i&=W_O\,r_i\\
-&=W_O\sum_j A_{ij}\,v_j\\
-&=W_O\sum_j A_{ij}\,W_V x_j
+h(x)_i&=W_{\mathrm{O}}\,r_i\\
+&=W_{\mathrm{O}}\sum_j A_{ij}\,v_j\\
+&=W_{\mathrm{O}}\sum_j A_{ij}\,W_{\mathrm{V}} x_j
 \end{aligned}
 $$
 
-The number $$A_{ij}$$ is just a scalar, so it can move past the matrices. And $$W_O$$ can move inside the sum, because matrix multiplication spreads over a sum. This gives:
+The number $$A_{ij}$$ is just a scalar, so it can move past the matrices. And $$W_{\mathrm{O}}$$ can move inside the sum, because matrix multiplication spreads over a sum. This gives:
 
 $$
-h(x)_i=\sum_j A_{ij}\,(W_O W_V)\,x_j
+h(x)_i=\sum_j A_{ij}\,(W_{\mathrm{O}} W_{\mathrm{V}})\,x_j
 $$
 
-Read this slowly. For each source token $$j$$, the matrix $$W_O W_V$$ turns $$x_j$$ into "what token $$j$$ sends". Then $$A_{ij}$$ decides how much of it token $$i$$ receives. The two parts never mix: $$A$$ only has position indices, and $$W_O W_V$$ only acts inside a vector.
+Read this slowly. For each source token $$j$$, the matrix $$W_{\mathrm{O}} W_{\mathrm{V}}$$ turns $$x_j$$ into "what token $$j$$ sends". Then $$A_{ij}$$ decides how much of it token $$i$$ receives. The two parts never mix: $$A$$ only has position indices, and $$W_{\mathrm{O}} W_{\mathrm{V}}$$ only acts inside a vector.
 
 In table form, using the two sides from above, the whole head is:
 
 $$
-h(x)=A\,x\,(W_O W_V)^\top
+h(x)=A\,x\,(W_{\mathrm{O}} W_{\mathrm{V}})^\top
 $$
 
-The paper gives the product $$W_O W_V$$ its own name, $$W_{OV}$$. It is 512 × 512.
+The paper gives the product $$W_{\mathrm{O}} W_{\mathrm{V}}$$ its own name, $$W_{\mathrm{OV}}$$. It is 512 × 512.
 
 ### The tensor product, made plain
 
@@ -257,7 +257,7 @@ $$
 That is all the symbol means here: "mix the rows with $$A$$, and change each row with $$W$$". With this notation, the whole head is
 
 $$
-h(x)=(A\otimes W_O W_V)\,x
+h(x)=(A\otimes W_{\mathrm{O}} W_{\mathrm{V}})\,x
 $$
 
 > [!DEFINITION] Tensor product (as used here)
@@ -289,21 +289,21 @@ The flat view is correct, but it hides the structure, so the paper (and this ser
 > [!PAPER] Elhage et al. (2021), A Mathematical Framework for Transformer Circuits · Attention Heads as Information Movement
 > [![The head written as a product of three tensor products, then collapsed by the mixed product property into A ⊗ W_O W_V](/img/papers/circuits/p2-tensor.png)](/img/papers/circuits/p2-tensor.png)
 >
-> **What it says:** a head is three tensor products in a row: compute the values ($$\text{Id}\otimes W_V$$), mix them across tokens ($$A\otimes\text{Id}$$), and project the results out ($$\text{Id}\otimes W_O$$). "Applying the mixed product property and collapsing identities" gives $$h(x)=(A\otimes W_O W_V)\,x$$.
+> **What it says:** a head is three tensor products in a row: compute the values ($$\text{Id}\otimes W_{\mathrm{V}}$$), mix them across tokens ($$A\otimes\text{Id}$$), and project the results out ($$\text{Id}\otimes W_{\mathrm{O}}$$). "Applying the mixed product property and collapsing identities" gives $$h(x)=(A\otimes W_{\mathrm{O}} W_{\mathrm{V}})\,x$$.
 >
-> **Why it matters:** the final line shows the whole head as one pair: a pattern $$A$$ and a matrix $$W_O W_V$$. This is the paper's main way of writing a head from now on.
+> **Why it matters:** the final line shows the whole head as one pair: a pattern $$A$$ and a matrix $$W_{\mathrm{O}} W_{\mathrm{V}}$$. This is the paper's main way of writing a head from now on.
 
 The paper skips the algebra, so let us fill it in. The three steps, read from right to left, are:
 
 $$
 \begin{aligned}
-h(x)={}&(\text{Id}\otimes W_O)\\
+h(x)={}&(\text{Id}\otimes W_{\mathrm{O}})\\
 &\cdot(A\otimes\text{Id})\\
-&\cdot(\text{Id}\otimes W_V)\,x
+&\cdot(\text{Id}\otimes W_{\mathrm{V}})\,x
 \end{aligned}
 $$
 
-Here $$\text{Id}$$ is the identity matrix, which changes nothing. So $$\text{Id}\otimes W_V$$ means "do not mix tokens; multiply each token by $$W_V$$". The **mixed-product property** says how two tensor products combine:
+Here $$\text{Id}$$ is the identity matrix, which changes nothing. So $$\text{Id}\otimes W_{\mathrm{V}}$$ means "do not mix tokens; multiply each token by $$W_{\mathrm{V}}$$". The **mixed-product property** says how two tensor products combine:
 
 $$
 \begin{aligned}
@@ -325,9 +325,9 @@ The last step uses $$D^\top B^\top=(BD)^\top$$, a standard rule for transposes. 
 
 $$
 \begin{aligned}
-&(\text{Id}\otimes W_O)(A\otimes\text{Id})\\
-&=(\text{Id}\,A)\otimes(W_O\,\text{Id})\\
-&=A\otimes W_O
+&(\text{Id}\otimes W_{\mathrm{O}})(A\otimes\text{Id})\\
+&=(\text{Id}\,A)\otimes(W_{\mathrm{O}}\,\text{Id})\\
+&=A\otimes W_{\mathrm{O}}
 \end{aligned}
 $$
 
@@ -335,15 +335,15 @@ Then combine the result with the last factor:
 
 $$
 \begin{aligned}
-&(A\otimes W_O)(\text{Id}\otimes W_V)\\
-&=(A\,\text{Id})\otimes(W_O W_V)\\
-&=A\otimes W_O W_V
+&(A\otimes W_{\mathrm{O}})(\text{Id}\otimes W_{\mathrm{V}})\\
+&=(A\,\text{Id})\otimes(W_{\mathrm{O}} W_{\mathrm{V}})\\
+&=A\otimes W_{\mathrm{O}} W_{\mathrm{V}}
 \end{aligned}
 $$
 
 That is the paper's result. The identities "collapse" because multiplying by $$\text{Id}$$ changes nothing.
 
-**On the real model.** We computed head 0.3's output on our prompt in three ways: the three steps, the formula with $$A$$ applied first, and the formula with $$W_{OV}$$ applied first.
+**On the real model.** We computed head 0.3's output on our prompt in three ways: the three steps, the formula with $$A$$ applied first, and the formula with $$W_{\mathrm{OV}}$$ applied first.
 
 ```python
 W_OV_row = model.W_V[0, 3] @ model.W_O[0, 3]     # TransformerLens stores the transpose: this is W_OV^T
@@ -365,9 +365,9 @@ We have collapsed the "what" part. The paper does the same for the "where" part,
 > [!PAPER] Elhage et al. (2021), A Mathematical Framework for Transformer Circuits · Attention Heads as Information Movement
 > [![The paragraph computing the attention pattern in one step as softmax of x^T W_Q^T W_K x, and the note that this would be horribly inefficient](/img/papers/circuits/p2-qk-one-step.png)](/img/papers/circuits/p2-qk-one-step.png)
 >
-> **What it says:** normally one computes keys and queries and then their dot products. "But we can do it all in one step without referring to keys and queries": $$A=\text{softmax}(x^\top W_Q^\top W_K\,x)$$. The paper adds that actually computing a head this way would be "horribly inefficient".
+> **What it says:** normally one computes keys and queries and then their dot products. "But we can do it all in one step without referring to keys and queries": $$A=\text{softmax}(x^\top {W_{\mathrm{Q}}}^{\top} W_{\mathrm{K}}\,x)$$. The paper adds that actually computing a head this way would be "horribly inefficient".
 >
-> **Why it matters:** the pattern depends on $$W_Q$$ and $$W_K$$ only through one product. Queries and keys are a way to compute it, not something the head needs.
+> **Why it matters:** the pattern depends on $$W_{\mathrm{Q}}$$ and $$W_{\mathrm{K}}$$ only through one product. Queries and keys are a way to compute it, not something the head needs.
 
 ### The derivation
 
@@ -376,27 +376,27 @@ Write the score of one pair as a product of matrices. A dot product $$a\cdot b$$
 $$
 \begin{aligned}
 s_{ij}&=q_i\cdot k_j\\
-&=(W_Q x_i)^\top(W_K x_j)\\
-&=x_i^\top W_Q^\top W_K\,x_j
+&=(W_{\mathrm{Q}} x_i)^\top(W_{\mathrm{K}} x_j)\\
+&=x_i^\top {W_{\mathrm{Q}}}^{\top} W_{\mathrm{K}}\,x_j
 \end{aligned}
 $$
 
-The last step uses the transpose rule again: $$(W_Q x_i)^\top=x_i^\top W_Q^\top$$. The paper names the middle product:
+The last step uses the transpose rule again: $$(W_{\mathrm{Q}} x_i)^\top=x_i^\top {W_{\mathrm{Q}}}^{\top}$$. The paper names the middle product:
 
 $$
-W_{QK}=W_Q^\top W_K
+W_{\mathrm{QK}}={W_{\mathrm{Q}}}^{\top} W_{\mathrm{K}}
 $$
 
-Its shape is $$(512\times64)(64\times512)=512\times512$$. With it, every score is $$s_{ij}=x_i^\top W_{QK}\,x_j$$. The paper writes the whole table of scores at once as $$x^\top W_{QK}\,x$$ (with the tokens as the columns of $$x$$), and then applies the masked softmax.
+Its shape is $$(512\times64)(64\times512)=512\times512$$. With it, every score is $$s_{ij}=x_i^\top W_{\mathrm{QK}}\,x_j$$. The paper writes the whole table of scores at once as $$x^\top W_{\mathrm{QK}}\,x$$ (with the tokens as the columns of $$x$$), and then applies the masked softmax.
 
 > [!DEFINITION] Bilinear form
-> A function of two vectors of the form $$a^\top M\,b$$. It is linear in $$a$$ when $$b$$ is fixed, and linear in $$b$$ when $$a$$ is fixed. An attention score is a bilinear form of the destination's stream and the source's stream, with the matrix $$W_{QK}$$.
+> A function of two vectors of the form $$a^\top M\,b$$. It is linear in $$a$$ when $$b$$ is fixed, and linear in $$b$$ when $$a$$ is fixed. An attention score is a bilinear form of the destination's stream and the source's stream, with the matrix $$W_{\mathrm{QK}}$$.
 
-**A toy example.** Let the stream have 2 numbers and the head 1 number. The query reads dimension 1, $$W_Q=(1,0)$$, and the key reads dimension 2, $$W_K=(0,1)$$. The destination token is $$(2,0)$$ and the source token is $$(0,3)$$.
+**A toy example.** Let the stream have 2 numbers and the head 1 number. The query reads dimension 1, $$W_{\mathrm{Q}}=(1,0)$$, and the key reads dimension 2, $$W_{\mathrm{K}}=(0,1)$$. The destination token is $$(2,0)$$ and the source token is $$(0,3)$$.
 
 {{FIG:p2_qk_score|The same attention score computed two ways. With a query and a key: the destination's query is 2, the source's key is 3, and the score is 6. With one matrix: W_QK = W_Q transposed times W_K is the 2 by 2 matrix [[0, 1], [0, 0]], and x_dst transposed times W_QK times x_src is also 6.}}
 
-The single entry 1 in $$W_{QK}$$ sits in row 1, column 2. It means "dimension 1 of the destination meets dimension 2 of the source". Every entry of a real $$W_{QK}$$ has this meaning: how much one direction at the destination wants to meet another direction at the source.
+The single entry 1 in $$W_{\mathrm{QK}}$$ sits in row 1, column 2. It means "dimension 1 of the destination meets dimension 2 of the source". Every entry of a real $$W_{\mathrm{QK}}$$ has this meaning: how much one direction at the destination wants to meet another direction at the source.
 
 **On the real model.** The real head also has biases on its queries and keys. Part 1 showed that a bias is just one more column for an always-1 input. So we add a 513th dimension that is always 1, put the biases there, and compute the whole pattern from a single 513 × 513 matrix:
 
@@ -414,7 +414,7 @@ scores = Xt @ (WQt @ WKt.T) @ Xt.T / 8                         # every query-key
 
 The pattern from one matrix matches the model's pattern to within 0.0000006. Look at the raw scores of the last row. " tea" (position 4) scores 2.93 and BOS scores 2.92. Nearly equal scores give nearly equal weights, which is why both got 0.37.
 
-**Why "horribly inefficient"?** $$W_{QK}$$ has $$512\times512=262{,}144$$ numbers, while $$W_Q$$ and $$W_K$$ together have $$65{,}536$$. Multiplying a token by the big matrix costs about four times as much as going through the two thin ones. So code keeps the factors. But for **reading** a head, the product is the natural object.
+**Why "horribly inefficient"?** $$W_{\mathrm{QK}}$$ has $$512\times512=262{,}144$$ numbers, while $$W_{\mathrm{Q}}$$ and $$W_{\mathrm{K}}$$ together have $$65{,}536$$. Multiplying a token by the big matrix costs about four times as much as going through the two thin ones. So code keeps the factors. But for **reading** a head, the product is the natural object.
 
 ## What the new form shows {§Observations about Attention Heads}
 
@@ -429,28 +429,28 @@ The first observation repeats the main idea: heads move information from one tok
 > [!PAPER] Elhage et al. (2021), A Mathematical Framework for Transformer Circuits · Observations about Attention Heads
 > [![The observations: an attention head applies two linear operations A and W_O W_V, A governs which tokens, W_O W_V governs which information; A is the only non-linear part](/img/papers/circuits/p2-two-operations.png)](/img/papers/circuits/p2-two-operations.png)
 >
-> **What it says:** a head applies two linear operations, $$A$$ and $$W_O W_V$$, which act on different dimensions. $$A$$ "governs which token's information is moved from and to", and $$W_O W_V$$ "governs which information is read from the source token and how it is written to the destination token". $$A$$ is "the only non-linear part", because it comes from a softmax. So if the pattern is held fixed, the head is linear, and the paper calls heads "half-linear".
+> **What it says:** a head applies two linear operations, $$A$$ and $$W_{\mathrm{O}} W_{\mathrm{V}}$$, which act on different dimensions. $$A$$ "governs which token's information is moved from and to", and $$W_{\mathrm{O}} W_{\mathrm{V}}$$ "governs which information is read from the source token and how it is written to the destination token". $$A$$ is "the only non-linear part", because it comes from a softmax. So if the pattern is held fixed, the head is linear, and the paper calls heads "half-linear".
 >
 > **Why it matters:** this gives the two circuits their jobs. It also gives a tool: if you record a head's pattern and then hold it fixed, everything else is plain matrix multiplication. Part 4 uses this "freezing" trick on the one-layer model.
 
-Why is the head non-linear at all? Because the pattern is computed from the input. If you double $$x$$, the scores grow four times (both $$x_i$$ and $$x_j$$ double), and the softmax of the new scores is a different pattern. But once $$A$$ is fixed, $$h(x)=A\,x\,W_{OV}^\top$$ is linear in $$x$$: doubling $$x$$ doubles the output.
+Why is the head non-linear at all? Because the pattern is computed from the input. If you double $$x$$, the scores grow four times (both $$x_i$$ and $$x_j$$ double), and the softmax of the new scores is a different pattern. But once $$A$$ is fixed, $$h(x)=A\,x\,{W_{\mathrm{OV}}}^{\top}$$ is linear in $$x$$: doubling $$x$$ doubles the output.
 
 ### W_OV and W_QK are low-rank
 
-The paper's footnote on this observation explains how $$W_{OV}$$ chooses what to read and where to write. It uses the singular value decomposition $$W_{OV}=USV$$. "Since $$d_\text{head}<d_\text{model}$$, $$W_{OV}$$ is low-rank and only a subset of the diagonal entries in $$S$$ are non-zero." The right singular vectors "describe which subspace of the residual stream being attended to is read in", and the left singular vectors "describe what subspace of the destination residual stream they are written to".
+The paper's footnote on this observation explains how $$W_{\mathrm{OV}}$$ chooses what to read and where to write. It uses the singular value decomposition $$W_{\mathrm{OV}}=USV$$. "Since $$d_\text{head}<d_\text{model}$$, $$W_{\mathrm{OV}}$$ is low-rank and only a subset of the diagonal entries in $$S$$ are non-zero." The right singular vectors "describe which subspace of the residual stream being attended to is read in", and the left singular vectors "describe what subspace of the destination residual stream they are written to".
 
 > [!DEFINITION] Singular value decomposition (SVD)
 > A way to write any matrix as $$M=U S V^\top$$. The columns of $$V$$ are **input directions**, the columns of $$U$$ are **output directions**, and $$S$$ is a diagonal list of **singular values**, one per pair. The matrix takes the size of the input along input direction $$k$$, multiplies it by singular value $$k$$, and writes the result along output direction $$k$$. The number of singular values that are not zero is the rank of $$M$$. (The paper writes $$USV$$ and leaves the transpose implicit.)
 
-First, why can the rank of $$W_{OV}$$ be at most 64? Apply it to any vector $$x$$:
+First, why can the rank of $$W_{\mathrm{OV}}$$ be at most 64? Apply it to any vector $$x$$:
 
 $$
-W_{OV}\,x=W_O\,(W_V\,x)
+W_{\mathrm{OV}}\,x=W_{\mathrm{O}}\,(W_{\mathrm{V}}\,x)
 $$
 
-The bracket $$W_V x$$ has only 64 numbers. So the output is $$W_O$$ times some 64-number vector. That is always a mix of the 64 columns of $$W_O$$. Every possible output lies in a space of at most 64 dimensions, out of 512. The same argument works for $$W_{QK}=W_Q^\top W_K$$.
+The bracket $$W_{\mathrm{V}} x$$ has only 64 numbers. So the output is $$W_{\mathrm{O}}$$ times some 64-number vector. That is always a mix of the 64 columns of $$W_{\mathrm{O}}$$. Every possible output lies in a space of at most 64 dimensions, out of 512. The same argument works for $$W_{\mathrm{QK}}={W_{\mathrm{Q}}}^{\top} W_{\mathrm{K}}$$.
 
-**A toy example.** In our three-step toy, $$W_{OV}=W_O W_V$$ is a 3 × 3 matrix whose last row is $$(1,1,0)$$ and whose other rows are zero. Its rank is 1. The SVD from the toy script finds one singular value, 1.414. Its input direction is $$(0.707,0.707,0)$$, which is "dimensions 1 and 2 together". Its output direction is $$(0,0,1)$$, which is "dimension 3". In words: this head reads dimensions 1 and 2, and writes into dimension 3. Those are two different subspaces, just like the paper's drawing.
+**A toy example.** In our three-step toy, $$W_{\mathrm{OV}}=W_{\mathrm{O}} W_{\mathrm{V}}$$ is a 3 × 3 matrix whose last row is $$(1,1,0)$$ and whose other rows are zero. Its rank is 1. The SVD from the toy script finds one singular value, 1.414. Its input direction is $$(0.707,0.707,0)$$, which is "dimensions 1 and 2 together". Its output direction is $$(0,0,1)$$, which is "dimension 3". In words: this head reads dimensions 1 and 2, and writes into dimension 3. Those are two different subspaces, just like the paper's drawing.
 
 **On the real model.** Our script computes the SVD of both matrices of head 0.3:
 
@@ -466,38 +466,38 @@ The bracket $$W_V x$$ has only 64 numbers. So the output is $$W_O$$ times some 6
 
 There is a sharp cliff after value 64. The 65th singular value is about a million times smaller than the 64th, which means it is zero up to rounding. So each 512 × 512 matrix really lives in 64 dimensions.
 
-Does the head read and write in different places, as the paper's drawing says? We measured the overlap between the 64-dimensional read subspace and the 64-dimensional write subspace of each head's $$W_{OV}$$. The score is 1 if they are the same subspace and 0 if they are at right angles. Two random 64-dimensional subspaces of a 512-dimensional space score about $$64/512=0.125$$.
+Does the head read and write in different places, as the paper's drawing says? We measured the overlap between the 64-dimensional read subspace and the 64-dimensional write subspace of each head's $$W_{\mathrm{OV}}$$. The score is 1 if they are the same subspace and 0 if they are at right angles. Two random 64-dimensional subspaces of a 512-dimensional space score about $$64/512=0.125$$.
 
 ```text
   overlap of the 64-dim read and write subspaces of W_OV (1 = the same subspace, 0 = at right angles, random 64-dim subspaces of 512 dims: 0.125)
     head 0.0: 0.153, head 0.1: 0.176, head 0.2: 0.134, head 0.3: 0.155, head 0.4: 0.130, head 0.5: 0.120, head 0.6: 0.130, head 0.7: 0.155
 ```
 
-Every head scores between 0.120 and 0.176, close to the random 0.125. So the heads read from one part of the stream and write to a mostly different part. For head 0.3 this makes sense. It reads "which token is this" (an embedding direction) and writes "which token should come next" (an unembedding direction). Part 1 showed that these are different, because $$W_U$$ is not the inverse of $$W_E$$.
+Every head scores between 0.120 and 0.176, close to the random 0.125. So the heads read from one part of the stream and write to a mostly different part. For head 0.3 this makes sense. It reads "which token is this" (an embedding direction) and writes "which token should come next" (an unembedding direction). Part 1 showed that these are different, because $$W_{\mathrm{U}}$$ is not the inverse of $$W_{\mathrm{E}}$$.
 
 ### Queries, keys and values are superficial
 
 > [!PAPER] Elhage et al. (2021), A Mathematical Framework for Transformer Circuits · Observations about Attention Heads
 > [![The observations that W_Q and W_K always operate together, that keys, queries and values are superficial, and the definitions of W_OV and W_QK](/img/papers/circuits/p2-always-together.png)](/img/papers/circuits/p2-always-together.png)
 >
-> **What it says:** $$W_Q$$ and $$W_K$$ "always operate together", and so do $$W_O$$ and $$W_V$$. So "keys, queries and value vectors are, in some sense, superficial". They are by-products of computing two low-rank matrices, and "one could easily reparametrize" the factors to get different vectors that work identically. That is why the paper names the products $$W_{OV}=W_O W_V$$ and $$W_{QK}=W_Q^\top W_K$$.
+> **What it says:** $$W_{\mathrm{Q}}$$ and $$W_{\mathrm{K}}$$ "always operate together", and so do $$W_{\mathrm{O}}$$ and $$W_{\mathrm{V}}$$. So "keys, queries and value vectors are, in some sense, superficial". They are by-products of computing two low-rank matrices, and "one could easily reparametrize" the factors to get different vectors that work identically. That is why the paper names the products $$W_{\mathrm{OV}}=W_{\mathrm{O}} W_{\mathrm{V}}$$ and $$W_{\mathrm{QK}}={W_{\mathrm{Q}}}^{\top} W_{\mathrm{K}}$$.
 >
 > **Why it matters:** the familiar story of queries, keys and values describes one of infinitely many equal ways to split the same two matrices. Only the products are fixed by what the head does, so only the products deserve to be interpreted.
 
-What does "reparametrize" mean? Take any invertible 64 × 64 matrix $$M$$. Replace $$W_V$$ by $$M\,W_V$$ and $$W_O$$ by $$W_O M^{-1}$$. The value vectors are now completely different. But their product is unchanged:
+What does "reparametrize" mean? Take any invertible 64 × 64 matrix $$M$$. Replace $$W_{\mathrm{V}}$$ by $$M\,W_{\mathrm{V}}$$ and $$W_{\mathrm{O}}$$ by $$W_{\mathrm{O}} M^{-1}$$. The value vectors are now completely different. But their product is unchanged:
 
 $$
 \begin{aligned}
-W_O'W_V'&=(W_O M^{-1})(M\,W_V)\\
-&=W_O\,(M^{-1}M)\,W_V\\
-&=W_O W_V
+W_{\mathrm{O}}'W_{\mathrm{V}}'&=(W_{\mathrm{O}} M^{-1})(M\,W_{\mathrm{V}})\\
+&=W_{\mathrm{O}}\,(M^{-1}M)\,W_{\mathrm{V}}\\
+&=W_{\mathrm{O}} W_{\mathrm{V}}
 \end{aligned}
 $$
 
 > [!DEFINITION] Invertible matrix
 > A square matrix $$M$$ that can be undone: there is a matrix $$M^{-1}$$ with $$M^{-1}M=I$$, the identity. Multiplying by $$M$$ and then by $$M^{-1}$$ gets you back where you started.
 
-The same trick works for queries and keys, with $$M$$ on one side and the transpose of $$M^{-1}$$ on the other. In our toy, scaling every value by $$M=2$$ and $$W_O$$ by one half gives new values $$(4,2,0)$$ but exactly the same outputs.
+The same trick works for queries and keys, with $$M$$ on one side and the transpose of $$M^{-1}$$ on the other. In our toy, scaling every value by $$M=2$$ and $$W_{\mathrm{O}}$$ by one half gives new values $$(4,2,0)$$ but exactly the same outputs.
 
 On the real head we used a random 64 × 64 matrix. The value vectors and queries change completely, and the head does not change at all:
 
@@ -507,7 +507,7 @@ On the real head we used a random 64 × 64 matrix. The value vectors and queries
   queries: mean |change| 5.28 (mean size 0.72); every query-key score: max |change| 2.0e-12 (mean size 22.83)
 ```
 
-The values moved by 4.62 on average, eight times their usual size. The head's output moved by less than $$10^{-13}$$. So "dimension 17 of the value vector" means nothing on its own, just as "dimension 7 of the stream" meant nothing in Part 1. The meaningful objects are $$W_{OV}$$ and $$W_{QK}$$.
+The values moved by 4.62 on average, eight times their usual size. The head's output moved by less than $$10^{-13}$$. So "dimension 17 of the value vector" means nothing on its own, just as "dimension 7 of the stream" meant nothing in Part 1. The meaningful objects are $$W_{\mathrm{OV}}$$ and $$W_{\mathrm{QK}}$$.
 
 ### Products of heads behave like heads
 
@@ -515,57 +515,57 @@ The last observation looks ahead. By the mixed-product property, two heads appli
 
 $$
 \begin{aligned}
-&(A^{2}\otimes W_{OV}^{2})(A^{1}\otimes W_{OV}^{1})\\
-&=(A^{2}A^{1})\otimes(W_{OV}^{2}W_{OV}^{1})
+&(A^{2}\otimes W_{\mathrm{OV}}^{2})(A^{1}\otimes W_{\mathrm{OV}}^{1})\\
+&=(A^{2}A^{1})\otimes(W_{\mathrm{OV}}^{2}W_{\mathrm{OV}}^{1})
 \end{aligned}
 $$
 
-The result has the same shape as one head: a pattern $$A^2A^1$$ and an OV matrix $$W_{OV}^2W_{OV}^1$$. The paper calls it a **virtual attention head**. It only appears when there are two layers, so Part 5 comes back to it. Our toy script checked the property itself on 2 × 2 matrices, with a difference of exactly 0.
+The result has the same shape as one head: a pattern $$A^2A^1$$ and an OV matrix $$W_{\mathrm{OV}}^2W_{\mathrm{OV}}^1$$. The paper calls it a **virtual attention head**. It only appears when there are two layers, so Part 5 comes back to it. Our toy script checked the property itself on 2 × 2 matrices, with a difference of exactly 0.
 
 ## From weights to tokens: the QK and OV circuits {§Splitting Attention Head terms into Query-Key and Output-Value Circuits}
 
-So far $$W_{QK}$$ and $$W_{OV}$$ act on the 512-number stream. A stream vector is hard to read. A token is easy to read. The paper's last step for a single head is to attach the embedding and the unembedding, so that both matrices go from tokens to tokens.
+So far $$W_{\mathrm{QK}}$$ and $$W_{\mathrm{OV}}$$ act on the 512-number stream. A stream vector is hard to read. A token is easy to read. The paper's last step for a single head is to attach the embedding and the unembedding, so that both matrices go from tokens to tokens.
 
 > [!PAPER] Elhage et al. (2021), A Mathematical Framework for Transformer Circuits · Splitting Attention Head terms into Query-Key and Output-Value Circuits
 > [![The paper's figure of the OV circuit W_U W_O W_V W_E from a source token to the output, and the QK circuit W_E^T W_Q^T W_K W_E from the source and destination tokens to an attention score](/img/papers/circuits/p2-circuits-fig.png)](/img/papers/circuits/p2-circuits-fig.png)
 >
-> **What it says:** the **OV ("output-value") circuit**, $$W_U W_O W_V W_E$$, "determines how attending to a given token affects the logits". The **QK ("query-key") circuit**, $$W_E^\top W_Q^\top W_K W_E$$, "controls which tokens the head prefers to attend to". Each one is a path through the model that starts and ends at tokens.
+> **What it says:** the **OV ("output-value") circuit**, $$W_{\mathrm{U}} W_{\mathrm{O}} W_{\mathrm{V}} W_{\mathrm{E}}$$, "determines how attending to a given token affects the logits". The **QK ("query-key") circuit**, $${W_{\mathrm{E}}}^{\top} {W_{\mathrm{Q}}}^{\top} W_{\mathrm{K}} W_{\mathrm{E}}$$, "controls which tokens the head prefers to attend to". Each one is a path through the model that starts and ends at tokens.
 >
 > **Why it matters:** each circuit is a table indexed by tokens, so a person can read it. The paper defines them inside its study of the one-layer model; here we only build them and read one head. Part 4 reads them as skip-trigrams.
 
 ### The derivation
 
-Take a one-layer model and ignore the position embedding for now, as the paper does. Then the stream that the head reads at position $$j$$ is just the token's embedding, $$x_j=W_E\,t_j$$, where $$t_j$$ is the one-hot vector of the token (Part 1).
+Take a one-layer model and ignore the position embedding for now, as the paper does. Then the stream that the head reads at position $$j$$ is just the token's embedding, $$x_j=W_{\mathrm{E}}\,t_j$$, where $$t_j$$ is the one-hot vector of the token (Part 1).
 
-**The QK circuit.** Put $$x_i=W_E t_i$$ and $$x_j=W_E t_j$$ into the score:
+**The QK circuit.** Put $$x_i=W_{\mathrm{E}} t_i$$ and $$x_j=W_{\mathrm{E}} t_j$$ into the score:
 
 $$
 \begin{aligned}
-s_{ij}&=x_i^\top W_{QK}\,x_j\\
-&=(W_E t_i)^\top W_{QK}\,(W_E t_j)\\
-&=t_i^\top\big(W_E^\top W_{QK} W_E\big)\,t_j
+s_{ij}&=x_i^\top W_{\mathrm{QK}}\,x_j\\
+&=(W_{\mathrm{E}} t_i)^\top W_{\mathrm{QK}}\,(W_{\mathrm{E}} t_j)\\
+&=t_i^\top\big({W_{\mathrm{E}}}^{\top} W_{\mathrm{QK}} W_{\mathrm{E}}\big)\,t_j
 \end{aligned}
 $$
 
 The matrix in the bracket is the QK circuit. It multiplies a 48,262 × 512 matrix, a 512 × 512 matrix and a 512 × 48,262 matrix, so its shape is 48,262 × 48,262. Multiplying by two one-hot vectors just picks one entry. So the entry in row $$a$$, column $$b$$ is the score that a destination token $$a$$ gives to a source token $$b$$. It is a table of "how much does token $$a$$ want to read token $$b$$".
 
-**The OV circuit.** The head adds $$h(x)_i$$ to the stream, and in a one-layer model the stream goes straight to the unembedding. So the head's effect on the logits at position $$i$$ is $$W_U\,h(x)_i$$. Using our one-line formula for the head:
+**The OV circuit.** The head adds $$h(x)_i$$ to the stream, and in a one-layer model the stream goes straight to the unembedding. So the head's effect on the logits at position $$i$$ is $$W_{\mathrm{U}}\,h(x)_i$$. Using our one-line formula for the head:
 
 $$
 \begin{aligned}
-W_U h(x)_i&=\sum_j A_{ij}\,W_U W_{OV}\,x_j\\
-&=\sum_j A_{ij}\,\big(W_U W_{OV} W_E\big)\,t_j
+W_{\mathrm{U}} h(x)_i&=\sum_j A_{ij}\,W_{\mathrm{U}} W_{\mathrm{OV}}\,x_j\\
+&=\sum_j A_{ij}\,\big(W_{\mathrm{U}} W_{\mathrm{OV}} W_{\mathrm{E}}\big)\,t_j
 \end{aligned}
 $$
 
 The matrix in the bracket is the OV circuit, also $$48{,}262\times48{,}262$$. Column $$b$$ of it is a list of 48,262 logit changes. It answers: "if this head reads token $$b$$ with full weight, which next tokens does it push up?"
 
 > [!DEFINITION] QK circuit and OV circuit
-> The **QK circuit** $$W_E^\top W_{QK} W_E$$ is a table of attention scores, with one row per destination token and one column per source token. The **OV circuit** $$W_U W_{OV} W_E$$ is a table of logit effects, with one column per source token and one row per output token. Together they describe one head of a one-layer model completely, apart from positions.
+> The **QK circuit** $${W_{\mathrm{E}}}^{\top} W_{\mathrm{QK}} W_{\mathrm{E}}$$ is a table of attention scores, with one row per destination token and one column per source token. The **OV circuit** $$W_{\mathrm{U}} W_{\mathrm{OV}} W_{\mathrm{E}}$$ is a table of logit effects, with one column per source token and one row per output token. Together they describe one head of a one-layer model completely, apart from positions.
 
 {{FIG:p2_circuits|The two circuits as paths. QK: the destination token goes through W_E and W_Q to a 64-number query, a source token goes through W_E and W_K to a 64-number key, and their dot product is one score. OV: the source token goes through W_E, W_V, W_O and W_U to 48,262 logits. Each circuit is a 48,262 by 48,262 table.}}
 
-Look at the formula for $$W_U h(x)_i$$ once more. It is the sum over source tokens of **(weight from QK) × (effect from OV)**. The QK circuit only affects the weights $$A_{ij}$$. The OV circuit only affects what each source contributes. That is the "completely separable" of the paper, now written in tokens.
+Look at the formula for $$W_{\mathrm{U}} h(x)_i$$ once more. It is the sum over source tokens of **(weight from QK) × (effect from OV)**. The QK circuit only affects the weights $$A_{ij}$$. The OV circuit only affects what each source contributes. That is the "completely separable" of the paper, now written in tokens.
 
 **Why splitting is useful.** Each circuit is a fixed table that can be read from the weights alone, without any input text. The QK circuit is bilinear (a score between two tokens), and the OV circuit is linear (an effect of one token). Both are easy kinds of function. The only hard part, the softmax, sits between them and does not change what either table says.
 
@@ -631,13 +631,13 @@ Most rows make sense once you pair them with the OV circuit. Standing on " in", 
 Not every row is this clean. The row for " drink" is topped by pieces of code punctuation. This is honest data: a single head has 64 dimensions to serve 48,262 tokens, and the token-only view leaves out positions and biases. Part 4 shows how the paper summarises whole circuits rather than picking rows, and where the simple reading breaks down.
 
 > [!TAKEAWAYS] Key takeaways
-> - **Heads are independent and additive.** Stacking the result vectors and multiplying by the big $$W_O^H$$ equals each head times its own slice of $$W_O$$, added up. On `attn-only-1l` and `attn-only-2l` the two ways differed by at most 0.000006.
+> - **Heads are independent and additive.** Stacking the result vectors and multiplying by the big $$W_{\mathrm{O}}^H$$ equals each head times its own slice of $$W_{\mathrm{O}}$$, added up. On `attn-only-1l` and `attn-only-2l` the two ways differed by at most 0.000006.
 > - **A head moves information between tokens.** Its value step and output step act on each token alone. Only the attention pattern $$A$$ mixes tokens. On our prompt, head 0.3 read " tea" with weight 0.37 and wrote a direction whose top token is " tea".
-> - **The whole head is one formula:** $$h(x)=(A\otimes W_O W_V)\,x=A\,x\,W_{OV}^\top$$. The left factor says where information comes from, and the right factor says what is moved. The order of the two does not matter.
-> - **The pattern needs only one matrix:** $$s_{ij}=x_i^\top W_{QK}\,x_j$$ with $$W_{QK}=W_Q^\top W_K$$. On the real head it reproduced the pattern to within 0.0000006.
-> - **Both matrices are low-rank.** $$W_{OV}$$ and $$W_{QK}$$ are 512 × 512 but have rank exactly 64. The heads read and write in mostly different subspaces (overlap 0.12 to 0.18, close to the random 0.125).
-> - **Queries, keys and values are superficial.** A random invertible 64 × 64 change moved the values by 4.62 on average and the output by less than $$10^{-13}$$. Only $$W_{OV}$$ and $$W_{QK}$$ are meaningful.
-> - **The QK circuit** $$W_E^\top W_{QK} W_E$$ says which tokens a head wants to read, and **the OV circuit** $$W_U W_{OV} W_E$$ says what reading them does to the logits. Head 0.3 is a copying head: reading " tea" raises " tea", and reading " Paris" raises " Paris" and "France".
+> - **The whole head is one formula:** $$h(x)=(A\otimes W_{\mathrm{O}} W_{\mathrm{V}})\,x=A\,x\,{W_{\mathrm{OV}}}^{\top}$$. The left factor says where information comes from, and the right factor says what is moved. The order of the two does not matter.
+> - **The pattern needs only one matrix:** $$s_{ij}=x_i^\top W_{\mathrm{QK}}\,x_j$$ with $$W_{\mathrm{QK}}={W_{\mathrm{Q}}}^{\top} W_{\mathrm{K}}$$. On the real head it reproduced the pattern to within 0.0000006.
+> - **Both matrices are low-rank.** $$W_{\mathrm{OV}}$$ and $$W_{\mathrm{QK}}$$ are 512 × 512 but have rank exactly 64. The heads read and write in mostly different subspaces (overlap 0.12 to 0.18, close to the random 0.125).
+> - **Queries, keys and values are superficial.** A random invertible 64 × 64 change moved the values by 4.62 on average and the output by less than $$10^{-13}$$. Only $$W_{\mathrm{OV}}$$ and $$W_{\mathrm{QK}}$$ are meaningful.
+> - **The QK circuit** $${W_{\mathrm{E}}}^{\top} W_{\mathrm{QK}} W_{\mathrm{E}}$$ says which tokens a head wants to read, and **the OV circuit** $$W_{\mathrm{U}} W_{\mathrm{OV}} W_{\mathrm{E}}$$ says what reading them does to the logits. Head 0.3 is a copying head: reading " tea" raises " tea", and reading " Paris" raises " Paris" and "France".
 
 **Next, in Part 3:** we put the pieces together. The paper's **path expansion trick** multiplies out the whole model, embedding, heads and unembedding, and turns it into a sum of end-to-end paths: the direct path from Part 1, plus one term per head built from exactly the QK and OV circuits of this part. **Part 4** then reads those terms for the one-layer model as **skip-trigrams**, with the paper's results on copying and its "bugs".
 

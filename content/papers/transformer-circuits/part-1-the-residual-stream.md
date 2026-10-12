@@ -174,7 +174,7 @@ attn-only-2l: layers=2 heads/layer=8 d_model=512 d_head=64 n_vocab=48262 n_ctx=1
   W_E + W_U hold 49,420,288 of 52,094,086 parameters
 ```
 
-One warning. The paper writes vectors as **columns** ($$W x$$); TransformerLens writes them as **rows** ($$x W$$). So every TransformerLens matrix is the **transpose** of the paper's: the paper's $$W_E$$ is 512 × 48,262, TransformerLens stores 48,262 × 512. In the text we always use the paper's shapes. Notice also that 95% of the weights sit in the embedding and unembedding; the sixteen heads are small.
+One warning. The paper writes vectors as **columns** ($$W x$$); TransformerLens writes them as **rows** ($$x W$$). So every TransformerLens matrix is the **transpose** of the paper's: the paper's $$W_{\mathrm{E}}$$ is 512 × 48,262, TransformerLens stores 48,262 × 512. In the text we always use the paper's shapes. Notice also that 95% of the weights sit in the embedding and unembedding; the sixteen heads are small.
 
 > [!DEFINITION] Dimension and $$d_\text{model}$$
 > A vector's **dimension** is how many numbers it has; each position is also called a dimension ("dimension 3"). $$d_\text{model}$$ is the width of the stream: 512 in our small models, 768 in GPT-2 small.
@@ -184,39 +184,39 @@ One warning. The paper writes vectors as **columns** ($$W x$$); TransformerLens 
 The model cannot do maths on words, so the first step turns each token into a vector of 512 numbers.
 
 $$
-x_0=W_E\,t
+x_0=W_{\mathrm{E}}\,t
 $$
 
 Here is what each symbol means:
 
 - $$t$$ is the token, written as a **one-hot vector**. It has 48,262 numbers, all 0 except a single 1 at the token's index. Its shape is $$n_\text{vocab}=48{,}262$$.
-- $$W_E$$ is the **embedding matrix**, with one column per token. Its shape is $$d_\text{model}\times n_\text{vocab}=512\times48{,}262$$.
+- $$W_{\mathrm{E}}$$ is the **embedding matrix**, with one column per token. Its shape is $$d_\text{model}\times n_\text{vocab}=512\times48{,}262$$.
 - $$x_0$$ is the result, the token's starting vector in the residual stream. Its shape is $$d_\text{model}=512$$.
 
 > [!DEFINITION] One-hot vector
 > A one-hot vector is a vector of zeros with a single 1. It is a way to write "token number $$k$$" so that a matrix can use it: the 1 sits at position $$k$$.
 
 > [!DEFINITION] Embedding
-> An embedding is the vector a model uses to stand for a token. The **embedding matrix** $$W_E$$ stores one such vector per token in the vocabulary, learned in training.
+> An embedding is the vector a model uses to stand for a token. The **embedding matrix** $$W_{\mathrm{E}}$$ stores one such vector per token in the vocabulary, learned in training.
 
 **Derivation.** Why does multiplying by a one-hot vector give "the token's vector"? Write out the matrix-vector product for output number $$i$$:
 
 $$
-(W_E t)_i=\sum_{j=1}^{n_\text{vocab}}(W_E)_{i j}\,t_j
+(W_{\mathrm{E}} t)_i=\sum_{j=1}^{n_\text{vocab}}(W_{\mathrm{E}})_{i j}\,t_j
 $$
 
 Every $$t_j$$ is 0 except $$t_k=1$$, where $$k$$ is our token. So every term of the sum is 0 except one:
 
 $$
-(W_E t)_i=(W_E)_{i k}\cdot1=(W_E)_{i k}
+(W_{\mathrm{E}} t)_i=(W_{\mathrm{E}})_{i k}\cdot1=(W_{\mathrm{E}})_{i k}
 $$
 
-That is true for every row $$i$$. So $$W_E t$$ is simply **column $$k$$ of $$W_E$$**. The multiplication is a lookup.
+That is true for every row $$i$$. So $$W_{\mathrm{E}} t$$ is simply **column $$k$$ of $$W_{\mathrm{E}}$$**. The multiplication is a lookup.
 
-**Toy example.** Take a vocabulary of four tokens (the, cat, dog, sat) and a stream of only 3 dimensions. Our toy script uses this $$W_E$$ (3 × 4), with one column per token:
+**Toy example.** Take a vocabulary of four tokens (the, cat, dog, sat) and a stream of only 3 dimensions. Our toy script uses this $$W_{\mathrm{E}}$$ (3 × 4), with one column per token:
 
 $$
-W_E=\begin{bmatrix}1&0&0&0\\0&1&1&0\\0&0&1&1\end{bmatrix}
+W_{\mathrm{E}}=\begin{bmatrix}1&0&0&0\\0&1&1&0\\0&0&1&1\end{bmatrix}
 $$
 
 The token "the" is the one-hot vector
@@ -228,12 +228,12 @@ $$
 So its starting vector is
 
 $$
-x_0=W_E\,t_\text{the}=\begin{bmatrix}1\\0\\0\end{bmatrix}
+x_0=W_{\mathrm{E}}\,t_\text{the}=\begin{bmatrix}1\\0\\0\end{bmatrix}
 $$
 
 <figure class="fig"><svg viewBox="0 0 760 270" role="img" aria-label="A 3 by 4 embedding matrix with one column per token (the, cat, dog, sat), multiplied by the one-hot vector 1, 0, 0, 0 for "the", gives the first column, 1, 0, 0: the vector of "the"."><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0,0L10,5L0,10z"/></marker><marker id="ah-on" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-on" d="M0,0L10,5L0,10z"/></marker><marker id="ah-2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-2" d="M0,0L10,5L0,10z"/></marker></defs><text class="t-title" x="380.0" y="22.0" text-anchor="middle">Multiplying by a one-hot vector picks one column</text><text class="t-note" x="103.0" y="60.0" text-anchor="middle">the</text><text class="t-tick" x="149.0" y="60.0" text-anchor="middle">cat</text><text class="t-tick" x="195.0" y="60.0" text-anchor="middle">dog</text><text class="t-tick" x="241.0" y="60.0" text-anchor="middle">sat</text><rect class="box-1" x="77" y="67" width="48" height="140" rx="6"/><text class="t-muted" x="68.0" y="97.0" text-anchor="end">dim 1</text><rect class="box" x="82.0" y="72.0" width="40.0" height="40.0" rx="6"/><text class="t-val" x="102.0" y="97.0" text-anchor="middle">1</text><rect class="box" x="128.0" y="72.0" width="40.0" height="40.0" rx="6"/><text class="t-val" x="148.0" y="97.0" text-anchor="middle">0</text><rect class="box" x="174.0" y="72.0" width="40.0" height="40.0" rx="6"/><text class="t-val" x="194.0" y="97.0" text-anchor="middle">0</text><rect class="box" x="220.0" y="72.0" width="40.0" height="40.0" rx="6"/><text class="t-val" x="240.0" y="97.0" text-anchor="middle">0</text><text class="t-muted" x="68.0" y="143.0" text-anchor="end">dim 2</text><rect class="box" x="82.0" y="118.0" width="40.0" height="40.0" rx="6"/><text class="t-val" x="102.0" y="143.0" text-anchor="middle">0</text><rect class="box" x="128.0" y="118.0" width="40.0" height="40.0" rx="6"/><text class="t-val" x="148.0" y="143.0" text-anchor="middle">1</text><rect class="box" x="174.0" y="118.0" width="40.0" height="40.0" rx="6"/><text class="t-val" x="194.0" y="143.0" text-anchor="middle">1</text><rect class="box" x="220.0" y="118.0" width="40.0" height="40.0" rx="6"/><text class="t-val" x="240.0" y="143.0" text-anchor="middle">0</text><text class="t-muted" x="68.0" y="189.0" text-anchor="end">dim 3</text><rect class="box" x="82.0" y="164.0" width="40.0" height="40.0" rx="6"/><text class="t-val" x="102.0" y="189.0" text-anchor="middle">0</text><rect class="box" x="128.0" y="164.0" width="40.0" height="40.0" rx="6"/><text class="t-val" x="148.0" y="189.0" text-anchor="middle">0</text><rect class="box" x="174.0" y="164.0" width="40.0" height="40.0" rx="6"/><text class="t-val" x="194.0" y="189.0" text-anchor="middle">1</text><rect class="box" x="220.0" y="164.0" width="40.0" height="40.0" rx="6"/><text class="t-val" x="240.0" y="189.0" text-anchor="middle">1</text><text class="t-math" x="172.0" y="232.0" text-anchor="middle">W<tspan baseline-shift="sub" style="font-size:72%">E</tspan>   (3 × 4)</text><text class="t-muted" x="172.0" y="252.0" text-anchor="middle">one column per token</text><text class="t-title" x="308.0" y="142.0" text-anchor="middle">×</text><rect class="box-1" x="330.0" y="48.0" width="40.0" height="34.0" rx="6"/><text class="t-val" x="350.0" y="70.0" text-anchor="middle">1</text><text class="t-tick" x="380.0" y="70.0" text-anchor="start">the</text><rect class="box" x="330.0" y="88.0" width="40.0" height="34.0" rx="6"/><text class="t-val" x="350.0" y="110.0" text-anchor="middle">0</text><text class="t-tick" x="380.0" y="110.0" text-anchor="start">cat</text><rect class="box" x="330.0" y="128.0" width="40.0" height="34.0" rx="6"/><text class="t-val" x="350.0" y="150.0" text-anchor="middle">0</text><text class="t-tick" x="380.0" y="150.0" text-anchor="start">dog</text><rect class="box" x="330.0" y="168.0" width="40.0" height="34.0" rx="6"/><text class="t-val" x="350.0" y="190.0" text-anchor="middle">0</text><text class="t-tick" x="380.0" y="190.0" text-anchor="start">sat</text><text class="t-math" x="350.0" y="232.0" text-anchor="middle">t  (4)</text><text class="t-muted" x="350.0" y="252.0" text-anchor="middle">"the" is token 1</text><text class="t-title" x="492.0" y="142.0" text-anchor="middle">=</text><rect class="box-1" x="520.0" y="72.0" width="44.0" height="40.0" rx="6"/><text class="t-val" x="542.0" y="97.0" text-anchor="middle">1</text><rect class="box-1" x="520.0" y="118.0" width="44.0" height="40.0" rx="6"/><text class="t-val" x="542.0" y="143.0" text-anchor="middle">0</text><rect class="box-1" x="520.0" y="164.0" width="44.0" height="40.0" rx="6"/><text class="t-val" x="542.0" y="189.0" text-anchor="middle">0</text><text class="t-math" x="542.0" y="232.0" text-anchor="middle">x₀  (3)</text><text class="t-muted" x="542.0" y="252.0" text-anchor="middle">the vector of "the"</text><text class="t-tick" x="600.0" y="100.0" text-anchor="start">each output number is</text><text class="t-tick" x="600.0" y="118.0" text-anchor="start">row · t = 1 × (column 1)</text><text class="t-tick" x="600.0" y="136.0" text-anchor="start">+ 0 × (everything else)</text></svg><figcaption>This is Equation 1 worked by hand. The one-hot vector for "the" has a 1 in position 1, so the product keeps column 1 of W_E and throws away the other columns. The result (1, 0, 0) is the vector that stands for "the".</figcaption></figure>
 
-**Why write it this way, and what is it useful for?** Code does a lookup, not a multiplication. The paper writes the multiplication on purpose: it makes the embedding a **linear map** like every other step, so it can be multiplied with later matrices. At the end of this part, the product $$W_U W_E$$ turns out to be a bigram table.
+**Why write it this way, and what is it useful for?** Code does a lookup, not a multiplication. The paper writes the multiplication on purpose: it makes the embedding a **linear map** like every other step, so it can be multiplied with later matrices. At the end of this part, the product $$W_{\mathrm{U}} W_{\mathrm{E}}$$ turns out to be a bigram table.
 
 > [!DEFINITION] Linear map
 > A linear map is a function $$f$$ that respects addition and scaling: $$f(a+b)=f(a)+f(b)$$ and $$f(c\,a)=c\,f(a)$$. Multiplying by a matrix is always a linear map, and every linear map between vectors can be written as a matrix. Linear maps are the easiest functions to take apart, because you can handle each piece of the input separately and add up the results.
@@ -263,13 +263,13 @@ The paper's third equation, $$x_{i+2}=x_{i+1}+m(x_{i+1})$$, is the same "read, c
 ### Equation 4: the unembedding
 
 $$
-T(t)=W_U\,x_{-1}
+T(t)=W_{\mathrm{U}}\,x_{-1}
 $$
 
 Here is what each symbol means:
 
 - $$x_{-1}$$ is the stream after the last layer (index $$-1$$ means "the last one", as in Python). Its shape is 512.
-- $$W_U$$ is the **unembedding matrix**, with one row per token. Its shape is $$n_\text{vocab}\times d_\text{model}=48{,}262\times512$$.
+- $$W_{\mathrm{U}}$$ is the **unembedding matrix**, with one row per token. Its shape is $$n_\text{vocab}\times d_\text{model}=48{,}262\times512$$.
 - $$T(t)$$ is a vector of **logits**, one score per token in the vocabulary. Its shape is 48,262. ($$T$$ stands for "transformer", because the whole model is the function $$T$$.)
 
 > [!DEFINITION] Logit
@@ -279,20 +279,20 @@ Here is what each symbol means:
 > Softmax is the function that turns a list of scores $$z_1,\dots,z_n$$ into probabilities: $$\operatorname{softmax}(z)_b=e^{z_b}/\sum_c e^{z_c}$$. Each result is between 0 and 1, and they add up to 1. Bigger scores get bigger probabilities.
 
 > [!DEFINITION] Unembedding
-> The unembedding is the last matrix of the model, $$W_U$$. Row $$b$$ of $$W_U$$ is a direction in the stream; the logit for token $$b$$ is the dot product of that row with the final stream vector. So "how much the stream points in direction $$b$$" becomes "how likely token $$b$$ is next".
+> The unembedding is the last matrix of the model, $$W_{\mathrm{U}}$$. Row $$b$$ of $$W_{\mathrm{U}}$$ is a direction in the stream; the logit for token $$b$$ is the dot product of that row with the final stream vector. So "how much the stream points in direction $$b$$" becomes "how likely token $$b$$ is next".
 
-**Toy example.** In our 3-dimensional toy, take this $$W_U$$ (4 × 3), one row per possible next token:
+**Toy example.** In our 3-dimensional toy, take this $$W_{\mathrm{U}}$$ (4 × 3), one row per possible next token:
 
 $$
-W_U=\begin{bmatrix}0&0&1\\2&0&0\\1&0&0\\0&2&0\end{bmatrix}
+W_{\mathrm{U}}=\begin{bmatrix}0&0&1\\2&0&0\\1&0&0\\0&2&0\end{bmatrix}
 \begin{matrix}\leftarrow\text{the}\\\leftarrow\text{cat}\\\leftarrow\text{dog}\\\leftarrow\text{sat}\end{matrix}
 $$
 
-With no layers at all, $$x_{-1}=x_0=(1,0,0)$$, the vector of "the". Each logit is one row of $$W_U$$ times that vector:
+With no layers at all, $$x_{-1}=x_0=(1,0,0)$$, the vector of "the". Each logit is one row of $$W_{\mathrm{U}}$$ times that vector:
 
 $$
 \begin{aligned}
-W_U x_0&=(0\cdot1,\;2\cdot1,\;1\cdot1,\;0\cdot1)\\
+W_{\mathrm{U}} x_0&=(0\cdot1,\;2\cdot1,\;1\cdot1,\;0\cdot1)\\
 &=(0,2,1,0)
 \end{aligned}
 $$
@@ -358,13 +358,13 @@ x_\text{final}&=\begin{bmatrix}1\\0\\0\end{bmatrix}+\begin{bmatrix}0\\0.5\\0\end
 \end{aligned}
 $$
 
-Now apply the unembedding. Because $$W_U$$ is linear, $$W_U(a+b+c)=W_U a+W_U b+W_U c$$, so the logits split into one piece per writer:
+Now apply the unembedding. Because $$W_{\mathrm{U}}$$ is linear, $$W_{\mathrm{U}}(a+b+c)=W_{\mathrm{U}} a+W_{\mathrm{U}} b+W_{\mathrm{U}} c$$, so the logits split into one piece per writer:
 
 $$
 \begin{aligned}
-W_U x_\text{final}&=\underbrace{(0,2,1,0)}_{W_U x_0}\\
-&\quad+\underbrace{(0,0,0,1)}_{W_U h_1}\\
-&\quad+\underbrace{(-0.3,0.4,0.2,0)}_{W_U h_2}\\
+W_{\mathrm{U}} x_\text{final}&=\underbrace{(0,2,1,0)}_{W_{\mathrm{U}} x_0}\\
+&\quad+\underbrace{(0,0,0,1)}_{W_{\mathrm{U}} h_1}\\
+&\quad+\underbrace{(-0.3,0.4,0.2,0)}_{W_{\mathrm{U}} h_2}\\
 &=(-0.3,2.4,1.2,1.0)
 \end{aligned}
 $$
@@ -408,11 +408,11 @@ Now split the logit of "ley". One detail: before the unembedding, what is left o
 $$
 \begin{aligned}
 \text{share of }p&=\frac{1}{0.945}\big(p-\text{mean}(p)\big)\\
-&\qquad\cdot W_U[\,:,\text{ley}\,]
+&\qquad\cdot W_{\mathrm{U}}[\,:,\text{ley}\,]
 \end{aligned}
 $$
 
-where $$W_U[\,:,\text{ley}\,]$$ is the unembedding direction of "ley". The shares plus the unembedding bias add up to the real logit:
+where $$W_{\mathrm{U}}[\,:,\text{ley}\,]$$ is the unembedding direction of "ley". The shares plus the unembedding bias add up to the real logit:
 
 ```text
   sum of all lines = 20.645; the model's real logit = 20.645
@@ -452,7 +452,7 @@ W'x'&=(W R^\top)(R x)\\
 \end{aligned}
 $$
 
-exactly what it saw before. A writer $$W_O$$ becomes $$R\,W_O$$. Every number in the stream changes; every output stays the same. (In our 3-dimensional toy, a 90-degree turn moves "cat" from $$(0,1,0)$$ to $$(0,0,1)$$, and its logits stay $$(0,0,0,2)$$.)
+exactly what it saw before. A writer $$W_{\mathrm{O}}$$ becomes $$R\,W_{\mathrm{O}}$$. Every number in the stream changes; every output stays the same. (In our 3-dimensional toy, a 90-degree turn moves "cat" from $$(0,1,0)$$ to $$(0,0,1)$$, and its logits stay $$(0,0,0,2)$$.)
 
 **Real model.** We rotated all 512 dimensions of `attn-only-1l` at random (keeping fixed the all-ones direction that layer norm uses), together with every matrix that reads or writes the stream:
 
@@ -470,7 +470,7 @@ exactly what it saw before. A writer $$W_O$$ becomes $$R\,W_O$$. Every number in
 > [!PAPER] Elhage et al. (2021), A Mathematical Framework for Transformer Circuits · Virtual Weights
 > [![The paper's figure of layers reading and writing the residual stream, and virtual weights such as W_I^3 W_O^1](/img/papers/circuits/p1-virtual-weights-fig.png)](/img/papers/circuits/p1-virtual-weights-fig.png)
 >
-> **What it says:** each layer reads with $$W_I$$ and writes with $$W_O$$. Because both are linear, you can "multiply through" the stream: the product of one layer's output weights with a later layer's input weights, such as $$W_I^2W_O^1$$, is a **virtual weight** that connects the two layers directly. $$W_I^3W_O^1$$ connects layer 1 to layer 3, even with layer 2 in between.
+> **What it says:** each layer reads with $$W_{\mathrm{I}}$$ and writes with $$W_{\mathrm{O}}$$. Because both are linear, you can "multiply through" the stream: the product of one layer's output weights with a later layer's input weights, such as $$W_{\mathrm{I}}^2W_{\mathrm{O}}^1$$, is a **virtual weight** that connects the two layers directly. $$W_{\mathrm{I}}^3W_{\mathrm{O}}^1$$ connects layer 1 to layer 3, even with layer 2 in between.
 >
 > **Why it matters:** it finds which layers talk to which by multiplying two weight matrices, without running the model.
 
@@ -478,21 +478,21 @@ exactly what it saw before. A writer $$W_O$$ becomes $$R\,W_O$$. Every number in
 
 Give every layer two matrices:
 
-- An **input matrix** $$W_I$$ reads from the stream: the layer's input is $$W_I x$$. Its shape is $$d_\text{in}\times d_\text{model}$$.
-- An **output matrix** $$W_O$$ writes to the stream: the layer adds $$W_O a$$, where $$a$$ is what the layer computed. Its shape is $$d_\text{model}\times d_\text{out}$$.
+- An **input matrix** $$W_{\mathrm{I}}$$ reads from the stream: the layer's input is $$W_{\mathrm{I}} x$$. Its shape is $$d_\text{in}\times d_\text{model}$$.
+- An **output matrix** $$W_{\mathrm{O}}$$ writes to the stream: the layer adds $$W_{\mathrm{O}} a$$, where $$a$$ is what the layer computed. Its shape is $$d_\text{model}\times d_\text{out}$$.
 
-(A head has three input matrices, $$W_Q$$, $$W_K$$ and $$W_V$$; for now they are all "input weights", and Part 2 separates them.)
+(A head has three input matrices, $$W_{\mathrm{Q}}$$, $$W_{\mathrm{K}}$$ and $$W_{\mathrm{V}}$$; for now they are all "input weights", and Part 2 separates them.)
 
 > [!DEFINITION] Projection (reading with a matrix)
-> Multiplying the stream by a short, wide matrix, such as $$W_V$$ (64 × 512), keeps only the parts of the stream the matrix "looks at" and drops the rest. The paper calls this reading "by performing a linear projection".
+> Multiplying the stream by a short, wide matrix, such as $$W_{\mathrm{V}}$$ (64 × 512), keeps only the parts of the stream the matrix "looks at" and drops the rest. The paper calls this reading "by performing a linear projection".
 
 ### Derivation: where virtual weights come from
 
-Let layer 1 write $$W_O^1a^1$$ into the stream. Later, layer 2 reads the stream. By the sum rule above, the stream it reads contains layer 1's output as one term:
+Let layer 1 write $$W_{\mathrm{O}}^1a^1$$ into the stream. Later, layer 2 reads the stream. By the sum rule above, the stream it reads contains layer 1's output as one term:
 
 $$
 \begin{aligned}
-x={}&x_0+W_O^1a^1\\
+x={}&x_0+W_{\mathrm{O}}^1a^1\\
 &+\text{(everything else written}\\
 &\quad\text{before layer 2)}
 \end{aligned}
@@ -502,28 +502,28 @@ Layer 2 multiplies this by its input matrix. Matrix multiplication spreads over 
 
 $$
 \begin{aligned}
-W_I^2x={}&W_I^2x_0\\
-&+\big(W_I^2W_O^1\big)\,a^1\\
-&+W_I^2(\text{everything else})
+W_{\mathrm{I}}^2x={}&W_{\mathrm{I}}^2x_0\\
+&+\big(W_{\mathrm{I}}^2W_{\mathrm{O}}^1\big)\,a^1\\
+&+W_{\mathrm{I}}^2(\text{everything else})
 \end{aligned}
 $$
 
-Look at the middle term: what layer 2 receives **from layer 1** is $$a^1$$ times one matrix, $$W_I^2W_O^1$$. It acts like a direct wire from layer 1 to layer 2, though no such wire exists in the code. The paper calls it a **virtual weight**.
+Look at the middle term: what layer 2 receives **from layer 1** is $$a^1$$ times one matrix, $$W_{\mathrm{I}}^2W_{\mathrm{O}}^1$$. It acts like a direct wire from layer 1 to layer 2, though no such wire exists in the code. The paper calls it a **virtual weight**.
 
 $$
-W_\text{virtual}^{1\to2}=W_I^2\,W_O^1
+W_\text{virtual}^{1\to2}=W_{\mathrm{I}}^2\,W_{\mathrm{O}}^1
 $$
 
 Its shape is $$(d_\text{in}^2\times d_\text{model})$$ times $$(d_\text{model}\times d_\text{out}^1)$$, which gives $$d_\text{in}^2\times d_\text{out}^1$$. The 512-wide stream drops out of the shape. What is left connects layer 1's outputs straight to layer 2's inputs.
 
 > [!DEFINITION] Virtual weight
-> A virtual weight is the product $$W_I^\text{later}W_O^\text{earlier}$$ of a later layer's read matrix and an earlier layer's write matrix. It describes how strongly, and in which way, the later layer reads what the earlier one wrote. It is "virtual" because it is not stored anywhere in the model; it is computed from two real matrices.
+> A virtual weight is the product $$W_{\mathrm{I}}^\text{later}W_{\mathrm{O}}^\text{earlier}$$ of a later layer's read matrix and an earlier layer's write matrix. It describes how strongly, and in which way, the later layer reads what the earlier one wrote. It is "virtual" because it is not stored anywhere in the model; it is computed from two real matrices.
 
-**Toy example.** One writer and two readers on our 3-dimensional stream. The writer has $$W_O=(0,0,1)^\top$$: it writes its single number into dimension 3. It sends $$a=0.7$$. Reader A has $$W_I=(0,0,2)$$: it reads dimension 3. Reader B has $$W_I=(1,0,0)$$: it reads dimension 1. The virtual weight of reader A is
+**Toy example.** One writer and two readers on our 3-dimensional stream. The writer has $$W_{\mathrm{O}}=(0,0,1)^\top$$: it writes its single number into dimension 3. It sends $$a=0.7$$. Reader A has $$W_{\mathrm{I}}=(0,0,2)$$: it reads dimension 3. Reader B has $$W_{\mathrm{I}}=(1,0,0)$$: it reads dimension 1. The virtual weight of reader A is
 
 $$
 \begin{aligned}
-W_I^A W_O&=(0,0,2)\cdot(0,0,1)^\top\\
+W_{\mathrm{I}}^A W_{\mathrm{O}}&=(0,0,2)\cdot(0,0,1)^\top\\
 &=2
 \end{aligned}
 $$
@@ -532,7 +532,7 @@ The virtual weight of reader B is
 
 $$
 \begin{aligned}
-W_I^B W_O&=(1,0,0)\cdot(0,0,1)^\top\\
+W_{\mathrm{I}}^B W_{\mathrm{O}}&=(1,0,0)\cdot(0,0,1)^\top\\
 &=0
 \end{aligned}
 $$
@@ -541,7 +541,7 @@ Reader A receives $$2\times0.7=1.4$$. Reader B receives 0: the virtual weight sa
 
 <figure class="fig"><svg viewBox="0 0 760 400" role="img" aria-label="A residual stream with three dimensions drawn as three lanes. A writer with W_O = (0, 0, 1) adds 0.7 into dimension 3. Reader A with W_I = (0, 0, 2) reads dimension 3 and gets 1.4: their virtual weight is 2. Reader B with W_I = (1, 0, 0) reads dimension 1 and gets 0: their virtual weight is 0."><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0,0L10,5L0,10z"/></marker><marker id="ah-on" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-on" d="M0,0L10,5L0,10z"/></marker><marker id="ah-2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-2" d="M0,0L10,5L0,10z"/></marker></defs><text class="t-title" x="24.0" y="24.0" text-anchor="start">A writer and two readers, connected only through the stream</text><rect class="box" x="150" y="117" width="460" height="26" rx="13"/><text class="t-tick" x="140.0" y="134.0" text-anchor="end">dimension 1</text><rect class="box" x="150" y="157" width="460" height="26" rx="13"/><text class="t-tick" x="140.0" y="174.0" text-anchor="end">dimension 2</text><rect class="box-3" x="150" y="197" width="460" height="26" rx="13"/><text class="t-tick" x="140.0" y="214.0" text-anchor="end">dimension 3</text><text class="t-muted" x="150.0" y="100.0" text-anchor="start">residual stream (3 numbers) →</text><rect class="box" x="450.0" y="50.0" width="220.0" height="30.0" rx="6"/><text class="t-tick" x="560.0" y="69.5" text-anchor="middle">reader B: W<tspan baseline-shift="sub" style="font-size:72%">I</tspan> = [1, 0, 0]</text><line class="edge" x1="560.0" y1="117.0" x2="560.0" y2="82.0" marker-end="url(#ah)"/><text class="t-tick" x="548.0" y="106.0" text-anchor="end">reads dim 1: gets 0</text><rect class="box-2" x="200.0" y="270.0" width="200.0" height="30.0" rx="6"/><text class="t-tick" x="300.0" y="289.5" text-anchor="middle">writer: W<tspan baseline-shift="sub" style="font-size:72%">O</tspan> = [0, 0, 1]ᵀ</text><line class="edge" x1="300.0" y1="268.0" x2="300.0" y2="225.0" marker-end="url(#ah)"/><text class="t-tick" x="310.0" y="252.0" text-anchor="start">adds 0.7 to dim 3</text><text class="t-tick" x="300.0" y="320.0" text-anchor="middle">sends a = 0.7</text><rect class="box-1" x="450.0" y="270.0" width="220.0" height="30.0" rx="6"/><text class="t-tick" x="560.0" y="289.5" text-anchor="middle">reader A: W<tspan baseline-shift="sub" style="font-size:72%">I</tspan> = [0, 0, 2]</text><line class="edge" x1="560.0" y1="225.0" x2="560.0" y2="268.0" marker-end="url(#ah)"/><text class="t-note" x="570.0" y="252.0" text-anchor="start">reads 2 × 0.7 = 1.4</text><text class="t-tick" x="24.0" y="362.0" text-anchor="start">virtual weight, writer → A:  W<tspan baseline-shift="sub" style="font-size:72%">I</tspan> W<tspan baseline-shift="sub" style="font-size:72%">O</tspan> = [0, 0, 2] · [0, 0, 1]ᵀ = 2</text><text class="t-tick" x="24.0" y="386.0" text-anchor="start">virtual weight, writer → B:  W<tspan baseline-shift="sub" style="font-size:72%">I</tspan> W<tspan baseline-shift="sub" style="font-size:72%">O</tspan> = [1, 0, 0] · [0, 0, 1]ᵀ = 0   (they never talk)</text></svg><figcaption>This figure works out virtual weights by hand. The writer puts 0.7 into dimension 3. Reader A reads dimension 3 with weight 2 and gets 1.4, so its virtual weight with the writer is 2. Reader B reads only dimension 1 and gets nothing, so its virtual weight is 0.</figcaption></figure>
 
-**Real model.** In `attn-only-2l`, take head 0.0 (layer 0, head 0). In the paper's shapes it reads with $$W_V$$ (64 × 512) and writes with $$W_O$$ (512 × 64). A head in layer 1 reads with its own $$W_V$$ (64 × 512). The virtual weight from a layer-0 head to a layer-1 head is therefore 64 × 64, much smaller than either matrix:
+**Real model.** In `attn-only-2l`, take head 0.0 (layer 0, head 0). In the paper's shapes it reads with $$W_{\mathrm{V}}$$ (64 × 512) and writes with $$W_{\mathrm{O}}$$ (512 × 64). A head in layer 1 reads with its own $$W_{\mathrm{V}}$$ (64 × 512). The virtual weight from a layer-0 head to a layer-1 head is therefore 64 × 64, much smaller than either matrix:
 
 ```python
 V = model.W_V[1, h2].T @ model.W_O[0, h1].T    # paper's W_V (64 x 512) times paper's W_O (512 x 64)
@@ -557,7 +557,7 @@ V = model.W_V[1, h2].T @ model.W_O[0, h1].T    # paper's W_V (64 x 512) times pa
   the embedding as a "layer 0 writer": W_E is (512, 48262); head 0.0 reading it: W_V W_E is (64, 48262)
 ```
 
-There are three things to see. There is one 64 × 64 virtual weight for each of the 64 pairs of heads; Part 5 turns their sizes into a fair score. The embedding is a writer too: $$W_V W_E$$ says what head 0.0 reads about each of the 48,262 tokens. And a head's own write-after-read matrix $$W_O W_V$$ is 512 × 512 but has **rank** only 64, because everything passes through the head's 64 numbers. That is where Part 2 starts.
+There are three things to see. There is one 64 × 64 virtual weight for each of the 64 pairs of heads; Part 5 turns their sizes into a fair score. The embedding is a writer too: $$W_{\mathrm{V}} W_{\mathrm{E}}$$ says what head 0.0 reads about each of the 48,262 tokens. And a head's own write-after-read matrix $$W_{\mathrm{O}} W_{\mathrm{V}}$$ is 512 × 512 but has **rank** only 64, because everything passes through the head's 64 numbers. That is where Part 2 starts.
 
 > [!DEFINITION] Rank
 > The rank of a matrix is the number of independent directions it can output. A 512 × 512 matrix built as (512 × 64) times (64 × 512) can only output vectors from a 64-dimensional space, so its rank is at most 64. A matrix with a rank much smaller than its size is called **low-rank**.
@@ -612,7 +612,7 @@ Now we can read the first real result of the paper. It is short, and everything 
 > [!PAPER] Elhage et al. (2021), A Mathematical Framework for Transformer Circuits · Zero-Layer Transformers
 > [![The zero-layer section: T = W_U W_E approximates the bigram log-likelihood; the direct path; Barack followed by Obama](/img/papers/circuits/p1-zero-layer.png)](/img/papers/circuits/p1-zero-layer.png)
 >
-> **What it says:** a zero-layer model is $$T=W_U W_E$$, and the best it can do is "approximate the bigram log-likelihood". The same term sits inside every transformer as the **direct path**, often storing pairs like "Barack" followed by "Obama".
+> **What it says:** a zero-layer model is $$T=W_{\mathrm{U}} W_{\mathrm{E}}$$, and the best it can do is "approximate the bigram log-likelihood". The same term sits inside every transformer as the **direct path**, often storing pairs like "Barack" followed by "Obama".
 >
 > **Why it matters:** it is the simplest circuit: one matrix product, read straight from the weights.
 
@@ -622,26 +622,26 @@ With no layers, Equation 2 never runs, so the last stream is the first stream: $
 
 $$
 \begin{aligned}
-T(t)&=W_U\,x_0\\
-&=W_U\,(W_E\,t)\\
-&=(W_U W_E)\,t
+T(t)&=W_{\mathrm{U}}\,x_0\\
+&=W_{\mathrm{U}}\,(W_{\mathrm{E}}\,t)\\
+&=(W_{\mathrm{U}} W_{\mathrm{E}})\,t
 \end{aligned}
 $$
 
-The last step only moves the brackets, which is allowed for matrix products. So the whole model is a single matrix $$W_U W_E$$ applied to the one-hot token. The paper drops the $$t$$ and writes $$T=W_U W_E$$.
+The last step only moves the brackets, which is allowed for matrix products. So the whole model is a single matrix $$W_{\mathrm{U}} W_{\mathrm{E}}$$ applied to the one-hot token. The paper drops the $$t$$ and writes $$T=W_{\mathrm{U}} W_{\mathrm{E}}$$.
 
 Here are the shapes:
 
 $$
 \begin{aligned}
-&\underbrace{W_U}_{48{,}262\times512}\;\underbrace{W_E}_{512\times48{,}262}\\
-&=\underbrace{W_U W_E}_{48{,}262\times48{,}262}
+&\underbrace{W_{\mathrm{U}}}_{48{,}262\times512}\;\underbrace{W_{\mathrm{E}}}_{512\times48{,}262}\\
+&=\underbrace{W_{\mathrm{U}} W_{\mathrm{E}}}_{48{,}262\times48{,}262}
 \end{aligned}
 $$
 
-By the one-hot rule, multiplying by $$t$$ picks one **column**: column $$a$$ of $$W_U W_E$$ is the list of next-token logits when the current token is $$a$$. The matrix is a **table** with one row per next token and one column per current token: the shape of a bigram table.
+By the one-hot rule, multiplying by $$t$$ picks one **column**: column $$a$$ of $$W_{\mathrm{U}} W_{\mathrm{E}}$$ is the list of next-token logits when the current token is $$a$$. The matrix is a **table** with one row per next token and one column per current token: the shape of a bigram table.
 
-**Toy example.** Our toy's table is $$W_U W_E$$ = (4 × 3)(3 × 4) = 4 × 4. The script computed it:
+**Toy example.** Our toy's table is $$W_{\mathrm{U}} W_{\mathrm{E}}$$ = (4 × 3)(3 × 4) = 4 × 4. The script computed it:
 
 ```text
   the whole table W_U W_E (row = next token, column = current token):
@@ -651,13 +651,13 @@ By the one-hot rule, multiplying by $$t$$ picks one **column**: column $$a$$ of 
      sat: [0.0, 2.0, 2.0, 0.0]
 ```
 
-Check one column by hand: column "the" is $$W_U(1,0,0)^\top$$, the first column of $$W_U$$, which is $$(0,2,1,0)$$: the logits we computed for Equation 4. This toy table has learned "the → cat", "cat → sat" and "dog → sat".
+Check one column by hand: column "the" is $$W_{\mathrm{U}}(1,0,0)^\top$$, the first column of $$W_{\mathrm{U}}$$, which is $$(0,2,1,0)$$: the logits we computed for Equation 4. This toy table has learned "the → cat", "cat → sat" and "dog → sat".
 
 <figure class="fig"><svg viewBox="0 0 760 310" role="img" aria-label="A 4 by 4 table of logits W_U W_E for the toy model, rows are the next token and columns the current token. The column for "the" is 0, 2, 1, 0; its softmax gives the 0.083, cat 0.610, dog 0.225, sat 0.083."><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0,0L10,5L0,10z"/></marker><marker id="ah-on" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-on" d="M0,0L10,5L0,10z"/></marker><marker id="ah-2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-2" d="M0,0L10,5L0,10z"/></marker></defs><text class="t-title" x="24.0" y="24.0" text-anchor="start">The zero-layer model is one table: W<tspan baseline-shift="sub" style="font-size:72%">U</tspan> W<tspan baseline-shift="sub" style="font-size:72%">E</tspan></text><text class="t-muted" x="212.0" y="42.0" text-anchor="middle">current token (column)</text><text class="t-note" x="143.0" y="66.0" text-anchor="middle">the</text><text class="t-tick" x="189.0" y="66.0" text-anchor="middle">cat</text><text class="t-tick" x="235.0" y="66.0" text-anchor="middle">dog</text><text class="t-tick" x="281.0" y="66.0" text-anchor="middle">sat</text><text class="t-muted" x="56.0" y="172.0" text-anchor="end">next</text><text class="t-muted" x="56.0" y="188.0" text-anchor="end">token</text><text class="t-muted" x="56.0" y="204.0" text-anchor="end">(row)</text><text class="t-tick" x="110.0" y="103.0" text-anchor="end">the</text><g class="mark"><title>after the, logit of the: 0</title><rect class="cell" x="122" y="78" width="42" height="42" rx="5" style="fill-opacity:0.08"/></g><text class="t-val" x="143.0" y="103.0" text-anchor="middle">0</text><g class="mark"><title>after cat, logit of the: 0</title><rect class="cell" x="168" y="78" width="42" height="42" rx="5" style="fill-opacity:0.08"/></g><text class="t-val" x="189.0" y="103.0" text-anchor="middle">0</text><g class="mark"><title>after dog, logit of the: 1</title><rect class="cell" x="214" y="78" width="42" height="42" rx="5" style="fill-opacity:0.28"/></g><text class="t-val" x="235.0" y="103.0" text-anchor="middle">1</text><g class="mark"><title>after sat, logit of the: 1</title><rect class="cell" x="260" y="78" width="42" height="42" rx="5" style="fill-opacity:0.28"/></g><text class="t-val" x="281.0" y="103.0" text-anchor="middle">1</text><text class="t-tick" x="110.0" y="149.0" text-anchor="end">cat</text><g class="mark"><title>after the, logit of cat: 2</title><rect class="cell" x="122" y="124" width="42" height="42" rx="5" style="fill-opacity:0.48"/></g><text class="t-val" x="143.0" y="149.0" text-anchor="middle">2</text><g class="mark"><title>after cat, logit of cat: 0</title><rect class="cell" x="168" y="124" width="42" height="42" rx="5" style="fill-opacity:0.08"/></g><text class="t-val" x="189.0" y="149.0" text-anchor="middle">0</text><g class="mark"><title>after dog, logit of cat: 0</title><rect class="cell" x="214" y="124" width="42" height="42" rx="5" style="fill-opacity:0.08"/></g><text class="t-val" x="235.0" y="149.0" text-anchor="middle">0</text><g class="mark"><title>after sat, logit of cat: 0</title><rect class="cell" x="260" y="124" width="42" height="42" rx="5" style="fill-opacity:0.08"/></g><text class="t-val" x="281.0" y="149.0" text-anchor="middle">0</text><text class="t-tick" x="110.0" y="195.0" text-anchor="end">dog</text><g class="mark"><title>after the, logit of dog: 1</title><rect class="cell" x="122" y="170" width="42" height="42" rx="5" style="fill-opacity:0.28"/></g><text class="t-val" x="143.0" y="195.0" text-anchor="middle">1</text><g class="mark"><title>after cat, logit of dog: 0</title><rect class="cell" x="168" y="170" width="42" height="42" rx="5" style="fill-opacity:0.08"/></g><text class="t-val" x="189.0" y="195.0" text-anchor="middle">0</text><g class="mark"><title>after dog, logit of dog: 0</title><rect class="cell" x="214" y="170" width="42" height="42" rx="5" style="fill-opacity:0.08"/></g><text class="t-val" x="235.0" y="195.0" text-anchor="middle">0</text><g class="mark"><title>after sat, logit of dog: 0</title><rect class="cell" x="260" y="170" width="42" height="42" rx="5" style="fill-opacity:0.08"/></g><text class="t-val" x="281.0" y="195.0" text-anchor="middle">0</text><text class="t-tick" x="110.0" y="241.0" text-anchor="end">sat</text><g class="mark"><title>after the, logit of sat: 0</title><rect class="cell" x="122" y="216" width="42" height="42" rx="5" style="fill-opacity:0.08"/></g><text class="t-val" x="143.0" y="241.0" text-anchor="middle">0</text><g class="mark"><title>after cat, logit of sat: 2</title><rect class="cell" x="168" y="216" width="42" height="42" rx="5" style="fill-opacity:0.48"/></g><text class="t-val" x="189.0" y="241.0" text-anchor="middle">2</text><g class="mark"><title>after dog, logit of sat: 2</title><rect class="cell" x="214" y="216" width="42" height="42" rx="5" style="fill-opacity:0.48"/></g><text class="t-val" x="235.0" y="241.0" text-anchor="middle">2</text><g class="mark"><title>after sat, logit of sat: 0</title><rect class="cell" x="260" y="216" width="42" height="42" rx="5" style="fill-opacity:0.08"/></g><text class="t-val" x="281.0" y="241.0" text-anchor="middle">0</text><rect class="box-on" x="120" y="76" width="46" height="184" rx="6" style="fill:none"/><text class="t-tick" x="212.0" y="286.0" text-anchor="middle">the "the" column = logits after "the"</text><text class="t-note" x="470.0" y="66.0" text-anchor="start">softmax of that column</text><text class="t-tick" x="500.0" y="103.0" text-anchor="end">the</text><g class="mark"><title>P(the | the) = 0.083</title><rect class="s1" x="510" y="90" width="16.6" height="20" rx="3"/></g><text class="t-val" x="534.6" y="105.0" text-anchor="start">0.083</text><text class="t-tick" x="500.0" y="149.0" text-anchor="end">cat</text><g class="mark"><title>P(cat | the) = 0.610</title><rect class="s1" x="510" y="136" width="122.0" height="20" rx="3"/></g><text class="t-val" x="640.0" y="151.0" text-anchor="start">0.610</text><text class="t-tick" x="500.0" y="195.0" text-anchor="end">dog</text><g class="mark"><title>P(dog | the) = 0.225</title><rect class="s1" x="510" y="182" width="45.0" height="20" rx="3"/></g><text class="t-val" x="563.0" y="197.0" text-anchor="start">0.225</text><text class="t-tick" x="500.0" y="241.0" text-anchor="end">sat</text><g class="mark"><title>P(sat | the) = 0.083</title><rect class="s1" x="510" y="228" width="16.6" height="20" rx="3"/></g><text class="t-val" x="534.6" y="243.0" text-anchor="start">0.083</text><text class="t-tick" x="470.0" y="286.0" text-anchor="start">probabilities of the next token</text></svg><figcaption>The toy zero-layer model is one 4 by 4 table, W_U W_E. Each column is a current token and lists the scores of every possible next token. The softmax of the "the" column gives the probabilities after "the": cat 0.610, dog 0.225, and 0.083 for the other two.</figcaption></figure>
 
 ### Derivation 2: the best table is the log of the bigram probabilities
 
-Why does the paper say the best $$W_U W_E$$ is "the bigram log-likelihood"? Here is the reasoning in three steps.
+Why does the paper say the best $$W_{\mathrm{U}} W_{\mathrm{E}}$$ is "the bigram log-likelihood"? Here is the reasoning in three steps.
 
 **Step 1: what training rewards.** A language model is trained to make the real next token likely. For one current token $$a$$, the training loss is the average of $$-\log q(b\mid a)$$ over all the times a token $$b$$ followed $$a$$ in the training text. Here $$q(b\mid a)$$ is the model's probability for $$b$$, the softmax of column $$a$$.
 
@@ -668,7 +668,7 @@ Why does the paper say the best $$W_U W_E$$ is "the bigram log-likelihood"? Here
 
 $$
 \begin{aligned}
-&\operatorname{softmax}\big(\text{column }a\text{ of }W_U W_E\big)_b\\
+&\operatorname{softmax}\big(\text{column }a\text{ of }W_{\mathrm{U}} W_{\mathrm{E}}\big)_b\\
 &=P(b\mid a)
 \end{aligned}
 $$
@@ -703,16 +703,16 @@ The $$e^c$$ cancels, and the probabilities in the bottom add up to 1. So the bes
 
 The best column for "the" holds $$\log(2/3)=-0.405$$ for "cat" and $$\log(1/3)=-1.099$$ for "dog" (and very negative numbers for unseen words). Adding 5 to both changes nothing, as Step 3 promised.
 
-**The catch.** A full bigram table for our vocabulary has $$48{,}262^2\approx2.33$$ billion entries, but $$W_U W_E$$ passes through a 512-wide middle, so its rank is at most 512. It cannot hold an arbitrary table. That is why the paper says "approximate": the model stores the best **low-rank** version it can.
+**The catch.** A full bigram table for our vocabulary has $$48{,}262^2\approx2.33$$ billion entries, but $$W_{\mathrm{U}} W_{\mathrm{E}}$$ passes through a 512-wide middle, so its rank is at most 512. It cannot hold an arbitrary table. That is why the paper says "approximate": the model stores the best **low-rank** version it can.
 
 ### The direct path in a real model
 
-The term $$W_U W_E$$ is not only the zero-layer model. In every transformer the stream is "embedding plus everything the layers add", so the logits always contain $$W_U x_0=W_U W_E t$$: the token's embedding going straight to the unembedding. The paper calls it the **direct path**.
+The term $$W_{\mathrm{U}} W_{\mathrm{E}}$$ is not only the zero-layer model. In every transformer the stream is "embedding plus everything the layers add", so the logits always contain $$W_{\mathrm{U}} x_0=W_{\mathrm{U}} W_{\mathrm{E}} t$$: the token's embedding going straight to the unembedding. The paper calls it the **direct path**.
 
 > [!DEFINITION] Direct path
-> The direct path is the term $$W_U W_E$$ inside any transformer. It is the route from the embedding straight to the unembedding, skipping every layer. It can only use the current token, so it can only store bigram-like knowledge.
+> The direct path is the term $$W_{\mathrm{U}} W_{\mathrm{E}}$$ inside any transformer. It is the route from the embedding straight to the unembedding, skipping every layer. It can only use the current token, so it can only store bigram-like knowledge.
 
-In a model with layers, heads can predict part of the bigram table, so the direct path holds a kind of "residual": pairs no general rule explains, like "Barack" followed by "Obama". Let us read it from the weights of the one-layer `attn-only-1l`: take one token's embedding, multiply by $$W_U$$, list the five highest of the 48,262 scores.
+In a model with layers, heads can predict part of the bigram table, so the direct path holds a kind of "residual": pairs no general rule explains, like "Barack" followed by "Obama". Let us read it from the weights of the one-layer `attn-only-1l`: take one token's embedding, multiply by $$W_{\mathrm{U}}$$, list the five highest of the 48,262 scores.
 
 ```python
 t = model.to_single_token(' Barack')
@@ -740,28 +740,28 @@ This is the paper's own example, found in a different model trained by different
 
 ### The unembedding is not the inverse of the embedding
 
-A footnote adds: although $$W_U$$ is called the "un-embedding", it should not be the **inverse** of $$W_E$$. If it were, $$W_U W_E$$ would be the identity matrix, and the direct path would predict "the next token repeats this one", which is rarely true of text. The output above agrees: "Barack" ranks only 33rd after itself, "New" 33,197th. Over 2,000 ordinary tokens, we compared GPT-2, which uses the **same** matrix to embed and unembed ("tied" weights):
+A footnote adds: although $$W_{\mathrm{U}}$$ is called the "un-embedding", it should not be the **inverse** of $$W_{\mathrm{E}}$$. If it were, $$W_{\mathrm{U}} W_{\mathrm{E}}$$ would be the identity matrix, and the direct path would predict "the next token repeats this one", which is rarely true of text. The output above agrees: "Barack" ranks only 33rd after itself, "New" 33,197th. Over 2,000 ordinary tokens, we compared GPT-2, which uses the **same** matrix to embed and unembed ("tied" weights):
 
 ```text
   attn-only-1l: tokens 1000..2999, share whose top direct-path prediction is the token itself: 0.000
   gpt2: tokens 1000..2999, share whose top direct-path prediction is the token itself: 0.988
 ```
 
-The untied toy never picks the token itself; tied GPT-2 does so 98.8% of the time, and must use its layers to undo it. The direct path is a clean bigram table only when $$W_U$$ is free to differ from $$W_E$$, as in the paper's models.
+The untied toy never picks the token itself; tied GPT-2 does so 98.8% of the time, and must use its layers to undo it. The direct path is a clean bigram table only when $$W_{\mathrm{U}}$$ is free to differ from $$W_{\mathrm{E}}$$, as in the paper's models.
 
 **What it is useful for.** This is the paper's method in miniature: a behaviour ("after Barack, say Obama") found by multiplying two weight matrices, with no input text, and read by a person. Part 3 shows every model in the paper splits into terms like this; Parts 4 to 6 read the others.
 
 > [!TAKEAWAYS] Key takeaways
 > - **Mechanistic interpretability** reverse-engineers the exact computation inside a network, like turning a binary back into source code. The paper starts with attention-only transformers of zero, one and two layers.
 > - **Three simplifications:** the paper drops MLPs, which is a real loss. It drops biases, which is free because a bias is an always-1 input. It drops layer norm, which is almost free: folding it changed no log-probability by more than 0.00008.
-> - **Four equations:** the model is $$x_0=W_E t$$ (a column lookup), $$x_{i+1}=x_i+\sum_h h(x_i)$$ (every head adds), the same for MLPs, and $$T(t)=W_U x_{-1}$$. In `attn-only-2l`, $$W_E$$ (512 × 48,262) and $$W_U$$ hold 95% of the 52.1 million weights.
+> - **Four equations:** the model is $$x_0=W_{\mathrm{E}} t$$ (a column lookup), $$x_{i+1}=x_i+\sum_h h(x_i)$$ (every head adds), the same for MLPs, and $$T(t)=W_{\mathrm{U}} x_{-1}$$. In `attn-only-2l`, $$W_{\mathrm{E}}$$ (512 × 48,262) and $$W_{\mathrm{U}}$$ hold 95% of the 52.1 million weights.
 > - **The residual stream is a sum.** Our 20 pieces added up to the real vector (error 0.0000024), and the logit of "ley" (20.645) split into the same pieces; head 1.6 gave 9.63 of it by looking back at the earlier "ley".
 > - **No privileged basis:** rotating the whole stream of `attn-only-1l` moved no logit by more than 0.0001. Study the matrices, not the dimensions.
-> - **Virtual weights** $$W_I^2W_O^1$$ connect any two layers directly (64 × 64 between two heads); different subspaces mean a virtual weight of 0.
+> - **Virtual weights** $$W_{\mathrm{I}}^2W_{\mathrm{O}}^1$$ connect any two layers directly (64 × 64 between two heads); different subspaces mean a virtual weight of 0.
 > - **Bandwidth is scarce:** GPT-2 small computes 60 times more numbers than its stream has dimensions.
-> - **A zero-layer model is one table**, $$W_U W_E$$, of rank at most 512; its best values are log bigram probabilities. Inside every model it is the **direct path**: Barack → Obama, Hong → Kong, Los → Angeles.
+> - **A zero-layer model is one table**, $$W_{\mathrm{U}} W_{\mathrm{E}}$$, of rank at most 512; its best values are log bigram probabilities. Inside every model it is the **direct path**: Barack → Obama, Hong → Kong, Los → Angeles.
 
-**Next, in Part 2:** we open up one attention head. Part 2 shows why heads are independent and simply add, how a head moves information between tokens, and how its four matrices collapse into two: the **QK circuit** $$W_Q^\top W_K$$ (where to look) and the **OV circuit** $$W_O W_V$$ (what to copy).
+**Next, in Part 2:** we open up one attention head. Part 2 shows why heads are independent and simply add, how a head moves information between tokens, and how its four matrices collapse into two: the **QK circuit** $${W_{\mathrm{Q}}}^{\top} W_{\mathrm{K}}$$ (where to look) and the **OV circuit** $$W_{\mathrm{O}} W_{\mathrm{V}}$$ (what to copy).
 
 <details>
 <summary>Run it yourself</summary>
