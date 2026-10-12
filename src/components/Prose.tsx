@@ -17,6 +17,22 @@ async function renderMermaid(root: HTMLElement) {
   await mermaid.run({ nodes }).catch(() => {})
 }
 
+/** Shrinks display equations that are wider than the column (phones), down to 60% size; anything wider still scrolls. */
+function fitMath(root: HTMLElement) {
+  for (const box of root.querySelectorAll<HTMLElement>('.katex-display')) {
+    const k = box.querySelector<HTMLElement>(':scope > .katex')
+    if (!k) continue
+    k.style.fontSize = ''
+    let size = 1
+    for (let i = 0; i < 4; i++) {           // spacing does not scale exactly with font size, so re-measure
+      const over = box.scrollWidth / box.clientWidth
+      if (over <= 1.01 || size <= 0.6) break
+      size = Math.max(0.6, size * 0.98 / over)
+      k.style.fontSize = `${1.08 * size}em`
+    }
+  }
+}
+
 /** Renders build-time HTML and wires up copy buttons, in-app links and Mermaid diagrams. */
 export default function Prose({ html }: { html: string }) {
   const ref = useRef<HTMLDivElement>(null)
@@ -26,6 +42,9 @@ export default function Prose({ html }: { html: string }) {
     const root = ref.current
     if (!root) return
     renderMermaid(root)
+    fitMath(root)
+    const onResize = () => fitMath(root)
+    window.addEventListener('resize', onResize)
     const onTheme = () => renderMermaid(root)
     window.addEventListener('themechange', onTheme)
 
@@ -74,6 +93,7 @@ export default function Prose({ html }: { html: string }) {
     return () => {
       root.removeEventListener('click', onClick)
       window.removeEventListener('themechange', onTheme)
+      window.removeEventListener('resize', onResize)
     }
   }, [html, navigate])
 
