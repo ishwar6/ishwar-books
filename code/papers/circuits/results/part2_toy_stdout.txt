@@ -1,0 +1,23 @@
+== A. TWO HEADS: CONCATENATE THEN MULTIPLY, OR EACH HEAD ALONE THEN ADD
+  W_O^H = [[1.0, 0.0, 2.0, 0.0], [0.0, 1.0, 0.0, 0.0], [1.0, 1.0, 0.0, 1.0]] (3 x 4), [r1; r2] = [1.0, 2.0, 3.0, -1.0]  ->  W_O^H [r1; r2] = [7.0, 2.0, 2.0]
+  W_O^1 r1 = [1.0, 2.0, 3.0], W_O^2 r2 = [6.0, 0.0, -1.0], sum = [7.0, 2.0, 2.0]
+
+== B. ONE HEAD MOVES INFORMATION (3 tokens, 3-dim stream, d_head = 1)
+  values v = W_V x_i: [2.0, 1.0, 0.0]
+  results r_i = sum_j A_ij v_j: [2.0, 1.5, 1.8]   (token 3: 0.8 x 2 + 0.2 x 1 = 1.8)
+  outputs h(x)_i = W_O r_i: [[0.0, 0.0, 2.0], [0.0, 0.0, 1.5], [0.0, 0.0, 1.8]]
+  W_OV = W_O W_V = [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [1.0, 1.0, 0.0]]; A x W_OV^T = [[0.0, 0.0, 2.0], [0.0, 0.0, 1.5], [0.0, 0.0, 1.8]]  (same)
+
+== C. THE TENSOR PRODUCT: (A (x) W) x = A x W^T
+  x = [[1.0, 2.0], [3.0, 4.0]]; W first: x W^T = [[2.0, 1.0], [4.0, 3.0]], then A: [[2.0, 1.0], [3.0, 2.0]]
+  A first: A x = [[1.0, 2.0], [2.0, 3.0]], then W: [[2.0, 1.0], [3.0, 2.0]]
+  as one 4 x 4 matrix A (x) W = [[0.0, 1.0, 0.0, 0.0], [1.0, 0.0, 0.0, 0.0], [0.0, 0.5, 0.0, 0.5], [0.5, 0.0, 0.5, 0.0]], times x flattened [1.0, 2.0, 3.0, 4.0] = [2.0, 1.0, 3.0, 2.0]
+  mixed-product rule (B (x) V)(A (x) W) = (BA) (x) (VW): max difference 0.0
+
+== D. ONE ATTENTION SCORE: q . k = x_dst^T W_Q^T W_K x_src
+  q = W_Q x_dst = 2.0, k = W_K x_src = 3.0, q . k = 6.0
+  W_QK = W_Q^T W_K = [[0.0, 1.0], [0.0, 0.0]]; x_dst^T W_QK x_src = 6.0
+
+== E. SCALE THE VALUES BY M = 2 AND W_O BY 1/2
+  new values [4.0, 2.0, 0.0]; new outputs equal the old ones: True
+  W_OV is unchanged: [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [1.0, 1.0, 0.0]]

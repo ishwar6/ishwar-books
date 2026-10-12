@@ -1,0 +1,57 @@
+== 1. ONE HEAD, FOUR MATRICES (attn-only-1l, head 0.3, paper shapes = TransformerLens shapes transposed)
+  W_Q: paper shape (64, 512)  (32,768 numbers)
+  W_K: paper shape (64, 512)  (32,768 numbers)
+  W_V: paper shape (64, 512)  (32,768 numbers)
+  W_O: paper shape (512, 64)  (32,768 numbers)
+  d_model=512 d_head=64 heads per layer=8  (8 x 64 = 512)
+  scores are divided by sqrt(d_head) = 8 before the softmax (the paper folds this into W_Q)
+
+== 2. CONCATENATE-THEN-MULTIPLY EQUALS THE SUM OF EACH HEAD THROUGH ITS OWN SLICE OF W_O
+  attn-only-1l layer 0: W_O^H is (512, 512) (paper shape); |concat - sum| max = 1.2e-06; |sum - model| max = 3.5e-06
+  attn-only-2l layer 0: W_O^H is (512, 512) (paper shape); |concat - sum| max = 3.3e-06; |sum - model| max = 3.8e-06
+  attn-only-2l layer 1: W_O^H is (512, 512) (paper shape); |concat - sum| max = 5.7e-06; |sum - model| max = 4.8e-06
+  attn-only-1l, last position: size of each head's 512-number output: [4.413, 3.045, 2.973, 3.543, 1.932, 3.227, 2.175, 3.62]; size of their sum 9.169
+
+== 3. ONE HEAD ON A REAL PROMPT (attn-only-1l, head 0.3)
+  prompt: ['<|BOS|>', 'I', ' like', ' green', ' tea', ',', ' so', ' I', ' drink', ' green']  (10 tokens); the model predicts ' tea' next
+  row of A for the last token ' green': ' tea' 0.37, '<|BOS|>' 0.37, ' drink' 0.15
+  every row adds up to 1: max |row sum - 1| = 1.2e-07; entries above the diagonal (the future) are 0
+  three steps by hand: |r - model r| max = 0.0e+00
+  (A (x) W_OV) x, A first vs W_OV first: max diff 1.7e-06; vs the three steps: 1.4e-06
+  head 0.3 output at ' green', read with W_U: top tokens [(' tea', 2.62), (' teac', 2.44), (' Tea', 2.3), (' cups', 2.25), (' brew', 2.16)]
+  rank of " tea" among 48,262 tokens: 1
+
+== 4. THE PATTERN IN ONE STEP: A = softmax(x^T W_QK x), WITHOUT KEYS OR QUERIES
+  W_QK with the biases folded in: (513, 513); |A from W_QK - model A| max = 6.0e-07
+  raw scores of the last row (before softmax): [2.92, -1.89, -2.8, -0.45, 2.93, 1.48, -3.64, -2.5, 2.01, -0.58]
+
+== 5. W_OV = W_O W_V AND W_QK = W_Q^T W_K (paper shapes)
+  W_OV: shape (512, 512) = 262,144 numbers, rank 64; stored as two factors: 65,536 numbers
+    singular values: 1st 2.866, 2nd 2.761, 64th 1.0605, 65th 8.8e-07, 512th 4.2e-11
+  W_QK: shape (512, 512) = 262,144 numbers, rank 64; stored as two factors: 65,536 numbers
+    singular values: 1st 1.312, 2nd 1.196, 64th 0.1876, 65th 2.7e-07, 512th 2.3e-11
+  overlap of the 64-dim read and write subspaces of W_OV (1 = the same subspace, 0 = at right angles, random 64-dim subspaces of 512 dims: 0.125)
+    head 0.0: 0.153, head 0.1: 0.176, head 0.2: 0.134, head 0.3: 0.155, head 0.4: 0.130, head 0.5: 0.120, head 0.6: 0.130, head 0.7: 0.155
+
+== 6. CHANGE THE VALUES WITH ANY INVERTIBLE 64 x 64 MATRIX M: THE HEAD DOES NOT CHANGE
+  value vectors: mean |change| 4.62 (their mean size is 0.58); head output: max |change| 3.9e-14
+  queries: mean |change| 5.28 (mean size 0.72); every query-key score: max |change| 2.0e-12 (mean size 22.83)
+
+== 7. THE OV CIRCUIT W_U W_OV W_E AND THE QK CIRCUIT W_E^T W_QK W_E (head 0.3, read from the weights only)
+  each full circuit is 48,262 x 48,262 = 2.33 billion numbers, so we compute one column or row at a time
+  OV  attend to ' tea'     -> raises [' tea', ' Tea', ' teac', ' brew', ' brewing', ' flavon']
+  OV  attend to ' green'   -> raises [' green', 'Green', ' greens', 'green', ' Green', ' cyan']
+  OV  attend to ' Paris'   -> raises ['Paris', ' Paris', 'France', ' rue', 'French', 'rès']
+  OV  attend to ' Obama'   -> raises ['Obama', ' Obama', ' McCain', ' Romney', ' Barack', ' Palin']
+  OV  attend to ' coffee'  -> raises [' Coffee', ' coffee', ' caffeine', ' Starbucks', ' roast', ' caffe']
+  OV  attend to ' cat'     -> raises [' cats', ' cat', 'Cat', ' Cat', 'cats', ' euthan']
+  OV  attend to ' London'  -> raises ['London', ' London', 'inburgh', ' Thames', 'Brit', 'Oxford']
+  OV  attend to ' Potter'  -> raises [' Potter', ' Hog', 'Harry', ' wand', ' teac', 'Ep']
+  share of tokens 1000..2999 whose top OV output is the token itself: 0.0: 0.37, 0.1: 0.00, 0.2: 0.00, 0.3: 0.34, 0.4: 0.26, 0.5: 0.00, 0.6: 0.12, 0.7: 0.00
+  QK  query ' in'    -> attends most to ['imbabwe', ' Bulgaria', ' Cambodia', 'agua', 'htra', ' vivo', ' Aires', 'alore']  (scores 4.6 .. 3.9; median 0.5)
+  QK  query ' see'   -> attends most to [' Derek', ' Trudeau', ' Shawn', ' Stephanie', ' Laden', ' Elaine', ' Bess', ' Cassie']  (scores 2.8 .. 2.7; median 0.2)
+  QK  query ' of'    -> attends most to [' HBV', ' schizophrenia', ' cirrhosis', ' hepatocellular', ' sepsis', 'aucoma', ' ovarian', ' psori']  (scores 2.7 .. 2.4; median 0.4)
+  QK  query ' the'   -> attends most to [' cytosol', 'arynx', ' myocardium', ' landlord', 'aucoma', ' cerebellum', ' cytoplasm', ' debtor']  (scores 2.8 .. 2.5; median 0.5)
+  QK  query ' drink' -> attends most to ['()))', "']))", 'ength', '())', ',)', 'ayout', ' and', 'er']  (scores 3.0 .. 2.6; median -0.1)
+
+total time 4.8 s
