@@ -55,7 +55,7 @@ export function PartNav({ paper, current }: { paper: Paper; current?: string }) 
           const on = p.slug === current
           const body = (
             <>
-              <span className="pn">Part {p.partNumber}</span>
+              <span className="pn">{p.partLabel}</span>
               <span className="pt">{p.title}</span>
               {p.covers && <span className="pc">{p.covers}</span>}
             </>

@@ -11,7 +11,7 @@ export default function PaperPart() {
   const paper = papers.find((p) => p.slug === slug)
   const idx = paper ? paper.parts.findIndex((p) => p.slug === partSlug) : -1
   const meta = idx >= 0 ? paper!.parts[idx] : undefined
-  useTitle(meta && paper ? `${paper.short}, Part ${meta.partNumber}: ${meta.title}` : undefined, meta?.description)
+  useTitle(meta && paper ? `${paper.short}, ${meta.partLabel}: ${meta.title}` : undefined, meta?.description)
   if (!paper || !meta) return <NotFound />
   const prev = paper.parts[idx - 1]
   const next = paper.parts[idx + 1]
@@ -28,7 +28,7 @@ export default function PaperPart() {
               <Link to={`/${paper.route}`}>{paper.short}</Link>
             </nav>
             <PaperSheet paper={paper} compact />
-            <div className="part-label">Part {meta.partNumber} of {paper.parts.length}{meta.covers ? <span className="covers"> · Covers {meta.covers}</span> : null}</div>
+            <div className="part-label">{meta.partOf}{meta.covers ? <span className="covers"> · Covers {meta.covers}</span> : null}</div>
             <h1>{meta.title}</h1>
             {meta.description && <p className="lede">{meta.description}</p>}
             <div className="meta"><span>{meta.minutes} min read</span>{meta.tags.map((t) => <span key={t} className="tag">{t}</span>)}</div>
@@ -37,9 +37,9 @@ export default function PaperPart() {
         }
         footer={
           <nav className="pager">
-            {prev && <Link to={`/${prev.route}`}><span className="dir">← Part {prev.partNumber}</span><span className="t">{prev.title}</span></Link>}
+            {prev && <Link to={`/${prev.route}`}><span className="dir">← {prev.partLabel}</span><span className="t">{prev.title}</span></Link>}
             {next
-              ? <Link to={`/${next.route}`} className="next"><span className="dir">Part {next.partNumber} →</span><span className="t">{next.title}</span></Link>
+              ? <Link to={`/${next.route}`} className="next"><span className="dir">{next.partLabel} →</span><span className="t">{next.title}</span></Link>
               : <Link to={`/${paper.route}`} className="next"><span className="dir">Back to the overview →</span><span className="t">{paper.short}, explained</span></Link>}
           </nav>
         }

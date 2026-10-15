@@ -129,22 +129,22 @@ for (const p of papers) {
       hasPart: p.parts.map((x) => ({ '@type': 'TechArticle', headline: x.title, position: x.partNumber, url: url(x.route) })),
     }, crumbs([['Home', ''], ['Research papers', 'papers'], [p.short, p.route]])],
     body: `<article><h1>${esc(p.short)}, explained</h1><p>${esc(p.description)}</p>${cite}${p.learn.length ? `<h2>What you will learn</h2><ul>${p.learn.map((l) => `<li>${esc(l)}</li>`).join('')}</ul>` : ''}${content(p.route)}
-      <h2>Parts</h2>${list(p.parts.map((x) => [`${BASE}${x.route}/`, `Part ${x.partNumber}: ${x.title}`, x.description]))}</article>`,
+      <h2>Parts</h2>${list(p.parts.map((x) => [`${BASE}${x.route}/`, `${x.partLabel}: ${x.title}`, x.description]))}</article>`,
   })
   p.parts.forEach((x, i) => {
     const prev = p.parts[i - 1], next = p.parts[i + 1]
     const img = ogImage(`paper-${p.slug}-${x.slug}`)
     pages.push({
-      route: x.route, title: `${p.short}, Part ${x.partNumber}: ${x.title} · ${site.name}`, description: x.description, image: img, type: 'article',
+      route: x.route, title: `${p.short}, ${x.partLabel}: ${x.title} · ${site.name}`, description: x.description, image: img, type: 'article',
       published: iso(x.date), modified: iso(x.updated ?? x.date), tags: x.tags,
       ld: [{
-        '@type': 'TechArticle', headline: `${p.short}, Part ${x.partNumber}: ${x.title}`, description: x.description, url: url(x.route), mainEntityOfPage: url(x.route),
+        '@type': 'TechArticle', headline: `${p.short}, ${x.partLabel}: ${x.title}`, description: x.description, url: url(x.route), mainEntityOfPage: url(x.route),
         image: img, datePublished: iso(x.date), dateModified: iso(x.updated ?? x.date), inLanguage: 'en', timeRequired: `PT${x.minutes}M`,
         keywords: x.tags.join(', '), author, publisher: author, about: scholarly, position: x.partNumber,
         isPartOf: { '@type': 'TechArticle', headline: `${p.short}, explained`, url: url(p.route) },
-      }, crumbs([['Home', ''], ['Research papers', 'papers'], [p.short, p.route], [`Part ${x.partNumber}`, x.route]])],
-      body: `<article><p><a href="${BASE}${p.route}/">${esc(p.short)}, explained</a> · Part ${x.partNumber} of ${p.parts.length}${x.covers ? ` · Covers ${esc(x.covers)}` : ''}</p><h1>${esc(x.title)}</h1><p>${esc(x.description)}</p>${cite}${content(x.route)}
-        <nav>${prev ? `<a href="${BASE}${prev.route}/">Previous: Part ${prev.partNumber}, ${esc(prev.title)}</a>` : ''} ${next ? `<a href="${BASE}${next.route}/">Next: Part ${next.partNumber}, ${esc(next.title)}</a>` : ''}</nav></article>`,
+      }, crumbs([['Home', ''], ['Research papers', 'papers'], [p.short, p.route], [x.partLabel, x.route]])],
+      body: `<article><p><a href="${BASE}${p.route}/">${esc(p.short)}, explained</a> · ${x.partOf}${x.covers ? ` · Covers ${esc(x.covers)}` : ''}</p><h1>${esc(x.title)}</h1><p>${esc(x.description)}</p>${cite}${content(x.route)}
+        <nav>${prev ? `<a href="${BASE}${prev.route}/">Previous: ${prev.partLabel}, ${esc(prev.title)}</a>` : ''} ${next ? `<a href="${BASE}${next.route}/">Next: ${next.partLabel}, ${esc(next.title)}</a>` : ''}</nav></article>`,
     })
   })
 }
@@ -292,7 +292,7 @@ fs.writeFileSync(path.join(DIST, 'rss.xml'), `<?xml version="1.0" encoding="UTF-
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel>
 <title>${esc(site.name)}: writings and research papers</title><link>${ORIGIN}${BASE}</link><description>${esc(site.description)}</description><language>en</language>
 <atom:link href="${ORIGIN}${BASE}rss.xml" rel="self" type="application/rss+xml" />
-${[...manifest.writings, ...papers.flatMap((p) => p.parts.map((x) => ({ ...x, title: `${p.short}, Part ${x.partNumber}: ${x.title}` })))]
+${[...manifest.writings, ...papers.flatMap((p) => p.parts.map((x) => ({ ...x, title: `${p.short}, ${x.partLabel}: ${x.title}` })))]
   .sort((a, b) => (b.date ?? '').localeCompare(a.date ?? '')).map((w) => `<item><title>${esc(w.title)}</title><link>${url(w.route)}</link><guid>${url(w.route)}</guid><pubDate>${new Date(w.date + 'T00:00:00Z').toUTCString()}</pubDate><description>${esc(w.description)}</description></item>`).join('\n')}
 </channel></rss>
 `)

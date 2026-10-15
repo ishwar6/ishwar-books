@@ -82,7 +82,7 @@ One detail differs between the paper and the code. Real implementations, includi
 
 In Part 1 we wrote a layer as "every head adds its output to the stream". But that is not how the original transformer paper describes a layer. The paper first shows that the two descriptions are the same.
 
-> [!PAPER] Elhage et al. (2021), A Mathematical Framework for Transformer Circuits · Attention Heads are Independent and Additive
+> [!PAPER] · Attention Heads are Independent and Additive
 > [![The paragraph showing that stacking result vectors and multiplying by W_O^H equals the sum of each head's W_O times its result](/img/papers/circuits/p2-independent.png)](/img/papers/circuits/p2-independent.png)
 >
 > **What it says:** the original transformer paper stacks the result vectors of all heads and multiplies them by one big output matrix $$W_{\mathrm{O}}^H$$. If you split $$W_{\mathrm{O}}^H$$ into one block per head, the big product turns into a sum: each head multiplies its own result by its own block, and the results are added.
@@ -139,7 +139,7 @@ In all three layers the largest difference is a few millionths, which is roundin
 
 If heads work alone, what does each one do? The paper's answer is short.
 
-> [!PAPER] Elhage et al. (2021), A Mathematical Framework for Transformer Circuits · Attention Heads as Information Movement
+> [!PAPER] · Attention Heads as Information Movement
 > [![The paragraph stating that the fundamental action of attention heads is moving information, and that where to move from is separable from what is moved](/img/papers/circuits/p2-moving.png)](/img/papers/circuits/p2-moving.png)
 >
 > **What it says:** "The fundamental action of attention heads is moving information." A head reads from the stream of one token and writes into the stream of another. The main point of the section is that **which tokens** the information comes from is "completely separable" from **what information** is read and how it is written.
@@ -148,7 +148,7 @@ If heads work alone, what does each one do? The paper's answer is short.
 
 Remember from Part 1 that every position has its own residual stream. Before attention, the stream at position 9 only knows about token 9. A head is the only part of this model that can carry information **across** positions. The paper draws it like this:
 
-> [!PAPER] Elhage et al. (2021), A Mathematical Framework for Transformer Circuits · Attention Heads as Information Movement
+> [!PAPER] · Attention Heads as Information Movement
 > [![The paper's figure: a band of information leaves the residual stream of token A and enters the residual stream of token B, in a different place](/img/papers/circuits/p2-moving-fig.png)](/img/papers/circuits/p2-moving-fig.png)
 >
 > **What it says:** attention heads copy information from the residual stream of one token to the residual stream of another. "They typically write to a different subspace than they read from."
@@ -159,7 +159,7 @@ Remember from Part 1 that every position has its own residual stream. Before att
 
 The paper then writes a head as three steps. These are the same equations as in our first section, but now each step is labelled by what it does.
 
-> [!PAPER] Elhage et al. (2021), A Mathematical Framework for Transformer Circuits · Attention Heads as Information Movement
+> [!PAPER] · Attention Heads as Information Movement
 > [![The three steps of an attention head: compute value vectors, mix them with the attention pattern, project out with W_O; and the remark that x is multiplied on different sides](/img/papers/circuits/p2-three-steps.png)](/img/papers/circuits/p2-three-steps.png)
 >
 > **What it says:** given an attention pattern, a head (1) computes a value vector for each token, $$v_i=W_{\mathrm{V}} x_i$$, (2) mixes the value vectors with the pattern, $$r_i=\sum_j A_{ij}v_j$$, and (3) computes the output for each token, $$h(x)_i=W_{\mathrm{O}} r_i$$. If we treat $$x$$ as a table with one vector per token, then $$W_{\mathrm{V}}$$ and $$W_{\mathrm{O}}$$ multiply it on one side and $$A$$ multiplies it on the other.
@@ -265,7 +265,7 @@ $$
 
 The appendix of the paper lists the practical rules:
 
-> [!PAPER] Elhage et al. (2021), A Mathematical Framework for Transformer Circuits · Tensor Product / Kronecker Product Notation
+> [!PAPER] · Tensor Product / Kronecker Product Notation
 > [![The notation appendix: Id ⊗ W multiplies each position, A ⊗ Id multiplies across positions, A ⊗ W does both and the order does not matter, and the mixed-product property](/img/papers/circuits/p2-tensor-notation.png)](/img/papers/circuits/p2-tensor-notation.png)
 >
 > **What it says:** $$\text{Id}\otimes W$$ multiplies every position by $$W$$, and $$A\otimes\text{Id}$$ multiplies across positions. $$A\otimes W$$ does both, and "it doesn't matter which order you do this in". Tensor products also obey the mixed-product property.
@@ -286,7 +286,7 @@ The flat view is correct, but it hides the structure, so the paper (and this ser
 
 ### The paper's derivation, step by step
 
-> [!PAPER] Elhage et al. (2021), A Mathematical Framework for Transformer Circuits · Attention Heads as Information Movement
+> [!PAPER] · Attention Heads as Information Movement
 > [![The head written as a product of three tensor products, then collapsed by the mixed product property into A ⊗ W_O W_V](/img/papers/circuits/p2-tensor.png)](/img/papers/circuits/p2-tensor.png)
 >
 > **What it says:** a head is three tensor products in a row: compute the values ($$\text{Id}\otimes W_{\mathrm{V}}$$), mix them across tokens ($$A\otimes\text{Id}$$), and project the results out ($$\text{Id}\otimes W_{\mathrm{O}}$$). "Applying the mixed product property and collapsing identities" gives $$h(x)=(A\otimes W_{\mathrm{O}} W_{\mathrm{V}})\,x$$.
@@ -362,7 +362,7 @@ All three agree up to rounding noise. Here `X` is the stream as the head sees it
 
 We have collapsed the "what" part. The paper does the same for the "where" part, the attention pattern.
 
-> [!PAPER] Elhage et al. (2021), A Mathematical Framework for Transformer Circuits · Attention Heads as Information Movement
+> [!PAPER] · Attention Heads as Information Movement
 > [![The paragraph computing the attention pattern in one step as softmax of x^T W_Q^T W_K x, and the note that this would be horribly inefficient](/img/papers/circuits/p2-qk-one-step.png)](/img/papers/circuits/p2-qk-one-step.png)
 >
 > **What it says:** normally one computes keys and queries and then their dot products. "But we can do it all in one step without referring to keys and queries": $$A=\text{softmax}(x^\top {W_{\mathrm{Q}}}^{\top} W_{\mathrm{K}}\,x)$$. The paper adds that actually computing a head this way would be "horribly inefficient".
@@ -426,7 +426,7 @@ The first observation repeats the main idea: heads move information from one tok
 
 ### Two linear operations, and only one is non-linear
 
-> [!PAPER] Elhage et al. (2021), A Mathematical Framework for Transformer Circuits · Observations about Attention Heads
+> [!PAPER] · Observations about Attention Heads
 > [![The observations: an attention head applies two linear operations A and W_O W_V, A governs which tokens, W_O W_V governs which information; A is the only non-linear part](/img/papers/circuits/p2-two-operations.png)](/img/papers/circuits/p2-two-operations.png)
 >
 > **What it says:** a head applies two linear operations, $$A$$ and $$W_{\mathrm{O}} W_{\mathrm{V}}$$, which act on different dimensions. $$A$$ "governs which token's information is moved from and to", and $$W_{\mathrm{O}} W_{\mathrm{V}}$$ "governs which information is read from the source token and how it is written to the destination token". $$A$$ is "the only non-linear part", because it comes from a softmax. So if the pattern is held fixed, the head is linear, and the paper calls heads "half-linear".
@@ -477,7 +477,7 @@ Every head scores between 0.120 and 0.176, close to the random 0.125. So the hea
 
 ### Queries, keys and values are superficial
 
-> [!PAPER] Elhage et al. (2021), A Mathematical Framework for Transformer Circuits · Observations about Attention Heads
+> [!PAPER] · Observations about Attention Heads
 > [![The observations that W_Q and W_K always operate together, that keys, queries and values are superficial, and the definitions of W_OV and W_QK](/img/papers/circuits/p2-always-together.png)](/img/papers/circuits/p2-always-together.png)
 >
 > **What it says:** $$W_{\mathrm{Q}}$$ and $$W_{\mathrm{K}}$$ "always operate together", and so do $$W_{\mathrm{O}}$$ and $$W_{\mathrm{V}}$$. So "keys, queries and value vectors are, in some sense, superficial". They are by-products of computing two low-rank matrices, and "one could easily reparametrize" the factors to get different vectors that work identically. That is why the paper names the products $$W_{\mathrm{OV}}=W_{\mathrm{O}} W_{\mathrm{V}}$$ and $$W_{\mathrm{QK}}={W_{\mathrm{Q}}}^{\top} W_{\mathrm{K}}$$.
@@ -526,7 +526,7 @@ The result has the same shape as one head: a pattern $$A^2A^1$$ and an OV matrix
 
 So far $$W_{\mathrm{QK}}$$ and $$W_{\mathrm{OV}}$$ act on the 512-number stream. A stream vector is hard to read. A token is easy to read. The paper's last step for a single head is to attach the embedding and the unembedding, so that both matrices go from tokens to tokens.
 
-> [!PAPER] Elhage et al. (2021), A Mathematical Framework for Transformer Circuits · Splitting Attention Head terms into Query-Key and Output-Value Circuits
+> [!PAPER] · Splitting Attention Head terms into Query-Key and Output-Value Circuits
 > [![The paper's figure of the OV circuit W_U W_O W_V W_E from a source token to the output, and the QK circuit W_E^T W_Q^T W_K W_E from the source and destination tokens to an attention score](/img/papers/circuits/p2-circuits-fig.png)](/img/papers/circuits/p2-circuits-fig.png)
 >
 > **What it says:** the **OV ("output-value") circuit**, $$W_{\mathrm{U}} W_{\mathrm{O}} W_{\mathrm{V}} W_{\mathrm{E}}$$, "determines how attending to a given token affects the logits". The **QK ("query-key") circuit**, $${W_{\mathrm{E}}}^{\top} {W_{\mathrm{Q}}}^{\top} W_{\mathrm{K}} W_{\mathrm{E}}$$, "controls which tokens the head prefers to attend to". Each one is a path through the model that starts and ends at tokens.

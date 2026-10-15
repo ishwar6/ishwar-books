@@ -13,7 +13,7 @@ This part is about how BERT learns language from plain text, before any real tas
 
 ## Not a normal language model {§3.1}
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 3.1 · page 4
+> [!PAPER] · Section 3.1 · page 4
 > [![The opening of Section 3.1, Pre-training BERT: unlike Peters et al. and Radford et al., we do not use traditional left-to-right or right-to-left language models to pre-train BERT. Instead, we pre-train BERT using two unsupervised tasks, presented in the left part of Figure 1](/img/papers/bert/p3-intro.png)](/img/papers/bert/p3-intro.png)
 >
 > **Context:** the start of Section 3.1. Section 3 has just described the model and its input (Part 2).
@@ -27,7 +27,7 @@ This part is about how BERT learns language from plain text, before any real tas
 
 ## Why not just look both ways? {§3.1}
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 3.1, Task #1 · page 4
+> [!PAPER] · Section 3.1, Task #1 · page 4
 > [![Task 1, Masked LM: a deep bidirectional model is strictly more powerful than a left-to-right model or a shallow concatenation. Unfortunately, standard conditional language models can only be trained left-to-right or right-to-left, since bidirectional conditioning would allow each word to indirectly see itself, and the model could trivially predict the target word in a multi-layered context](/img/papers/bert/p3-mlm-why.png)](/img/papers/bert/p3-mlm-why.png)
 >
 > **Context:** the first paragraph of Task #1. Part 1 showed why both directions help. Now the paper explains why you cannot simply switch them on.
@@ -87,7 +87,7 @@ Three things to notice:
 
 ## The fix: hide the words you predict {§3.1}
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 3.1, Task #1 · page 4
+> [!PAPER] · Section 3.1, Task #1 · page 4
 > [![To train a deep bidirectional representation, we simply mask some percentage of the input tokens at random, and then predict those masked tokens: a masked LM, also called a Cloze task. The final hidden vectors of the mask tokens are fed into an output softmax over the vocabulary. We mask 15 percent of all WordPiece tokens in each sequence at random. Unlike denoising auto-encoders, we only predict the masked words rather than reconstructing the entire input](/img/papers/bert/p3-mlm-how.png)](/img/papers/bert/p3-mlm-how.png)
 >
 > **Context:** the second paragraph of Task #1: the solution to the problem above.
@@ -186,7 +186,7 @@ The paper's contrast with denoising auto-encoders (Vincent et al., 2008) is abou
 
 ## The [MASK] problem and the 80/10/10 rule {§3.1}
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 3.1, Task #1 · page 4
+> [!PAPER] · Section 3.1, Task #1 · page 4
 > [![A downside is a mismatch between pre-training and fine-tuning, since the MASK token does not appear during fine-tuning. The training data generator chooses 15 percent of the token positions at random for prediction. If the i-th token is chosen, it is replaced by the MASK token 80 percent of the time, a random token 10 percent of the time, and the unchanged i-th token 10 percent of the time. Then T_i is used to predict the original token with cross entropy loss](/img/papers/bert/p3-mlm-8010.png)](/img/papers/bert/p3-mlm-8010.png)
 >
 > **Context:** the last paragraph of Task #1. Masking works, but it creates a new problem.
@@ -200,7 +200,7 @@ The paper's contrast with denoising auto-encoders (Vincent et al., 2008) is abou
 
 Appendix A.1 walks through the rule on one sentence, and explains the reasons.
 
-> [!PAPER] Devlin et al. (2018), BERT · Appendix A.1 · page 12
+> [!PAPER] · Appendix A.1 · page 12
 > [![Appendix A.1, Masked LM and the Masking Procedure: assuming the sentence is my dog is hairy and the 4th token is chosen: 80 percent of the time replace it with MASK, giving my dog is MASK; 10 percent of the time replace it with a random word, giving my dog is apple; 10 percent of the time keep it unchanged, my dog is hairy. The purpose of this is to bias the representation towards the actual observed word](/img/papers/bert/p3-a1-mlm.png)](/img/papers/bert/p3-a1-mlm.png)
 >
 > **Context:** Appendix A.1 gives examples of both pre-training tasks. This is the masked LM example.
@@ -209,7 +209,7 @@ Appendix A.1 walks through the rule on one sentence, and explains the reasons.
 >
 > **Why it matters:** each of the three cases teaches the model something different. The next paragraph of the appendix says what.
 
-> [!PAPER] Devlin et al. (2018), BERT · Appendix A.1 · page 12
+> [!PAPER] · Appendix A.1 · page 12
 > [![The advantage of this procedure is that the Transformer encoder does not know which words it will be asked to predict or which have been replaced by random words, so it is forced to keep a distributional contextual representation of every input token. Because random replacement only occurs for 1.5 percent of all tokens, 10 percent of 15 percent, this does not seem to harm the model's language understanding capability](/img/papers/bert/p3-a1-why.png)](/img/papers/bert/p3-a1-why.png)
 >
 > **Context:** right after the example.
@@ -315,7 +315,7 @@ With a whole paragraph of context, BERT finds the hidden word 58.3% of the time,
 
 ### The cost: only 15% of tokens teach anything
 
-> [!PAPER] Devlin et al. (2018), BERT · Appendix A.1 · pages 12 and 13
+> [!PAPER] · Appendix A.1 · pages 12 and 13
 > [![Compared to standard language model training, the masked LM only makes predictions on 15 percent of tokens in each batch, which suggests that more pre-training steps may be required for the model to converge](/img/papers/bert/p3-a1-cost.png)](/img/papers/bert/p3-a1-cost.png)
 > [![In Section C.1 we demonstrate that MLM does converge marginally slower than a left-to-right model, which predicts every token, but the empirical improvements of the MLM model far outweigh the increased training cost](/img/papers/bert/p3-a1-cost2.png)](/img/papers/bert/p3-a1-cost2.png)
 >
@@ -330,7 +330,7 @@ With a whole paragraph of context, BERT finds the hidden word 58.3% of the time,
 
 ## Task 2: next sentence prediction {§3.1}
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 3.1, Task #2 · page 4
+> [!PAPER] · Section 3.1, Task #2 · page 4
 > [![Task 2, Next Sentence Prediction: question answering and natural language inference are based on understanding the relationship between two sentences, which is not directly captured by language modeling. When choosing sentences A and B, 50 percent of the time B is the actual next sentence that follows A, labeled IsNext, and 50 percent of the time it is a random sentence from the corpus, labeled NotNext. C is used for next sentence prediction](/img/papers/bert/p3-nsp.png)](/img/papers/bert/p3-nsp.png)
 >
 > **Context:** the second pre-training task, right after the masked LM.
@@ -349,7 +349,7 @@ With a whole paragraph of context, BERT finds the hidden word 58.3% of the time,
 
 Here is where NSP lives in the paper's Figure 1: the left-most output, $$C$$, feeds the box marked NSP.
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 3, Figure 1 · page 3
+> [!PAPER] · Section 3, Figure 1 · page 3
 > [![Figure 1 of the BERT paper: in pre-training, the output C of the [CLS] token feeds the NSP head and the output vectors at masked positions feed the Mask LM heads; the caption says the same architectures are used in both pre-training and fine-tuning](/img/papers/bert/p3-figure1.png)](/img/papers/bert/p3-figure1.png)
 >
 > **Context:** the paper's main figure, seen again from the point of view of the two pre-training heads.
@@ -374,7 +374,7 @@ where:
 
 Appendix A.1 shows two examples:
 
-> [!PAPER] Devlin et al. (2018), BERT · Appendix A.1 · page 13
+> [!PAPER] · Appendix A.1 · page 13
 > [![Two next sentence prediction examples. Input: CLS the man went to MASK store SEP he bought a gallon MASK milk SEP, Label IsNext. Input: CLS the man MASK to the store SEP penguin MASK are flight less birds SEP, Label NotNext](/img/papers/bert/p3-a1-nsp.png)](/img/papers/bert/p3-a1-nsp.png)
 >
 > **Context:** the second half of Appendix A.1.
@@ -399,7 +399,7 @@ The released `bert-base-uncased` still contains its trained NSP layer, so we can
 
 All six are right, and very confident. The paper reports how good the final model is in a footnote:
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 3.1, footnotes 5 and 6 · page 4
+> [!PAPER] · Section 3.1, footnotes 5 and 6 · page 4
 > [![Footnote 5: the final model achieves 97 to 98 percent accuracy on NSP. Footnote 6: the vector C is not a meaningful sentence representation without fine-tuning, since it was trained with NSP](/img/papers/bert/p3-footnotes.png)](/img/papers/bert/p3-footnotes.png)
 >
 > **Context:** two footnotes attached to the NSP paragraph.
@@ -465,7 +465,7 @@ Every pair scores above 0.76, and the two sentences with **opposite** meanings s
 
 ### NSP and earlier work {§3.1}
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 3.1 · page 5
+> [!PAPER] · Section 3.1 · page 5
 > [![The NSP task is closely related to representation-learning objectives used in Jernite et al. 2017 and Logeswaran and Lee 2018. However, in prior work, only sentence embeddings are transferred to down-stream tasks, where BERT transfers all parameters to initialize end-task model parameters](/img/papers/bert/p3-nsp-prior.png)](/img/papers/bert/p3-nsp-prior.png)
 >
 > **Context:** the paragraph after Task #2, at the top of page 5.
@@ -496,7 +496,7 @@ The two cited papers, in their own words:
 
 ## The pre-training data {§3.1}
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 3.1 · page 5
+> [!PAPER] · Section 3.1 · page 5
 > [![Pre-training data: the BooksCorpus, 800 million words, and English Wikipedia, 2,500 million words. For Wikipedia only the text passages are extracted, ignoring lists, tables and headers. It is critical to use a document-level corpus rather than a shuffled sentence-level corpus such as the Billion Word Benchmark in order to extract long contiguous sequences](/img/papers/bert/p3-data.png)](/img/papers/bert/p3-data.png)
 >
 > **Context:** the last paragraph of Section 3.1.
@@ -542,7 +542,7 @@ Why must the text be **document-level**? The Billion Word Benchmark is a big set
 
 Appendix A.2 gives the exact recipe. First, how one training example is built.
 
-> [!PAPER] Devlin et al. (2018), BERT · Appendix A.2 · page 13
+> [!PAPER] · Appendix A.2 · page 13
 > [![A.2 Pre-training Procedure: to generate each training input sequence, sample two spans of text from the corpus, called sentences even though they are typically much longer. The first receives the A embedding, the second the B embedding. 50 percent of the time B is the actual next sentence. The combined length is at most 512 tokens. The LM masking is applied after WordPiece tokenization with a uniform masking rate of 15 percent, and no special consideration given to partial word pieces](/img/papers/bert/p3-a2-data.png)](/img/papers/bert/p3-a2-data.png)
 >
 > **Context:** the start of Appendix A.2.
@@ -558,7 +558,7 @@ Google noticed this too. In May 2019 the BERT repository added **Whole Word Mask
 
 Next, the training run itself. The sentence starts at the bottom of the left column:
 
-> [!PAPER] Devlin et al. (2018), BERT · Appendix A.2 · page 13
+> [!PAPER] · Appendix A.2 · page 13
 > [![We train with batch size of 256 sequences, 256 sequences times 512 tokens equals 128,000 tokens per batch, for 1,000,000 steps, which is approximately 40](/img/papers/bert/p3-a2-train0.png)](/img/papers/bert/p3-a2-train0.png)
 > [![epochs over the 3.3 billion word corpus. Adam with learning rate 1e-4, beta1 0.9, beta2 0.999, L2 weight decay of 0.01, learning rate warmup over the first 10,000 steps, and linear decay of the learning rate. Dropout probability of 0.1 on all layers. A gelu activation rather than the standard relu, following OpenAI GPT. The training loss is the sum of the mean masked LM likelihood and the mean next sentence prediction likelihood](/img/papers/bert/p3-a2-train.png)](/img/papers/bert/p3-a2-train.png)
 >
@@ -715,7 +715,7 @@ $$
 
 ### Hardware and the two sequence lengths
 
-> [!PAPER] Devlin et al. (2018), BERT · Appendix A.2 · page 13
+> [!PAPER] · Appendix A.2 · page 13
 > [![Training of BERT-base was performed on 4 Cloud TPUs in Pod configuration, 16 TPU chips total; BERT-large on 16 Cloud TPUs, 64 TPU chips total. Each pre-training took 4 days. Longer sequences are disproportionately expensive because attention is quadratic to the sequence length. We pre-train with sequence length of 128 for 90 percent of the steps, then the rest 10 percent of the steps with sequence of 512 to learn the positional embeddings](/img/papers/bert/p3-a2-tpu.png)](/img/papers/bert/p3-a2-tpu.png)
 >
 > **Context:** the last two paragraphs of Appendix A.2.

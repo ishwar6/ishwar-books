@@ -23,7 +23,7 @@ The small `Paper §1` tag above each heading tells you which section of the pape
 
 ## The title {§Title}
 
-> [!PAPER] Devlin et al. (2018), BERT · Title · page 1
+> [!PAPER] · Title · page 1
 > [![The title of the BERT paper: BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding, by Jacob Devlin, Ming-Wei Chang, Kenton Lee and Kristina Toutanova, Google AI Language](/img/papers/bert/p1-title.png)](/img/papers/bert/p1-title.png)
 >
 > **Context:** the first thing on page 1. The paper was posted to arXiv in October 2018 and published at NAACL 2019, a major conference on language technology.
@@ -51,7 +51,7 @@ Let us take the title apart, one word at a time.
 
 ## What BERT is {§Abstract}
 
-> [!PAPER] Devlin et al. (2018), BERT · Abstract · page 1
+> [!PAPER] · Abstract · page 1
 > [![The first half of the BERT abstract, with three highlights: Bidirectional Encoder Representations from Transformers; jointly conditioning on both left and right context in all layers; one additional output layer](/img/papers/bert/p1-abstract-what.png)](/img/papers/bert/p1-abstract-what.png)
 >
 > **Context:** the abstract, the paper's summary of itself in two paragraphs. This is the first paragraph.
@@ -201,7 +201,7 @@ The idea itself came from computer vision, which the paper mentions in its relat
 
 ## The results in the abstract {§Abstract}
 
-> [!PAPER] Devlin et al. (2018), BERT · Abstract · page 1
+> [!PAPER] · Abstract · page 1
 > [![The second paragraph of the BERT abstract: new state-of-the-art results on eleven tasks, GLUE score 80.5 percent, MultiNLI accuracy 86.7 percent, SQuAD v1.1 Test F1 93.2 and SQuAD v2.0 Test F1 83.1](/img/papers/bert/p1-abstract-results.png)](/img/papers/bert/p1-abstract-results.png)
 >
 > **Context:** the second paragraph of the abstract, right after the description of BERT.
@@ -234,7 +234,7 @@ A note on the wording "7.7% point absolute improvement": it means the score went
 
 Now the introduction. Its first paragraph sets the scene.
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 1 · page 1
+> [!PAPER] · Section 1 · page 1
 > [![The first paragraph of the introduction: language model pre-training has been shown to be effective for sentence-level tasks such as natural language inference and paraphrasing, and token-level tasks such as named entity recognition and question answering](/img/papers/bert/p1-intro-tasks.png)](/img/papers/bert/p1-intro-tasks.png)
 >
 > **Context:** the opening paragraph of Section 1 (Introduction).
@@ -271,7 +271,7 @@ The two token-level examples in that paragraph deserve a closer look, because bo
 
 ## Two ways to reuse a pre-trained model {§1}
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 1 · page 1
+> [!PAPER] · Section 1 · page 1
 > [![The second paragraph of the introduction: there are two existing strategies, feature-based and fine-tuning. ELMo uses task-specific architectures that include the pre-trained representations as additional features. OpenAI GPT is trained by simply fine-tuning all pre-trained parameters. Both use unidirectional language models](/img/papers/bert/p1-intro-strategies.png)](/img/papers/bert/p1-intro-strategies.png)
 >
 > **Context:** the second paragraph of the introduction. It describes the two ways people used pre-trained models in 2018.
@@ -351,7 +351,7 @@ $$
 
 ## The problem: reading in only one direction {§1}
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 1 · page 1
+> [!PAPER] · Section 1 · page 1
 > [![The third paragraph of the introduction: the major limitation is that standard language models are unidirectional. In OpenAI GPT every token can only attend to previous tokens. This is sub-optimal for sentence-level tasks and could be very harmful for token-level tasks such as question answering, where it is crucial to incorporate context from both directions](/img/papers/bert/p1-intro-limitation.png)](/img/papers/bert/p1-intro-limitation.png)
 >
 > **Context:** the third paragraph of the introduction: the problem statement of the whole paper.
@@ -445,7 +445,7 @@ What this shows, and what it does not:
 
 If language models are one-directional by nature, how do you pre-train a two-directional model? The paper's answer is in the next paragraph.
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 1 · pages 1 and 2
+> [!PAPER] · Section 1 · pages 1 and 2
 > [![The fourth paragraph of the introduction: BERT alleviates the unidirectionality constraint by using a masked language model pre-training objective, inspired by the Cloze task. The masked language model randomly masks some of the tokens from the input, and the objective is to predict the original vocabulary id of the masked word](/img/papers/bert/p1-intro-mlm.png)](/img/papers/bert/p1-intro-mlm.png)
 > [![The paragraph continues on page 2: based only on its context. The MLM objective enables the representation to fuse the left and the right context. In addition, a next sentence prediction task jointly pre-trains text-pair representations](/img/papers/bert/p1-intro-mlm2.png)](/img/papers/bert/p1-intro-mlm2.png)
 >
@@ -470,7 +470,7 @@ The paragraph ends with a second task, **next sentence prediction**: given two p
 
 ## The three contributions {§1}
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 1 · page 2
+> [!PAPER] · Section 1 · page 2
 > [![The contributions of the paper as three bullet points: the importance of bidirectional pre-training; pre-trained representations reduce the need for heavily-engineered task-specific architectures; BERT advances the state of the art for eleven NLP tasks. The code and models are released on GitHub](/img/papers/bert/p1-contributions.png)](/img/papers/bert/p1-contributions.png)
 >
 > **Context:** the end of the introduction, where the authors list what is new in their paper.
@@ -540,7 +540,7 @@ GPT-2 (Radford et al., 2019, [*Language Models are Unsupervised Multitask Learne
 
 The paper puts its clearest picture of this argument in the appendix (Appendix A.4), so we read it now, where it belongs in the story.
 
-> [!PAPER] Devlin et al. (2018), BERT · Appendix A.4, Figure 3 · page 13
+> [!PAPER] · Appendix A.4, Figure 3 · page 13
 > [![Figure 3 of the BERT paper: three diagrams. BERT, a stack of Transformer blocks where every block connects to every position below. OpenAI GPT, a stack of Transformer blocks where each block connects only to positions on its left. ELMo, a left-to-right LSTM and a right-to-left LSTM whose outputs are combined. The caption says only BERT representations are jointly conditioned on both left and right context in all layers](/img/papers/bert/p1-figure3.png)](/img/papers/bert/p1-figure3.png)
 >
 > **Context:** Appendix A.4 compares BERT, OpenAI GPT and ELMo. Figure 3 draws the three of them.

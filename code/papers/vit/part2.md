@@ -13,7 +13,7 @@ Everything that can be checked, we check on a released model, `google/vit-base-p
 
 ## Related work: attention on images before ViT {§2}
 
-> [!PAPER] Dosovitskiy et al. (2020), ViT · Section 2 · page 2
+> [!PAPER] · Section 2 · page 2
 > [![The first paragraph of Section 2: Transformers were proposed by Vaswani et al. (2017) for machine translation and have since become the state of the art method in many NLP tasks. Large Transformer-based models are often pre-trained on large corpora and then fine-tuned: BERT uses a denoising self-supervised pre-training task, while the GPT line of work uses language modeling as its pre-training task](/img/papers/vit/p2-related-transformers.png)](/img/papers/vit/p2-related-transformers.png)
 >
 > **Context:** the opening of Related Work, right after the headline numbers of the introduction.
@@ -28,7 +28,7 @@ Everything that can be checked, we check on a released model, `google/vit-base-p
 > [!DEFINITION] Self-attention
 > The step in which every token in a sequence compares itself with every other token, decides how much to look at each one, and takes a weighted mix of their information. The weights are computed from the data, not fixed in advance. Appendix A of the paper, covered at the end of this part, writes it out.
 
-> [!PAPER] Dosovitskiy et al. (2020), ViT · Section 2 · page 2
+> [!PAPER] · Section 2 · page 2
 > [![The second paragraph of Section 2: naive application of self-attention to images would require that each pixel attends to every other pixel, with quadratic cost in the number of pixels. Parmar et al. applied self-attention only in local neighborhoods for each query pixel; such local blocks can completely replace convolutions (Hu, Ramachandran, Zhao); Sparse Transformers (Child et al.) employ scalable approximations; attention in blocks of varying sizes (Weissenborn) or only along individual axes (Ho, Wang); these require complex engineering to be implemented efficiently on hardware accelerators](/img/papers/vit/p2-related-approx.png)](/img/papers/vit/p2-related-approx.png)
 >
 > **Context:** the longest paragraph of Section 2. It lists the ways people made attention cheap enough for pictures.
@@ -74,7 +74,7 @@ And here are the patterns of the Sparse Transformer, which the ViT paper names e
 >
 > **Why it matters:** the pictures make "scalable approximations to global self-attention" concrete: it means deleting most cells of the attention matrix by hand. ViT's attention matrix is the full one, (a), but only 197×197.
 
-> [!PAPER] Dosovitskiy et al. (2020), ViT · Section 2 · page 2
+> [!PAPER] · Section 2 · page 2
 > [![The third paragraph of Section 2: most related to ours is the model of Cordonnier et al. (2020), which extracts patches of size 2 by 2 from the input image and applies full self-attention on top. This model is very similar to ViT, but our work goes further to demonstrate that large scale pre-training makes vanilla transformers competitive with state-of-the-art CNNs. Cordonnier et al. use a small patch size of 2 by 2 pixels, which makes the model applicable only to small-resolution images](/img/papers/vit/p2-related-cordonnier.png)](/img/papers/vit/p2-related-cordonnier.png)
 >
 > **Context:** the paragraph that names the closest earlier work.
@@ -98,7 +98,7 @@ The Cordonnier paper is about something else: it proves that attention *can* do 
 >
 > **Why it matters:** their 2×2 groups are the "patches" the ViT paper refers to. On a 32×32 image that gives 256 tokens; on a 224×224 image it would give 12,544, far too many. ViT's 16×16 patches give 196 at 224×224. Same idea, eight times larger patches, and a different question.
 
-> [!PAPER] Dosovitskiy et al. (2020), ViT · Section 2 · page 2
+> [!PAPER] · Section 2 · page 2
 > [![The fourth paragraph of Section 2: there has also been a lot of interest in combining convolutional neural networks with forms of self-attention, by augmenting feature maps for image classification (Bello et al.) or by further processing the output of a CNN using self-attention, for object detection (Hu et al., Carion et al.), video processing (Wang et al., Sun et al.), image classification (Wu et al.), unsupervised object discovery (Locatello et al.) or unified text-vision tasks (Chen et al., Lu et al., Li et al.)](/img/papers/vit/p2-related-cnn-attn.png)](/img/papers/vit/p2-related-cnn-attn.png)
 >
 > **Context:** the fourth paragraph: attention as an add-on to a CNN rather than a replacement.
@@ -110,7 +110,7 @@ The Cordonnier paper is about something else: it proves that attention *can* do 
 > [!DEFINITION] Feature map
 > The output of a convolutional layer: a grid of positions, each holding a vector of numbers. A ResNet turns a 224×224×3 picture into, for example, a 14×14×1024 feature map: 196 positions, each described by 1,024 numbers. The hybrid ViT reads these positions as tokens.
 
-> [!PAPER] Dosovitskiy et al. (2020), ViT · Section 2 · page 2
+> [!PAPER] · Section 2 · page 2
 > [![The fifth paragraph of Section 2: another recent related model is image GPT (iGPT), which applies Transformers to image pixels after reducing image resolution and color space. The model is trained in an unsupervised fashion as a generative model, and the resulting representation can then be fine-tuned or probed linearly for classification performance, achieving a maximal accuracy of 72% on ImageNet](/img/papers/vit/p2-related-igpt.png)](/img/papers/vit/p2-related-igpt.png)
 >
 > **Context:** the one earlier model that used a Transformer on raw pixels at scale.
@@ -128,7 +128,7 @@ The Cordonnier paper is about something else: it proves that attention *can* do 
 > [!DEFINITION] Linear probe
 > A test of a representation: freeze the model, take its output vectors, and train only one linear layer on top to predict the classes. If the probe scores well, the frozen vectors already contain the information. Part 4 uses a related "few-shot linear" measure.
 
-> [!PAPER] Dosovitskiy et al. (2020), ViT · Section 2 · page 2
+> [!PAPER] · Section 2 · page 2
 > [![The last paragraph of Section 2: our work adds to the increasing collection of papers that explore image recognition at larger scales than the standard ImageNet dataset. Additional data sources allow state-of-the-art results (Mahajan et al., Touvron et al., Xie et al.). Sun et al. (2017) study how CNN performance scales with dataset size, and Kolesnikov et al. (2020) and Djolonga et al. (2020) explore CNN transfer learning from ImageNet-21k and JFT-300M. We focus on these two latter datasets as well, but train Transformers instead of ResNet-based models](/img/papers/vit/p2-related-scale.png)](/img/papers/vit/p2-related-scale.png)
 >
 > **Context:** the closing paragraph, which places ViT in the "more data" line of work rather than the "new attention" line.
@@ -143,7 +143,7 @@ The Cordonnier paper is about something else: it proves that attention *can* do 
 
 Section 3 is short. It opens with one sentence of design philosophy and one picture, Figure 1. Here is the picture first, because everything else in this part explains one piece of it.
 
-> [!PAPER] Dosovitskiy et al. (2020), ViT · Figure 1 · page 3
+> [!PAPER] · Figure 1 · page 3
 > [![Figure 1 of the ViT paper. Left: a picture is split into nine patches, each goes through a linear projection of flattened patches, position embeddings 1 to 9 are added along with an extra learnable class embedding at position 0, the sequence enters a Transformer encoder, and an MLP head on the class token outputs Bird, Ball, Car. Right: the Transformer encoder block, repeated L times: Norm, Multi-Head Attention, a residual addition, Norm, MLP, another residual addition. Caption: we split an image into fixed-size patches, linearly embed each of them, add position embeddings, and feed the resulting sequence of vectors to a standard Transformer encoder; to perform classification we use the standard approach of adding an extra learnable classification token](/img/papers/vit/p2-figure1.png)](/img/papers/vit/p2-figure1.png)
 >
 > **Context:** the top of page 3, the one figure of the method section.
@@ -163,7 +163,7 @@ How to read Figure 1, left to right and bottom to top:
 
 {{FIG:p2_figure1_frames|Figure 1 redrawn as nine numbered frames with the real sizes. The 224×224×3 picture is cut into 196 patches of 16×16×3; each is flattened to 768 numbers and multiplied by E (768×768); the [class] token is prepended and 197 position rows are added; the 12-layer encoder keeps the shape 197×768; the [class] output is normalised and a single linear layer gives 1000 scores, the largest of which is "Egyptian cat" with probability 0.937 on our picture.}}
 
-> [!PAPER] Dosovitskiy et al. (2020), ViT · Section 3 · page 3
+> [!PAPER] · Section 3 · page 3
 > [![The opening of Section 3: in model design we follow the original Transformer (Vaswani et al., 2017) as closely as possible. An advantage of this intentionally simple setup is that scalable NLP Transformer architectures, and their efficient implementations, can be used almost out of the box](/img/papers/vit/p2-method-intro.png)](/img/papers/vit/p2-method-intro.png)
 >
 > **Context:** the two sentences between the Figure 1 caption and Section 3.1.
@@ -178,7 +178,7 @@ The phrase "out of the box" is also why we can check this paper so thoroughly. V
 
 ## From pixels to a sequence: the reshape {§3.1}
 
-> [!PAPER] Dosovitskiy et al. (2020), ViT · Section 3.1 · page 3
+> [!PAPER] · Section 3.1 · page 3
 > [![The first paragraph of Section 3.1: the standard Transformer receives as input a 1D sequence of token embeddings. To handle 2D images, we reshape the image x in R H by W by C into a sequence of flattened 2D patches x p in R N by P squared times C, where (H, W) is the resolution of the original image, C is the number of channels, (P, P) is the resolution of each image patch, and N equals HW over P squared is the resulting number of patches, which also serves as the effective input sequence length. The Transformer uses constant latent vector size D through all of its layers, so we flatten the patches and map to D dimensions with a trainable linear projection (Eq. 1). We refer to the output of this projection as the patch embeddings](/img/papers/vit/p2-vit-reshape.png)](/img/papers/vit/p2-vit-reshape.png)
 >
 > **Context:** the first paragraph of Section 3.1, which does the only real translation work in the paper: from a 2D picture to a 1D sequence.
@@ -271,7 +271,7 @@ A difference of $$5 \times 10^{-6}$$ is rounding noise in 32-bit arithmetic. So 
 
 ## The [class] token and the head {§3.1}
 
-> [!PAPER] Dosovitskiy et al. (2020), ViT · Section 3.1 · page 3
+> [!PAPER] · Section 3.1 · page 3
 > [![The second paragraph of Section 3.1: similar to BERT's class token, we prepend a learnable embedding to the sequence of embedded patches (z 0 0 equals x class), whose state at the output of the Transformer encoder (z L 0) serves as the image representation y (Eq. 4). Both during pre-training and fine-tuning, a classification head is attached to z L 0. The classification head is implemented by a MLP with one hidden layer at pre-training time and by a single linear layer at fine-tuning time](/img/papers/vit/p2-vit-class.png)](/img/papers/vit/p2-vit-class.png)
 >
 > **Context:** the second paragraph of Section 3.1, about the one token that is not a patch.
@@ -322,7 +322,7 @@ So the released files match the sentence: an MLP with one hidden layer for pre-t
 
 ## Position embeddings {§3.1}
 
-> [!PAPER] Dosovitskiy et al. (2020), ViT · Section 3.1 · page 3
+> [!PAPER] · Section 3.1 · page 3
 > [![The third paragraph of Section 3.1: position embeddings are added to the patch embeddings to retain positional information. We use standard learnable 1D position embeddings, since we have not observed significant performance gains from using more advanced 2D-aware position embeddings (Appendix D.4). The resulting sequence of embedding vectors serves as input to the encoder](/img/papers/vit/p2-vit-pos.png)](/img/papers/vit/p2-vit-pos.png)
 >
 > **Context:** the third paragraph of Section 3.1.
@@ -355,7 +355,7 @@ Compare with the original-order output in the Appendix A section: the rows for t
 
 ## The encoder: LayerNorm, attention, MLP {§3.1}
 
-> [!PAPER] Dosovitskiy et al. (2020), ViT · Section 3.1 · pages 3 and 4
+> [!PAPER] · Section 3.1 · pages 3 and 4
 > [![The fourth paragraph of Section 3.1: the Transformer encoder (Vaswani et al., 2017) consists of alternating layers of multiheaded self-attention (MSA, see Appendix A) and MLP blocks (Eq. 2, 3). Layernorm (LN) is applied before every block, and residual connections after every block (Wang et al., 2019; Baevski and Auli, 2019)](/img/papers/vit/p2-vit-encoder.png)](/img/papers/vit/p2-vit-encoder.png)
 > [![The paragraph continues at the top of page 4: the MLP contains two layers with a GELU non-linearity, followed by Equations 1 to 4](/img/papers/vit/p2-eq1-4.png)](/img/papers/vit/p2-eq1-4.png)
 >
@@ -636,7 +636,7 @@ The model says "Egyptian cat" with probability 0.937, and the next four guesses 
 
 ## Inductive bias {§3.1}
 
-> [!PAPER] Dosovitskiy et al. (2020), ViT · Section 3.1, Inductive bias · page 4
+> [!PAPER] · Section 3.1, Inductive bias · page 4
 > [![The Inductive bias paragraph: we note that Vision Transformer has much less image-specific inductive bias than CNNs. In CNNs, locality, two-dimensional neighborhood structure, and translation equivariance are baked into each layer throughout the whole model. In ViT, only MLP layers are local and translationally equivariant, while the self-attention layers are global. The two-dimensional neighborhood structure is used very sparingly: in the beginning of the model by cutting the image into patches and at fine-tuning time for adjusting the position embeddings for images of different resolution. Other than that, the position embeddings at initialization time carry no information about the 2D positions of the patches and all spatial relations between the patches have to be learned from scratch](/img/papers/vit/p2-inductive.png)](/img/papers/vit/p2-inductive.png)
 >
 > **Context:** the first of two named paragraphs that close Section 3.1. It restates the thesis of the introduction in the vocabulary of the model.
@@ -657,7 +657,7 @@ The paragraph's two claims about ViT are easy to confirm from what we computed. 
 
 ## Hybrid architecture {§3.1}
 
-> [!PAPER] Dosovitskiy et al. (2020), ViT · Section 3.1, Hybrid Architecture · page 4
+> [!PAPER] · Section 3.1, Hybrid Architecture · page 4
 > [![The Hybrid Architecture paragraph: as an alternative to raw image patches, the input sequence can be formed from feature maps of a CNN (LeCun et al., 1989). In this hybrid model, the patch embedding projection E (Eq. 1) is applied to patches extracted from a CNN feature map. As a special case, the patches can have spatial size 1x1, which means that the input sequence is obtained by simply flattening the spatial dimensions of the feature map and projecting to the Transformer dimension. The classification input embedding and position embeddings are added as described above](/img/papers/vit/p2-hybrid.png)](/img/papers/vit/p2-hybrid.png)
 >
 > **Context:** the last paragraph of Section 3.1, which defines the third model family of the paper (ResNet, ViT, hybrid).
@@ -680,7 +680,7 @@ In shapes: a ResNet turns the $$224 \times 224 \times 3$$ picture into a $$14 \t
 
 The next part reads the experimental setup in full. We need one table from it now, because every number above (768, 12, 3,072) came from it:
 
-> [!PAPER] Dosovitskiy et al. (2020), ViT · Table 1 · page 5
+> [!PAPER] · Table 1 · page 5
 > [![Table 1, details of Vision Transformer model variants: ViT-Base has 12 layers, hidden size D 768, MLP size 3072, 12 heads, 86M parameters; ViT-Large has 24 layers, 1024, 4096, 16 heads, 307M; ViT-Huge has 32 layers, 1280, 5120, 16 heads, 632M](/img/papers/vit/p2-table1.png)](/img/papers/vit/p2-table1.png)
 >
 > **Context:** Section 4.1, Model Variants. The paper says the Base and Large sizes "are directly adopted from BERT".
@@ -753,7 +753,7 @@ Two things stand out. The embeddings are tiny: 0.9% of the model, against about 
 
 The paper keeps the attention formulas out of the main text and puts them in Appendix A. They are the inside of the "MSA" box above.
 
-> [!PAPER] Dosovitskiy et al. (2020), ViT · Appendix A · page 13
+> [!PAPER] · Appendix A · page 13
 > [![Appendix A, Multihead Self-Attention: standard qkv self-attention is a popular building block. For each element in an input sequence z in R N by D, we compute a weighted sum over all values v in the sequence. The attention weights A i j are based on the pairwise similarity between two elements of the sequence and their respective query q i and key k j representations. Equation 5: q, k, v equals z U qkv, with U qkv in R D by 3 D h. Equation 6: A equals softmax of q k transpose over square root of D h, with A in R N by N. Equation 7: SA of z equals A v](/img/papers/vit/p2-appendix-a.png)](/img/papers/vit/p2-appendix-a.png)
 >
 > **Context:** the first half of Appendix A, one attention head.
@@ -856,7 +856,7 @@ which the script checks the same way (`A[t0, t0] = 3.173 / 4.803 = 0.661`). And 
 
 ### Equation 8: many heads
 
-> [!PAPER] Dosovitskiy et al. (2020), ViT · Appendix A · page 13
+> [!PAPER] · Appendix A · page 13
 > [![The second half of Appendix A: multihead self-attention (MSA) is an extension of SA in which we run k self-attention operations, called heads, in parallel, and project their concatenated outputs. To keep compute and number of parameters constant when changing k, D h (Eq. 5) is typically set to D over k. Equation 8: MSA of z equals the concatenation of SA 1 of z to SA k of z, times U msa, with U msa in R k D h by D](/img/papers/vit/p2-appendix-msa.png)](/img/papers/vit/p2-appendix-msa.png)
 >
 > **Context:** the second half of Appendix A.

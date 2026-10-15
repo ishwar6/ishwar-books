@@ -13,7 +13,7 @@ This part is about the second step of the recipe: **fine-tuning**. We read Secti
 
 ## One model, many tasks {§3.2}
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 3.2 · page 5
+> [!PAPER] · Section 3.2 · page 5
 > [![Section 3.2, first paragraph: fine-tuning is straightforward since self-attention lets BERT model many downstream tasks by swapping out the appropriate inputs and outputs. Encoding a concatenated text pair with self-attention effectively includes bidirectional cross attention between two sentences](/img/papers/bert/p4-finetune-swap.png)](/img/papers/bert/p4-finetune-swap.png)
 >
 > **Context:** the start of Section 3.2, "Fine-tuning BERT", right after the pre-training data.
@@ -32,7 +32,7 @@ The key sentence is the last one. Put a question and a passage into one sequence
 
 ## Plugging a task into BERT {§3.2}
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 3.2 · page 5
+> [!PAPER] · Section 3.2 · page 5
 > [![Section 3.2, second paragraph, first half: for each task, plug in the task-specific inputs and outputs and fine-tune all the parameters end-to-end. Sentence A and B are analogous to sentence pairs in paraphrasing, hypothesis-premise pairs in entailment, question-passage pairs in question answering](/img/papers/bert/p4-finetune-inputs.png)](/img/papers/bert/p4-finetune-inputs.png)
 > [![The paragraph continues in the right column: a degenerate text-empty pair in text classification or sequence tagging. Token representations go into an output layer for token-level tasks, the CLS representation into an output layer for classification](/img/papers/bert/p4-finetune-inputs2.png)](/img/papers/bert/p4-finetune-inputs2.png)
 >
@@ -98,7 +98,7 @@ averaged over all 12 layers and heads, "born" (question) gives 0.162 of its atte
 
 The paper draws these cases in Appendix A.5.
 
-> [!PAPER] Devlin et al. (2018), BERT · Appendix A.5 · page 14
+> [!PAPER] · Appendix A.5 · page 14
 > [![Appendix A.5: task-specific models are formed by incorporating BERT with one additional output layer, so a minimal number of parameters are learned from scratch. Tasks (a) and (b) are sequence-level, (c) and (d) are token-level](/img/papers/bert/p4-a5.png)](/img/papers/bert/p4-a5.png)
 >
 > **Context:** Appendix A.5, which exists only to introduce Figure 4.
@@ -107,7 +107,7 @@ The paper draws these cases in Appendix A.5.
 >
 > **Why it matters:** "learned from scratch" is the key phrase. Only the tiny output layer starts random; everything else starts from pre-training.
 
-> [!PAPER] Devlin et al. (2018), BERT · Appendix A.5, Figure 4 · page 15
+> [!PAPER] · Appendix A.5, Figure 4 · page 15
 > [![Figure 4 of the BERT paper: four diagrams. (a) Sentence pair classification (MNLI, QQP, QNLI, STS-B, MRPC, RTE, SWAG): the class label comes from C. (b) Single sentence classification (SST-2, CoLA): class label from C. (c) Question answering (SQuAD v1.1): start and end span read from the passage tokens. (d) Single sentence tagging (CoNLL-2003 NER): one tag per token, like O and B-PER](/img/papers/bert/p4-figure4.png)](/img/papers/bert/p4-figure4.png)
 >
 > **Context:** Figure 4, the picture for all of Section 4.
@@ -125,7 +125,7 @@ How to read each panel:
 
 ## Fine-tuning is cheap {§3.2}
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 3.2 and footnote 7 · page 5
+> [!PAPER] · Section 3.2 and footnote 7 · page 5
 > [![Section 3.2, last paragraph: compared to pre-training, fine-tuning is relatively inexpensive. All results can be replicated in at most 1 hour on a single Cloud TPU, or a few hours on a GPU, starting from the exact same pre-trained model](/img/papers/bert/p4-finetune-cost.png)](/img/papers/bert/p4-finetune-cost.png)
 > [![Footnote 7: for example, the BERT SQuAD model can be trained in around 30 minutes on a single Cloud TPU to achieve a Dev F1 score of 91.0%](/img/papers/bert/p4-footnote7.png)](/img/papers/bert/p4-footnote7.png)
 >
@@ -144,7 +144,7 @@ We will test the "few hours on a GPU" claim ourselves later in this part, on the
 
 Which settings did the authors use for fine-tuning? Appendix A.3 answers.
 
-> [!PAPER] Devlin et al. (2018), BERT · Appendix A.3 · pages 13 and 14
+> [!PAPER] · Appendix A.3 · pages 13 and 14
 > [![Appendix A.3: for fine-tuning, most hyperparameters are the same as in pre-training, except the batch size, learning rate and number of training epochs. Dropout is kept at 0.1. Batch size 16 or 32](/img/papers/bert/p4-a3.png)](/img/papers/bert/p4-a3.png)
 > [![Appendix A.3 continued: learning rate 5e-5, 3e-5 or 2e-5; number of epochs 2, 3 or 4. Large data sets with 100k+ labeled examples were far less sensitive to the choice than small data sets; it is reasonable to run an exhaustive search and pick the best model on the development set](/img/papers/bert/p4-a3b.png)](/img/papers/bert/p4-a3b.png)
 >
@@ -169,7 +169,7 @@ The size of the grid is 2 batch sizes × 3 learning rates × 3 epoch counts = 18
 
 ## Section 4: the experiments {§4}
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 4 and 4.1 · page 5
+> [!PAPER] · Section 4 and 4.1 · page 5
 > [![The start of Section 4, Experiments: fine-tuning results on 11 NLP tasks. Section 4.1 GLUE: the General Language Understanding Evaluation benchmark is a collection of diverse natural language understanding tasks](/img/papers/bert/p4-glue-intro.png)](/img/papers/bert/p4-glue-intro.png)
 >
 > **Context:** the beginning of Section 4.
@@ -202,7 +202,7 @@ First, the benchmark's own summary table:
 
 Before the results, let us meet the tasks. Appendix B.1 describes each one.
 
-> [!PAPER] Devlin et al. (2018), BERT · Appendix B.1 · page 14
+> [!PAPER] · Appendix B.1 · page 14
 > [![Appendix B.1: GLUE results come from the GLUE leaderboard and the OpenAI blog. MNLI: given a pair of sentences, predict entailment, contradiction or neutral. QQP: are two Quora questions semantically equivalent. QNLI: a version of SQuAD converted to binary classification, does the sentence contain the answer to the question](/img/papers/bert/p4-b1a.png)](/img/papers/bert/p4-b1a.png)
 > [![Appendix B.1 continued: SST-2, binary sentiment of movie review sentences. CoLA, is an English sentence linguistically acceptable. STS-B, sentence pairs scored 1 to 5 for similarity. MRPC, are two news sentences semantically equivalent](/img/papers/bert/p4-b1b.png)](/img/papers/bert/p4-b1b.png)
 > [![Appendix B.1 continued: RTE, binary entailment like MNLI with much less training data. WNLI, a small inference dataset with construction issues; every submitted system performed worse than the 65.1 majority-class baseline, so it is excluded to be fair to OpenAI GPT](/img/papers/bert/p4-b1c.png)](/img/papers/bert/p4-b1c.png)
@@ -235,7 +235,7 @@ Here are all nine in plain words, with one made-up example each:
 
 ## The classification layer {§4.1}
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 4.1 · page 5
+> [!PAPER] · Section 4.1 · page 5
 > [![Section 4.1: to fine-tune on GLUE, use the final hidden vector C corresponding to the first input token, CLS, as the aggregate representation. The only new parameters are classification layer weights W in R K by H, where K is the number of labels. Compute a standard classification loss with C and W, log of softmax of C W transpose](/img/papers/bert/p4-glue-head.png)](/img/papers/bert/p4-glue-head.png)
 >
 > **Context:** the second paragraph of Section 4.1, the first concrete fine-tuning recipe of the paper.
@@ -346,7 +346,7 @@ The hand-written loss and the library's loss agree to all six printed decimals. 
 
 ## Table 1: the GLUE results {§4.1}
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 4.1, footnote 9 and the paragraph after Table 1 · page 6
+> [!PAPER] · Section 4.1, footnote 9 and the paragraph after Table 1 · page 6
 > [![Footnote 9 of the BERT paper: the GLUE data set distribution does not include the Test labels, and we only made a single GLUE evaluation server submission for each of BERT-base and BERT-large](/img/papers/bert/p4-footnote9.png)](/img/papers/bert/p4-footnote9.png)
 > [![From Section 4.1: BERT-base and OpenAI GPT are nearly identical in terms of model architecture apart from the attention masking; for MNLI, BERT obtains a 4.6% absolute accuracy improvement](/img/papers/bert/p4-gpt-arch.png)](/img/papers/bert/p4-gpt-arch.png)
 >
@@ -356,7 +356,7 @@ The hand-written loss and the library's loss agree to all six printed decimals. 
 >
 > **Why it matters:** one submission means the test numbers were not tuned by trying many times against the hidden labels. And the second sentence is what makes the GPT row a fair comparison: same size, different mask (Part 1).
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 4.1, Table 1 · page 6
+> [!PAPER] · Section 4.1, Table 1 · page 6
 > [![Table 1: GLUE test results. Columns MNLI matched and mismatched, QQP, QNLI, SST-2, CoLA, STS-B, MRPC, RTE and Average, with training set sizes below each name. Rows: Pre-OpenAI SOTA 74.0 average, BiLSTM+ELMo+Attn 71.0, OpenAI GPT 75.1, BERT-base 79.6, BERT-large 82.1](/img/papers/bert/p4-table1.png)](/img/papers/bert/p4-table1.png)
 >
 > **Context:** the main results table of the paper, at the top of page 6.
@@ -388,7 +388,7 @@ And the rows:
 - **OpenAI GPT**: the left-to-right Transformer from Part 1, fine-tuned the same way.
 - **BERT-base and BERT-large**: one model each, one task at a time ("single-model, single task").
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 4.1 · page 6
+> [!PAPER] · Section 4.1 · page 6
 > [![Section 4.1: batch size 32, fine-tune for 3 epochs for all GLUE tasks; for each task the best learning rate among 5e-5, 4e-5, 3e-5 and 2e-5 on the Dev set. For BERT-large, fine-tuning was sometimes unstable on small datasets, so several random restarts were run and the best model on Dev selected](/img/papers/bert/p4-glue-setup.png)](/img/papers/bert/p4-glue-setup.png)
 > [![Section 4.1 results: both BERT models outperform all systems on all tasks, with 4.5% and 7.0% average improvement over the prior state of the art. On the official GLUE leaderboard, BERT-large obtains 80.5, compared to OpenAI GPT with 72.8](/img/papers/bert/p4-glue-results.png)](/img/papers/bert/p4-glue-results.png)
 >
@@ -405,7 +405,7 @@ The two averages check out against the table: $$79.6 - 75.1 = 4.5$$ and $$82.1 -
 
 Two more sentences in this paragraph matter. First, "BERT-base and OpenAI GPT are nearly identical in terms of model architecture apart from the attention masking": the 4.5-point gap comes mostly from reading in both directions and from the pre-training tasks (Part 5 tests this). Second, footnote 9 says the GLUE test labels are hidden, and the authors "only made a single GLUE evaluation server submission for each of BERT-base and BERT-large". They did not tune on the test set.
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 4.1 · page 6
+> [!PAPER] · Section 4.1 · page 6
 > [![BERT-large significantly outperforms BERT-base across all tasks, especially those with very little training data. The effect of model size is explored in Section 5.2](/img/papers/bert/p4-glue-size.png)](/img/papers/bert/p4-glue-size.png)
 >
 > **Context:** the last sentence of Section 4.1.
@@ -494,7 +494,7 @@ What a SQuAD example looks like, from the dataset's own paper:
 >
 > **Why it matters:** because every answer is a span, the model never has to *write* anything. It only has to point at a start and an end, which is why two vectors are enough.
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 4.2 · page 6
+> [!PAPER] · Section 4.2 · page 6
 > [![Section 4.2: the Stanford Question Answering Dataset, SQuAD v1.1, is a collection of 100k crowd-sourced question and answer pairs. Given a question and a passage from](/img/papers/bert/p4-squad-intro.png)](/img/papers/bert/p4-squad-intro.png)
 > [![Section 4.2 continued: predict the answer text span in the passage. The question uses the A embedding and the passage the B embedding. Only a start vector S and an end vector E are introduced. The probability of word i being the start is a softmax of S dot T i over the paragraph. The score of a span from i to j is S dot T i plus E dot T j, and the maximum scoring span with j at least i is the prediction. The training objective is the sum of the log-likelihoods of the correct start and end positions. 3 epochs, learning rate 5e-5, batch size 32](/img/papers/bert/p4-squad-se.png)](/img/papers/bert/p4-squad-se.png)
 >
@@ -646,7 +646,7 @@ The misses are instructive. "What was the theme of Super Bowl 50?" appears twice
 
 Two footnotes qualify Table 2:
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 4.2, footnotes 11 and 12 · page 7
+> [!PAPER] · Section 4.2, footnotes 11 and 12 · page 7
 > [![Footnote 11 of the BERT paper: QANet is described in Yu et al. 2018, but the system has improved substantially after publication](/img/papers/bert/p4-footnote11.png)](/img/papers/bert/p4-footnote11.png)
 > [![Footnote 12 of the BERT paper: the TriviaQA data used consists of paragraphs from TriviaQA-Wiki formed of the first 400 tokens in documents that contain at least one of the provided possible answers](/img/papers/bert/p4-footnote12.png)](/img/papers/bert/p4-footnote12.png)
 >
@@ -656,7 +656,7 @@ Two footnotes qualify Table 2:
 >
 > **Why it matters:** both are honesty notes. Leaderboard entries were moving targets, and the "+TriviaQA" rows used extra training data, so they are not directly comparable with systems that did not.
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 4.2, Table 2 · page 7
+> [!PAPER] · Section 4.2, Table 2 · page 7
 > [![Table 2: SQuAD 1.1 results. Top leaderboard systems on Dec 10th 2018: Human test EM 82.3 F1 91.2, #1 ensemble nlnet 86.0 and 91.7. Published: BiDAF+ELMo, R.M. Reader. Ours: BERT-base single dev EM 80.8 F1 88.5; BERT-large single 84.1 and 90.9; BERT-large ensemble 85.8 and 91.8; BERT-large single plus TriviaQA dev 84.2 and 91.1, test 85.1 and 91.8; BERT-large ensemble plus TriviaQA dev 86.2 and 92.2, test 87.4 and 93.2. The ensemble is 7 systems with different pre-training checkpoints and fine-tuning seeds](/img/papers/bert/p4-table2.png)](/img/papers/bert/p4-table2.png)
 >
 > **Context:** the SQuAD v1.1 results table.
@@ -668,7 +668,7 @@ Two footnotes qualify Table 2:
 > [!DEFINITION] Ensemble
 > Several models trained separately whose answers are combined. Here, "7x systems which use different pre-training checkpoints and fine-tuning seeds". Ensembles are usually a point or two better than any single member, and cost 7 times as much to run.
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 4.2 · pages 6 and 7
+> [!PAPER] · Section 4.2 · pages 6 and 7
 > [![Section 4.2: the top leaderboard systems may use any public data, so BERT first fine-tunes on TriviaQA before SQuAD. The best system outperforms the top leaderboard system by +1.5 F1 as an ensemble and +1.3 F1 as a single system; the single BERT model beats the top ensemble in F1](/img/papers/bert/p4-squad-trivia.png)](/img/papers/bert/p4-squad-trivia.png)
 > [![Without TriviaQA fine-tuning data, we only lose 0.1-0.4 F1, still outperforming all existing systems by a wide margin](/img/papers/bert/p4-squad-trivia2.png)](/img/papers/bert/p4-squad-trivia2.png)
 >
@@ -691,7 +691,7 @@ The arithmetic: the ensemble's 93.2 test F1 minus the top leaderboard ensemble's
 >
 > **Why it matters:** these traps are why SQuAD 2.0 is hard: a model that just matches words will answer confidently and be wrong.
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 4.3 · page 7
+> [!PAPER] · Section 4.3 · page 7
 > [![Section 4.3: SQuAD 2.0 allows that no short answer exists in the paragraph. Questions without an answer are treated as having an answer span that starts and ends at the CLS token. For prediction, compare the score of the no-answer span s null equal to S dot C plus E dot C to the score of the best non-null span](/img/papers/bert/p4-squad2.png)](/img/papers/bert/p4-squad2.png)
 > [![Section 4.3 continued: s hat i j equals the max over j at least i of S dot T i plus E dot T j. Predict a non-null answer when s hat is greater than s null plus tau, where the threshold tau is selected on the dev set to maximize F1. No TriviaQA. 2 epochs, learning rate 5e-5, batch size 48. A +5.1 F1 improvement over the previous best system](/img/papers/bert/p4-squad2b.png)](/img/papers/bert/p4-squad2b.png)
 >
@@ -780,7 +780,7 @@ One caution, which applies to the paper too: choosing $$\tau$$ on the dev set an
 
 ### Table 3 {§4.3}
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 4.3, Table 3 · page 7
+> [!PAPER] · Section 4.3, Table 3 · page 7
 > [![Table 3: SQuAD 2.0 results, excluding systems that use BERT. Human dev EM 86.3 F1 89.0, test 86.9 and 89.5. Number 1 single MIR-MRC test 74.8 and 78.0. Number 2 nlnet 74.2 and 77.1. Published unet ensemble 71.4 and 74.9, SLQA+ 71.4 and 74.4. BERT-large single dev 78.7 and 81.9, test 80.0 and 83.1](/img/papers/bert/p4-table3.png)](/img/papers/bert/p4-table3.png)
 >
 > **Context:** the SQuAD 2.0 results table.
@@ -803,7 +803,7 @@ One caution, which applies to the paper too: choosing $$\tau$$ on the dev set an
 > [!DEFINITION] Adversarial filtering
 > Building a test by keeping only the wrong answers that fool existing models. The test is then hard on purpose for the models of its time.
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 4.4 · page 7
+> [!PAPER] · Section 4.4 · page 7
 > [![Section 4.4: SWAG contains 113k sentence-pair completion examples for grounded commonsense inference; choose the most plausible continuation among four choices. Construct four input sequences, each the given sentence plus one possible continuation. The only new parameter is a vector whose dot product with C gives a score for each choice, normalized with softmax. 3 epochs, learning rate 2e-5, batch size 16. BERT-large outperforms ESIM+ELMo by +27.1% and OpenAI GPT by 8.3%](/img/papers/bert/p4-swag.png)](/img/papers/bert/p4-swag.png)
 >
 > **Context:** Section 4.4, the last task of Section 4.
@@ -848,7 +848,7 @@ scores C.w by hand: [-0.3572, 0.141, -0.337, -0.0369];  library: [-0.3572, 0.141
 softmax over the 4 choices (untrained w): [0.198, 0.326, 0.202, 0.273]
 ```
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 4.4, Table 4 · page 7
+> [!PAPER] · Section 4.4, Table 4 · page 7
 > [![Table 4: SWAG dev and test accuracies. ESIM+GloVe 51.9 and 52.7, ESIM+ELMo 59.1 and 59.2, OpenAI GPT test 78.0, BERT-base dev 81.6, BERT-large dev 86.6 and test 86.3. Human expert 85.0, human with 5 annotations 88.0, measured with 100 samples](/img/papers/bert/p4-table4.png)](/img/papers/bert/p4-table4.png)
 >
 > **Context:** the SWAG results.

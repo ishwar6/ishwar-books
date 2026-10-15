@@ -17,6 +17,8 @@ export type PageMeta = {
   seriesPart?: number
   accent?: string
   partNumber?: number
+  partLabel?: string
+  partOf?: string
   covers?: string
 }
 export type Book = {

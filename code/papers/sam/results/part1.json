@@ -1,0 +1,184 @@
+{
+ "params": {
+  "facebook/sam-vit-base": {
+   "image_encoder": 89670912,
+   "prompt_encoder": 6476,
+   "mask_decoder": 4058340,
+   "total": 93735728,
+   "layers": 12,
+   "width": 768,
+   "heads": 12,
+   "global_layers": [
+    2,
+    5,
+    8,
+    11
+   ]
+  },
+  "facebook/sam-vit-large": {
+   "image_encoder": 308278272,
+   "prompt_encoder": 6476,
+   "mask_decoder": 4058340,
+   "total": 312343088,
+   "layers": 24,
+   "width": 1024,
+   "heads": 16,
+   "global_layers": [
+    5,
+    11,
+    17,
+    23
+   ]
+  },
+  "facebook/sam-vit-huge": {
+   "image_encoder": 637026048,
+   "prompt_encoder": 6476,
+   "mask_decoder": 4058340,
+   "total": 641090864,
+   "layers": 32,
+   "width": 1280,
+   "heads": 16,
+   "global_layers": [
+    7,
+    15,
+    23,
+    31
+   ]
+  }
+ },
+ "pipeline": {
+  "orig": [
+   640,
+   480
+  ],
+  "resized": [
+   1024,
+   768
+  ],
+  "padded": [
+   1024,
+   1024
+  ],
+  "pixel_numbers": 3145728,
+  "embedding": [
+   1,
+   256,
+   64,
+   64
+  ],
+  "embedding_numbers": 1048576
+ },
+ "clicks": {
+  "ear": {
+   "point": [
+    275,
+    62
+   ],
+   "masks": [
+    {
+     "score": 0.9464314579963684,
+     "pixels": 427,
+     "percent": 0.13899739583333334
+    },
+    {
+     "score": 0.944463849067688,
+     "pixels": 470,
+     "percent": 0.15299479166666666
+    },
+    {
+     "score": 0.9801292419433594,
+     "pixels": 49520,
+     "percent": 16.119791666666668
+    }
+   ],
+   "best": 3,
+   "pair_iou": {
+    "1-2": 0.8964059196617337,
+    "1-3": 0.00821558336697618,
+    "2-3": 0.009144679734339987
+   }
+  },
+  "remote": {
+   "point": [
+    80,
+    90
+   ],
+   "masks": [
+    {
+     "score": 0.6564839482307434,
+     "pixels": 772,
+     "percent": 0.2513020833333333
+    },
+    {
+     "score": 0.9894577264785767,
+     "pixels": 4089,
+     "percent": 1.3310546875
+    },
+    {
+     "score": 0.7926599979400635,
+     "pixels": 44927,
+     "percent": 14.624674479166666
+    }
+   ],
+   "best": 2,
+   "pair_iou": {
+    "1-2": 0.1887992174125703,
+    "1-3": 0.017183430899013957,
+    "2-3": 0.09091718412677216
+   }
+  }
+ },
+ "ear_iou": {
+  "a": 427,
+  "b": 470,
+  "inter": 424,
+  "union": 473,
+  "iou": 0.8964059196617337
+ },
+ "ear_single": {
+  "score": 0.9259190559387207,
+  "pixels": 465
+ },
+ "two_clicks": {
+  "score": 0.9687094688415527,
+  "pixels": 50214
+ },
+ "box": {
+  "box": [
+   255,
+   20,
+   640,
+   360
+  ],
+  "score": 0.9955452680587769,
+  "pixels": 58209
+ },
+ "timing": {
+  "facebook/sam-vit-base": {
+   "encoder_mps": 0.7561691874987446,
+   "decoder_mps": 0.005702696660300717,
+   "encoder_cpu": 1.444337139003134,
+   "decoder_cpu": 0.017622950840741395
+  },
+  "facebook/sam-vit-huge": {
+   "encoder_mps": 3.0693817167019004,
+   "decoder_mps": 0.005772140839835629,
+   "encoder_cpu": 6.8094411946561495,
+   "decoder_cpu": 0.017475023340666668
+  }
+ },
+ "amortized": [
+  {
+   "k": 1,
+   "ms": 3086.8567400425673
+  },
+  {
+   "k": 10,
+   "ms": 324.4131950108567
+  },
+  {
+   "k": 100,
+   "ms": 48.168840507685665
+  }
+ ]
+}

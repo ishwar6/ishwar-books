@@ -13,7 +13,7 @@ This part reads the paper's answer: Section 5 (the ablation studies), plus Appen
 
 ## What an ablation study is {§5}
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 5 · page 7
+> [!PAPER] · Section 5 · page 7
 > [![The opening of Section 5, Ablation Studies: in this section, we perform ablation experiments over a number of facets of BERT in order to better understand their relative importance](/img/papers/bert/p5-intro.png)](/img/papers/bert/p5-intro.png)
 >
 > **Context:** right after the experiments of Section 4 (GLUE, SQuAD, SWAG), where BERT set new records.
@@ -32,7 +32,7 @@ The key rule of a good ablation is in the next screenshot: change **one** thing 
 
 ## Effect of the pre-training tasks {§5.1}
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 5.1 · page 8
+> [!PAPER] · Section 5.1 · page 8
 > [![Section 5.1: two pre-training objectives evaluated using exactly the same pre-training data, fine-tuning scheme, and hyperparameters as BERT-base. No NSP is a bidirectional model trained with the masked LM but without next sentence prediction. LTR and No NSP is a left-context-only model trained as a standard left-to-right LM, with the left-only constraint also applied at fine-tuning, and no NSP. This is directly comparable to OpenAI GPT, but using a larger training dataset, the BERT input representation and the BERT fine-tuning scheme](/img/papers/bert/p5-setup.png)](/img/papers/bert/p5-setup.png)
 >
 > **Context:** the first ablation, about the two pre-training tasks of Part 3 (masked LM and next sentence prediction).
@@ -60,7 +60,7 @@ What differs between the four models is easiest to see in their attention masks 
 
 ### Table 5, row by row
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 5.1, Table 5 · page 8
+> [!PAPER] · Section 5.1, Table 5 · page 8
 > [![Table 5 of the BERT paper: Dev set results on MNLI-m, QNLI, MRPC, SST-2 (accuracy) and SQuAD (F1). BERT-base 84.4, 88.4, 86.7, 92.7, 88.5. No NSP 83.9, 84.9, 86.5, 92.6, 87.9. LTR and No NSP 82.1, 84.3, 77.5, 92.1, 77.8. Plus BiLSTM 82.1, 84.1, 75.7, 91.6, 84.9](/img/papers/bert/p5-table5.png)](/img/papers/bert/p5-table5.png)
 >
 > **Context:** the results of the models just described, all with the BERT-base architecture.
@@ -96,7 +96,7 @@ effect of adding a BiLSTM to the LTR model        +0.0    -0.2    -1.8    -0.5  
 
 **Row 1 to row 2: removing NSP.**
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 5.1 · page 8
+> [!PAPER] · Section 5.1 · page 8
 > [![We first examine the impact brought by the NSP task. In Table 5, we show that removing NSP hurts performance significantly on QNLI, MNLI, and SQuAD 1.1. The LTR model performs worse than the MLM model on all tasks, with large drops on MRPC and SQuAD](/img/papers/bert/p5-nsp-ltr.png)](/img/papers/bert/p5-nsp-ltr.png)
 >
 > **Context:** the paper's reading of Table 5.
@@ -112,7 +112,7 @@ Looking at the computed differences, the NSP claim is weaker than the word "sign
 
 **Row 2 to row 3: one direction instead of two.** This is the big one. With everything else equal, going from the masked LM to a left-to-right LM costs **9.0** points on MRPC and **10.1** points of F1 on SQuAD, and loses something on every task. This is the cleanest evidence in the paper that the bidirectional design, not just more data or a bigger batch, explains much of BERT's gain.
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 5.1 · page 8
+> [!PAPER] · Section 5.1 · page 8
 > [![For SQuAD it is intuitively clear that a LTR model will perform poorly at token predictions, since the token-level hidden states have no right-side context. In order to make a good faith attempt at strengthening the LTR system, we added a randomly initialized BiLSTM on top](/img/papers/bert/p5-bilstm.png)](/img/papers/bert/p5-bilstm.png)
 > [![The paragraph ends at the top of the next column: results are still far worse than those of the pre-trained bidirectional models. The BiLSTM hurts performance on the GLUE tasks](/img/papers/bert/p5-bilstm2.png)](/img/papers/bert/p5-bilstm2.png)
 >
@@ -130,7 +130,7 @@ On the GLUE tasks the BiLSTM does not help at all (MNLI unchanged, the others do
 
 ### Why not just do what ELMo does?
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 5.1 · page 8
+> [!PAPER] · Section 5.1 · page 8
 > [![We recognize that it would also be possible to train separate LTR and RTL models and represent each token as the concatenation of the two models, as ELMo does. However: (a) this is twice as expensive as a single bidirectional model; (b) this is non-intuitive for tasks like QA, since the RTL model would not be able to condition the answer on the question; (c) this it is strictly less powerful than a deep bidirectional model, since it can use both left and right context at every layer](/img/papers/bert/p5-elmo-args.png)](/img/papers/bert/p5-elmo-args.png)
 >
 > **Context:** the last paragraph of Section 5.1. The paper did not run this experiment; it argues instead.
@@ -183,7 +183,7 @@ where $$h_{k,j}$$ is the (forward and backward, concatenated) vector of token $$
 
 Table 5's LTR & No NSP row matters for one more reason, which the paper explains in Appendix A.4.
 
-> [!PAPER] Devlin et al. (2018), BERT · Appendix A.4 · page 14
+> [!PAPER] · Appendix A.4 · page 14
 > [![Appendix A.4: OpenAI GPT is the most comparable method. Many design decisions in BERT were made to be as close to GPT as possible. Other differences: GPT is trained on the BooksCorpus (800M words), BERT on BooksCorpus and Wikipedia (2,500M words); GPT uses [SEP] and [CLS] only at fine-tuning time, BERT learns them and the sentence A and B embeddings during pre-training; GPT was trained for 1M steps with a batch size of 32,000 words, BERT for 1M steps with 128,000 words; GPT used the same learning rate of 5e-5 for all fine-tuning experiments, BERT chooses a task-specific fine-tuning learning rate](/img/papers/bert/p5-a4.png)](/img/papers/bert/p5-a4.png)
 >
 > **Context:** Appendix A.4 compares BERT, ELMo and OpenAI GPT (Figure 3 of the paper, which we read in Part 1).
@@ -199,7 +199,7 @@ Table 5's LTR & No NSP row matters for one more reason, which the paper explains
 | Batch size | 32,000 words, 1M steps | 128,000 words, 1M steps |
 | Fine-tuning learning rate | always 5e-5 | best of several, chosen per task on Dev |
 
-> [!PAPER] Devlin et al. (2018), BERT · Appendix A.4 · page 13
+> [!PAPER] · Appendix A.4 · page 13
 > [![The opening of Appendix A.4: BERT and OpenAI GPT are fine-tuning approaches, while ELMo is a feature-based approach; many design decisions in BERT were intentionally made to make it as close to GPT as possible; the bi-directionality and the two pre-training tasks account for the majority of the empirical improvements](/img/papers/bert/p5-a4-open.png)](/img/papers/bert/p5-a4-open.png)
 >
 > **Context:** the start of Appendix A.4, just before the list of differences in the table above.
@@ -210,7 +210,7 @@ Table 5's LTR & No NSP row matters for one more reason, which the paper explains
 
 <figure class="fig"><svg viewBox="0 0 760 384" role="img" aria-label="The four differences between GPT and BERT besides the architecture: BERT used about four times more text, a four times larger batch, learned its special tokens during pre-training, and tuned the fine-tuning learning rate per task. The LTR and No NSP ablation keeps all four and still loses."><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0,0L10,5L0,10z"/></marker><marker id="ah-on" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-on" d="M0,0L10,5L0,10z"/></marker><marker id="ah-2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-2" d="M0,0L10,5L0,10z"/></marker></defs><text class="t-title" x="14.0" y="22.0" text-anchor="start">Appendix A.4: the four non-architecture differences between OpenAI GPT and BERT</text><rect class="s2" x="14" y="36" width="12" height="12" rx="2"/><text class="t-note" x="32.0" y="46.0" text-anchor="start">OpenAI GPT</text><rect class="s1" x="130" y="36" width="12" height="12" rx="2"/><text class="t-note" x="148.0" y="46.0" text-anchor="start">BERT</text><text class="t-note" x="14.0" y="78.0" text-anchor="start">pre-training text</text><rect class="s2" x="190" y="64" width="80.0" height="18" rx="3"/><text class="t-tick" x="276.0" y="78.0" text-anchor="start">BooksCorpus, 800M words</text><rect class="s1" x="190" y="88" width="330.0" height="18" rx="3"/><text class="t-tick" x="526.0" y="102.0" text-anchor="start">BooksCorpus + Wikipedia, 3,300M words</text><text class="t-note" x="14.0" y="142.0" text-anchor="start">batch size</text><rect class="s2" x="190" y="128" width="82.5" height="18" rx="3"/><text class="t-tick" x="278.5" y="142.0" text-anchor="start">32,000 words per step, 1M steps</text><rect class="s1" x="190" y="152" width="330.0" height="18" rx="3"/><text class="t-tick" x="526.0" y="166.0" text-anchor="start">128,000 words per step, 1M steps</text><text class="t-note" x="14.0" y="206.0" text-anchor="start">[CLS], [SEP], A/B</text><rect class="box-2" x="190.0" y="192.0" width="250.0" height="22.0" rx="5"/><text class="t-tick" x="200.0" y="207.0" text-anchor="start">GPT: added only at fine-tuning</text><rect class="box-1" x="190.0" y="220.0" width="250.0" height="22.0" rx="5"/><text class="t-tick" x="200.0" y="235.0" text-anchor="start">BERT: learned during pre-training</text><text class="t-note" x="14.0" y="270.0" text-anchor="start">fine-tuning rate</text><rect class="box-2" x="190.0" y="256.0" width="250.0" height="22.0" rx="5"/><text class="t-tick" x="200.0" y="271.0" text-anchor="start">GPT: always 5e-5</text><rect class="box-1" x="190.0" y="284.0" width="250.0" height="22.0" rx="5"/><text class="t-tick" x="200.0" y="299.0" text-anchor="start">BERT: best of 5e-5, 3e-5, 2e-5 on Dev</text><rect class="box-on" x="14.0" y="326.0" width="732.0" height="46.0" rx="10"/><text class="t-note" x="26.0" y="345.0" text-anchor="start">The "LTR &amp; No NSP" row of Table 5 = GPT's objective + all four BERT advantages above.</text><text class="t-tick" x="26.0" y="363.0" text-anchor="start">So its gap to BERT-base (MRPC 77.5 vs 86.7, SQuAD 77.8 vs 88.5) comes from the masked LM and NSP.</text></svg><figcaption>The four non-architecture differences between OpenAI GPT and BERT, as bars and boxes: training text (800M against 3,300M words), batch size (32,000 against 128,000 words per step), when [CLS], [SEP] and A/B are learned, and the fine-tuning learning rate. The "LTR & No NSP" row of Table 5 is GPT's objective with all four BERT advantages.</figcaption></figure>
 
-> [!PAPER] Devlin et al. (2018), BERT · Appendix A.4 · page 14
+> [!PAPER] · Appendix A.4 · page 14
 > [![To isolate the effect of these differences, we perform ablation experiments in Section 5.1 which demonstrate that the majority of the improvements are in fact coming from the two pre-training tasks and the bidirectionality they enable](/img/papers/bert/p5-a4-end.png)](/img/papers/bert/p5-a4-end.png)
 >
 > **Context:** the end of Appendix A.4, pointing back to Section 5.1.
@@ -223,7 +223,7 @@ The logic: the LTR & No NSP model is GPT's recipe (left to right, no NSP) but tr
 
 ## Effect of model size {§5.2}
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 5.2 · page 8
+> [!PAPER] · Section 5.2 · page 8
 > [![Section 5.2: we trained BERT models with a differing number of layers, hidden units and attention heads, otherwise using the same hyperparameters and training procedure. Table 6 reports the average Dev Set accuracy from 5 random restarts of fine-tuning. Larger models lead to a strict accuracy improvement across all four datasets, even for MRPC which only has 3,600 labeled training examples](/img/papers/bert/p5-size-intro.png)](/img/papers/bert/p5-size-intro.png)
 >
 > **Context:** the second ablation: not *what* BERT learns, but *how big* it is.
@@ -240,7 +240,7 @@ The logic: the LTR & No NSP model is GPT's recipe (left to right, no NSP) but tr
 
 A small inconsistency: the text says "all four datasets", but Table 6 shows three tasks (MNLI-m, MRPC, SST-2). The paper does not say what the fourth one is.
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 5.2, Table 6 · page 9
+> [!PAPER] · Section 5.2, Table 6 · page 9
 > [![Table 6: ablation over BERT model size. Columns: number of layers, hidden size, number of attention heads, masked LM perplexity of held-out training data, and Dev accuracy on MNLI-m, MRPC and SST-2. Rows: 3, 768, 12, 5.84, 77.9, 79.8, 88.4. 6, 768, 3, 5.24, 80.6, 82.2, 90.7. 6, 768, 12, 4.68, 81.9, 84.8, 91.3. 12, 768, 12, 3.99, 84.4, 86.7, 92.9. 12, 1024, 16, 3.54, 85.7, 86.9, 93.3. 24, 1024, 16, 3.23, 86.6, 87.8, 93.7](/img/papers/bert/p5-table6.png)](/img/papers/bert/p5-table6.png)
 >
 > **Context:** the table for Section 5.2. The fourth row (12, 768, 12) is BERT-base and the last (24, 1024, 16) is BERT-large.
@@ -349,7 +349,7 @@ Al-Rfou et al. 2018: L=64, H=512: the layers alone, if shaped like BERT's (12H^2
 
 The layers alone give 75.6M and 201.8M. The rest of the published totals is embeddings and other parts (the big Transformer's shared vocabulary table of about 37,000 tokens × 1,024 adds roughly 38M). So the orders of magnitude agree; the exact numbers depend on details these papers do not spell out in the same way.
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 5.2 · page 8
+> [!PAPER] · Section 5.2 · page 8
 > [![For example, the largest Transformer explored in Vaswani et al. (2017) is (L=6, H=1024, A=16) with 100M parameters for the encoder, and the largest Transformer we have found in the literature is (L=64, H=512, A=2) with 235M parameters (Al-Rfou et al., 2018). By contrast, BERT-base contains 110M parameters and BERT-large contains 340M parameters](/img/papers/bert/p5-size-prior.png)](/img/papers/bert/p5-size-prior.png)
 >
 > **Context:** the paper places its model sizes in the literature of the time.
@@ -358,7 +358,7 @@ The layers alone give 75.6M and 201.8M. The rest of the published totals is embe
 >
 > **Why it matters:** BERT-large was bigger than any Transformer the authors knew of. The gains in Table 6 came on top of models that were "already quite large".
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 5.2 · pages 8 and 9
+> [!PAPER] · Section 5.2 · pages 8 and 9
 > [![It has long been known that increasing the model size will lead to continual improvements on large-scale tasks such as machine translation and language modeling. However, we believe that this is the first work to demonstrate convincingly that scaling to extreme model sizes also leads to large improvements on very small scale tasks, provided that the model has been sufficiently pre-trained](/img/papers/bert/p5-size-claim.png)](/img/papers/bert/p5-size-claim.png)
 > [![Peters et al. presented mixed results on increasing the pre-trained bi-LM size from two to four layers, and Melamud et al. found 200 to 600 hidden units helped but 1,000 did not. Both used a feature-based approach. We hypothesize that when the model is fine-tuned directly and uses only a very small number of randomly initialized additional parameters, the task-specific models can benefit from the larger, more expressive pre-trained representations even when downstream task data is very small](/img/papers/bert/p5-size-claim2.png)](/img/papers/bert/p5-size-claim2.png)
 >
@@ -428,7 +428,7 @@ What the measurement does show: the 15% / 80-10-10 recipe behaves as described (
 
 Part 1 introduced two ways to reuse a pre-trained model: feature-based (freeze it, use its vectors) and fine-tuning (train everything). Every BERT result so far was fine-tuned. Section 5.3 asks whether frozen BERT features are good too.
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 5.3 · page 9
+> [!PAPER] · Section 5.3 · page 9
 > [![Section 5.3: all results so far used fine-tuning. However, the feature-based approach, where fixed features are extracted from the pre-trained model, has certain advantages. First, not all tasks can be easily represented by a Transformer encoder architecture. Second, there are major computational benefits to pre-compute an expensive representation of the training data once and then run many experiments with cheaper models on top](/img/papers/bert/p5-feature-why.png)](/img/papers/bert/p5-feature-why.png)
 >
 > **Context:** the third ablation: not what BERT learns or how big it is, but how you use it.
@@ -439,7 +439,7 @@ Part 1 introduced two ways to reuse a pre-trained model: feature-based (freeze i
 
 **Use case.** A team wants to try twenty different classifiers on a million documents. Fine-tuning means twenty full BERT training runs. Feature-based means running BERT once over the million documents, saving the vectors, and training twenty small models on the saved vectors, each in minutes.
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 5.3 · page 9
+> [!PAPER] · Section 5.3 · page 9
 > [![The two approaches are compared on the CoNLL-2003 Named Entity Recognition task. The input uses a case-preserving WordPiece model and includes the maximal document context provided by the data. Following standard practice it is a tagging task, but no CRF layer is used](/img/papers/bert/p5-feature-setup.png)](/img/papers/bert/p5-feature-setup.png)
 > [![We use the representation of the first sub-token as the input to the token-level classifier over the NER label set](/img/papers/bert/p5-feature-setup-b.png)](/img/papers/bert/p5-feature-setup-b.png)
 > [![To ablate the fine-tuning approach, we apply the feature-based approach by extracting the activations from one or more layers without fine-tuning any parameters of BERT. These contextual embeddings are used as input to a randomly initialized two-layer 768-dimensional BiLSTM before the classification layer](/img/papers/bert/p5-feature-setup2.png)](/img/papers/bert/p5-feature-setup2.png)
@@ -495,7 +495,7 @@ The six feature choices in Table 7 read different hidden states:
 
 <figure class="fig"><svg viewBox="0 0 760 290" role="img" aria-label="The six feature choices of Table 7, drawn as which hidden states they read: the embeddings alone, one layer, a weighted sum, or the last four layers glued together."><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0,0L10,5L0,10z"/></marker><marker id="ah-on" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-on" d="M0,0L10,5L0,10z"/></marker><marker id="ah-2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-2" d="M0,0L10,5L0,10z"/></marker></defs><text class="t-title" x="409.0" y="22.0" text-anchor="middle">which of the 13 hidden states each feature choice uses</text><text class="t-tick" x="229.0" y="44.0" text-anchor="middle">E</text><text class="t-tick" x="259.0" y="44.0" text-anchor="middle">1</text><text class="t-tick" x="289.0" y="44.0" text-anchor="middle">2</text><text class="t-tick" x="319.0" y="44.0" text-anchor="middle">3</text><text class="t-tick" x="349.0" y="44.0" text-anchor="middle">4</text><text class="t-tick" x="379.0" y="44.0" text-anchor="middle">5</text><text class="t-tick" x="409.0" y="44.0" text-anchor="middle">6</text><text class="t-tick" x="439.0" y="44.0" text-anchor="middle">7</text><text class="t-tick" x="469.0" y="44.0" text-anchor="middle">8</text><text class="t-tick" x="499.0" y="44.0" text-anchor="middle">9</text><text class="t-tick" x="529.0" y="44.0" text-anchor="middle">10</text><text class="t-tick" x="559.0" y="44.0" text-anchor="middle">11</text><text class="t-tick" x="589.0" y="44.0" text-anchor="middle">12</text><text class="t-tick" x="204.0" y="72.0" text-anchor="end">Embeddings</text><rect class="box-1" x="216.0" y="56.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="246.0" y="56.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="276.0" y="56.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="306.0" y="56.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="336.0" y="56.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="366.0" y="56.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="396.0" y="56.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="426.0" y="56.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="456.0" y="56.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="486.0" y="56.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="516.0" y="56.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="546.0" y="56.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="576.0" y="56.0" width="26.0" height="26.0" rx="4"/><text class="t-tick" x="616.0" y="68.0" text-anchor="start">one layer</text><text class="t-muted" x="616.0" y="82.0" text-anchor="start">paper Dev F1 91.0</text><text class="t-tick" x="204.0" y="106.0" text-anchor="end">Second-to-last hidden</text><rect class="box-ghost" x="216.0" y="90.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="246.0" y="90.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="276.0" y="90.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="306.0" y="90.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="336.0" y="90.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="366.0" y="90.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="396.0" y="90.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="426.0" y="90.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="456.0" y="90.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="486.0" y="90.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="516.0" y="90.0" width="26.0" height="26.0" rx="4"/><rect class="box-1" x="546.0" y="90.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="576.0" y="90.0" width="26.0" height="26.0" rx="4"/><text class="t-tick" x="616.0" y="102.0" text-anchor="start">one layer</text><text class="t-muted" x="616.0" y="116.0" text-anchor="start">paper Dev F1 95.6</text><text class="t-tick" x="204.0" y="140.0" text-anchor="end">Last hidden</text><rect class="box-ghost" x="216.0" y="124.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="246.0" y="124.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="276.0" y="124.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="306.0" y="124.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="336.0" y="124.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="366.0" y="124.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="396.0" y="124.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="426.0" y="124.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="456.0" y="124.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="486.0" y="124.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="516.0" y="124.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="546.0" y="124.0" width="26.0" height="26.0" rx="4"/><rect class="box-1" x="576.0" y="124.0" width="26.0" height="26.0" rx="4"/><text class="t-tick" x="616.0" y="136.0" text-anchor="start">one layer</text><text class="t-muted" x="616.0" y="150.0" text-anchor="start">paper Dev F1 94.9</text><text class="t-tick" x="204.0" y="174.0" text-anchor="end">Weighted sum last four</text><rect class="box-ghost" x="216.0" y="158.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="246.0" y="158.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="276.0" y="158.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="306.0" y="158.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="336.0" y="158.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="366.0" y="158.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="396.0" y="158.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="426.0" y="158.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="456.0" y="158.0" width="26.0" height="26.0" rx="4"/><rect class="box-3" x="486.0" y="158.0" width="26.0" height="26.0" rx="4"/><rect class="box-3" x="516.0" y="158.0" width="26.0" height="26.0" rx="4"/><rect class="box-3" x="546.0" y="158.0" width="26.0" height="26.0" rx="4"/><rect class="box-3" x="576.0" y="158.0" width="26.0" height="26.0" rx="4"/><text class="t-tick" x="616.0" y="170.0" text-anchor="start">weighted sum of 4</text><text class="t-muted" x="616.0" y="184.0" text-anchor="start">paper Dev F1 95.9</text><text class="t-tick" x="204.0" y="208.0" text-anchor="end">Concat last four</text><rect class="box-ghost" x="216.0" y="192.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="246.0" y="192.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="276.0" y="192.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="306.0" y="192.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="336.0" y="192.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="366.0" y="192.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="396.0" y="192.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="426.0" y="192.0" width="26.0" height="26.0" rx="4"/><rect class="box-ghost" x="456.0" y="192.0" width="26.0" height="26.0" rx="4"/><rect class="box-2" x="486.0" y="192.0" width="26.0" height="26.0" rx="4"/><rect class="box-2" x="516.0" y="192.0" width="26.0" height="26.0" rx="4"/><rect class="box-2" x="546.0" y="192.0" width="26.0" height="26.0" rx="4"/><rect class="box-2" x="576.0" y="192.0" width="26.0" height="26.0" rx="4"/><text class="t-tick" x="616.0" y="204.0" text-anchor="start">4 x 768 = 3,072 numbers</text><text class="t-muted" x="616.0" y="218.0" text-anchor="start">paper Dev F1 96.1</text><text class="t-tick" x="204.0" y="242.0" text-anchor="end">Weighted sum all 12 layers</text><rect class="box-ghost" x="216.0" y="226.0" width="26.0" height="26.0" rx="4"/><rect class="box-3" x="246.0" y="226.0" width="26.0" height="26.0" rx="4"/><rect class="box-3" x="276.0" y="226.0" width="26.0" height="26.0" rx="4"/><rect class="box-3" x="306.0" y="226.0" width="26.0" height="26.0" rx="4"/><rect class="box-3" x="336.0" y="226.0" width="26.0" height="26.0" rx="4"/><rect class="box-3" x="366.0" y="226.0" width="26.0" height="26.0" rx="4"/><rect class="box-3" x="396.0" y="226.0" width="26.0" height="26.0" rx="4"/><rect class="box-3" x="426.0" y="226.0" width="26.0" height="26.0" rx="4"/><rect class="box-3" x="456.0" y="226.0" width="26.0" height="26.0" rx="4"/><rect class="box-3" x="486.0" y="226.0" width="26.0" height="26.0" rx="4"/><rect class="box-3" x="516.0" y="226.0" width="26.0" height="26.0" rx="4"/><rect class="box-3" x="546.0" y="226.0" width="26.0" height="26.0" rx="4"/><rect class="box-3" x="576.0" y="226.0" width="26.0" height="26.0" rx="4"/><text class="t-tick" x="616.0" y="238.0" text-anchor="start">weighted sum of 12</text><text class="t-muted" x="616.0" y="252.0" text-anchor="start">paper Dev F1 95.5</text><text class="t-muted" x="214.0" y="278.0" text-anchor="start">E = embedding output (before any layer); 1 to 12 = outputs of the 12 layers</text></svg><figcaption>The six feature choices of Table 7. A weighted sum learns one weight per layer and adds the layers up; concatenation glues the last four 768-number vectors into one of 3,072 numbers.</figcaption></figure>
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 5.3, Table 7 · page 9
+> [!PAPER] · Section 5.3, Table 7 · page 9
 > [![Table 7: CoNLL-2003 NER results. ELMo Dev F1 95.7, Test F1 92.2. CVT Test 92.6. CSE Test 93.1. Fine-tuning: BERT-large Dev 96.6, Test 92.8; BERT-base Dev 96.4, Test 92.4. Feature-based BERT-base, Dev F1: Embeddings 91.0, Second-to-Last Hidden 95.6, Last Hidden 94.9, Weighted Sum Last Four Hidden 95.9, Concat Last Four Hidden 96.1, Weighted Sum All 12 Layers 95.5. Scores are averaged over 5 random restarts](/img/papers/bert/p5-table7.png)](/img/papers/bert/p5-table7.png)
 >
 > **Context:** the results of Section 5.3.
@@ -504,7 +504,7 @@ The six feature choices in Table 7 read different hidden states:
 >
 > **Why it matters:** it shows how close frozen BERT gets to fine-tuned BERT.
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 5.3 · page 9
+> [!PAPER] · Section 5.3 · page 9
 > [![Results are presented in Table 7. BERT-large performs competitively with state-of-the-art methods. The best performing method concatenates the token representations from the top four hidden layers of the pre-trained Transformer, which is only 0.3 F1 behind fine-tuning the entire model. This demonstrates that BERT is effective for both fine-tuning and feature-based approaches](/img/papers/bert/p5-feature-result.png)](/img/papers/bert/p5-feature-result.png)
 >
 > **Context:** the paper's reading of Table 7.
@@ -606,7 +606,7 @@ Our absolute numbers are about 5 to 8.5 points lower than the paper's. That is e
 
 The last two ablations are in Appendix C. The first asks whether BERT's long pre-training is necessary.
 
-> [!PAPER] Devlin et al. (2018), BERT · Appendix C.1 · page 16
+> [!PAPER] · Appendix C.1 · page 16
 > [![Appendix C.1: Figure 5 presents MNLI Dev accuracy after fine-tuning from a checkpoint pre-trained for k steps. Question 1: does BERT really need such a large amount of pre-training (128,000 words per batch times 1,000,000 steps)? Answer: yes, BERT-base achieves almost 1.0% additional accuracy on MNLI when trained on 1M steps compared to 500k steps. Question 2: does MLM pre-training converge slower than LTR pre-training, since only 15% of words are predicted in each batch? Answer: the MLM model does converge slightly slower than the LTR model. However, in terms of absolute accuracy the MLM model begins to outperform the LTR model almost immediately](/img/papers/bert/p5-c1.png)](/img/papers/bert/p5-c1.png)
 >
 > **Context:** Appendix C.1, "Effect of Number of Training Steps".
@@ -623,7 +623,7 @@ The last two ablations are in Appendix C. The first asks whether BERT's long pre
 
 The total pre-training in Question 1 is the paper's own product: 128,000 words per batch × 1,000,000 steps = **128 billion** words processed (with the paper's rounding of 256 × 512 = 131,072 to 128,000, as in Part 3).
 
-> [!PAPER] Devlin et al. (2018), BERT · Appendix C.1, Figure 5 · page 16
+> [!PAPER] · Appendix C.1, Figure 5 · page 16
 > [![Figure 5: MNLI Dev accuracy after fine-tuning, starting from model parameters pre-trained for k steps, for k from near 0 to 1,000 thousand. Two curves: BERT-base with the masked LM, rising to about 84, and BERT-base left-to-right, flattening near 82](/img/papers/bert/p5-figure5.png)](/img/papers/bert/p5-figure5.png)
 >
 > **Context:** the figure for Appendix C.1. The x-axis is k, the pre-training steps in thousands; the y-axis is MNLI Dev accuracy after fine-tuning.
@@ -655,7 +655,7 @@ That is the "converges slightly slower" of Question 2, made concrete: per step t
 
 Part 3 explained the 80/10/10 masking recipe and *why* the paper uses it. Appendix C.2 tests whether it was a good choice.
 
-> [!PAPER] Devlin et al. (2018), BERT · Appendix C.2 · page 16
+> [!PAPER] · Appendix C.2 · page 16
 > [![Appendix C.2: In Section 3.1, we mention that BERT uses a mixed strategy for masking the target tokens when pre-training with the masked language model objective. The following is an ablation study to evaluate the effect of different masking strategies](/img/papers/bert/p5-c2.png)](/img/papers/bert/p5-c2.png)
 > [![Note that the purpose of the masking strategies is to reduce the mismatch between pre-training and fine-tuning, as the [MASK] symbol never appears during the fine-tuning stage. We report the Dev results for both MNLI and NER. For NER, we report both fine-tuning and feature-based approaches, as we expect the mismatch will be amplified for the feature-based approach as the model will not have the chance to adjust the representations](/img/papers/bert/p5-c2-why.png)](/img/papers/bert/p5-c2-why.png)
 >
@@ -670,7 +670,7 @@ Part 3 explained the 80/10/10 masking recipe and *why* the paper uses it. Append
 
 Why would the mismatch be worse for frozen features? With fine-tuning, every weight of BERT is adjusted on the task's real sentences, so the model can unlearn any habit tied to `[MASK]`. With frozen features, BERT is used exactly as pre-trained. If its vectors for ordinary, unmasked words are not very informative (because it was never asked to predict an unmasked word), nothing can fix that afterwards.
 
-> [!PAPER] Devlin et al. (2018), BERT · Appendix C.2, Table 8 · page 16
+> [!PAPER] · Appendix C.2, Table 8 · page 16
 > [![Table 8: ablation over different masking strategies. Masking rates MASK, SAME, RND and Dev set results MNLI fine-tune, NER fine-tune, NER feature-based. 80, 10, 10: 84.2, 95.4, 94.9. 100, 0, 0: 84.3, 94.9, 94.0. 80, 0, 20: 84.1, 95.2, 94.6. 80, 20, 0: 84.4, 95.2, 94.7. 0, 20, 80: 83.7, 94.8, 94.6. 0, 0, 100: 83.6, 94.9, 94.6](/img/papers/bert/p5-table8.png)](/img/papers/bert/p5-table8.png)
 > [![The results are presented in Table 8. MASK means that we replace the target token with the [MASK] symbol for MLM; SAME means that we keep the target token as is; RND means that we replace the target token with another random token. The left part of the table shows the probabilities used during MLM pre-training (BERT uses 80%, 10%, 10%). For the feature-based approach, we concatenate the last 4 layers of BERT as the features](/img/papers/bert/p5-c2-legend.png)](/img/papers/bert/p5-c2-legend.png)
 >
@@ -691,7 +691,7 @@ Row by row:
 5. **0 / 20 / 80 (no `[MASK]` at all):** 83.7, 94.8, 94.6.
 6. **0 / 0 / 100 (always random):** **83.6** on MNLI, the worst. Here the model is trained to find and fix wrong words, and 15% of every training input is noise.
 
-> [!PAPER] Devlin et al. (2018), BERT · Appendix C.2 · page 16
+> [!PAPER] · Appendix C.2 · page 16
 > [![From the table it can be seen that fine-tuning is surprisingly robust to different masking strategies. However, as expected, using only the MASK strategy was problematic when applying the feature-based approach to NER. Interestingly, using only the RND strategy performs much worse than our strategy as well](/img/papers/bert/p5-c2-result.png)](/img/papers/bert/p5-c2-result.png)
 >
 > **Context:** the last paragraph of the paper's appendix.

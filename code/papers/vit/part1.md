@@ -23,7 +23,7 @@ The small `Paper §1` tag above each heading tells you which section of the pape
 
 ## The title {§Title}
 
-> [!PAPER] Dosovitskiy et al. (2020), ViT · Title · page 1
+> [!PAPER] · Title · page 1
 > [![The title of the ViT paper: An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale, with 16x16 Words and Image Recognition at Scale highlighted](/img/papers/vit/p1-title.png)](/img/papers/vit/p1-title.png)
 >
 > **Context:** the first thing on page 1. Above it, in small print, the page says "Published as a conference paper at ICLR 2021". ICLR is one of the three big machine-learning conferences.
@@ -95,7 +95,7 @@ The title's analogy is worth drawing out, because the whole paper rests on it. A
 
 Here is the paper's own drawing of the model, which Part 2 explains block by block. We show it now because it makes the title concrete.
 
-> [!PAPER] Dosovitskiy et al. (2020), ViT · Figure 1 · page 3
+> [!PAPER] · Figure 1 · page 3
 > [![Figure 1 of the ViT paper: a picture is cut into nine patches, the patches are flattened and passed through a linear projection, a class token and position embeddings are added, the sequence goes through a Transformer encoder, and an MLP head on the class token outputs the class. On the right, the Transformer encoder block with layer norm, multi-head attention, an MLP and residual connections](/img/papers/vit/p1-figure1.png)](/img/papers/vit/p1-figure1.png)
 >
 > **Context:** Figure 1, at the top of Section 3 (page 3). It is the only diagram of the model in the paper.
@@ -106,7 +106,7 @@ Here is the paper's own drawing of the model, which Part 2 explains block by blo
 
 ## The authors and the footnotes {§Title}
 
-> [!PAPER] Dosovitskiy et al. (2020), ViT · Authors · page 1
+> [!PAPER] · Authors · page 1
 > [![The author list of the ViT paper: Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov, Dirk Weissenborn, Xiaohua Zhai, Thomas Unterthiner, Mostafa Dehghani, Matthias Minderer, Georg Heigold, Sylvain Gelly, Jakob Uszkoreit, Neil Houlsby, with footnotes for equal technical contribution and equal advising, and the affiliation Google Research, Brain Team](/img/papers/vit/p1-authors.png)](/img/papers/vit/p1-authors.png)
 >
 > **Context:** under the title. Twelve authors, one affiliation, two kinds of footnote mark.
@@ -119,7 +119,7 @@ The order of the names matters less than usual: six of the twelve are marked as 
 
 There is one footnote on page 1, attached to the last sentence of the abstract.
 
-> [!PAPER] Dosovitskiy et al. (2020), ViT · Footnote 1 · page 1
+> [!PAPER] · Footnote 1 · page 1
 > [![Footnote 1 of the ViT paper: Fine-tuning code and pre-trained models are available at https://github.com/google-research/vision_transformer](/img/papers/vit/p1-footnote.png)](/img/papers/vit/p1-footnote.png)
 >
 > **Context:** footnote 1, at the bottom of page 1.
@@ -132,7 +132,7 @@ There is one footnote on page 1, attached to the last sentence of the abstract.
 
 The abstract is one paragraph of four sentences. We read it in two halves.
 
-> [!PAPER] Dosovitskiy et al. (2020), ViT · Abstract · page 1
+> [!PAPER] · Abstract · page 1
 > [![The first half of the ViT abstract: while the Transformer architecture has become the de-facto standard for natural language processing tasks, its applications to computer vision remain limited. In vision, attention is either applied in conjunction with convolutional networks, or used to replace certain components of convolutional networks while keeping their overall structure in place](/img/papers/vit/p1-abstract-1.png)](/img/papers/vit/p1-abstract-1.png)
 >
 > **Context:** the first two sentences of the abstract: the state of the field in 2020.
@@ -161,7 +161,7 @@ The abstract is one paragraph of four sentences. We read it in two halves.
 
 The figure shows the real difference between the two operations. A convolution is **local** (each output looks at a small neighbourhood) and **shares weights** (the same filter is used everywhere). Self-attention is **global** (each token can look at every token) and its weights depend on the content, not on the position. Hold on to those two words, local and global; the introduction will come back to them under the name "inductive bias".
 
-> [!PAPER] Dosovitskiy et al. (2020), ViT · Abstract · page 1
+> [!PAPER] · Abstract · page 1
 > [![The second half of the ViT abstract: we show that this reliance on CNNs is not necessary and a pure transformer applied directly to sequences of image patches can perform very well on image classification tasks. When pre-trained on large amounts of data and transferred to multiple mid-sized or small image recognition benchmarks (ImageNet, CIFAR-100, VTAB, etc.), Vision Transformer (ViT) attains excellent results compared to state-of-the-art convolutional networks while requiring substantially fewer computational resources to train](/img/papers/vit/p1-abstract-2.png)](/img/papers/vit/p1-abstract-2.png)
 >
 > **Context:** the last two sentences of the abstract: the claim and the result.
@@ -330,7 +330,7 @@ Three things to notice:
 
 Now the introduction. Its first paragraph is about language, not pictures.
 
-> [!PAPER] Dosovitskiy et al. (2020), ViT · Section 1 · page 1
+> [!PAPER] · Section 1 · page 1
 > [![The first paragraph of the ViT introduction: self-attention-based architectures, in particular Transformers, have become the model of choice in natural language processing. The dominant approach is to pre-train on a large text corpus and then fine-tune on a smaller task-specific dataset. Thanks to Transformers' computational efficiency and scalability, it has become possible to train models of unprecedented size, with over 100B parameters. With the models and datasets growing, there is still no sign of saturating performance](/img/papers/vit/p1-intro-nlp.png)](/img/papers/vit/p1-intro-nlp.png)
 >
 > **Context:** the opening paragraph of Section 1 (Introduction). It cites four language papers: the Transformer (Vaswani et al., 2017), BERT (Devlin et al., 2019), GPT-3 (Brown et al., 2020) and GShard (Lepikhin et al., 2020).
@@ -386,7 +386,7 @@ The paragraph's last sentence is the one to remember: "there is still no sign of
 
 ## In vision, convolutions still ruled {§1}
 
-> [!PAPER] Dosovitskiy et al. (2020), ViT · Section 1 · page 1
+> [!PAPER] · Section 1 · page 1
 > [![The second paragraph of the ViT introduction: in computer vision, convolutional architectures remain dominant. Inspired by NLP successes, multiple works try combining CNN-like architectures with self-attention, some replacing the convolutions entirely. The latter models, while theoretically efficient, have not yet been scaled effectively on modern hardware accelerators due to the use of specialized attention patterns. Therefore, in large-scale image recognition, classic ResNet-like architectures are still state of the art](/img/papers/vit/p1-intro-cnn.png)](/img/papers/vit/p1-intro-cnn.png)
 >
 > **Context:** the second paragraph of the introduction: the state of computer vision in 2020, with nine citations.
@@ -481,7 +481,7 @@ Patches make attention about 65,000 times cheaper than pixels. That single fact 
 
 ## The fewest possible modifications {§1}
 
-> [!PAPER] Dosovitskiy et al. (2020), ViT · Section 1 · page 1
+> [!PAPER] · Section 1 · page 1
 > [![The third paragraph of the ViT introduction: inspired by the Transformer scaling successes in NLP, we experiment with applying a standard Transformer directly to images, with the fewest possible modifications. To do so, we split an image into patches and provide the sequence of linear embeddings of these patches as an input to a Transformer. Image patches are treated the same way as tokens (words) in an NLP application. We train the model on image classification in supervised fashion](/img/papers/vit/p1-intro-ours.png)](/img/papers/vit/p1-intro-ours.png)
 >
 > **Context:** the third paragraph: what the authors actually do, in four sentences.
@@ -521,7 +521,7 @@ Our code found this layer in the released model. In the implementation it is sto
 
 The fourth paragraph starts at the bottom of page 1 and ends at the top of page 2. It reports the first, disappointing result, and explains it.
 
-> [!PAPER] Dosovitskiy et al. (2020), ViT · Section 1 · pages 1 to 2
+> [!PAPER] · Section 1 · pages 1 to 2
 > [![The fourth paragraph of the ViT introduction, first part: when trained on mid-sized datasets such as ImageNet without strong regularization, these models yield modest accuracies of a few percentage points below ResNets of comparable size. This seemingly discouraging outcome may be expected: Transformers lack some of the inductive biases](/img/papers/vit/p1-intro-midsize.png)](/img/papers/vit/p1-intro-midsize.png)
 > [![The paragraph continues on page 2: inherent to CNNs, such as translation equivariance and locality, and therefore do not generalize well when trained on insufficient amounts of data](/img/papers/vit/p1-intro-midsize2.png)](/img/papers/vit/p1-intro-midsize2.png)
 >
@@ -646,7 +646,7 @@ An honesty note on the ResNet column: its confidence drops to 0.607 at a 12-pixe
 
 ## Large scale training trumps inductive bias {§1}
 
-> [!PAPER] Dosovitskiy et al. (2020), ViT · Section 1 · page 2
+> [!PAPER] · Section 1 · page 2
 > [![The fifth paragraph of the ViT introduction: however, the picture changes if the models are trained on larger datasets (14M-300M images). We find that large scale training trumps inductive bias. Our Vision Transformer (ViT) attains excellent results when pre-trained at sufficient scale and transferred to tasks with fewer datapoints. When pre-trained on the public ImageNet-21k dataset or the in-house JFT-300M dataset, ViT approaches or beats state of the art on multiple image recognition benchmarks. In particular, the best model reaches the accuracy of 88.55% on ImageNet, 90.72% on ImageNet-ReaL, 94.55% on CIFAR-100, and 77.63% on the VTAB suite of 19 tasks](/img/papers/vit/p1-intro-scale.png)](/img/papers/vit/p1-intro-scale.png)
 >
 > **Context:** the last paragraph of the introduction, at the top of page 2. The turn of the story, and the headline numbers.
@@ -669,7 +669,7 @@ The two datasets named here are the paper's fuel.
 
 The paper proves the sketch in Section 4.3, which Part 4 reads in full. Two sentences from it are worth seeing now, because they are the evidence behind "the picture changes".
 
-> [!PAPER] Dosovitskiy et al. (2020), ViT · Section 4.3 · page 6
+> [!PAPER] · Section 4.3 · page 6
 > [![A passage from Section 4.3: first, we pre-train ViT models on datasets of increasing size: ImageNet, ImageNet-21k, and JFT-300M. When pre-trained on the smallest dataset, ImageNet, ViT-Large models underperform compared to ViT-Base models](/img/papers/vit/p1-sec43-small.png)](/img/papers/vit/p1-sec43-small.png)
 > [![A sentence from Section 4.3 on page 7: the BiT CNNs outperform ViT on ImageNet, but with the larger datasets, ViT overtakes](/img/papers/vit/p1-sec43-overtake.png)](/img/papers/vit/p1-sec43-overtake.png)
 >
@@ -681,7 +681,7 @@ The paper proves the sketch in Section 4.3, which Part 4 reads in full. Two sent
 
 The exact numbers are in the paper's Table 5 (appendix), which Part 4 redraws in full. Here is the table, and the ImageNet rows for the two 16-pixel-patch models as a chart.
 
-> [!PAPER] Dosovitskiy et al. (2020), ViT · Table 5 · page 15
+> [!PAPER] · Table 5 · page 15
 > [![Table 5 of the ViT paper: top-1 accuracy of ViT-B/16, ViT-B/32, ViT-L/16, ViT-L/32 and ViT-H/14 on CIFAR-10, CIFAR-100, ImageNet, ImageNet ReaL, Oxford Flowers-102 and Oxford-IIIT Pets, after pre-training on ImageNet, ImageNet-21k or JFT-300M. The ImageNet rows are highlighted: 77.91, 73.38, 76.53, 71.16 after ImageNet pre-training; 83.97, 81.28, 85.15, 80.99, 85.13 after ImageNet-21k; 84.15, 80.73, 87.12, 84.37, 88.04 after JFT-300M](/img/papers/vit/p1-table5.png)](/img/papers/vit/p1-table5.png)
 >
 > **Context:** Table 5 in Appendix D, the numbers behind Figure 3 of the main text. Models fine-tuned at 384-pixel resolution.

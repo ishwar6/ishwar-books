@@ -388,6 +388,11 @@
   background: color-mix(in srgb, var(--why) 9%, transparent); border: 1px solid color-mix(in srgb, var(--why) 28%, transparent);
 }
 .prose .pp-why .pp-label { color: var(--why); }
+.prose .pp-explain > * + * { margin-top: 14px; }
+.prose .pp-explain ul, .prose .pp-explain ol { margin-bottom: 0; padding-left: 1.2em; }
+.prose .pp-explain li { margin: 8px 0; line-height: 1.75; }
+.prose .pp-explain li > p { margin: 0; }
+.prose .pp-explain .katex-display { margin: 12px 0; overflow-x: auto; overflow-y: hidden; }
 .prose .callout-paper > .pp-link { margin: 0; padding: 16px 28px 0; font-size: 0.95em; }
 .prose .callout-paper::after { content: ''; display: block; height: 24px; }
 @media (max-width: 640px) {

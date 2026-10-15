@@ -1,0 +1,24 @@
+picture: 640 x 480 pixels
+
+== YOLO11n-seg ==
+parameters: 2,876,848   classes it knows: 80
+the first 20 classes: person, bicycle, car, motorcycle, airplane, bus, train, truck, boat, traffic light, fire hydrant, stop sign, parking meter, bench, bird, cat, dog, horse, sheep, cow
+is "ear" a class? False   is "button" a class? False
+object      score   box (x1, y1, x2, y2)     mask pixels
+cat         0.860   (5, 53, 317, 470)             54,371
+cat         0.846   (339, 27, 640, 374)           61,884
+remote      0.821   (40, 73, 176, 118)             4,564
+couch       0.555   (1, 1, 637, 473)             174,666
+time for the whole picture (all objects): 10.1 ms (mps)   11.8 ms (cpu)
+
+== SAM ViT-H, prompted with the YOLO boxes ==
+parameters: 641,090,864 (223 times YOLO11n-seg)
+object     SAM score  SAM pixels  YOLO pixels  IoU(YOLO, SAM)
+cat            0.964      50,508       54,371           0.928
+cat            0.992      58,097       61,884           0.923
+remote         0.972       4,105        4,564           0.899
+couch          0.991     183,830      174,666           0.944
+time: SAM image encoder 2947.5 ms (mps), then about 6 ms for each box (Part 1)
+YOLO is 292 times faster on this picture, and it also names the objects
+
+saved road-yolo-sam.png

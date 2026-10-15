@@ -13,7 +13,7 @@ After that, this part steps outside the paper. It answers three questions: what 
 
 ## The conclusion {§6}
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 6 (Conclusion) · page 9
+> [!PAPER] · Section 6 (Conclusion) · page 9
 > [![The conclusion of the BERT paper: rich, unsupervised pre-training is an integral part of many language understanding systems; these results enable even low-resource tasks to benefit from deep unidirectional architectures; our major contribution is further generalizing these findings to deep bidirectional architectures, allowing the same pre-trained model to successfully tackle a broad set of NLP tasks](/img/papers/bert/p6-conclusion.png)](/img/papers/bert/p6-conclusion.png)
 >
 > **Context:** Section 6, the whole conclusion. It is one paragraph of three sentences, right after the ablation studies of Section 5.
@@ -196,7 +196,7 @@ Every model has limits. Here are BERT's main ones. Where the paper itself mentio
 
 ### Limit 1: at most 512 tokens
 
-> [!PAPER] Devlin et al. (2018), BERT · Appendix A.2 · page 13
+> [!PAPER] · Appendix A.2 · page 13
 > [![Appendix A.2: longer sequences are disproportionately expensive because attention is quadratic to the sequence length. BERT is pre-trained with sequence length 128 for 90 percent of the steps, then 512 for the last 10 percent to learn the positional embeddings](/img/papers/bert/p6-length.png)](/img/papers/bert/p6-length.png)
 >
 > **Context:** Appendix A.2, the pre-training procedure (covered in Part 3).
@@ -252,7 +252,7 @@ The price: a token in window 1 never sees a token in window 2. Facts that are fa
 
 ### Limit 2: `[MASK]` never appears after pre-training
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 3.1 · page 4
+> [!PAPER] · Section 3.1 · page 4
 > [![Section 3.1: a downside is that we are creating a mismatch between pre-training and fine-tuning, since the MASK token does not appear during fine-tuning](/img/papers/bert/p6-mismatch.png)](/img/papers/bert/p6-mismatch.png)
 >
 > **Context:** Section 3.1, right after the masked LM is introduced (Part 3).
@@ -265,7 +265,7 @@ During pre-training, BERT sees `[MASK]` in about 12% of positions (80% of the 15
 
 ### Limit 3: only 15% of tokens teach the model
 
-> [!PAPER] Devlin et al. (2018), BERT · Appendix A.1 · page 12
+> [!PAPER] · Appendix A.1 · page 12
 > [![Appendix A.1: compared to standard language model training, the masked LM only makes predictions on 15 percent of tokens in each batch, which suggests that more pre-training steps may be required for the model to converge](/img/papers/bert/p6-fifteen.png)](/img/papers/bert/p6-fifteen.png)
 >
 > **Context:** Appendix A.1, after the masking examples. The sentence continues on page 13 with "to converge".
@@ -319,7 +319,7 @@ best pair by the chain rule:                                  "new york" 0.04154
 
 ### Limit 5: no ready-made sentence vector
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 3.1, footnote 6 · page 4
+> [!PAPER] · Section 3.1, footnote 6 · page 4
 > [![Footnote 6: the vector C is not a meaningful sentence representation without fine-tuning, since it was trained with NSP](/img/papers/bert/p6-footnote6.png)](/img/papers/bert/p6-footnote6.png)
 >
 > **Context:** a footnote to the next sentence prediction task in Section 3.1.
@@ -376,7 +376,7 @@ This is only six pairs, so treat it as an illustration, not a benchmark. Sentenc
 
 BERT is an encoder. It reads a whole input and gives back one vector per token; it has no natural way to write a long answer one word at a time. As footnote 4 of the paper puts it (Part 2), the left-context-only Transformer is called a "Transformer decoder" "since it can be used for text generation". Chatbots are built on decoders, in the line of GPT, not on BERT.
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 3, footnote 4 · page 4
+> [!PAPER] · Section 3, footnote 4 · page 4
 > [![Footnote 4 of the BERT paper: the bidirectional Transformer is often referred to as a Transformer encoder while the left-context-only version is referred to as a Transformer decoder since it can be used for text generation](/img/papers/bert/p6-footnote4.png)](/img/papers/bert/p6-footnote4.png)
 >
 > **Context:** a footnote to the model description in Section 3.
@@ -387,7 +387,7 @@ BERT is an encoder. It reads a whole input and gives back one vector per token; 
 
 ### Limit 7: pre-training is expensive
 
-> [!PAPER] Devlin et al. (2018), BERT · Appendix A.2 · page 13
+> [!PAPER] · Appendix A.2 · page 13
 > [![Appendix A.2: training of BERT-base was performed on 4 Cloud TPUs in Pod configuration, 16 TPU chips total; BERT-large on 16 Cloud TPUs, 64 TPU chips total; each pre-training took 4 days to complete](/img/papers/bert/p6-compute.png)](/img/papers/bert/p6-compute.png)
 >
 > **Context:** Appendix A.2, the pre-training procedure.
@@ -401,7 +401,7 @@ BERT is an encoder. It reads a whole input and gives back one vector per token; 
 
 The good news is the paper's own: fine-tuning is cheap. Section 3.2 says every result in the paper "can be replicated in at most 1 hour on a single Cloud TPU, or a few hours on a GPU, starting from the exact same pre-trained model" (Part 4).
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 3.2 · page 5
+> [!PAPER] · Section 3.2 · page 5
 > [![From Section 3.2: compared to pre-training, fine-tuning is relatively inexpensive; all of the results in the paper can be replicated in at most 1 hour on a single Cloud TPU, or a few hours on a GPU, starting from the exact same pre-trained model](/img/papers/bert/p6-finetune-cost.png)](/img/papers/bert/p6-finetune-cost.png)
 >
 > **Context:** the end of Section 3.2.

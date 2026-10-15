@@ -141,7 +141,8 @@ for (const dir of paperDirs) {
     paper.parts.push(page)
     pages.push(page)
   }
-  paper.parts.sort((a, b) => (a.data.part ?? 1e9) - (b.data.part ?? 1e9) || natural(a.slug, b.slug))
+  // a page with `label:` and no `part:` (e.g. label: Background) is outside the numbering and comes first
+  paper.parts.sort((a, b) => (a.data.part ?? (a.data.label ? 0 : 1e9)) - (b.data.part ?? (b.data.label ? 0 : 1e9)) || natural(a.slug, b.slug))
 }
 
 const byFile = new Map(pages.map((p) => [path.resolve(p.file), p]))
@@ -178,16 +179,22 @@ function pngWidth(url) {
     return buf.readUInt32BE(16)
   } catch { return 0 }
 }
-const PAPER_LABELS = { 'Context:': ['pp-ctx', 'Where this is'], 'What it says:': ['pp-says', 'What it says'], 'Why it matters:': ['pp-why', 'Why it matters'] }
+const PAPER_LABELS = { 'Context:': ['pp-ctx', 'Where this is'], 'What it says:': ['pp-says', 'What it says'], 'Why it matters:': ['pp-why', 'Why it matters'], 'What it means:': ['pp-why pp-explain', 'What it means'] }
 const el = (tag, cls, children) => ({ type: 'pp', data: { hName: tag, hProperties: { className: cls } }, children })
 function shapePaperBox(node, title) {
-  const [name, ...where] = title.split(' · ').map((t) => t.trim())
+  const parts = title.split(/\s*·\s*/).map((t) => t.trim())
+  const [name, ...where] = title.trim().startsWith('·') ? ['', ...parts.filter(Boolean)] : parts
   node.children[0] = el('div', ['pp-head'], [
     el('span', ['pp-kicker'], [{ type: 'text', value: /blog|docs|documentation|guide \(|report/i.test(title) ? 'From the source' : 'From the paper' }]),
-    el('span', ['pp-name'], [{ type: 'text', value: name }]),
+    // a title that starts with "·" has no name: the box shows the paper the series explains, so the name is not repeated
+    ...(name ? [el('span', ['pp-name'], [{ type: 'text', value: name }])] : []),
     ...(where.length ? [el('span', ['pp-where'], where.map((w) => el('span', ['pp-pill'], [{ type: 'text', value: w }])))] : []),
   ])
+  let explain = null   // a "What it means" note takes every later paragraph, list and equation of the box
   for (const p of node.children.slice(1)) {
+    const first0 = p.children?.[0]
+    const isLabel = p.type === 'paragraph' && first0?.type === 'strong' && first0.children[0]?.type === 'text' && PAPER_LABELS[first0.children[0].value.trim()]
+    if (explain && !isLabel) { explain.children.push(p); p.moved = true; continue }
     if (p.type !== 'paragraph') continue
     const kids = p.children.filter((c) => !(c.type === 'text' && !c.value.trim()))
     const isShot = kids.length && kids.every((c) => c.type === 'image' || (c.type === 'link' && c.children.length === 1 && c.children[0].type === 'image'))
@@ -205,12 +212,14 @@ function shapePaperBox(node, title) {
     const first = p.children[0]
     const label = first?.type === 'strong' && first.children[0]?.type === 'text' ? PAPER_LABELS[first.children[0].value.trim()] : null
     if (label) {
-      p.data = { hName: 'div', hProperties: { className: ['pp-note', label[0]] } }
+      p.data = { hName: 'div', hProperties: { className: ['pp-note', ...label[0].split(' ')] } }
+      if (label[0].includes('pp-explain')) explain = p
       p.children = [el('span', ['pp-label'], [{ type: 'text', value: label[1] }]), { type: 'paragraph', children: p.children.slice(1).map((c, i) => (i === 0 && c.type === 'text' ? { ...c, value: c.value.replace(/^\s+/, '').replace(/^[a-z]/, (ch) => ch.toUpperCase()) } : c)) }]
       continue
     }
     if (kids.length === 1 && kids[0].type === 'link') p.data = { hProperties: { className: ['pp-link'] } }
   }
+  node.children = node.children.filter((c) => !c.moved)
 }
 
 /** Paper section markers:  ## Masked LM {§3.1}  → <h2 data-sec="§3.1">Masked LM</h2> (shown as a "Paper §3.1" badge) */
@@ -425,12 +434,18 @@ const metaOf = (p) => {
     ...(p.data.series ? { series: p.data.series, seriesPart: p.data.series_part ?? 1 } : {}),
     ...(p.collection === 'videos' ? videoMeta(p.data) : {}),
     ...(p.part ? { part: p.part } : {}),
-    ...(p.collection === 'paper-part' ? { partNumber: p.data.part, covers: p.data.covers ?? '', short: p.data.short ?? '' } : {}),
+    ...(p.collection === 'paper-part' ? { partNumber: p.data.part, partLabel: partLabelOf(p), partOf: partOfOf(p), covers: p.data.covers ?? '', short: p.data.short ?? '' } : {}),
   }
 }
 
+function partLabelOf(p) { return p.data.label ?? `Part ${p.data.part}` }
+function partOfOf(p) {
+  if (p.data.label) return p.data.label
+  const n = papers.find((x) => x.slug === p.paper)?.parts.filter((x) => x.data.part).length   // numbered parts only
+  return `Part ${p.data.part} of ${n}`
+}
 const paperShort = (slug) => papers.find((x) => x.slug === slug)?.data.short ?? pretty(slug)
-const pageLabel = (p) => `${paperShort(p.paper)}, Part ${p.data.part}`
+const pageLabel = (p) => `${paperShort(p.paper)}, ${partLabelOf(p)}`
 
 let rendered = 0
 const search = [] // one document per section: route, anchor, page title, heading, text, book

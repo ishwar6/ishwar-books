@@ -1,0 +1,52 @@
+picture: 640 x 480 pixels (width x height)
+
+== parameters of the three released SAM models ==
+model                  image encoder  prompt encoder  mask decoder           total
+facebook/sam-vit-base      89,670,912           6,476     4,058,340      93,735,728
+facebook/sam-vit-large     308,278,272           6,476     4,058,340     312,343,088
+facebook/sam-vit-huge     637,026,048           6,476     4,058,340     641,090,864
+  facebook/sam-vit-base: 12 layers, width 768, 12 heads, global attention in layers [2, 5, 8, 11]; encoder = 95.7% of all weights
+  facebook/sam-vit-large: 24 layers, width 1024, 16 heads, global attention in layers [5, 11, 17, 23]; encoder = 98.7% of all weights
+  facebook/sam-vit-huge: 32 layers, width 1280, 16 heads, global attention in layers [7, 15, 23, 31]; encoder = 99.4% of all weights
+
+== the input pipeline (facebook/sam-vit-huge) ==
+resize: longest side 640 -> 1024, scale 1.6000; picture becomes 1024 x 768
+pad: 1024 x 768 -> 1024 x 1024 (zeros added below: 256 rows)
+pixel tensor: (1, 3, 1024, 1024) = 3,145,728 numbers
+image embedding: (1, 256, 64, 64) = 1,048,576 numbers (each of 64 x 64 = 4,096 cells covers 16 x 16 pixels)
+
+== one click at (275, 62) on the left cat's ear ==
+low-resolution mask logits from the decoder: (1, 1, 3, 256, 256)  (batch, prompts, 3 masks, 256, 256)
+  mask 1: predicted IoU 0.946       427 pixels =   0.14% of the picture
+  mask 2: predicted IoU 0.944       470 pixels =   0.15% of the picture
+  mask 3: predicted IoU 0.980    49,520 pixels =  16.12% of the picture
+  SAM ranks mask 3 first (highest predicted IoU)
+  IoU between the masks: 1-2: 0.896, 1-3: 0.008, 2-3: 0.009
+
+== one click at (80, 90) on the buttons of the left remote control ==
+low-resolution mask logits from the decoder: (1, 1, 3, 256, 256)  (batch, prompts, 3 masks, 256, 256)
+  mask 1: predicted IoU 0.656       772 pixels =   0.25% of the picture
+  mask 2: predicted IoU 0.989     4,089 pixels =   1.33% of the picture
+  mask 3: predicted IoU 0.793    44,927 pixels =  14.62% of the picture
+  SAM ranks mask 2 first (highest predicted IoU)
+  IoU between the masks: 1-2: 0.189, 1-3: 0.017, 2-3: 0.091
+
+worked IoU, ear mask 1 vs ear mask 2: intersection 424 pixels, union 473 pixels, IoU = 424/473 = 0.896
+same ear click with multimask_output=False: 1 mask, predicted IoU 0.926, 465 pixels
+two clicks (ear + body), one mask: predicted IoU 0.969, 50,214 pixels
+
+== a box prompt [255, 20, 640, 360] around the right cat ==
+  1 mask, predicted IoU 0.996, 58,209 pixels = 18.95% of the picture
+
+== timing on this computer (Apple M5 Pro) ==
+facebook/sam-vit-base: image encoder   756.2 ms (GPU)    1444.3 ms (CPU)   prompt encoder + mask decoder   5.7 ms (GPU)   17.6 ms (CPU)
+facebook/sam-vit-huge: image encoder  3069.4 ms (GPU)    6809.4 ms (CPU)   prompt encoder + mask decoder   5.8 ms (GPU)   17.5 ms (CPU)
+
+amortized time per prompt, ViT-H, encoder on the GPU and decoder on the CPU:  (T_enc + k * T_dec) / k
+  k =   1 prompts: (3069 + 1 x 17.5) / 1 =  3086.9 ms per prompt
+  k =  10 prompts: (3069 + 10 x 17.5) / 10 =   324.4 ms per prompt
+  k = 100 prompts: (3069 + 100 x 17.5) / 100 =    48.2 ms per prompt
+
+== the dataset numbers of the paper ==
+SA-1B: 1,129M masks / 11M images = 103 masks per image
+Open Images: 2.7M masks / 1M images = 2.7 masks per image; SA-1B / Open Images = 418x masks, 11x images, 38x masks per image

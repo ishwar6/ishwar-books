@@ -13,7 +13,7 @@ Everything that can be checked, we check on the real released model, `bert-base-
 
 ## Related work: a long history of pre-training {§2}
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 2 · page 2
+> [!PAPER] · Section 2 · page 2
 > [![The opening of Section 2, Related Work: there is a long history of pre-training general language representations, and we briefly review the most widely-used approaches in this section](/img/papers/bert/p2-related-intro.png)](/img/papers/bert/p2-related-intro.png)
 >
 > **Context:** right after the introduction. Before describing BERT, the authors place it in the history of the field.
@@ -28,7 +28,7 @@ The three groups are: **feature-based** approaches (§2.1), **fine-tuning** appr
 
 ### Word embeddings {§2.1}
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 2.1 · page 2
+> [!PAPER] · Section 2.1 · page 2
 > [![Section 2.1, Unsupervised Feature-based Approaches: learning widely applicable representations of words has been an active area of research for decades. Pre-trained word embeddings are an integral part of modern NLP systems, offering significant improvements over embeddings learned from scratch](/img/papers/bert/p2-feature-words.png)](/img/papers/bert/p2-feature-words.png)
 >
 > **Context:** the first paragraph of Section 2.1.
@@ -88,7 +88,7 @@ where:
 
 ### Sentence and paragraph embeddings {§2.1}
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 2.1 · page 2
+> [!PAPER] · Section 2.1 · page 2
 > [![These approaches have been generalized to coarser granularities, such as sentence embeddings or paragraph embeddings. Prior work trained sentence representations by ranking candidate next sentences, generating the next sentence, or with denoising auto-encoder objectives](/img/papers/bert/p2-feature-sentences.png)](/img/papers/bert/p2-feature-sentences.png)
 >
 > **Context:** the second paragraph of Section 2.1.
@@ -141,7 +141,7 @@ The paragraph packs three earlier sentence objectives into one sentence. Each on
 
 ### ELMo: a word's vector depends on its sentence {§2.1}
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 2.1 · page 2
+> [!PAPER] · Section 2.1 · page 2
 > [![The ELMo paragraph: ELMo extracts context-sensitive features from a left-to-right and a right-to-left language model. The contextual representation of each token is the concatenation of the left-to-right and right-to-left representations. Melamud et al. 2016 predicted a word from both sides with LSTMs, but their model is feature-based and not deeply bidirectional](/img/papers/bert/p2-elmo.png)](/img/papers/bert/p2-elmo.png)
 >
 > **Context:** the third paragraph of Section 2.1, about the strongest feature-based model of 2018.
@@ -209,7 +209,7 @@ The static row of the table cannot tell the two banks apart: it is literally the
 
 ### Fine-tuning approaches {§2.2}
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 2.2 · pages 2 and 3
+> [!PAPER] · Section 2.2 · pages 2 and 3
 > [![Section 2.2, Unsupervised Fine-tuning Approaches: the first works only pre-trained word embedding parameters. More recently, sentence or document encoders have been pre-trained from unlabeled text and fine-tuned for a supervised downstream task. The advantage is that few parameters need to be learned from scratch. OpenAI GPT achieved previously state-of-the-art results on many sentence-level tasks from the GLUE benchmark](/img/papers/bert/p2-finetune.png)](/img/papers/bert/p2-finetune.png)
 > [![The paragraph continues on page 3: left-to-right language modeling and auto-encoder objectives have been used for pre-training such models](/img/papers/bert/p2-finetune2.png)](/img/papers/bert/p2-finetune2.png)
 >
@@ -226,7 +226,7 @@ The key phrase is "**few parameters need to be learned from scratch**". With the
 
 ### Transfer learning from labelled data {§2.3}
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 2.3 · page 3
+> [!PAPER] · Section 2.3 · page 3
 > [![Section 2.3, Transfer Learning from Supervised Data: effective transfer from supervised tasks with large datasets, such as natural language inference and machine translation. Computer vision has shown the importance of transfer learning from large pre-trained models, where an effective recipe is to fine-tune models pre-trained with ImageNet](/img/papers/bert/p2-supervised.png)](/img/papers/bert/p2-supervised.png)
 >
 > **Context:** the last part of Related Work.
@@ -250,7 +250,7 @@ The key phrase is "**few parameters need to be learned from scratch**". With the
 
 Now Section 3, the description of BERT itself. It opens with the two steps and with the paper's main picture, Figure 1.
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 3 · page 3
+> [!PAPER] · Section 3 · page 3
 > [![The opening of Section 3: there are two steps in our framework, pre-training and fine-tuning. During pre-training the model is trained on unlabeled data over different pre-training tasks. For fine-tuning, the model is first initialized with the pre-trained parameters, and all of the parameters are fine-tuned using labeled data from the downstream tasks. Each downstream task has separate fine-tuned models](/img/papers/bert/p2-bert-intro.png)](/img/papers/bert/p2-bert-intro.png)
 >
 > **Context:** the first paragraph of Section 3.
@@ -262,7 +262,7 @@ Now Section 3, the description of BERT itself. It opens with the two steps and w
 > [!DEFINITION] Initialized with
 > The numbers a model starts from before training. "Initialized with the pre-trained parameters" means the copy starts as an exact clone of pre-trained BERT, not from random numbers.
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 3, Figure 1 · page 3
+> [!PAPER] · Section 3, Figure 1 · page 3
 > [![Figure 1 of the BERT paper. Left, pre-training: an unlabeled sentence A and B pair goes in as [CLS], the tokens of masked sentence A, [SEP], and the tokens of masked sentence B. BERT turns input embeddings E into outputs C and T; C feeds NSP and the T vectors feed Mask LM. Right, fine-tuning: the same BERT is copied for MNLI, NER and SQuAD; for SQuAD a question and a paragraph go in and start and end span outputs come out](/img/papers/bert/p2-figure1.png)](/img/papers/bert/p2-figure1.png)
 >
 > **Context:** Figure 1 sits at the top of page 3. The question-answering example in it is the "running example" for Section 3.
@@ -284,7 +284,7 @@ How to read Figure 1, from bottom to top:
 > [!DEFINITION] MNLI, NER, SQuAD
 > Three of the downstream tasks in Figure 1. **MNLI** (MultiNLI): natural language inference on sentence pairs. **NER**: named entity recognition, a label for every token. **SQuAD**: question answering, find the answer span in a paragraph. Part 4 covers all of them.
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 3 · page 3
+> [!PAPER] · Section 3 · page 3
 > [![A distinctive feature of BERT is its unified architecture across different tasks](/img/papers/bert/p2-unified.png)](/img/papers/bert/p2-unified.png)
 > [![There is minimal difference between the pre-trained architecture and the final downstream architecture. Then the Model Architecture paragraph: a multi-layer bidirectional Transformer encoder based on the original implementation of Vaswani et al. 2017, almost identical to the original](/img/papers/bert/p2-architecture.png)](/img/papers/bert/p2-architecture.png)
 >
@@ -338,7 +338,7 @@ where:
 
 The paper hands the details to Vaswani et al. and to "The Annotated Transformer" in two footnotes:
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 3, footnotes 1 and 2 · page 3
+> [!PAPER] · Section 3, footnotes 1 and 2 · page 3
 > [![Footnotes 1 and 2 of the BERT paper: the tensor2tensor library on GitHub, and The Annotated Transformer at nlp.seas.harvard.edu](/img/papers/bert/p2-footnotes12.png)](/img/papers/bert/p2-footnotes12.png)
 >
 > **Context:** the two links behind "the tensor2tensor library" and "excellent guides such as The Annotated Transformer".
@@ -508,7 +508,7 @@ The largest difference from the model's own layer is $$8.34 \times 10^{-7}$$, th
 
 ## Two model sizes: L, H and A {§3}
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 3 · page 3
+> [!PAPER] · Section 3 · page 3
 > [![We denote the number of layers as L, the hidden size as H, and the number of self-attention heads as A. BERT-BASE: L=12, H=768, A=12, Total Parameters=110M. BERT-LARGE: L=24, H=1024, A=16, Total Parameters=340M. BERT-BASE was chosen to have the same model size as OpenAI GPT. BERT uses bidirectional self-attention, while the GPT Transformer uses constrained self-attention where every token can only attend to context to its left](/img/papers/bert/p2-sizes.png)](/img/papers/bert/p2-sizes.png)
 >
 > **Context:** the second paragraph of "Model Architecture".
@@ -527,7 +527,7 @@ The largest difference from the model's own layer is $$8.34 \times 10^{-7}$$, th
 
 The feed-forward size comes from a footnote:
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 3, footnote 3 · page 3
+> [!PAPER] · Section 3, footnote 3 · page 3
 > [![Footnote 3: In all cases we set the feed-forward/filter size to be 4H, i.e., 3072 for the H = 768 and 4096 for the H = 1024](/img/papers/bert/p2-footnote3.png)](/img/papers/bert/p2-footnote3.png)
 >
 > **Context:** footnote 3, attached to the definition of L, H and A.
@@ -538,7 +538,7 @@ The feed-forward size comes from a footnote:
 
 And footnote 4 explains two names you will see everywhere:
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 3, footnote 4 · pages 3 and 4
+> [!PAPER] · Section 3, footnote 4 · pages 3 and 4
 > [![Footnote 4, first line: We note that in the literature the bidirectional Trans-](/img/papers/bert/p2-footnote4a.png)](/img/papers/bert/p2-footnote4a.png)
 > [![Footnote 4, continued on page 4: former is often referred to as a Transformer encoder while the left-context-only version is referred to as a Transformer decoder since it can be used for text generation](/img/papers/bert/p2-footnote4.png)](/img/papers/bert/p2-footnote4.png)
 >
@@ -612,7 +612,7 @@ Two things stand out in the picture:
 
 ## Input: sentences and sequences {§3}
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 3, Input/Output Representations · page 4
+> [!PAPER] · Section 3, Input/Output Representations · page 4
 > [![Input/Output Representations: the input representation can unambiguously represent both a single sentence and a pair of sentences in one token sequence. A sentence can be an arbitrary span of contiguous text, rather than an actual linguistic sentence. A sequence refers to the input token sequence to BERT, which may be a single sentence or two sentences packed together](/img/papers/bert/p2-input.png)](/img/papers/bert/p2-input.png)
 >
 > **Context:** the first paragraph of "Input/Output Representations", at the top of page 4.
@@ -626,7 +626,7 @@ Two things stand out in the picture:
 
 ## WordPiece: how text becomes tokens {§3}
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 3, Input/Output Representations · page 4
+> [!PAPER] · Section 3, Input/Output Representations · page 4
 > [![We use WordPiece embeddings with a 30,000 token vocabulary. The first token of every sequence is always a special classification token [CLS], whose final hidden state is used as the aggregate sequence representation for classification tasks. Sentence pairs are separated with a special token [SEP], and a learned embedding is added to every token indicating whether it belongs to sentence A or sentence B. The input embedding is E, the final hidden vector of [CLS] is C in R to the H, and the final hidden vector of the i-th token is T i in R to the H](/img/papers/bert/p2-wordpiece.png)](/img/papers/bert/p2-wordpiece.png)
 >
 > **Context:** the second paragraph of "Input/Output Representations". It is short but dense: five ideas in nine lines.
@@ -767,7 +767,7 @@ Two ways tell the sentences apart, exactly as the paper says: the `[SEP]` token 
 
 ## Three embeddings, added together {§3}
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 3, Input/Output Representations · page 4
+> [!PAPER] · Section 3, Input/Output Representations · page 4
 > [![For a given token, its input representation is constructed by summing the corresponding token, segment, and position embeddings. A visualization of this construction can be seen in Figure 2](/img/papers/bert/p2-sum.png)](/img/papers/bert/p2-sum.png)
 >
 > **Context:** the last paragraph of "Input/Output Representations".
@@ -776,7 +776,7 @@ Two ways tell the sentences apart, exactly as the paper says: the `[SEP]` token 
 >
 > **Why it matters:** this is the very first computation BERT does. Everything else builds on these vectors.
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 3, Figure 2 · page 5
+> [!PAPER] · Section 3, Figure 2 · page 5
 > [![Figure 2 of the BERT paper: the input [CLS] my dog is cute [SEP] he likes play ##ing [SEP]. Below each token: its token embedding E with the token as subscript, plus a segment embedding E A for the first six tokens and E B for the rest, plus a position embedding E 0 to E 10](/img/papers/bert/p2-figure2.png)](/img/papers/bert/p2-figure2.png)
 >
 > **Context:** Figure 2, at the top of page 5, the picture for the paragraph above.

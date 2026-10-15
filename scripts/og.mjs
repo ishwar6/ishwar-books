@@ -51,7 +51,7 @@ const paperCard = (title, kicker, short) => card(title, kicker, paperArt(short, 
 await shot(paperCard('Research papers, one section at a time', 'Research papers', 'BERT'), 'papers.png')
 for (const pp of papers) {
   await shot(paperCard(`${pp.short}, explained`, `Research paper · ${pp.parts.length} parts`, pp.short), `paper-${pp.slug}.png`)
-  for (const x of pp.parts) await shot(paperCard(x.title, `${pp.short} · Part ${x.partNumber} of ${pp.parts.length}`, pp.short), `paper-${pp.slug}-${x.slug}.png`)
+  for (const x of pp.parts) await shot(paperCard(x.title, `${pp.short} · ${x.partOf}`, pp.short), `paper-${pp.slug}-${x.slug}.png`)
 }
 console.log(fs.readdirSync(OUT))
 await b.close()
