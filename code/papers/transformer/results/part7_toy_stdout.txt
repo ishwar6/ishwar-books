@@ -1,0 +1,58 @@
+== 1. The model
+task: ISO date "2021-03-12" -> "12 March 2021"
+vocabulary: 41 tokens; d_model 128, h 4, d_ff 512, layers 2 + 2, dropout 0.1
+parameters: 930,944; file size 3.8 MB
+
+== 2. Training (3,000 steps of 128 dates, CPU)
+step     1  loss 4.383  token accuracy 0.021  exact match on 500 test dates 0.000
+step   100  loss 0.998  token accuracy 0.907
+step   200  loss 0.715  token accuracy 0.995
+step   300  loss 0.699  token accuracy 0.996
+step   500  loss 0.704  token accuracy 0.995  exact match on 500 test dates 0.958
+step  1000  loss 0.686  token accuracy 0.999  exact match on 500 test dates 1.000
+step  2000  loss 0.685  token accuracy 0.999  exact match on 500 test dates 1.000
+step  3000  loss 0.684  token accuracy 0.999  exact match on 500 test dates 1.000
+training time: 249 s
+uniform guess over 41 tokens: ln 41 = 3.714
+smoothed target: right token 0.9024, each other token 0.00244
+entropy terms: 0.0926 + 0.5869
+lowest possible loss with label smoothing 0.1 and 41 classes: 0.680
+Eq. 3 with d_model 128, warmup 400: 128^-0.5 = 0.0884, 400^-0.5 = 0.05, peak 0.00442
+
+== 3. Outputs
+dates 1900 to 2099: 73,049; training 71,049, held out 2,000
+held-out test dates (never seen in training): exact match 100.0% of 2,000
+  1965-05-10  ->  10 May 1965
+  1915-06-20  ->  20 June 1915
+  1977-03-18  ->  18 March 1977
+  1968-04-22  ->  22 April 1968
+  1956-07-26  ->  26 July 1956
+  1963-09-01  ->  1 September 1963
+early checkpoints, same first three test dates:
+  step    1: 'OOOOOOOOOOOOOOOOOOOOOOOO'   'O'                    'OOOOOOOOOOOOOOOOOOOOOOOO'
+  step  100: '10 May 1965'          '20 June 19555'        '18 March 1977'     
+  step  200: '10 May 1965'          '20 June 1915'         '18 March 1977'     
+  step  300: '10 May 1965'          '20 June 1915'         '18 March 1977'     
+  step  500: '10 May 1965'          '20 June 1915'         '18 March 1977'     
+  step 1000: '10 May 1965'          '20 June 1915'         '18 March 1977'     
+outside what it was trained on:
+  2150-07-04  ->  4 July 1950
+  1850-11-23  ->  23 November 1950
+  2021-02-30  ->  30 February 2021
+  2021-13-01  ->  1 March 2021
+  0001-01-01  ->  1 January 2001
+
+== 4. Cross-attention: where does each output character look?
+2,000 held-out dates: 11,408 digits, 2,000 first month letters, 10,433 other month letters.
+A = digit: the strongest look is at the exact input digit it copies
+B = first month letter: the strongest look is at a month digit
+C = other month letters: the strongest look is at a dash or </s>
+  decoder layer 1, head 0:  A   1.7%   B   2.5%   C  95.7%
+  decoder layer 1, head 1:  A  29.9%   B   8.8%   C  68.0%
+  decoder layer 1, head 2:  A   3.0%   B   0.0%   C  92.0%
+  decoder layer 1, head 3:  A  12.3%   B  91.8%   C   9.5%
+  decoder layer 2, head 0:  A  82.5%   B  16.6%   C  93.9%
+  decoder layer 2, head 1:  A  82.2%   B  95.0%   C 100.0%
+  decoder layer 2, head 2:  A  99.4%   B  25.6%   C 100.0%
+  decoder layer 2, head 3:  A  70.8%   B 100.0%   C  67.9%
+example for the attention map: 1965-05-10 -> 10 May 1965

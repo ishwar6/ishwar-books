@@ -41,7 +41,7 @@ Each part follows the paper's own sections:
 4. **[Why Self-Attention](part-4-why-self-attention.md)**: §4 and Table 1. Cost per layer, steps in sequence and path length, against recurrent and convolutional layers.
 5. **[Training](part-5-training.md)**: §5. The data, batching, hardware, the learning-rate schedule, dropout and label smoothing.
 6. **[Results, Variations and Impact](part-6-results-and-impact.md)**: §6, §7, Tables 2 to 4 and the attention pictures of the appendix. What the paper showed, and what came after.
-7. **Build It from Scratch** (coming soon): the whole Transformer in about 300 lines of PyTorch, one block at a time. We load the released model's weights into our own code, get the same translation, and train a small Transformer on your laptop.
+7. **[Build It from Scratch](part-7-build-it-from-scratch.md)**: the whole Transformer in about 300 lines of PyTorch, one block at a time. We load the released model's weights into our own code, get the same translation, and train a small Transformer on your laptop.
 
 ## How to read the boxes
 

@@ -1,0 +1,39 @@
+== 1. Copy the weights
+Marian tensors: 259, copied into our model: 254
+not copied: encoder/decoder embed_tokens and lm_head (the same table as model.shared),
+            encoder/decoder embed_positions (fixed sinusoids, not learned)
+our sin_then_cos table vs Marian's position table, max abs difference: 3.4e-05
+parameters: ours 73,886,208, Marian 74,410,496
+gap: 524,288 = 2 x 512 x 512, the two fixed position tables that Marian stores as (frozen) parameters
+
+== 2. Encoder output
+src (5, 15) -> memory (5, 15, 512); max abs difference on real tokens: 1.91e-06
+size of the numbers: max abs value 9.03
+
+== 3. Decoder logits (teacher forcing with Marian's own German translation)
+target (5, 15) -> logits (5, 15, 58101); max abs difference: 2.67e-05
+same top token at 100.0% of 55 positions
+
+== 4. Greedy translation: ours vs MarianMTModel.generate(num_beams=1)
+EN    The cat sat on the mat.
+ours  Die Katze saß auf der Matte.
+        (same as MarianMTModel)
+EN    Attention is all you need.
+ours  Achtung ist alles, was du brauchst.
+        (same as MarianMTModel)
+EN    The weather is nice today, so we will walk to the station.
+ours  Das Wetter ist heute schön, so dass wir zum Bahnhof gehen.
+        (same as MarianMTModel)
+EN    I have read this book twice.
+ours  Ich habe dieses Buch zweimal gelesen.
+        (same as MarianMTModel)
+EN    Neural networks learn from examples.
+ours  Neuronale Netzwerke lernen aus Beispielen.
+        (same as MarianMTModel)
+identical: 5 of 5
+
+== 5. Our beam search (beam 4, length penalty alpha 0.6, as in §6.1)
+EN    The weather is nice today, so we will walk to the station.
+beam  Das Wetter ist heute schön, also gehen wir zum Bahnhof.
+EN    I have read this book twice.
+beam  Ich habe dieses Buch zweimal gelesen.

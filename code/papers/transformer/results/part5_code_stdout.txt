@@ -1,0 +1,53 @@
+== 1. The learning rate of Eq. 3: by hand and with LambdaLR
+step      1: by hand 0.0000002   LambdaLR 0.0000002
+step  1,000: by hand 0.0001747   LambdaLR 0.0001747
+step  4,000: by hand 0.0006988   LambdaLR 0.0006988
+step 16,000: by hand 0.0003494   LambdaLR 0.0003494
+max abs difference over 20,000 steps: 0.0e+00
+
+== 2. Adam: by hand and torch.optim.Adam (lr 0.001, betas (0.9, 0.98), eps 1e-9)
+step 1: loss 3.714999   max |A - B| = 0.0e+00   mean |change of a weight| = 0.001000
+step 2: loss 3.708678   max |A - B| = 0.0e+00   mean |change of a weight| = 0.002000
+step 3: loss 3.702367   max |A - B| = 0.0e+00   mean |change of a weight| = 0.003000
+step 4: loss 3.696066   max |A - B| = 0.0e+00   mean |change of a weight| = 0.004000
+step 5: loss 3.689773   max |A - B| = 0.0e+00   mean |change of a weight| = 0.004999
+
+== 3. Dropout: by hand and nn.Dropout(p = 0.1)
+same seed: max abs difference 0.0e+00; zeros 3301 of 32768 (10.07%)
+mean of x -0.0131, mean after dropout -0.0129; inference: True
+
+== 4. Label smoothing: by hand and nn.CrossEntropyLoss(label_smoothing=0.1)
+5 words, logits [4.0, 0.5, 0.0, -0.5, 0.2], correct word 0, p = [0.9242, 0.0279, 0.0169, 0.0103, 0.0207]
+target, eps over all 5 words     : [0.92, 0.02, 0.02, 0.02, 0.02]
+target, eps over the 4 wrong ones: [0.9, 0.025, 0.025, 0.025, 0.025]
+loss by hand 0.394805   CrossEntropyLoss 0.394805   difference 0.0e+00
+loss with eps over the wrong words only: 0.473805
+24 positions (6 of them padding), V = 1,000: by hand 11.374208   library 11.374207   difference 1.9e-06
+Marian, 14 target tokens, V = 58,101: by hand 1.545421   library 1.545421   eps over the wrong tokens only 1.545445
+
+== 5. Batching by length with padding masks (Marian tokenizer)
+lengths in tokens: [7, 19, 9, 17, 8, 12, 22, 16]
+batch of sentences [0, 4, 2, 5]: shape (4, 12), real tokens 36, padding 12
+batch of sentences [7, 3]: shape (2, 17), real tokens 33, padding 1
+batch of sentences [1, 6]: shape (2, 22), real tokens 41, padding 3
+one batch of all 8 in the given order would hold 66 padding tokens; the sorted batches hold 16
+last batch: our ids == tokenizer ids: True, our mask == tokenizer mask: True
+sentence 1 (19 tokens, padded to 22): encoder output alone vs in the batch
+  with the padding mask   : max abs difference 1.4e-06
+  without the padding mask: max abs difference 0.44
+
+== 6. One training step written out, on a tiny Transformer that learns to reverse digits
+tiny model: d_model 64, 4 heads, d_ff 128, 2+2 layers, 169,357 weights
+gradient norm by hand 1.6337, clip_grad_norm_ 1.6337; clipped gradients max abs difference 0.0e+00
+step    1: lr 0.00004   loss 2.640   gradient norm before clipping 1.44
+step   50: lr 0.00221   loss 1.778   gradient norm before clipping 0.89
+step  100: lr 0.00442   loss 1.232   gradient norm before clipping 1.46
+step  200: lr 0.00884   loss 0.937   gradient norm before clipping 1.44
+step  400: lr 0.00625   loss 0.726   gradient norm before clipping 1.52
+step  600: lr 0.00510   loss 0.708   gradient norm before clipping 1.91
+step 1000: lr 0.00395   loss 0.598   gradient norm before clipping 2.24
+lowest possible smoothed loss with V = 13: 0.537
+1000 steps in 26 s on the CPU
+example: [5, 4, 9, 5, 6, 1] -> [1, 6, 5, 9, 4, 5]
+exact reversals on 500 new lists: 491 / 500
+same run, embeddings started with spread 1 (PyTorch default): loss 1.160, exact reversals 144 / 500

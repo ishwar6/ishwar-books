@@ -1,0 +1,66 @@
+vocabulary: 41 tokens: ['<pad>', '<s>', '</s>', ' ', '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'D', 'F', 'J', 'M', 'N', 'O', 'S', 'a', 'b', 'c', 'e', 'g', 'h', 'i', 'l', 'm', 'n', 'o', 'p', 'r', 's', 't', 'u', 'v', 'y']
+train dates: 71049, held-out test dates: 2000
+parameters: 930,944
+{"step": 1, "loss": 4.383, "token_acc": 0.0214, "lr": 2.2e-05, "seconds": 0.3, "test_exact": 0.0}
+{"step": 50, "loss": 2.1979, "token_acc": 0.4696, "lr": 0.000563, "seconds": 14.7}
+{"step": 100, "loss": 0.9978, "token_acc": 0.9067, "lr": 0.001116, "seconds": 21.3}
+{"step": 150, "loss": 0.7611, "token_acc": 0.9867, "lr": 0.001668, "seconds": 28.4}
+{"step": 200, "loss": 0.7146, "token_acc": 0.9947, "lr": 0.002221, "seconds": 33.7}
+{"step": 250, "loss": 0.7241, "token_acc": 0.9886, "lr": 0.002773, "seconds": 39.4, "test_exact": 0.896}
+{"step": 300, "loss": 0.6985, "token_acc": 0.9963, "lr": 0.003326, "seconds": 44.8}
+{"step": 350, "loss": 0.7013, "token_acc": 0.9948, "lr": 0.003878, "seconds": 49.2}
+{"step": 400, "loss": 0.7041, "token_acc": 0.9958, "lr": 0.004414, "seconds": 53.5}
+{"step": 450, "loss": 0.6966, "token_acc": 0.9979, "lr": 0.004162, "seconds": 57.5}
+{"step": 500, "loss": 0.704, "token_acc": 0.9947, "lr": 0.003949, "seconds": 61.5, "test_exact": 0.958}
+{"step": 550, "loss": 0.6936, "token_acc": 0.9979, "lr": 0.003765, "seconds": 66.6}
+{"step": 600, "loss": 0.7093, "token_acc": 0.9916, "lr": 0.003605, "seconds": 71.2}
+{"step": 650, "loss": 0.6965, "token_acc": 0.9974, "lr": 0.003464, "seconds": 75.6}
+{"step": 700, "loss": 0.6884, "token_acc": 0.9984, "lr": 0.003338, "seconds": 78.9}
+{"step": 750, "loss": 0.6931, "token_acc": 0.9969, "lr": 0.003225, "seconds": 82.1, "test_exact": 0.998}
+{"step": 800, "loss": 0.6991, "token_acc": 0.9958, "lr": 0.003123, "seconds": 86.1}
+{"step": 850, "loss": 0.694, "token_acc": 0.9979, "lr": 0.00303, "seconds": 89.9}
+{"step": 900, "loss": 0.6906, "token_acc": 0.9984, "lr": 0.002945, "seconds": 94.3}
+{"step": 950, "loss": 0.6993, "token_acc": 0.9958, "lr": 0.002866, "seconds": 98.4}
+{"step": 1000, "loss": 0.686, "token_acc": 0.999, "lr": 0.002794, "seconds": 102.3, "test_exact": 1.0}
+{"step": 1050, "loss": 0.6959, "token_acc": 0.9969, "lr": 0.002726, "seconds": 106.9}
+{"step": 1100, "loss": 0.6954, "token_acc": 0.9958, "lr": 0.002664, "seconds": 111.0}
+{"step": 1150, "loss": 0.6904, "token_acc": 0.9984, "lr": 0.002605, "seconds": 115.2}
+{"step": 1200, "loss": 0.6871, "token_acc": 0.9995, "lr": 0.00255, "seconds": 119.3}
+{"step": 1250, "loss": 0.7088, "token_acc": 0.9927, "lr": 0.002499, "seconds": 124.0, "test_exact": 0.954}
+{"step": 1300, "loss": 0.6917, "token_acc": 0.9974, "lr": 0.002451, "seconds": 127.8}
+{"step": 1350, "loss": 0.6856, "token_acc": 0.9989, "lr": 0.002405, "seconds": 131.0}
+{"step": 1400, "loss": 0.6851, "token_acc": 0.9995, "lr": 0.002361, "seconds": 134.3}
+{"step": 1450, "loss": 0.7091, "token_acc": 0.9936, "lr": 0.00232, "seconds": 137.5}
+{"step": 1500, "loss": 0.6936, "token_acc": 0.9969, "lr": 0.002281, "seconds": 140.7, "test_exact": 0.99}
+{"step": 1550, "loss": 0.6828, "token_acc": 1.0, "lr": 0.002244, "seconds": 144.8}
+{"step": 1600, "loss": 0.6858, "token_acc": 0.9984, "lr": 0.002209, "seconds": 148.3}
+{"step": 1650, "loss": 0.6883, "token_acc": 0.999, "lr": 0.002175, "seconds": 151.7}
+{"step": 1700, "loss": 0.6889, "token_acc": 0.9984, "lr": 0.002143, "seconds": 154.9}
+{"step": 1750, "loss": 0.6864, "token_acc": 0.999, "lr": 0.002112, "seconds": 158.1, "test_exact": 1.0}
+{"step": 1800, "loss": 0.6822, "token_acc": 1.0, "lr": 0.002083, "seconds": 162.7}
+{"step": 1850, "loss": 0.6891, "token_acc": 0.9984, "lr": 0.002054, "seconds": 167.2}
+{"step": 1900, "loss": 0.6874, "token_acc": 0.999, "lr": 0.002027, "seconds": 170.8}
+{"step": 1950, "loss": 0.6853, "token_acc": 0.999, "lr": 0.002001, "seconds": 174.8}
+{"step": 2000, "loss": 0.6849, "token_acc": 0.9989, "lr": 0.001976, "seconds": 177.9, "test_exact": 1.0}
+{"step": 2050, "loss": 0.6905, "token_acc": 0.9984, "lr": 0.001952, "seconds": 182.1}
+{"step": 2100, "loss": 0.6845, "token_acc": 0.9995, "lr": 0.001928, "seconds": 185.8}
+{"step": 2150, "loss": 0.6855, "token_acc": 0.999, "lr": 0.001906, "seconds": 189.5}
+{"step": 2200, "loss": 0.6903, "token_acc": 0.9984, "lr": 0.001884, "seconds": 192.6}
+{"step": 2250, "loss": 0.683, "token_acc": 1.0, "lr": 0.001863, "seconds": 196.1, "test_exact": 1.0}
+{"step": 2300, "loss": 0.6885, "token_acc": 0.9984, "lr": 0.001843, "seconds": 199.8}
+{"step": 2350, "loss": 0.6866, "token_acc": 0.999, "lr": 0.001823, "seconds": 203.3}
+{"step": 2400, "loss": 0.6841, "token_acc": 0.999, "lr": 0.001804, "seconds": 206.6}
+{"step": 2450, "loss": 0.6919, "token_acc": 0.9979, "lr": 0.001785, "seconds": 209.9}
+{"step": 2500, "loss": 0.6817, "token_acc": 1.0, "lr": 0.001767, "seconds": 213.0, "test_exact": 1.0}
+{"step": 2550, "loss": 0.6819, "token_acc": 1.0, "lr": 0.00175, "seconds": 216.7}
+{"step": 2600, "loss": 0.6879, "token_acc": 0.9984, "lr": 0.001733, "seconds": 219.8}
+{"step": 2650, "loss": 0.6859, "token_acc": 0.999, "lr": 0.001717, "seconds": 223.0}
+{"step": 2700, "loss": 0.6819, "token_acc": 1.0, "lr": 0.001701, "seconds": 226.5}
+{"step": 2750, "loss": 0.6945, "token_acc": 0.9974, "lr": 0.001685, "seconds": 229.7, "test_exact": 0.978}
+{"step": 2800, "loss": 0.682, "token_acc": 1.0, "lr": 0.00167, "seconds": 233.4}
+{"step": 2850, "loss": 0.684, "token_acc": 0.9995, "lr": 0.001655, "seconds": 236.5}
+{"step": 2900, "loss": 0.6814, "token_acc": 1.0, "lr": 0.001641, "seconds": 239.7}
+{"step": 2950, "loss": 0.6814, "token_acc": 1.0, "lr": 0.001627, "seconds": 243.3}
+{"step": 3000, "loss": 0.6841, "token_acc": 0.999, "lr": 0.001613, "seconds": 246.6, "test_exact": 1.0}
+final exact match on 2000 held-out dates: 1.0000 (0 wrong)
+saved toy.pt and toy_log.json after 249 s

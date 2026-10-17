@@ -1,6 +1,6 @@
 ---
 title: "Results, Variations and Impact"
-description: "What the Transformer scored, what it cost to train, which parts of it matter, and how it did on a second task. We check the cost and the size numbers by hand and look inside a released translator."
+description: "What the Transformer scored, what it cost to train, which parts of it matter, and how it did on a second task. We write BLEU, beam search, checkpoint averaging and the size count in Python, and check each one against a library."
 part: 6
 covers: "§6.1, Table 2, §6.2, Table 3, §6.3, Table 4, §7, Figures 3 to 5"
 date: 2026-10-18
@@ -39,6 +39,70 @@ A tiny example. The human text is "the cat sat on the mat" and the machine write
 | 4 | 3 | 1 ("the cat sat on") | 1/3 = 0.333 |
 
 Both texts have 6 words, so $$\text{BP} = 1$$. The geometric mean is $$(0.833 \times 0.600 \times 0.500 \times 0.333)^{1/4} = 0.0833^{1/4} = 0.537$$. The score is 53.7. One wrong word took away almost half of the points, because it broke three of the longer groups. Real scores are computed over a whole test set of about 3,000 sentences, not one sentence.
+
+### BLEU in code
+
+**Method 1: from scratch.** BLEU needs four small functions. The first counts word groups. The second compares one output with its reference. The third turns the counts into a score, and the fourth does it for a whole test set.
+
+```python
+def ngrams(words, n):
+    """Count every group of n words that follow each other."""
+    return Counter(tuple(words[i:i + n]) for i in range(len(words) - n + 1))
+
+
+def bleu_stats(hyp, ref, max_n=4):
+    """For one sentence: matches and totals for n = 1..4, and the two lengths."""
+    hyp, ref = hyp.split(), ref.split()
+    matches, totals = [], []
+    for n in range(1, max_n + 1):
+        h, r = ngrams(hyp, n), ngrams(ref, n)
+        # clipping: a group counts at most as often as it occurs in the reference
+        matches.append(sum(min(count, r[g]) for g, count in h.items()))
+        totals.append(max(len(hyp) - n + 1, 0))
+    return matches, totals, len(hyp), len(ref)
+
+
+def bleu_from_stats(matches, totals, c, r):
+    if min(matches) == 0:
+        return 0.0                                   # log(0): one empty precision makes the score 0
+    log_mean = sum(math.log(m / t) for m, t in zip(matches, totals)) / len(matches)   # geometric mean, in logs
+    bp = 1.0 if c > r else math.exp(1 - r / c)       # brevity penalty: only short outputs lose points
+    return 100 * bp * math.exp(log_mean)
+
+
+def corpus_bleu(hyps, refs):
+    """Corpus BLEU adds up the counts of all sentences first, then computes one score."""
+    M, T, C, Rl = [0] * 4, [0] * 4, 0, 0
+    for h, r in zip(hyps, refs):
+        m, t, c, rl = bleu_stats(h, r)
+        M = [a + b for a, b in zip(M, m)]
+        T = [a + b for a, b in zip(T, t)]
+        C, Rl = C + c, Rl + rl
+    return bleu_from_stats(M, T, C, Rl)
+```
+
+Read `ngrams` first. For "the cat sat" and $$n = 2$$ it slides a window of two words along the sentence and counts ("the", "cat") and ("cat", "sat"). A `Counter` is a dictionary that counts, so a group that occurs twice gets the value 2.
+
+`bleu_stats` holds the one idea of BLEU that the formula hides: **clipping**. Without it, the output "the the the the the the" would have six matching words, because "the" is in the reference. With clipping, "the" counts at most as often as the reference has it, which is twice. The line `min(count, r[g])` does this. `totals` is the number of groups in the output. A sentence of 6 words has 6 single words, 5 pairs, 4 triples and 3 groups of four.
+
+`bleu_from_stats` follows the formula. It takes the mean of the four log precisions, which is the log of their geometric mean. The brevity penalty is 1 when the output is longer than the reference, and $$e^{1 - r/c}$$ when it is shorter. If any precision is 0, its log is minus infinity and the score is 0.
+
+**Method 2: with the library.** The standard tool is sacreBLEU. It fixes the tokenization and the details, so that teams can compare scores. It is not in our Python environment, so we installed it into a separate folder only for this check. We ran both on four outputs against "the cat sat on the mat":
+
+```text
+sacrebleu: 2.6.0
+"the cat sat on a mat": p1..p4 = 5/6 3/5 2/4 1/3, c = 6, r = 6, BLEU ours 53.73, sacrebleu 53.73
+"the cat sat on the mat": p1..p4 = 6/6 5/5 4/4 3/3, c = 6, r = 6, BLEU ours 100.00, sacrebleu 100.00
+"the cat sat on": p1..p4 = 4/4 3/3 2/2 1/1, c = 4, r = 6, BLEU ours 60.65, sacrebleu 60.65
+"the the the the the the": p1..p4 = 2/6 0/5 0/4 0/3, c = 6, r = 6, BLEU ours 0.00, sacrebleu 0.00
+sacrebleu with its default smoothing on the last one: 9.65
+unclipped: "the" counted 6 times; clipped: min(6, 2) = 2
+two sentences: sentence BLEU 53.73 and 41.11 (mean 47.42); corpus BLEU ours 46.27, sacrebleu 46.27
+```
+
+Our 53.73 is the 53.7 of the table above, and sacreBLEU agrees on every line. The third output shows the brevity penalty at work. "the cat sat on" has perfect precisions, but it has 4 words where the reference has 6. So $$\text{BP} = e^{1 - 6/4} = 0.607$$, and the score is 60.65, not 100. The fourth output gets only 2 matches out of 6 words after clipping, and no matching pairs, so its score is 0.
+
+Two details matter for real use. First, sacreBLEU's `sentence_bleu` smooths empty precisions by default, so the hopeless fourth output gets 9.65 instead of 0. We turned that smoothing off for the comparison. Second, corpus BLEU is not the mean of the sentence scores. It adds up the matches and totals of all sentences, then computes one score: 46.27 for our two sentences, not their mean of 47.42. The scores in the paper's tables are corpus scores of this kind.
 
 > [!PAPER] · Table 2
 > [![Table 2 of the paper: BLEU scores on English-to-German and English-to-French newstest2014 and the training cost in FLOPs of ByteNet, Deep-Att + PosUnk, GNMT + RL, ConvS2S, MoE, three ensembles, and the two Transformer models. The Transformer base and big rows are highlighted](/img/papers/transformer/p6-table2.png)](/img/papers/transformer/p6-table2.png)
@@ -145,7 +209,159 @@ beam 4, alpha .6: Das Gesetz wird nie perfekt sein, aber seine Anwendung sollte 
 output limit = input length + 50 = 65 tokens; used 15
 ```
 
-For this sentence, greedy decoding and beam search give the same correct German. That is common for short, clear sentences. Beam search helps on hard sentences, where the best first word is not the best start for the whole sentence. We do not measure BLEU here: we have no test set and no BLEU tool installed, so any score from us would be a guess.
+For this sentence, greedy decoding and beam search give the same correct German. That is common for short, clear sentences. Beam search helps on hard sentences, where the best first word is not the best start for the whole sentence. We do not measure BLEU on the model here: we have no WMT test set, so any score from us would be a guess.
+
+### Checkpoint averaging in code
+
+Checkpoint averaging is the shortest algorithm on this page. A checkpoint is a dictionary from weight names to tensors, so the average is one dictionary of means.
+
+**Method 1: from scratch.**
+
+```python
+def average_by_hand(state_dicts):
+    """Weight by weight: the mean of the same tensor over all checkpoints."""
+    return {k: sum(sd[k] for sd in state_dicts) / len(state_dicts) for k in state_dicts[0]}
+```
+
+To see it work, we need weights that still move at the end of training. We trained a tiny network (8 inputs, 32 hidden units, 1 output) on a noisy curve, with plain gradient descent and a large step. We saved a checkpoint every 100 steps, our stand-in for the paper's "10-minute intervals", and averaged the last 5.
+
+**Method 2: with the library.** PyTorch has `torch.optim.swa_utils.AveragedModel`, which keeps a running mean of the weights it is given. "SWA" means stochastic weight averaging, a later method built on the same idea.
+
+```python
+last5 = checkpoints[-5:]
+avg = average_by_hand(last5)
+swa = AveragedModel(net)                  # Method 2: the library keeps a running mean
+for sd in last5:
+    net.load_state_dict(sd)
+    swa.update_parameters(net)
+```
+
+```text
+one weight in the last 5 checkpoints: -0.4073, -0.3782, -0.4102, -0.4517, -0.4189  -> mean -0.4133
+validation loss of the last 5 checkpoints: 0.8701, 0.9201, 0.9074, 0.8006, 0.8326
+validation loss of their average: 0.7449
+average by hand vs AveragedModel: max abs difference 1.2e-07
+```
+
+The first line is the needle of the scale from the box above. One weight jumps between −0.45 and −0.38, and the average sits in the middle. The validation loss is measured on new data that the network never trained on. Every single checkpoint scores between 0.80 and 0.92, and their average scores 0.7449, better than all five. The noise of the last steps pushes each checkpoint a little off in a random direction, and the average cancels much of it. The library's running mean agrees with ours to 0.00000012, which is rounding.
+
+One condition hides in this trick. The five checkpoints must be close to each other, in the same valley of the loss. Averaging two networks trained from different random starts usually gives a poor network, because their hidden units can be in a different order. The paper averages checkpoints only 10 minutes apart, so the condition holds.
+
+### Greedy decoding in code
+
+`model.generate` hides the decoding loop. Here we write it ourselves around the released Marian model. We use the model only for one thing: given the source and the tokens so far, give the log probability of every possible next token.
+
+```python
+@torch.no_grad()
+def encode(text):
+    x = tok([text], return_tensors='pt')
+    memory = model.get_encoder()(**x).last_hidden_state     # (1, n, 512), computed once
+    return x, memory
+
+
+@torch.no_grad()
+def next_log_probs(x, memory, prefixes):
+    """log P(next token | source, prefix) for each prefix. prefixes: (beams, t) -> (beams, V)."""
+    b = prefixes.shape[0]
+    out = model(encoder_outputs=BaseModelOutput(last_hidden_state=memory.expand(b, -1, -1)),
+                attention_mask=x['attention_mask'].expand(b, -1), decoder_input_ids=prefixes)
+    logits = out.logits[:, -1]                    # scores for the token after the prefix
+    logits[:, PAD] = -float('inf')                # the padding token is never a word
+    return torch.log_softmax(logits, dim=-1)
+```
+
+The encoder runs once per sentence; its output is the "memory" that every decoder step reads. The decoder runs again at each step on the whole prefix. A faster program would keep the keys and values of earlier steps in a cache, but the result is the same. Marian's settings forbid the padding token as an output, so we set its score to minus infinity, as the library does.
+
+**Method 1: from scratch.** Greedy decoding takes the best token, appends it, and repeats until the end token or the paper's limit of input length + 50.
+
+```python
+def greedy_decode(text, extra=50):
+    x, memory = encode(text)
+    ys = [START]
+    for _ in range(x['input_ids'].shape[1] + extra):           # the paper's limit: input length + 50
+        lp = next_log_probs(x, memory, torch.tensor([ys]))[0]
+        best = int(lp.argmax())                                # the single best next token
+        ys.append(best)
+        if best == EOS:
+            break
+    return ys
+```
+
+**Method 2: with the library.** `model.generate(**x, num_beams=1, do_sample=False, max_new_tokens=n + 50)` is greedy decoding. We compared the token ids, not only the text, on two sentences:
+
+```text
+The law will never be perfect, but its application should be just.
+  ours   : Das Gesetz wird nie perfekt sein, aber seine Anwendung sollte gerecht sein.
+  library: same token ids: True
+We trained the model on eight GPUs for twelve hours, and it still beat the ensembles.
+  ours   : Wir trainierten das Modell zwölf Stunden lang an acht GPUs, und es schlug die Ensembles noch.
+  library: same token ids: True
+```
+
+Our loop and the library choose the same tokens. Look at the end of the second translation: "schlug die Ensembles noch". A German reader expects "immer noch" (still) here; "noch" alone is less clear. Greedy decoding made one locally good choice and could not go back. Beam search can.
+
+### Beam search in code
+
+**Method 1: from scratch.** Beam search keeps $$k$$ open sentences, here 4. At each step it extends every open sentence by every token, adds the log probabilities, and keeps the best. A sentence that ends with the end token moves to a list of finished sentences. There, its score is divided by the length penalty.
+
+```python
+def lp_hf(n, alpha):
+    return n ** alpha                             # the library: length to the power alpha
+
+
+def lp_gnmt(n, alpha):
+    return ((5 + n) / 6) ** alpha                 # the paper (from GNMT): ((5 + |Y|) / 6) ^ alpha
+
+
+def beam_search(text, k=4, alpha=0.6, lp=lp_hf, extra=50):
+    x, memory = encode(text)
+    max_new = x['input_ids'].shape[1] + extra
+    running = [([START], 0.0)]                    # (tokens, sum of log probabilities)
+    finished = []                                 # (tokens, score after the length penalty)
+    for t in range(1, max_new + 1):
+        lp_next = next_log_probs(x, memory, torch.tensor([ys for ys, _ in running]))   # (beams, V)
+        total = torch.tensor([s for _, s in running])[:, None] + lp_next               # score of every extension
+        top_scores, top_idx = total.flatten().topk(2 * k)     # keep 2k, in case some of them end here
+        V = lp_next.shape[1]
+        new_running = []
+        for rank, (score, idx) in enumerate(zip(top_scores.tolist(), top_idx.tolist())):
+            beam, token = divmod(idx, V)
+            ys = running[beam][0] + [token]
+            if token == EOS:
+                if rank < k:                      # only a top-k candidate may finish
+                    finished.append((ys, score / lp(t, alpha)))
+            elif len(new_running) < k:
+                new_running.append((ys, score))
+        finished = sorted(finished, key=lambda f: -f[1])[:k]
+        running = new_running
+        # stop when k sentences are finished and the best open one cannot beat the worst finished one
+        if len(finished) == k and running[0][1] / lp(t, alpha) <= finished[-1][1]:
+            break
+    return finished[0]
+```
+
+Walk through one step. `total` is a table with one row per open sentence and one column per token: 4 × 58,101 scores. `flatten().topk(2 * k)` takes the best 8 of all of them at once, so two candidates may come from the same sentence. `divmod(idx, V)` turns a position in the flat list back into (sentence, token). We take 8 and not 4 because some of the best may be end tokens. Those leave the beam, and we still want 4 open sentences for the next step.
+
+The stop rule needs care. A finished sentence can still lose to an open one that ends later with a better score. So the search stops only when 4 sentences are finished, and the best open sentence cannot beat the worst finished one. The open sentence is scored as if it ended now. This is the library's rule, and we copied it to get the same output.
+
+There are two length penalties in the code. The paper uses GNMT's $$((5 + n)/6)^{\alpha}$$, the formula above. Hugging Face's `length_penalty=0.6` uses $$n^{\alpha}$$ instead, where $$n$$ counts the new tokens including the end token. Both grow with the length, so both work against short outputs, but they give different numbers.
+
+**Method 2: with the library.** `model.generate(**x, num_beams=4, length_penalty=0.6, max_new_tokens=n + 50)`. We compared the tokens and the final score, then ran our search again with the paper's penalty:
+
+```text
+The law will never be perfect, but its application should be just.
+  ours   : Das Gesetz wird nie perfekt sein, aber seine Anwendung sollte gerecht sein.  (score -0.7540)
+  library: same token ids: True, score -0.7540
+  with the paper's penalty ((5 + n) / 6)^0.6: Das Gesetz wird nie perfekt sein, aber seine Anwendung sollte gerecht sein.  (score -1.8590)
+We trained the model on eight GPUs for twelve hours, and it still beat the ensembles.
+  ours   : Wir trainierten das Modell zwölf Stunden lang an acht GPUs, und es schlug die Ensembles immer noch.  (score -1.6315)
+  library: same token ids: True, score -1.6315
+  with the paper's penalty ((5 + n) / 6)^0.6: Wir trainierten das Modell zwölf Stunden lang an acht GPUs, und es schlug die Ensembles immer noch.  (score -4.2675)
+length 4, log P -2.0: GNMT factor 1.275 -> -1.568;  library factor 2.297 -> -0.871
+length 8, log P -2.4: GNMT factor 1.590 -> -1.509;  library factor 3.482 -> -0.689
+```
+
+Our beam search gives the library's tokens and the library's score to four decimals. On the second sentence, it finds "immer noch", the better German that greedy decoding missed. The paper's penalty picks the same translations here, with other score values. The last two lines redo the worked example above with both penalties. Both prefer the longer candidate, and the library's factor grows faster.
 
 ## Model variations {§6.2}
 
@@ -200,6 +416,63 @@ base split: encoder 18.9 M, decoder 25.2 M, shared embedding 18.9 M
 Our counts are within about 2 million of the paper's for the base rows, and within 1.2 million for the big model. The paper does not give the exact vocabulary size or how it counted, so a small gap is expected. The shape of the numbers matches well: each change of a row moves our count by the same amount as the paper's.
 
 The split is worth a look. The shared embedding alone is 18.9 million weights, as much as the whole encoder stack. The released Marian model has 74.4 million weights mostly for this reason: its vocabulary of 58,101 tokens adds $$21{,}101 \times 512 = 10.8$$ million weights to the embedding.
+
+### The count in code
+
+**Method 1: from scratch.** The count is a function of the shapes in Table 3's columns. Each line of it names one matrix or bias of the network. Note $$d_k$$ and $$d_v$$. The query and key projections make $$h$$ heads of $$d_k$$ numbers each. $$W^O$$ takes the $$h \times d_v$$ joined head outputs back to $$d_{\text{model}}$$.
+
+```python
+def count_params(N=6, d_model=512, d_ff=2048, h=8, d_k=None, d_v=None, vocab=37000):
+    d_k = d_k or d_model // h
+    d_v = d_v or d_model // h
+    attention = (d_model * h * d_k + h * d_k        # W_Q and its bias: d_model -> h heads of d_k
+                 + d_model * h * d_k + h * d_k      # W_K
+                 + d_model * h * d_v + h * d_v      # W_V
+                 + h * d_v * d_model + d_model)     # W_O: the joined heads -> d_model
+    ffn = d_model * d_ff + d_ff + d_ff * d_model + d_model   # two linear layers with biases
+    norm = 2 * d_model                                        # LayerNorm: a gain and a bias
+    encoder_layer = attention + ffn + 2 * norm                # self-attention, FFN, 2 norms
+    decoder_layer = 2 * attention + ffn + 3 * norm            # + attention over the encoder, 3 norms
+    embedding = vocab * d_model                               # one matrix, shared 3 ways (Part 2)
+    return N * encoder_layer + N * decoder_layer + embedding
+```
+
+**Method 2: with the library.** PyTorch has ready-made layers with the paper's structure: `nn.TransformerEncoderLayer` and `nn.TransformerDecoderLayer`. We build $$N$$ of each with the shapes of a row and let PyTorch count. The `meta` device creates the shapes without real numbers, so even the big model takes no memory.
+
+```python
+def count_with_torch(N=6, d_model=512, d_ff=2048, h=8, vocab=37000):
+    """The same shapes built from PyTorch layers on the 'meta' device: no memory, only shapes."""
+    with torch.device('meta'):
+        enc = nn.ModuleList([nn.TransformerEncoderLayer(d_model, h, d_ff) for _ in range(N)])
+        dec = nn.ModuleList([nn.TransformerDecoderLayer(d_model, h, d_ff) for _ in range(N)])
+        emb = nn.Embedding(vocab, d_model)
+    return sum(p.numel() for m in (enc, dec, emb) for p in m.parameters())
+```
+
+```text
+row                  shapes (M) PyTorch (M) paper (M)
+base                      63.08       63.08 =        65
+(A) h=1, d_k=512          63.08       63.08 =         -
+(A) h=4, d_k=128          63.08       63.08 =         -
+(A) h=16, d_k=32          63.08       63.08 =         -
+(A) h=32, d_k=16          63.08       63.08 =         -
+(B) d_k=16                55.99    (cannot)        58
+(B) d_k=32                58.35    (cannot)        60
+(C) N=2                   33.66       33.66 =        36
+(C) N=4                   48.37       48.37 =        50
+(C) N=8                   77.80       77.80 =        80
+(C) d_model=256           26.83       26.83 =        28
+(C) d_model=1024         163.89      163.89 =       168
+(C) d_ff=1024             50.49       50.49 =        53
+(C) d_ff=4096             88.27       88.27 =        90
+big                      214.25      214.25 =       213
+Marian: count_params(vocab=58,101) = 73,886,208;  sum of the model's own tensors = 74,410,496;  difference 524,288
+  the difference is the two stored tables of sinusoidal positions, 2 x 512 x 512 = 524,288
+```
+
+Our function and PyTorch agree to the last weight on every row they can both build ("="). PyTorch's attention cannot build rows (B). It always splits $$d_{\text{model}}$$ into $$h$$ equal heads, so $$d_k = d_{\text{model}}/h = 64$$; a key size of 16 or 32 with 8 heads needs our own code. This table also has the rows that the first one left out. Each follows the same pattern: our count is 1 to 4 million below the paper's, except for the big model.
+
+The last two lines test the function on a real network. With Marian's vocabulary, it gives 73,886,208 weights. Marian itself holds 524,288 more, exactly $$2 \times 512 \times 512$$. Marian stores its sine-wave positions as two tables of 512 positions × 512 numbers, one for the encoder and one for the decoder. The paper computes those values with a formula, so our function does not count them. Everything else matches to the last weight.
 
 ### More heads, or bigger heads? {§6.2}
 
@@ -320,6 +593,69 @@ We gave the same sentence to the released Marian model and printed where "making
 
 The result is close to Figure 3. Head 3 puts all its weight on "difficult" (0.71) and "more" (0.29), five and six tokens away. Head 6 does almost the same. This is a different model, trained by other people on other data, and it found the same link. Other heads do other things. Head 7 looks only at the word itself, and heads 2 and 8 spread their weight or rest on the end token.
 
+### The heatmaps in code
+
+Where do these numbers come from? The library returns them if you ask with `output_attentions=True`. But they are only the softmax of Part 3, and we can compute them ourselves from the model's own weights.
+
+**Method 1: from scratch.** We take the vectors that enter encoder layer 5 and apply the layer's query and key matrices. Then we split them into 8 heads and compute $$\text{softmax}(QK^\top / \sqrt{d_k})$$ for each head.
+
+```python
+@torch.no_grad()
+def attention_weights_by_hand(layer, hidden, h=8):
+    """softmax(Q K^T / sqrt(d_k)) for every head of one self-attention layer. hidden: (1, n, d_model)."""
+    n, d_model = hidden.shape[1], hidden.shape[2]
+    d_k = d_model // h
+    Q = layer.self_attn.q_proj(hidden)                       # (1, n, d_model)
+    K = layer.self_attn.k_proj(hidden)
+    Q = Q.view(1, n, h, d_k).transpose(1, 2)                 # (1, h, n, d_k): split into heads
+    K = K.view(1, n, h, d_k).transpose(1, 2)
+    scores = Q @ K.transpose(-2, -1) / math.sqrt(d_k)        # (1, h, n, n): every query against every key
+    return torch.softmax(scores, dim=-1)                     # each row sums to 1
+
+
+L = 4                                                        # layer 5 of 6, counted from 0
+ours = attention_weights_by_hand(model.get_encoder().layers[L], enc.hidden_states[L])   # input of layer 5
+lib = enc.attentions[L]
+```
+
+`enc.hidden_states` is the list of vectors between the layers. Entry 0 is the embedding, and entry 4 is the output of layer 4, the input of layer 5. The values $$V$$ are not needed. The weights depend only on queries and keys; the values come in after, when the weights mix them.
+
+**Method 2: with the library.** `enc.attentions[4]` holds the same weights, from the same forward pass.
+
+```text
+27 tokens; shape (1, 8, 27, 27); by hand vs output_attentions: max abs difference 0.0e+00
+```
+
+The two agree exactly: 8 heads, each a table of 27 queries × 27 keys. The heatmap of "making" is one row of each table, row 18, for each of the 8 heads.
+
+The last step is the picture. A heatmap maps each weight to a shade: 0 is blank, 1 is full ink. Our figure scripts draw SVG squares with an opacity equal to the weight. In a terminal, the same idea fits in a few lines, with ten characters from light to dark:
+
+```python
+SHADES = ' .:-=+*#%@'                                       # 10 levels of ink, light to dark
+
+
+def text_heatmap(rows, labels):
+    """One line per head; one character per token; darker = more weight."""
+    lines = []
+    for name, row in zip(labels, rows):
+        lines.append(f'{name:>7s} |' + ''.join(SHADES[min(9, int(w * 10))] for w in row.tolist()) + '|')
+    return lines
+```
+
+```text
+ head 1 |                 +      .  |
+ head 2 |            . . .         .|
+ head 3 |                       :#  |
+ head 4 |                 .        .|
+ head 5 |                       : ..|
+ head 6 |                       .*  |
+ head 7 |                 @         |
+ head 8 |                         :-|
+columns: 27 tokens; "making" is column 18, "more" is 24, "difficult" is 25
+```
+
+Read it like the figure. Head 7's "@" sits in column 18: "making" looks at itself with weight 0.99. Heads 3 and 6 have their dark marks in columns 24 and 25, "more" and "difficult". Head 8 puts its marks at the right edge, on the full stop and the end token. The SVG figure above is the same table, drawn with more shades and the words as labels.
+
 > [!PAPER] · Figure 4
 > [![Figure 4 of the paper: the sentence The Law will never be perfect, but its application should be just, this is what we are missing, in my opinion. Top: all the attention lines of head 5. Bottom: the attention of the word its alone in heads 5 and 6, with sharp lines to Law and application](/img/papers/transformer/p6-figure4.png)](/img/papers/transformer/p6-figure4.png)
 >
@@ -377,16 +713,18 @@ The impact came fast and went far beyond translation:
 The base model of this paper has 65 million weights. Its block design is still at the core of the largest models in use today.
 
 > [!TAKEAWAYS] Key takeaways
-> - **BLEU counts shared word groups.** It is the geometric mean of the precisions of 1- to 4-word groups, times a penalty for short outputs. In our toy example, one wrong word cut the score from 100 to 53.7.
+> - **BLEU counts shared word groups.** It is the geometric mean of the precisions of 1- to 4-word groups, times a penalty for short outputs. In our toy example, one wrong word cut the score from 100 to 53.7. Our BLEU in Python gives sacreBLEU's numbers.
 > - **Better and cheaper at once.** The big model got 28.4 BLEU on English-to-German, more than 2 points above every earlier result, ensembles included. The base model (27.3) beat them all at $$3.3 \cdot 10^{18}$$ operations.
 > - **The cost is time × cards × speed.** 12 hours × 8 cards × 9.5 TFLOPS gives $$3.28 \cdot 10^{18}$$; 3.5 days gives $$2.30 \cdot 10^{19}$$. Both match Table 2.
 > - **English-to-French: 41.0 or 41.8.** The text and Table 2 disagree. Either way, the cost is less than a quarter of the best earlier single model.
-> - **Decoding settings matter.** The last 5 or 20 checkpoints are averaged, and beam search uses 4 beams and a length penalty with $$\alpha = 0.6$$.
+> - **Decoding settings matter.** The last 5 or 20 checkpoints are averaged, and beam search uses 4 beams and a length penalty with $$\alpha = 0.6$$. Our own beam search gives the same tokens as `model.generate`, and it fixed a greedy "noch" into "immer noch".
 > - **Eight heads is a sweet spot.** With the same budget of 512 numbers, 1 head loses 0.9 BLEU and 32 heads lose 0.4. Keys that are too small hurt.
 > - **Bigger is better, dropout helps, and learned positions work as well as sinusoids.** 2 layers give 23.7 BLEU; no dropout gives 24.6; learned positions give 25.7 against 25.8.
 > - **The size follows from the shapes.** Our count from the shapes gives 63.1 million weights for the base model (paper: 65) and 214.2 million for the big model (paper: 213).
 > - **One design, a second task.** With little tuning, a 4-layer Transformer parsed English at 91.3 F1 from 40,000 sentences, close to parsers built for the task.
 > - **Heads specialise.** In a released Marian model, one head links "making" to "more difficult" with all its weight, as in Figure 3. The "its" to "Law" link of Figure 4 did not show in the same layer.
+
+The code of the sections "in code" is in [`tx_part6_code.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/transformer/tx_part6_code.py), and its full output is in `results/part6_code_stdout.txt`. [Part 7](part-7-build-it-from-scratch.md) builds the whole Transformer from scratch.
 
 <figure><img src="/img/papers/transformer/part6-run.png" alt="Terminal output of tx_part6.py: the training cost in FLOPs, the parameter counts of the Table 3 rows, the Marian translation with greedy and beam search, and the attention of the words making and its in encoder layer 5" loading="lazy" /><figcaption>The output of tx_part6.py, as it ran for this article.</figcaption></figure>
 

@@ -1,0 +1,67 @@
+== 1. BLEU from scratch
+sacrebleu: 2.6.0
+"the cat sat on a mat": p1..p4 = 5/6 3/5 2/4 1/3, c = 6, r = 6, BLEU ours 53.73, sacrebleu 53.73
+"the cat sat on the mat": p1..p4 = 6/6 5/5 4/4 3/3, c = 6, r = 6, BLEU ours 100.00, sacrebleu 100.00
+"the cat sat on": p1..p4 = 4/4 3/3 2/2 1/1, c = 4, r = 6, BLEU ours 60.65, sacrebleu 60.65
+"the the the the the the": p1..p4 = 2/6 0/5 0/4 0/3, c = 6, r = 6, BLEU ours 0.00, sacrebleu 0.00
+sacrebleu with its default smoothing on the last one: 9.65
+unclipped: "the" counted 6 times; clipped: min(6, 2) = 2
+two sentences: sentence BLEU 53.73 and 41.11 (mean 47.42); corpus BLEU ours 46.27, sacrebleu 46.27
+
+== 2. Greedy decoding by hand around Marian, against model.generate
+The law will never be perfect, but its application should be just.
+  ours   : Das Gesetz wird nie perfekt sein, aber seine Anwendung sollte gerecht sein.
+  library: same token ids: True
+We trained the model on eight GPUs for twelve hours, and it still beat the ensembles.
+  ours   : Wir trainierten das Modell zwölf Stunden lang an acht GPUs, und es schlug die Ensembles noch.
+  library: same token ids: True
+
+== 3. Beam search with a length penalty by hand, against model.generate(num_beams=4, length_penalty=0.6)
+The law will never be perfect, but its application should be just.
+  ours   : Das Gesetz wird nie perfekt sein, aber seine Anwendung sollte gerecht sein.  (score -0.7540)
+  library: same token ids: True, score -0.7540
+  with the paper's penalty ((5 + n) / 6)^0.6: Das Gesetz wird nie perfekt sein, aber seine Anwendung sollte gerecht sein.  (score -1.8590)
+We trained the model on eight GPUs for twelve hours, and it still beat the ensembles.
+  ours   : Wir trainierten das Modell zwölf Stunden lang an acht GPUs, und es schlug die Ensembles immer noch.  (score -1.6315)
+  library: same token ids: True, score -1.6315
+  with the paper's penalty ((5 + n) / 6)^0.6: Wir trainierten das Modell zwölf Stunden lang an acht GPUs, und es schlug die Ensembles immer noch.  (score -4.2675)
+length 4, log P -2.0: GNMT factor 1.275 -> -1.568;  library factor 2.297 -> -0.871
+length 8, log P -2.4: GNMT factor 1.590 -> -1.509;  library factor 3.482 -> -0.689
+
+== 4. Checkpoint averaging on a tiny model
+one weight in the last 5 checkpoints: -0.4073, -0.3782, -0.4102, -0.4517, -0.4189  -> mean -0.4133
+validation loss of the last 5 checkpoints: 0.8701, 0.9201, 0.9074, 0.8006, 0.8326
+validation loss of their average: 0.7449
+average by hand vs AveragedModel: max abs difference 1.2e-07
+
+== 5. Parameters of Table 3 rows: from the shapes, and from PyTorch layers with the same shapes
+row                  shapes (M) PyTorch (M) paper (M)
+base                      63.08       63.08 =        65
+(A) h=1, d_k=512          63.08       63.08 =         -
+(A) h=4, d_k=128          63.08       63.08 =         -
+(A) h=16, d_k=32          63.08       63.08 =         -
+(A) h=32, d_k=16          63.08       63.08 =         -
+(B) d_k=16                55.99    (cannot)        58
+(B) d_k=32                58.35    (cannot)        60
+(C) N=2                   33.66       33.66 =        36
+(C) N=4                   48.37       48.37 =        50
+(C) N=8                   77.80       77.80 =        80
+(C) d_model=256           26.83       26.83 =        28
+(C) d_model=1024         163.89      163.89 =       168
+(C) d_ff=1024             50.49       50.49 =        53
+(C) d_ff=4096             88.27       88.27 =        90
+big                      214.25      214.25 =       213
+Marian: count_params(vocab=58,101) = 73,886,208;  sum of the model's own tensors = 74,410,496;  difference 524,288
+  the difference is the two stored tables of sinusoidal positions, 2 x 512 x 512 = 524,288
+
+== 6. Attention weights of encoder layer 5: by hand and output_attentions
+27 tokens; shape (1, 8, 27, 27); by hand vs output_attentions: max abs difference 0.0e+00
+ head 1 |                 +      .  |
+ head 2 |            . . .         .|
+ head 3 |                       :#  |
+ head 4 |                 .        .|
+ head 5 |                       : ..|
+ head 6 |                       .*  |
+ head 7 |                 @         |
+ head 8 |                         :-|
+columns: 27 tokens; "making" is column 18, "more" is 24, "difficult" is 25

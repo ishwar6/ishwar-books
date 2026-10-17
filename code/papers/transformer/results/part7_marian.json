@@ -1,0 +1,39 @@
+{
+ "info": {
+  "copied_tensors": 254,
+  "marian_tensors": 259,
+  "position_table_max_diff": 3.3736228942871094e-05,
+  "start_id": 58100,
+  "eos_id": 0
+ },
+ "enc_diff": 1.9073486328125e-06,
+ "logit_diff": 2.6702880859375e-05,
+ "same_argmax": 1.0,
+ "greedy": [
+  {
+   "en": "The cat sat on the mat.",
+   "ours": "Die Katze sa\u00df auf der Matte.",
+   "marian": "Die Katze sa\u00df auf der Matte."
+  },
+  {
+   "en": "Attention is all you need.",
+   "ours": "Achtung ist alles, was du brauchst.",
+   "marian": "Achtung ist alles, was du brauchst."
+  },
+  {
+   "en": "The weather is nice today, so we will walk to the station.",
+   "ours": "Das Wetter ist heute sch\u00f6n, so dass wir zum Bahnhof gehen.",
+   "marian": "Das Wetter ist heute sch\u00f6n, so dass wir zum Bahnhof gehen."
+  },
+  {
+   "en": "I have read this book twice.",
+   "ours": "Ich habe dieses Buch zweimal gelesen.",
+   "marian": "Ich habe dieses Buch zweimal gelesen."
+  },
+  {
+   "en": "Neural networks learn from examples.",
+   "ours": "Neuronale Netzwerke lernen aus Beispielen.",
+   "marian": "Neuronale Netzwerke lernen aus Beispielen."
+  }
+ ]
+}
