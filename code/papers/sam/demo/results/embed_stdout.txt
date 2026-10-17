@@ -1,0 +1,9 @@
+model facebook/sam-vit-huge on mps; embedding (256, 64, 64) stored as float16
+cats       640 x 480 -> 1024 x 768 in the 1024 frame; embedding range [-0.796, 0.677], float16 max abs error 2.44e-04 (mean 1.36e-05); 11.8 s
+car        1024 x 683 -> 1024 x 683 in the 1024 frame; embedding range [-0.808, 0.602], float16 max abs error 2.44e-04 (mean 1.36e-05); 10.5 s
+bike       640 x 388 -> 1024 x 621 in the 1024 frame; embedding range [-0.809, 0.672], float16 max abs error 2.44e-04 (mean 1.36e-05); 8.8 s
+shirt      640 x 480 -> 1024 x 768 in the 1024 frame; embedding range [-0.794, 0.670], float16 max abs error 2.44e-04 (mean 1.37e-05); 6.8 s
+fruit      432 x 324 -> 1024 x 768 in the 1024 frame; embedding range [-0.798, 0.659], float16 max abs error 2.44e-04 (mean 1.31e-05); 12.1 s
+sheep      640 x 480 -> 1024 x 768 in the 1024 frame; embedding range [-0.796, 0.633], float16 max abs error 2.44e-04 (mean 1.35e-05); 10.6 s
+elephants  640 x 480 -> 1024 x 768 in the 1024 frame; embedding range [-0.794, 0.645], float16 max abs error 2.44e-04 (mean 1.35e-05); 11.9 s
+carrots    640 x 427 -> 1024 x 683 in the 1024 frame; embedding range [-0.808, 0.728], float16 max abs error 2.44e-04 (mean 1.36e-05); 11.2 s

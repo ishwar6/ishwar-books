@@ -1,0 +1,113 @@
+{
+ "model": "facebook/sam-vit-huge",
+ "embedding": [
+  256,
+  64,
+  64
+ ],
+ "dtype": "float16",
+ "photos": [
+  {
+   "key": "cats",
+   "title": "Two cats",
+   "file": "img/cats.jpg",
+   "emb": "emb/cats.bin",
+   "width": 640,
+   "height": 480,
+   "source": "COCO val2017 39769 (the huggingface/cats-image test photo of Parts 1 to 4)",
+   "why": "Parts inside wholes: an ear, a head, a cat.",
+   "url": "http://farm1.staticflickr.com/60/210383891_f91a89fd5e_z.jpg",
+   "licence": "CC BY-SA 2.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/2.0/",
+   "click": [
+    275,
+    62
+   ]
+  },
+  {
+   "key": "shirt",
+   "title": "A shirt and a kite",
+   "file": "img/shirt.jpg",
+   "emb": "emb/shirt.bin",
+   "width": 640,
+   "height": 480,
+   "source": "COCO val2017 357888",
+   "why": "The paper's example: a point on a shirt can mean the shirt or the person.",
+   "url": "http://farm4.staticflickr.com/3577/3853391167_2ff6070b1a_z.jpg",
+   "licence": "CC BY-SA 2.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/2.0/",
+   "click": [
+    450,
+    330
+   ]
+  },
+  {
+   "key": "fruit",
+   "title": "A fruit stall",
+   "file": "img/fruit.jpg",
+   "emb": "emb/fruit.bin",
+   "width": 432,
+   "height": 324,
+   "source": "COCO val2017 498919",
+   "why": "Many small objects of one kind.",
+   "url": "http://farm1.staticflickr.com/226/508669075_b4ad2fd7e5_z.jpg",
+   "licence": "CC BY 2.0",
+   "licence_url": "https://creativecommons.org/licenses/by/2.0/",
+   "click": [
+    100,
+    250
+   ]
+  },
+  {
+   "key": "sheep",
+   "title": "Sheep",
+   "file": "img/sheep.jpg",
+   "emb": "emb/sheep.bin",
+   "width": 640,
+   "height": 480,
+   "source": "COCO val2017 364322",
+   "why": "A head, a sheep, a flock.",
+   "url": "http://farm9.staticflickr.com/8253/8665048529_079f677dfc_z.jpg",
+   "licence": "CC BY-SA 2.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/2.0/",
+   "click": [
+    575,
+    165
+   ]
+  },
+  {
+   "key": "elephants",
+   "title": "Elephants",
+   "file": "img/elephants.jpg",
+   "emb": "emb/elephants.bin",
+   "width": 640,
+   "height": 480,
+   "source": "COCO val2017 414795",
+   "why": "Many objects that touch each other.",
+   "url": "http://farm1.staticflickr.com/69/221842206_28bfc63fc8_z.jpg",
+   "licence": "CC BY 2.0",
+   "licence_url": "https://creativecommons.org/licenses/by/2.0/",
+   "click": [
+    330,
+    180
+   ]
+  },
+  {
+   "key": "carrots",
+   "title": "Carrots",
+   "file": "img/carrots.jpg",
+   "emb": "emb/carrots.bin",
+   "width": 640,
+   "height": 427,
+   "source": "COCO val2017 530052",
+   "why": "Long thin objects and a price sign.",
+   "url": "http://farm9.staticflickr.com/8039/7907967150_705e33f008_z.jpg",
+   "licence": "CC BY-SA 2.0",
+   "licence_url": "https://creativecommons.org/licenses/by-sa/2.0/",
+   "click": [
+    420,
+    420
+   ]
+  }
+ ]
+}

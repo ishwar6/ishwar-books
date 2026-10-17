@@ -1,0 +1,10 @@
+browser (onnxruntime-web 1.22, wasm, float16 embedding) vs Python (transformers SamModel, fp32 embedding)
+cats   one click on the ear                                       mask IoU 1.0000, 1.0000, 1.0000  score diff 1.4e-5  first: python 3, browser 3  decoder 350 ms
+cats   ear, body, and a background click on the sofa              mask IoU 0.9993, 0.9999, 1.0000  score diff 2.0e-5  first: python 3, browser 3  decoder 243 ms
+cats   a box around the right cat                                 mask IoU 1.0000, 1.0000, 1.0000  score diff 1.4e-6  first: python 1, browser 1  decoder 358 ms
+cats   ear, then body with the previous mask as prompt            mask IoU 1.0000, 1.0000, 1.0000  score diff 8.3e-7  first: python 3, browser 3  decoder 291 ms
+car    one click on the hub of the back wheel                     mask IoU 1.0000, 1.0000, 1.0000  score diff 6.7e-6  first: python 1, browser 1  decoder 284 ms
+car    a box around the front wheel                               mask IoU 1.0000, 1.0000, 1.0000  score diff 1.4e-6  first: python 2, browser 2  decoder 338 ms
+bike   one click on the front tyre                                mask IoU 1.0000, 1.0000, 1.0000  score diff 3.9e-6  first: python 3, browser 3  decoder 343 ms
+bike   one click on the frame, one background click on the tree   mask IoU 0.9973, 0.9999, 1.0000  score diff 2.5e-5  first: python 3, browser 3  decoder 307 ms
+8 cases, 24 masks: lowest IoU 0.9973, largest score difference 2.5e-5, same first mask in 8 of 8

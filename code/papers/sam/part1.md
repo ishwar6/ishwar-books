@@ -158,6 +158,9 @@ Four words in this half are new. The yellow boxes explain them.
 
 Before we read the introduction, we look at the model in operation. We loaded the released SAM with the largest image encoder, ViT-H (`facebook/sam-vit-huge`). The paper uses this model in its experiments. We gave the model one picture, the test photo from the `huggingface/cats-image` dataset, and two clicks.
 
+> [!TIP] Try it
+> Click on this photo yourself in the [live demo](/papers/sam/demo). The real SAM ViT-H answers each click with three masks and their scores.
+
 <figure><img src="/img/papers/sam/p1-sample.png" alt="The sample picture: two tabby cats on a pink sofa with two remote controls. Two green dots mark the two clicks, one on the ear of the left cat and one on the buttons of the left remote control" loading="lazy" width="560" /><figcaption>The picture of this part: 640 × 480 pixels. The green dots are the two clicks: one on the left cat's ear at pixel (275, 62), and one on the buttons of the left remote control at pixel (80, 90).</figcaption></figure>
 
 The code is in [`sam_part1.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/sam/sam_part1.py). These are its main lines:

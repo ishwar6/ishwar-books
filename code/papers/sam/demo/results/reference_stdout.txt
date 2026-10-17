@@ -1,0 +1,18 @@
+reference: transformers SamModel facebook/sam-vit-huge, CPU, fp32 embedding; masks = logits > 0 after post_process_masks
+cats   one click on the ear                                    scores 0.946, 0.944, 0.980  first: mask 3  pixels 427, 470, 49,520
+       fp16 embedding vs fp32: mask IoU 1.0000, 1.0000, 1.0000; score diff 1.4e-05
+cats   ear, body, and a background click on the sofa           scores 0.708, 1.004, 1.010  first: mask 3  pixels 2,790, 49,647, 50,434
+       fp16 embedding vs fp32: mask IoU 0.9993, 0.9999, 1.0000; score diff 2.0e-05
+cats   a box around the right cat                              scores 1.009, 1.009, 1.004  first: mask 1  pixels 57,227, 58,018, 58,372
+       fp16 embedding vs fp32: mask IoU 1.0000, 1.0000, 1.0000; score diff 1.3e-06
+cats   ear, then body with the previous mask as prompt         scores 0.996, 0.999, 1.005  first: mask 3  pixels 48,372, 50,316, 50,609
+       fp16 embedding vs fp32: mask IoU 1.0000, 1.0000, 1.0000; score diff 1.1e-06
+car    one click on the hub of the back wheel                  scores 0.970, 0.939, 0.903  first: mask 1  pixels 356, 4,601, 13,115
+       fp16 embedding vs fp32: mask IoU 1.0000, 1.0000, 1.0000; score diff 6.3e-06
+car    a box around the front wheel                            scores 0.997, 1.000, 0.996  first: mask 2  pixels 12,399, 12,500, 12,653
+       fp16 embedding vs fp32: mask IoU 1.0000, 1.0000, 1.0000; score diff 1.5e-06
+bike   one click on the front tyre                             scores 0.954, 0.991, 1.007  first: mask 3  pixels 34,274, 35,216, 59,045
+       fp16 embedding vs fp32: mask IoU 1.0000, 1.0000, 1.0000; score diff 4.1e-06
+bike   one click on the frame, one background click on the tree scores 0.279, 0.851, 0.968  first: mask 3  pixels 371, 48,006, 57,605
+       fp16 embedding vs fp32: mask IoU 0.9973, 0.9999, 1.0000; score diff 2.4e-05
+float16 storage of the embedding, all cases: lowest mask IoU 0.9973, largest score diff 2.4e-05

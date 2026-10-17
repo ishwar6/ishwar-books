@@ -1,0 +1,4 @@
+{
+  "title": "Segment Anything, live",
+  "description": "Click on a photo and watch the real SAM ViT-H answer with three masks and three scores. The mask decoder runs in your browser for every click."
+}
