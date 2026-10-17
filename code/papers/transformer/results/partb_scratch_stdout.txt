@@ -1,0 +1,43 @@
+== 1. RNN cell: our function against nn.RNNCell (same W, U, b)
+  'the'  ours h = [0.462, 0.716]   nn.RNNCell h = [0.462, 0.716]
+  'cat'  ours h = [0.115, 0.56]   nn.RNNCell h = [0.115, 0.56]
+  'sat'  ours h = [0.295, 0.871]   nn.RNNCell h = [0.295, 0.871]
+  max |ours - library| over the 3 steps: 0.0e+00
+
+== 2. LSTM cell: our function against nn.LSTMCell (input 4, hidden 3, 5 steps)
+  weight_ih (12, 4)  weight_hh (12, 3)  bias (12,)  (4 gates x 3)
+  ours    h_5 = [-0.076, -0.146, -0.486]  c_5 = [-0.235, -0.836, -0.774]
+  library h_5 = [-0.076, -0.146, -0.486]  c_5 = [-0.235, -0.836, -0.774]
+  max |ours - library|: h 0.0e+00, c 0.0e+00
+  forget gate of an untrained LSTM (hidden 64): mean 0.541; with +3 on its bias: mean 0.949
+
+== 3. Vanishing gradient: multiply the step derivatives by hand, compare with autograd
+   tanh RNN, hidden 64, PyTorch default start, one random network, 64-bit numbers
+  T =  1: |d sum(h_T) / d h_0| by hand 2.987e+00   autograd 2.987e+00
+  T =  5: |d sum(h_T) / d h_0| by hand 1.218e-01   autograd 1.218e-01
+  T = 10: |d sum(h_T) / d h_0| by hand 1.367e-03   autograd 1.367e-03
+  T = 20: |d sum(h_T) / d h_0| by hand 5.657e-07   autograd 5.657e-07
+  T = 50: |d sum(h_T) / d h_0| by hand 9.586e-18   autograd 9.586e-18
+  average shrink per step: x 0.440; |U| largest stretch (top singular value) 1.141
+
+== 4. Additive attention (Bahdanau): e_j = v . tanh(W s + U h_j), on the page example
+  W s = [-1.0, 2.0]; U h_j = [[1.0, 0.0], [0.0, 1.0], [1.0, 1.0]]
+  tanh(W s + U h_j) = [[0.0, 0.964], [-0.762, 0.995], [0.0, 0.995]]
+  scores e = [0.964, 1.757, 0.995]   weights alpha = [0.236, 0.521, 0.243]   context c = [0.479, 0.764]
+  batched torch: e = [0.964, 1.757, 0.995]   alpha = [0.236, 0.521, 0.243]   c = [0.479, 0.764]   max difference 0.0e+00
+  dot score for comparison: e = [-1.0, 2.0, 1.0]  alpha = [0.035, 0.705, 0.259]  c = [0.295, 0.965]; F.scaled_dot_product_attention (scale 1) c = [0.295, 0.965]
+
+== 5. A tiny sequence-to-sequence model: reverse a list of digits
+  encoder LSTM 16 -> 64, decoder LSTM cell 16 -> 64, output 64 -> 12; 42,956 weights
+  trained 2,500 steps of 64 lists, lengths 3 to 12, teacher forcing; last loss 0.004; 29 s on the CPU
+  input  [3, 1, 4, 1, 5, 9, 2, 6]
+  ours   [6, 2, 9, 5, 1, 4, 1, 3]
+  nn.LSTM / nn.LSTMCell [6, 2, 9, 5, 1, 4, 1, 3]; same tokens: True; max |h ours - h library| 6.6e-07
+
+== 6. The bottleneck: exact-match accuracy on 500 new lists of each length
+  same model plus additive attention: 68,364 weights; last loss 0.001; 36 s
+  length   no attention   with attention   (whole list right; tokens right)
+       4  100.0% (100.0%)   100.0% (100.0%)
+       8   95.4% (99.5%)   100.0% (100.0%)
+      12   19.2% (89.3%)    97.4% (99.8%)
+      16    0.4% (72.7%)    23.4% (91.3%)   longer than any training list

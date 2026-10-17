@@ -1,0 +1,43 @@
+== 1. Sequential against parallel (width d = 512, batch 32)
+  X (32, 12, 512)
+  RNN loop: 12 steps in order -> (32, 12, 512); max |ours - nn.RNN| = 8.3e-07
+  attention: 1 product X X^T (32, 12, 12), softmax, 1 product with X -> (32, 12, 512); max |ours - F.scaled_dot_product_attention| = 1.2e-07
+  attention row 7 computed alone, from X only: max |row 7 alone - row 7 of the full product| = 0.0e+00
+  change word 3 only; largest change of each output 0..11:
+    RNN       0.000 0.000 0.000 0.089 0.053 0.031 0.016 0.013 0.005 0.003 0.002 0.001
+    attention 0.004 0.004 0.004 0.006 0.004 0.004 0.004 0.004 0.004 0.004 0.004 0.004
+
+   time on the CPU (4 threads), forward pass only, fastest of 10 runs, random weights
+     n  steps in order  our loop ms  nn.RNN ms  our attention ms  SDPA ms
+    16         16 vs 1          2.1        1.8               0.3      0.1
+    64         64 vs 1          9.0        7.4               0.7      0.5
+   256        256 vs 1         51.9       38.2               7.9      4.3
+
+== 2. Teacher forcing with Helsinki-NLP/opus-mt-en-de
+  English ids (1, 12); German labels (1, 14): ['▁Der', '▁Hund', '▁saß', '▁auf', '▁der', '▁Matt', 'e', ',', '▁weil', '▁er', '▁müde', '▁war', '.', '</s>']
+  decoder input (1, 14): ['<pad>', '▁Der', '▁Hund', '▁saß', '▁auf', '▁der', '▁Matt', 'e', ',', '▁weil', '▁er', '▁müde', '▁war', '.']
+  same as the library shift_tokens_right: True
+  one call: logits (1, 14, 58101)
+  loss by hand 0.2030; library loss 0.2030; difference 1.5e-08
+  pos   decoder reads   must predict  p(right)   top guess
+    0           <pad>           ▁Der     0.796        ▁Der
+    1            ▁Der          ▁Hund     0.946       ▁Hund
+    2           ▁Hund           ▁saß     0.723        ▁saß
+    3            ▁saß           ▁auf     0.782        ▁auf
+    4            ▁auf           ▁der     0.767        ▁der
+    5            ▁der          ▁Matt     0.915       ▁Matt
+    6           ▁Matt              e     0.914           e
+    7               e              ,     0.771           ,
+    8               ,          ▁weil     0.837       ▁weil
+    9           ▁weil            ▁er     0.565         ▁er
+   10             ▁er          ▁müde     0.830       ▁müde
+   11           ▁müde           ▁war     0.881        ▁war
+   12            ▁war              .     0.900           .
+   13               .           </s>     0.889        </s>
+  top guess equals the label at 14 of 14 positions
+
+== 3. Writing the translation: our greedy loop against model.generate
+  ours    : Der Hund saß auf der Matte, weil er müde war.  (14 decoder calls)
+  generate: Der Hund saß auf der Matte, weil er müde war.
+  same tokens: True
+  max |teacher-forced logits - loop logits at the same position| = 1.0e-05

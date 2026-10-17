@@ -182,9 +182,111 @@ Check the first line by hand: $$0.5 \times 0 + 1 \times 1 = 1$$, and $$\tanh(1) 
 
 <figure class="fig"><svg viewBox="0 0 720 452" role="img" aria-label="Two diagrams. Top: a recurrent network reads six words one at a time, and each state h1 to h6 waits for the one before it. Bottom: self-attention computes six new word vectors at once, each one reading all six words."><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0,0L10,5L0,10z"/></marker><marker id="ah-on" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-on" d="M0,0L10,5L0,10z"/></marker><marker id="ah-2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-2" d="M0,0L10,5L0,10z"/></marker></defs><text class="t-title" x="20.0" y="28.0" text-anchor="start">A recurrent network: one state after the other</text><rect class="box" x="60.0" y="120.0" width="74.0" height="30.0" rx="6"/><text class="t-tick" x="97.0" y="139.5" text-anchor="middle">The</text><rect class="box-1" x="60.0" y="62.0" width="74.0" height="30.0" rx="6"/><text class="t-tick" x="97.0" y="81.5" text-anchor="middle">h1</text><line class="edge" x1="97.0" y1="120.0" x2="97.0" y2="94.0" marker-end="url(#ah)"/><rect class="box" x="160.0" y="120.0" width="74.0" height="30.0" rx="6"/><text class="t-tick" x="197.0" y="139.5" text-anchor="middle">cat</text><rect class="box-1" x="160.0" y="62.0" width="74.0" height="30.0" rx="6"/><text class="t-tick" x="197.0" y="81.5" text-anchor="middle">h2</text><line class="edge" x1="197.0" y1="120.0" x2="197.0" y2="94.0" marker-end="url(#ah)"/><line class="path" x1="134.0" y1="77.0" x2="158.0" y2="77.0" marker-end="url(#ah-on)"/><rect class="box" x="260.0" y="120.0" width="74.0" height="30.0" rx="6"/><text class="t-tick" x="297.0" y="139.5" text-anchor="middle">sat</text><rect class="box-1" x="260.0" y="62.0" width="74.0" height="30.0" rx="6"/><text class="t-tick" x="297.0" y="81.5" text-anchor="middle">h3</text><line class="edge" x1="297.0" y1="120.0" x2="297.0" y2="94.0" marker-end="url(#ah)"/><line class="path" x1="234.0" y1="77.0" x2="258.0" y2="77.0" marker-end="url(#ah-on)"/><rect class="box" x="360.0" y="120.0" width="74.0" height="30.0" rx="6"/><text class="t-tick" x="397.0" y="139.5" text-anchor="middle">on</text><rect class="box-1" x="360.0" y="62.0" width="74.0" height="30.0" rx="6"/><text class="t-tick" x="397.0" y="81.5" text-anchor="middle">h4</text><line class="edge" x1="397.0" y1="120.0" x2="397.0" y2="94.0" marker-end="url(#ah)"/><line class="path" x1="334.0" y1="77.0" x2="358.0" y2="77.0" marker-end="url(#ah-on)"/><rect class="box" x="460.0" y="120.0" width="74.0" height="30.0" rx="6"/><text class="t-tick" x="497.0" y="139.5" text-anchor="middle">the</text><rect class="box-1" x="460.0" y="62.0" width="74.0" height="30.0" rx="6"/><text class="t-tick" x="497.0" y="81.5" text-anchor="middle">h5</text><line class="edge" x1="497.0" y1="120.0" x2="497.0" y2="94.0" marker-end="url(#ah)"/><line class="path" x1="434.0" y1="77.0" x2="458.0" y2="77.0" marker-end="url(#ah-on)"/><rect class="box" x="560.0" y="120.0" width="74.0" height="30.0" rx="6"/><text class="t-tick" x="597.0" y="139.5" text-anchor="middle">mat</text><rect class="box-on" x="560.0" y="62.0" width="74.0" height="30.0" rx="6"/><text class="t-tick" x="597.0" y="81.5" text-anchor="middle">h6</text><line class="edge" x1="597.0" y1="120.0" x2="597.0" y2="94.0" marker-end="url(#ah)"/><line class="path" x1="534.0" y1="77.0" x2="558.0" y2="77.0" marker-end="url(#ah-on)"/><text class="t-note" x="20.0" y="178.0" text-anchor="start">Step t must wait for step t - 1. The word "The" reaches h6 through 5 later states.</text><text class="t-title" x="20.0" y="230.0" text-anchor="start">Self-attention: every word looks at every word in one step</text><rect class="box" x="60.0" y="380.0" width="74.0" height="30.0" rx="6"/><text class="t-tick" x="97.0" y="399.5" text-anchor="middle">The</text><rect class="box-1" x="60.0" y="264.0" width="74.0" height="30.0" rx="6"/><text class="t-tick" x="97.0" y="283.5" text-anchor="middle">The'</text><rect class="box" x="160.0" y="380.0" width="74.0" height="30.0" rx="6"/><text class="t-tick" x="197.0" y="399.5" text-anchor="middle">cat</text><rect class="box-1" x="160.0" y="264.0" width="74.0" height="30.0" rx="6"/><text class="t-tick" x="197.0" y="283.5" text-anchor="middle">cat'</text><rect class="box" x="260.0" y="380.0" width="74.0" height="30.0" rx="6"/><text class="t-tick" x="297.0" y="399.5" text-anchor="middle">sat</text><rect class="box-1" x="260.0" y="264.0" width="74.0" height="30.0" rx="6"/><text class="t-tick" x="297.0" y="283.5" text-anchor="middle">sat'</text><rect class="box" x="360.0" y="380.0" width="74.0" height="30.0" rx="6"/><text class="t-tick" x="397.0" y="399.5" text-anchor="middle">on</text><rect class="box-1" x="360.0" y="264.0" width="74.0" height="30.0" rx="6"/><text class="t-tick" x="397.0" y="283.5" text-anchor="middle">on'</text><rect class="box" x="460.0" y="380.0" width="74.0" height="30.0" rx="6"/><text class="t-tick" x="497.0" y="399.5" text-anchor="middle">the</text><rect class="box-1" x="460.0" y="264.0" width="74.0" height="30.0" rx="6"/><text class="t-tick" x="497.0" y="283.5" text-anchor="middle">the'</text><rect class="box" x="560.0" y="380.0" width="74.0" height="30.0" rx="6"/><text class="t-tick" x="597.0" y="399.5" text-anchor="middle">mat</text><rect class="box-on" x="560.0" y="264.0" width="74.0" height="30.0" rx="6"/><text class="t-tick" x="597.0" y="283.5" text-anchor="middle">mat'</text><line class="path" x1="97.0" y1="380.0" x2="597.0" y2="296.0" marker-end="url(#ah-on)"/><line class="path" x1="197.0" y1="380.0" x2="597.0" y2="296.0" marker-end="url(#ah-on)"/><line class="path" x1="297.0" y1="380.0" x2="597.0" y2="296.0" marker-end="url(#ah-on)"/><line class="path" x1="397.0" y1="380.0" x2="597.0" y2="296.0" marker-end="url(#ah-on)"/><line class="path" x1="497.0" y1="380.0" x2="597.0" y2="296.0" marker-end="url(#ah-on)"/><line class="path" x1="597.0" y1="380.0" x2="597.0" y2="296.0" marker-end="url(#ah-on)"/><line class="edge" x1="97.0" y1="380.0" x2="97.0" y2="296.0"/><line class="edge" x1="197.0" y1="380.0" x2="97.0" y2="296.0"/><line class="edge" x1="297.0" y1="380.0" x2="97.0" y2="296.0"/><line class="edge" x1="397.0" y1="380.0" x2="97.0" y2="296.0"/><line class="edge" x1="497.0" y1="380.0" x2="97.0" y2="296.0"/><line class="edge" x1="597.0" y1="380.0" x2="97.0" y2="296.0"/><line class="edge" x1="97.0" y1="380.0" x2="197.0" y2="296.0"/><line class="edge" x1="197.0" y1="380.0" x2="197.0" y2="296.0"/><line class="edge" x1="297.0" y1="380.0" x2="197.0" y2="296.0"/><line class="edge" x1="397.0" y1="380.0" x2="197.0" y2="296.0"/><line class="edge" x1="497.0" y1="380.0" x2="197.0" y2="296.0"/><line class="edge" x1="597.0" y1="380.0" x2="197.0" y2="296.0"/><line class="edge" x1="97.0" y1="380.0" x2="297.0" y2="296.0"/><line class="edge" x1="197.0" y1="380.0" x2="297.0" y2="296.0"/><line class="edge" x1="297.0" y1="380.0" x2="297.0" y2="296.0"/><line class="edge" x1="397.0" y1="380.0" x2="297.0" y2="296.0"/><line class="edge" x1="497.0" y1="380.0" x2="297.0" y2="296.0"/><line class="edge" x1="597.0" y1="380.0" x2="297.0" y2="296.0"/><line class="edge" x1="97.0" y1="380.0" x2="397.0" y2="296.0"/><line class="edge" x1="197.0" y1="380.0" x2="397.0" y2="296.0"/><line class="edge" x1="297.0" y1="380.0" x2="397.0" y2="296.0"/><line class="edge" x1="397.0" y1="380.0" x2="397.0" y2="296.0"/><line class="edge" x1="497.0" y1="380.0" x2="397.0" y2="296.0"/><line class="edge" x1="597.0" y1="380.0" x2="397.0" y2="296.0"/><line class="edge" x1="97.0" y1="380.0" x2="497.0" y2="296.0"/><line class="edge" x1="197.0" y1="380.0" x2="497.0" y2="296.0"/><line class="edge" x1="297.0" y1="380.0" x2="497.0" y2="296.0"/><line class="edge" x1="397.0" y1="380.0" x2="497.0" y2="296.0"/><line class="edge" x1="497.0" y1="380.0" x2="497.0" y2="296.0"/><line class="edge" x1="597.0" y1="380.0" x2="497.0" y2="296.0"/><text class="t-note" x="20.0" y="438.0" text-anchor="start">All six outputs are computed together. "The" reaches the new "mat" in one step.</text></svg><figcaption>Top: a recurrent network computes the states h1 to h6 one after the other, so the first word reaches h6 only through five later states. Bottom: self-attention computes six new vectors together, and each one reads all six words directly. The highlighted lines show the six links of the last word.</figcaption></figure>
 
-### A loop against one attention step
+### The loop and the matrix product, in code
 
-How much does the order cost on real hardware? We timed one GRU layer and one self-attention layer, both with vectors of 512 numbers, on batches of 32 random sentences. The GRU must loop over the words. The attention layer handles all the words in one step of matrix products.
+The figure is the whole argument of §1, and it fits in two short functions. The first is a recurrent layer, our **Method 1**. Read the `for` line: step `t` uses `h`, and `h` is the result of step `t - 1`. There is no way to start step 5 before step 4 is done.
+
+```python
+def rnn_layer(X, W, U, b):
+    """Method 1: a recurrent layer. X is (batch, n, d). Step t cannot start before step t - 1 ends."""
+    B, n, d = X.shape
+    h = torch.zeros(B, d)                               # h_0
+    states = []
+    for t in range(n):                                  # n steps, one after the other
+        h = torch.tanh(X[:, t] @ W.T + h @ U.T + b)     # (B, d): needs the h of the step before
+        states.append(h)
+    return torch.stack(states, 1)                       # (B, n, d)
+```
+
+The second is self-attention in its most basic form, with no learned weights: each word is its own query, key and value. [Part 3](part-3-attention.md) adds the learned matrices and the heads. Here we only need the shape of the computation. There is no loop over words. One matrix product compares every word with every word, a softmax turns each row into weights, and a second product mixes the words.
+
+```python
+def attention_layer(X):
+    """Method 1: self-attention with no learned weights, Q = K = V = X. All n rows in one go."""
+    d = X.shape[-1]
+    scores = X @ X.transpose(1, 2) / math.sqrt(d)      # (B, n, n): every word against every word
+    weights = torch.softmax(scores, dim=-1)             # each row adds up to 1
+    return weights @ X                                  # (B, n, d): a weighted mix for every word at once
+```
+
+Follow the shapes for a batch of 32 sentences of 12 words, each word a vector of 512 numbers. `X` has the shape (32, 12, 512). `X.transpose(1, 2)` swaps the last two axes, so it has the shape (32, 512, 12). Their product has the shape (32, 12, 12): for each sentence, a table of 12 × 12 scores. The division by $$\sqrt{d}$$ keeps the scores in a useful range; Part 3 explains it.
+
+Our **Method 2** is the library: `nn.RNN` for the loop, with the same weights, and `F.scaled_dot_product_attention`, the attention function that PyTorch ships. We also run two small tests. First, we compute row 7 of the attention output alone. Second, we change only word 3 and measure how much each output moves.
+
+```python
+# Each attention row needs only X, not the other outputs: compute row 7 alone.
+with torch.no_grad():
+    row7 = torch.softmax(X[:, 7:8] @ X.transpose(1, 2) / math.sqrt(d), -1) @ X     # (B, 1, d)
+log(f'  attention row 7 computed alone, from X only: max |row 7 alone - row 7 of the full product| = {diff(row7[:, 0], A_ours[:, 7]):.1e}')
+
+# Change word 3 only, and see which outputs move. Small word vectors keep the attention weights spread out.
+with torch.no_grad():
+    Xs = 0.05 * torch.randn(B, n, d)                    # (B, 12, 512)
+    Xs2 = Xs.clone(); Xs2[:, 3] += 0.05                 # the same sentence, word 3 changed
+    move_rnn = (rnn_layer(Xs2, W, U, b) - rnn_layer(Xs, W, U, b)).abs().amax(dim=(0, 2))   # (12,): one number per output
+    move_att = (attention_layer(Xs2) - attention_layer(Xs)).abs().amax(dim=(0, 2))
+```
+
+```text
+== 1. Sequential against parallel (width d = 512, batch 32)
+  X (32, 12, 512)
+  RNN loop: 12 steps in order -> (32, 12, 512); max |ours - nn.RNN| = 8.3e-07
+  attention: 1 product X X^T (32, 12, 12), softmax, 1 product with X -> (32, 12, 512); max |ours - F.scaled_dot_product_attention| = 1.2e-07
+  attention row 7 computed alone, from X only: max |row 7 alone - row 7 of the full product| = 0.0e+00
+  change word 3 only; largest change of each output 0..11:
+    RNN       0.000 0.000 0.000 0.089 0.053 0.031 0.016 0.013 0.005 0.003 0.002 0.001
+    attention 0.004 0.004 0.004 0.006 0.004 0.004 0.004 0.004 0.004 0.004 0.004 0.004
+```
+
+Both of our functions agree with the library to less than one millionth. Now read the last four lines, because they are the point of §1.
+
+Row 7 of attention, computed alone, is exactly row 7 of the full product. It needs only the inputs `X`, not any other output. So the 12 rows can go to 12 groups of GPU cores at the same time. The RNN has no such row: $$h_7$$ needs $$h_6$$, which needs $$h_5$$, and so on.
+
+The change test shows the two kinds of path. In the RNN, outputs 0 to 2 do not move at all, because they were computed before word 3. Output 3 moves by 0.089, and then the change fades along the chain: 0.053, 0.031, and only 0.001 at output 11. That is the fading trace of the [Background](background-the-road-to-the-transformer.md) page, in a real layer of 512 numbers.
+
+In attention, every output moves, even outputs 0, 1 and 2, which come before word 3. The change reaches output 11 as strongly as output 0, because each output reads word 3 directly, in one step. Output 3 moves a little more, because word 3 is also its own query.
+
+A learner often reads "parallel" as "no dependencies at all". That is wrong. Each attention output depends on every input word, as the second row shows. What attention removes is the dependence of one *output* on another *output*. All the inputs are known at the start, so all the outputs can start at once.
+
+How long does each take on a laptop CPU? The script times all four versions, with 16, 64 and 256 words:
+
+```python
+def fastest(f, k=10):
+    f()
+    best = 1e9
+    for _ in range(k):
+        t0 = time.perf_counter(); f(); best = min(best, time.perf_counter() - t0)
+    return best * 1000
+```
+
+```text
+   time on the CPU (4 threads), forward pass only, fastest of 10 runs, random weights
+     n  steps in order  our loop ms  nn.RNN ms  our attention ms  SDPA ms
+    16         16 vs 1          2.1        1.8               0.3      0.1
+    64         64 vs 1          9.0        7.4               0.7      0.5
+   256        256 vs 1         51.9       38.2               7.9      4.3
+```
+
+We take the fastest of 10 runs, because a slow run usually means that the computer did something else at that moment. The library's `nn.RNN` is faster than our loop, because its loop is written in C++. But it still takes 256 steps in order for 256 words. Our attention and the library's SDPA (scaled dot-product attention) take one step of matrix products at every length.
+
+Keep the warnings in mind. These are untrained layers with no learned query, key and value matrices, on a CPU with 4 threads. The times change from run to run. And attention's work grows with $$n^2$$: at 256 words, the score table has 256 × 256 entries for each sentence. The next table shows what happens on a GPU and at 1,024 words.
+
+### Real layers on a laptop GPU
+
+How much does the order cost with real layers on a GPU? We timed one GRU layer and one self-attention layer, both with vectors of 512 numbers, on batches of 32 random sentences. The **GRU** is a recurrent layer with gates, a lighter cousin of the LSTM. The attention layer is PyTorch's `nn.MultiheadAttention`, with learned matrices and 8 heads. The script `tx_part1.py` also writes the GRU as the loop that it is:
+
+```python
+def gru_loop(x):
+    """The GRU of §1, written as the loop that it is: step t needs h_(t-1)."""
+    cell = torch.nn.GRUCell(d, d)
+    cell.weight_ih, cell.weight_hh, cell.bias_ih, cell.bias_hh = gru.weight_ih_l0, gru.weight_hh_l0, gru.bias_ih_l0, gru.bias_hh_l0
+    h = torch.zeros(x.shape[0], d)
+    for t in range(x.shape[1]):
+        h = cell(x[:, t], h)
+    return h
+```
+
+The cell gets the weights of the full GRU layer, and the `for` loop takes one word per step. The output:
 
 ```text
 == 3. One GRU layer (a loop over the words) against one self-attention layer (all words at once)
@@ -221,6 +323,119 @@ With the known German sentence of 14 tokens, one call of the decoder gives 14 ro
 
 > [!DEFINITION] Teacher forcing
 > A way to train a decoder. At each position, the decoder gets the correct earlier words, not its own guesses, and it predicts the next word. Because all the inputs are known, a Transformer can compute the predictions for all positions in one pass. A mask stops each position from looking at later words ([Part 3](part-3-attention.md) shows it).
+
+### Teacher forcing in code
+
+The table above came from one line, `model(**enc, labels=labels)`, and the library hid the work. Here we do each step ourselves with the same released model, so that nothing is hidden. The German sentence is the model's own translation of our English sentence: 14 tokens, the last one `</s>`.
+
+**Step 1: shift the sentence.** At position $$t$$, the decoder must predict token $$t$$ of the German sentence. So its input at position $$t$$ must be the token *before* it. We build the input by putting a start token in front and dropping the last token:
+
+```python
+start = torch.tensor([[cfg.decoder_start_token_id]])          # Marian uses <pad> (id 58100) as the start token
+dec_in = torch.cat([start, labels[:, :-1]], dim=1)            # (1, m): drop the last token, put start in front
+dec_lib = shift_tokens_right(labels, cfg.pad_token_id, cfg.decoder_start_token_id)
+```
+
+`labels[:, :-1]` takes every token except the last one. The library has a function for this step, `shift_tokens_right`, and we compare with it.
+
+**Step 2: one call for all positions.** We give the model the English ids and the whole shifted German input at once:
+
+```python
+with torch.no_grad():
+    out = model(**src, decoder_input_ids=dec_in)
+logits = out.logits                                           # (1, m, 58101): one row of scores per position
+```
+
+**Step 3: the loss by hand.** The loss is the next-token loss of the Background page: $$-\log p$$ of the right token, averaged over the positions.
+
+$$
+\text{loss} = -\frac{1}{m} \sum_{t=0}^{m-1} \log p\left(y_t \mid y_{<t},\ \text{English}\right)
+$$
+
+Here $$m = 14$$ is the number of German tokens, $$y_t$$ is the right token at position $$t$$, and $$y_{<t}$$ are the tokens before it. In code, `log_softmax` turns each row of scores into log-probabilities. Then we pick, in each row, the entry of the right token:
+
+```python
+logp = torch.log_softmax(logits, dim=-1)                      # (1, m, 58101)
+logp_right = logp[0, torch.arange(m), labels[0]]              # (m,): log p of the right token at each position
+loss_ours = -logp_right.mean()
+with torch.no_grad():
+    loss_lib = model(**src, labels=labels).loss               # Method 2: the library shifts and averages for us
+```
+
+The line with `torch.arange(m)` is the one that needs a second look. It picks one number from each row: row 0 at column `labels[0, 0]`, row 1 at column `labels[0, 1]`, and so on. The result is 14 log-probabilities, one per position. Here is the output, with a table of what the decoder reads and what it must predict at each position:
+
+```text
+== 2. Teacher forcing with Helsinki-NLP/opus-mt-en-de
+  English ids (1, 12); German labels (1, 14): ['▁Der', '▁Hund', '▁saß', '▁auf', '▁der', '▁Matt', 'e', ',', '▁weil', '▁er', '▁müde', '▁war', '.', '</s>']
+  decoder input (1, 14): ['<pad>', '▁Der', '▁Hund', '▁saß', '▁auf', '▁der', '▁Matt', 'e', ',', '▁weil', '▁er', '▁müde', '▁war', '.']
+  same as the library shift_tokens_right: True
+  one call: logits (1, 14, 58101)
+  loss by hand 0.2030; library loss 0.2030; difference 1.5e-08
+  pos   decoder reads   must predict  p(right)   top guess
+    0           <pad>           ▁Der     0.796        ▁Der
+    1            ▁Der          ▁Hund     0.946       ▁Hund
+    2           ▁Hund           ▁saß     0.723        ▁saß
+    3            ▁saß           ▁auf     0.782        ▁auf
+    4            ▁auf           ▁der     0.767        ▁der
+    5            ▁der          ▁Matt     0.915       ▁Matt
+    6           ▁Matt              e     0.914           e
+    7               e              ,     0.771           ,
+    8               ,          ▁weil     0.837       ▁weil
+    9           ▁weil            ▁er     0.565         ▁er
+   10             ▁er          ▁müde     0.830       ▁müde
+   11           ▁müde           ▁war     0.881        ▁war
+   12            ▁war              .     0.900           .
+   13               .           </s>     0.889        </s>
+  top guess equals the label at 14 of 14 positions
+```
+
+Read the table diagonally. The token that position 1 must predict, `▁Hund`, is the token that position 2 reads. Each row sees only the tokens above it. Our loss, 0.2030, equals the library's loss and the 0.203 of the earlier run.
+
+The lowest probability is 0.565, for "er" at position 9. That is the word whose gender depends on "dog", six words back. The model is right, but less sure than anywhere else in the sentence. Hard links between distant words are the hard part of translation.
+
+Why does this need a mask? Position 3 reads `▁saß`, and it must predict `▁auf`. But `▁auf` is also in the input, at position 4. Without a mask, position 3 could look one place to the right and copy the answer. The loss would be almost 0, and the model would learn nothing useful. The decoder's mask hides the later positions, so each row must really predict.
+
+> [!DEFINITION] Logits
+> The raw scores that a model gives to each token of the vocabulary, before the softmax. A higher logit means a more likely token. The softmax turns one row of 58,101 logits into 58,101 probabilities that add up to 1.
+
+### Writing: one decoder call per token
+
+When the model translates a new sentence, it does not have the German sentence. It must write it. Here is the generation loop written out, our **Method 1**:
+
+```python
+def greedy(model, src, max_new=40):
+    """Method 1: our own generation loop. The encoder runs once; the decoder runs once per new token."""
+    enc_out = model.get_encoder()(**src)                      # (1, 12, 512), reused at every step
+    ys = torch.tensor([[cfg.decoder_start_token_id]])         # (1, 1): only the start token
+    step_logits = []
+    for _ in range(max_new):
+        logits = model(encoder_outputs=enc_out, attention_mask=src.attention_mask, decoder_input_ids=ys).logits
+        last = logits[:, -1].clone()                          # (1, 58101): scores for the next token only
+        last[:, cfg.pad_token_id] = -float('inf')             # never write the start/pad token (generate does the same)
+        nxt = last.argmax(-1, keepdim=True)                   # (1, 1): the most likely token
+        step_logits.append(logits[0, -1])
+        ys = torch.cat([ys, nxt], dim=1)                      # feed it back in: the input grows by one
+        if nxt.item() == cfg.eos_token_id:
+            break
+    return ys, torch.stack(step_logits)
+```
+
+The encoder runs once, and its 12 vectors are kept. The decoder runs inside the loop. At each step, it reads all the tokens so far, and we keep only the scores of the last position. We pick the best token and append it, so `ys` grows from shape (1, 1) to (1, 2), (1, 3) and so on. The loop is the same chain as in a recurrent network: step 5 needs the token of step 4.
+
+**Method 2** is the library's `model.generate` with one beam and no sampling, which is greedy decoding. We compare the two outputs, and we also compare the scores of our loop with the teacher-forced scores of Step 2:
+
+```text
+== 3. Writing the translation: our greedy loop against model.generate
+  ours    : Der Hund saß auf der Matte, weil er müde war.  (14 decoder calls)
+  generate: Der Hund saß auf der Matte, weil er müde war.
+  same tokens: True
+  max |teacher-forced logits - loop logits at the same position| = 1.0e-05
+```
+
+Our loop and the library write the same 14 tokens. The last line is the important one. The scores that the loop computed one step at a time equal the scores of the single teacher-forced call, to 0.00001. So the one parallel call computes exactly what 14 separate calls compute. This is why the Transformer can train on all positions at once and still learn the same thing that it does when it writes.
+
+Our loop is slow on purpose: at every step, it runs the decoder again over all the earlier tokens. Real code keeps the keys and values of earlier positions in a cache, so each step only computes the new position. That makes each step cheaper, but the steps still run in order.
+
 
 > [!PAPER] · §1
 > [![The third paragraph of the Introduction, with without regard to their distance and used in conjunction with a recurrent network highlighted](/img/papers/transformer/p1-intro-3.png)](/img/papers/transformer/p1-intro-3.png)
@@ -321,6 +536,7 @@ At 200 words apart, a recurrent network needs 200 steps and a ConvS2S-style stac
 > - **The problem with recurrence:** $$h_t = f(h_{t-1}, x_t)$$. Each state waits for the one before it, so the words of one sentence cannot be processed in parallel. In our one-number example, the trace of word 1 fell from 0.7616 to 0.0224 in six steps.
 > - **On our laptop GPU,** one self-attention layer was 1.9 to 3.8 times faster than one GRU layer for 16 to 1,024 words. Attention's work grows with $$n^2$$, which Part 4 counts.
 > - **Training is parallel, writing is not:** with teacher forcing, Marian scored a 14-token German sentence in 1 decoder call. Writing it took 14 calls.
+> - **In code, the two claims are a few lines each.** Each attention row needs only the inputs, so all rows can start together; each RNN state needs the state before it. Our teacher-forced loss (0.2030) equals the library's, and our 14-call greedy loop gives the same scores as the single call, to 0.00001.
 > - **Path length:** between two words 200 positions apart, a recurrent network needs 200 steps, a width-3 convolution stack 100 layers and a dilated stack 8. Self-attention needs 1.
 > - **The price** of one-step links is a blur from averaging. Multi-head attention fixes it.
 > - **The results:** 28.4 BLEU on WMT 2014 English-to-German, over 2 BLEU above the best earlier results, ensembles included. 41.8 BLEU on English-to-French after 3.5 days on 8 GPUs.
@@ -331,11 +547,12 @@ At 200 words apart, a recurrent network needs 200 steps and a ConvS2S-style stac
 <details>
 <summary>Run it yourself</summary>
 
-The script behind this part is [`code/papers/transformer/tx_part1.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/transformer/tx_part1.py). It loads the released translation model and translates one sentence. It works the recurrence by hand and times a GRU layer against an attention layer. It also compares teacher forcing with generation, and prints the path lengths. Every number is saved in `results/part1.json`.
+The script behind this part is [`code/papers/transformer/tx_part1.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/transformer/tx_part1.py). It loads the released translation model and translates one sentence. It works the recurrence by hand and times a GRU layer against an attention layer. It also compares teacher forcing with generation, and prints the path lengths. Every number is saved in `results/part1.json`. The second script, [`tx_part1_scratch.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/transformer/tx_part1_scratch.py), holds the code of the sections "The loop and the matrix product, in code", "Teacher forcing in code" and "Writing: one decoder call per token".
 
 ```bash
 pip install torch transformers sentencepiece
-python tx_part1.py        # downloads Helsinki-NLP/opus-mt-en-de (about 300 MB)
+python tx_part1.py           # downloads Helsinki-NLP/opus-mt-en-de (about 300 MB)
+python tx_part1_scratch.py   # the loop and the matrix product, teacher forcing and the greedy loop by hand
 ```
 
 <figure><img src="/img/papers/transformer/part1-run.png" alt="Terminal output of tx_part1.py: the shapes of the released model and its translation, the recurrence worked by hand, the GRU and attention timing table, teacher forcing against generation, and the path-length table" loading="lazy" /><figcaption>The full output of tx_part1.py, as it ran for this article.</figcaption></figure>

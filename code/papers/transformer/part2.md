@@ -1,6 +1,6 @@
 ---
 title: "The Architecture: Stacks, Feed-Forward Layers and Positions"
-description: "How the Transformer is built, block by block: the encoder and decoder stacks, the add and norm step, the feed-forward layer, the embeddings and the sine waves that give each word its place. We open a released English to German model and check each piece."
+description: "How the Transformer is built, block by block: the encoder and decoder stacks, the add and norm step, the feed-forward layer, the embeddings and the sine waves that give each word its place. We open a released English to German model, rebuild each piece in our own Python code and check it against the model."
 part: 2
 covers: "§3, Figure 1, §3.1, §3.3, §3.4, §3.5"
 date: 2026-10-18
@@ -9,7 +9,7 @@ tags: [transformer, attention, architecture, positional-encoding, nlp]
 
 Part 1 showed the promise: a translation model with no recurrence, built on attention. This part opens the box and names every block in Figure 1, except attention itself, which gets [Part 3](part-3-attention.md) for itself.
 
-To make each block concrete, we load a released English to German Transformer and send one sentence through it. Each number below comes from our script.
+To make each block concrete, we load a released English to German Transformer and send one sentence through it. We also write each block from scratch and compare it with the model. Each number below comes from our scripts.
 
 ## An encoder and a decoder {§3}
 
@@ -124,6 +124,15 @@ Our script follows the 12 tokens through the six encoder layers:
 
 The first number, 1, is the batch: one sentence. The shape never changes. Twelve vectors of 512 numbers go in, and twelve vectors of 512 numbers come out of each layer. What changes is the content: at the end, each vector also carries information about the other words of the sentence. This final set is the $$z$$ of Section 3.
 
+In the sections below, we write each block of this layer as our own short Python function. Next to it is the library's version of the same block. At the end, we stack our functions into a full encoder and compare its $$z$$ with the library's $$z$$. All of that code is in `tx_part2_scratch.py`. It starts from the same sentence and turns it into a tensor of token ids:
+
+```text
+sentence: The cat sat on the mat because it was tired.
+ids (1, 12): [36, 12064, 10369, 32, 4, 19160, 433, 56, 58, 15871, 3, 0]
+```
+
+The shape (1, 12) means one sentence of 12 token ids. Keep the number 12 in mind. It is $$n$$, the length of the sentence, in every shape below.
+
 ### The residual connection
 
 Imagine you edit a document with "track changes" on. You do not write the document again. You only write your changes, and the editor adds them to the old text. If you have nothing useful to add, the document stays as it was.
@@ -150,6 +159,22 @@ The change is smaller than the input, so the output still points in a similar di
 
 > [!DEFINITION] Norm (length) of a vector
 > The square root of the sum of the squares of its numbers. The vector $$(3, 4)$$ has the norm $$\sqrt{9 + 16} = 5$$. **Cosine similarity** compares two vectors by direction only: 1 means the same direction, 0 means at right angles.
+
+### The residual wrapper in code
+
+In code, the residual connection with its layer norm is one line. We write it as a function with two arguments, the sub-layer and the norm. The same wrapper goes around attention and around the feed-forward network:
+
+```python
+def add_and_norm(x, sublayer, norm):
+    """The residual wrapper of §3.1: LayerNorm(x + Sublayer(x))."""
+    return norm(x + sublayer(x))
+```
+
+`sublayer` and `norm` are functions. The line reads like the paper's formula: compute `sublayer(x)`, add it to `x`, then normalize the sum. In our sentence, `x` has the shape (1, 12, 512), and `sublayer(x)` must have the same shape, or the addition fails. This is the $$d_{\text{model}}$$ rule in practice.
+
+A common mistake is to write `norm(sublayer(x))` and forget the `+ x`. The code still runs, and the shapes still fit, but the direct path is gone. In a deep stack, such a model is much harder to train. With the released weights, its outputs would be wrong.
+
+Another mistake is the order. `x + sublayer(norm(x))` is the "pre-norm" form of later models, explained below. It needs different weights, so it does not match this model.
 
 ### Layer normalization
 
@@ -178,6 +203,51 @@ The word "layer" in the name means that the statistics come from the numbers of 
 The second line is the full test. We rebuilt encoder layer 1 from the formula $$\text{LayerNorm}(x + \text{Sublayer}(x))$$, twice, with the model's own weights. Our output and the library's output agree exactly. This confirms that the released model uses the same order as the paper: first add, then normalize.
 
 The order matters. Here, the layer norm sits after the addition, on the main path. Many later models move it before the sub-layer, to the form $$x + \text{Sublayer}(\text{LayerNorm}(x))$$, which is easier to train in very deep stacks. The 2017 paper uses the form after the addition.
+
+### Layer normalization in code
+
+The check above used the model's layer norm on one token. Here is our own function for all 12 tokens at once, our **Method 1**. Each line is one symbol of the formula:
+
+```python
+def layer_norm(x, gamma, beta, eps=1e-5):
+    """Method 1: normalise each token vector over its own d_model numbers."""
+    mu = x.mean(dim=-1, keepdim=True)                       # (1, n, 1): one mean per token
+    var = ((x - mu) ** 2).mean(dim=-1, keepdim=True)        # (1, n, 1): divide by d, not d - 1
+    x_hat = (x - mu) / torch.sqrt(var + eps)                # mean 0, standard deviation 1
+    return gamma * x_hat + beta                             # learned scale and shift, (d_model,) each
+```
+
+`dim=-1` means "along the last axis", the 512 numbers of one token. So `mu` has one mean for each of the 12 tokens. `keepdim=True` keeps that axis with size 1, so `mu` has the shape (1, 12, 1), not (1, 12). Then `x - mu` works: PyTorch repeats the one mean over the 512 numbers of its token. This repetition is called **broadcasting**, and it appears in almost every line of Transformer code.
+
+> [!DEFINITION] Broadcasting
+> PyTorch's rule for maths between tensors of different shapes. An axis of size 1 is repeated to match the other tensor. A (1, 12, 1) tensor of means minus a (1, 12, 512) tensor subtracts each token's mean from all 512 of its numbers.
+
+**Method 2** is the model's own `nn.LayerNorm`. We feed both the input of layer 1, the 12 vectors of embedding plus position:
+
+```python
+L0 = enc.layers[0]
+ln = L0.self_attn_layer_norm                                 # an nn.LayerNorm(512) with eps = 1e-5
+with torch.no_grad():
+    v = x0 + 0.0                                             # any (1, 12, 512) tensor works; we use layer 1's input
+    ln_ours = layer_norm(v, ln.weight, ln.bias, ln.eps)
+    ln_lib = ln(v)                                           # Method 2
+    x_hat = layer_norm(v, torch.ones(d_model), torch.zeros(d_model))
+```
+
+```text
+== 3. layer normalization
+  input (1, 12, 512): token 1 ("▁cat") mean 0.255, std 0.794
+  after normalising (before gamma, beta): mean -2.6e-08, std 1.0000
+  gamma: mean 1.167, range 0.113 to 1.997; beta: mean -0.006
+  max |ours - nn.LayerNorm| = 7.15e-07
+  mistake, dividing by d - 1 (torch.var default): max |wrong - nn.LayerNorm| = 3.70e-03
+```
+
+Read the output from the top. The token "cat" enters with mean 0.255 and standard deviation 0.794. After the normalising step, its mean is 0 (the $$-2.6 \times 10^{-8}$$ is rounding) and its standard deviation is exactly 1.
+
+Then $$\gamma$$ and $$\beta$$ act. The learned $$\gamma$$ is not 1 everywhere: its mean is 1.167, and it ranges from 0.113 to 1.997. So the model keeps some of the 512 numbers small and makes others large. Our function and `nn.LayerNorm` agree to $$7 \times 10^{-7}$$.
+
+The last line is a real trap. `torch.var` divides by $$d - 1$$ by default, the "unbiased" variance of statistics. Layer norm divides by $$d$$. With $$d = 512$$, the difference is small, 0.0037 at most here. But it is not rounding: it is a bug, and it grows through six layers. Our function avoids it by computing the mean of the squares itself.
 
 > [!DEFINITION] Mean, variance and standard deviation
 > The **mean** is the average. The **variance** is the average of the squared distances from the mean. The **standard deviation** is the square root of the variance: a typical distance from the mean.
@@ -263,6 +333,51 @@ The feed-forward network is small in idea but large in weights. Our script count
 
 Check the feed-forward count by hand: $$512 \times 2048 + 2048 + 2048 \times 512 + 512 = 2{,}099{,}712$$. Attention has four matrices of 512 × 512 plus their biases: $$4 \times 262{,}656 = 1{,}050{,}624$$. So two thirds of each encoder layer is the feed-forward network, not attention.
 
+### The feed-forward network in code
+
+Equation 2 becomes two lines of code. We pass the activation function as an argument, so that we can try both swish and ReLU:
+
+```python
+def swish(z):
+    return z * torch.sigmoid(z)                              # Marian's activation; the paper uses max(0, z)
+
+
+def ffn(x, W1, b1, W2, b2, act):
+    """Method 1: FFN(x) = act(x W1 + b1) W2 + b2, applied to every token with the same weights."""
+    hidden = act(x @ W1 + b1)                                # (1, n, 512) @ (512, 2048) -> (1, n, 2048)
+    return hidden @ W2 + b2                                  # (1, n, 2048) @ (2048, 512) -> (1, n, 512)
+```
+
+Now we take the weights from the model. Here is the detail that confuses almost everyone the first time. `nn.Linear` stores its weight with the shape (out, in), so `fc1.weight` is (2048, 512). The paper writes $$x W_1$$ with $$W_1$$ of the shape (512, 2048). So the paper's $$W_1$$ is the transpose, `.T`:
+
+```python
+W1, b1 = L0.fc1.weight.T, L0.fc1.bias                        # nn.Linear stores (out, in); the paper's W1 is (in, out)
+W2, b2 = L0.fc2.weight.T, L0.fc2.bias
+with torch.no_grad():
+    s = L0.self_attn_layer_norm(x0 + L0.self_attn(x0)[0])    # the FFN input in layer 1: (1, 12, 512)
+    f_ours = ffn(s, W1, b1, W2, b2, swish)
+    f_lib = L0.fc2(L0.activation_fn(L0.fc1(s)))              # Method 2: two nn.Linear layers and SiLU
+    f_relu = ffn(s, W1, b1, W2, b2, torch.relu)
+    hid_relu = torch.relu(s @ W1 + b1)
+```
+
+The input `s` is the real input of the feed-forward network in layer 1: the 12 token vectors after attention and the first Add & Norm. **Method 2** is the library's path: `fc1`, the activation and `fc2`.
+
+```text
+== 4. position-wise feed-forward network
+  W1 (512, 2048)  b1 (2048,)  W2 (2048, 512)  b2 (512,)
+  x (1, 12, 512) -> x W1 + b1 (1, 12, 2048) -> act -> times W2 + b2 (1, 12, 512)
+  max |ours (swish) - library fc1, SiLU, fc2| = 7.63e-06
+  swish(z) = z * sigmoid(z): swish(-2) = -0.238, swish(0) = 0, swish(2) = 1.762
+  with ReLU in place of swish: 93.2% of the 2048 hidden numbers are exactly 0; output changes by up to 1.59
+```
+
+Follow the shapes of the second line. The 12 vectors of 512 numbers become 12 vectors of 2048 numbers, and then 12 vectors of 512 again. The 12 never changes, because the network never mixes tokens. Our code and the library agree to about $$8 \times 10^{-6}$$, which is rounding in a sum of 2048 products.
+
+The last two lines show how swish differs from ReLU. Swish lets a small negative value through: $$\text{swish}(-2) = -0.238$$, where ReLU gives 0. For large inputs, the two are close: $$\text{swish}(2) = 1.762$$, against 2.
+
+If we put ReLU into this layer, 93.2% of the 2048 hidden numbers become exactly 0. So only a few units are "on" for each token. The output then changes by up to 1.59, so the swap would break this model. A model must use the activation that it was trained with.
+
 ## Embeddings and the shared matrix {§3.4}
 
 > [!PAPER] · §3.4
@@ -309,6 +424,55 @@ In our model, the rows of the table are small, and the position vectors are not:
 A row has a typical length of 1.08. A position vector always has the length 16, because it holds 256 pairs of $$\sin$$ and $$\cos$$, and each pair gives $$\sin^2 + \cos^2 = 1$$. Without the scale, the word would be a whisper next to its position. With $$\sqrt{512} = 22.63$$, the word has a typical length of 24.5 and the position 16. The word now leads, and the position is still clearly present. The row with length 0.00 is the padding token, which the model never needs to read.
 
 The shared table explains why the rows are small. The same rows also make the output scores, and large rows would give extreme scores. So the table stays small, and the scale is applied only where the table is used as an embedding.
+
+### The embedding and the output layer in code
+
+The embedding is a table lookup. In PyTorch, `E[ids]` picks one row of `E` for each id. With ids of the shape (1, 12), it gives the shape (1, 12, 512). Then we multiply by $$\sqrt{512}$$:
+
+```python
+def embed(ids, E):
+    """Method 1: pick one row of the table E for each token id, then scale by sqrt(d_model)."""
+    rows = E[ids]                                   # (1, n) ids -> (1, n, d_model) vectors
+    return rows * math.sqrt(d_model)                # sqrt(512) = 22.627
+
+
+E = model.model.shared.weight                       # (58101, 512): one row per vocabulary token
+with torch.no_grad():
+    x_ours = embed(ids, E)
+    x_lib = enc.embed_tokens(ids) * enc.embed_scale  # Method 2: nn.Embedding, then Marian's scale
+```
+
+```text
+== 1. embedding: row lookup times sqrt(d_model)
+  table E (58101, 512), ids (1, 12) -> vectors (1, 12, 512)
+  row 12064 ("▁cat") first 4 numbers: [0.0251, 0.0315, -0.0259, 0.0201]
+  after the scale x 22.627:          [0.5674, 0.7125, -0.5864, 0.4555]
+  max |ours - library| = 0.00e+00
+```
+
+The row of "cat" starts with 0.0251, 0.0315, and so on: small numbers, as the median length of 1.08 above suggests. The scale makes them 0.5674, 0.7125. Our lookup equals the library's `nn.Embedding` exactly, because `nn.Embedding` is this lookup and nothing more.
+
+Now the other end of the model. The decoder's last layer gives one vector of 512 numbers for each German position. The output layer must turn each one into 58,101 scores. With the shared table, this is a product with the transposed table, $$h E^\top$$, plus a bias:
+
+```python
+de_ids = tok(text_target=['Die Katze saß auf der Matte, weil sie müde war.'], return_tensors='pt')['input_ids']
+with torch.no_grad():
+    out = model(input_ids=ids, labels=de_ids, output_hidden_states=True)
+    top = out.decoder_hidden_states[-1]                       # (1, m, 512): the last decoder layer
+    logits_ours = top @ E.T + model.final_logits_bias         # (1, m, 512) @ (512, 58101) -> (1, m, 58101)
+```
+
+```text
+== 8. the output layer reuses the embedding table
+  decoder vectors (1, 14, 512) @ E^T (512, 58101) -> logits (1, 14, 58101)
+  max |ours - model logits| = 0.00e+00
+  position 0 (after the start token), top 3: ▁Die 0.768, ▁Der 0.033, ▁Sie 0.015
+  position 1: the row of ▁Katze gets score rank 1 of 58,101
+```
+
+Follow the shapes. The decoder gives 14 vectors, one for each German token. Each vector times $$E^\top$$ (512 × 58,101) gives 58,101 scores. The result has the shape (1, 14, 58101), and it equals the model's own logits exactly. MarianMT adds one small extra: `final_logits_bias`, a fixed bias of one number per token. The paper does not have it.
+
+The score of a token is the dot product of the decoder vector with that token's row of $$E$$. At position 0, after the start token, the vector is closest to the row of "Die": the softmax gives it 0.768. At position 1, the row of "Katze" gets the highest score of all 58,101 rows. So the same row that told the encoder "this is a cat" now tells the decoder "write cat". This is the meaning of tied weights.
 
 ## Positional encoding {§3.5}
 
@@ -424,6 +588,51 @@ Each row has four equal numbers. The starting position does not matter; only the
 
 {{FIG:p2_dots|The dot product of two position vectors against their distance k. The curves from position 0 and from position 3 are the same: the dot product depends only on the distance.}}
 
+### The position encoding in code
+
+Our first script filled the table above with two loops, one value at a time. Real code computes the whole table at once. Here is our **Method 1**, in the paper's order:
+
+```python
+def positional_encoding(n_pos, d_model):
+    """Method 1: the formula of §3.5, in the paper's order (sin in even dimensions, cos in odd ones)."""
+    pos = torch.arange(n_pos, dtype=torch.float64).unsqueeze(1)          # (n_pos, 1): 0, 1, 2, ...
+    i = torch.arange(d_model // 2, dtype=torch.float64).unsqueeze(0)     # (1, 256): pair number i
+    angle = pos / 10000 ** (2 * i / d_model)                             # (n_pos, 256): one angle per pair
+    PE = torch.zeros(n_pos, d_model, dtype=torch.float64)
+    PE[:, 0::2] = torch.sin(angle)                                       # dimensions 0, 2, 4, ...
+    PE[:, 1::2] = torch.cos(angle)                                       # dimensions 1, 3, 5, ...
+    return PE
+```
+
+The trick is in the two `unsqueeze` calls. `pos` becomes a column of the shape (12, 1), and `i` becomes a row of the shape (1, 256). Broadcasting turns `pos / 10000 ** (2 * i / d_model)` into a full table of the shape (12, 256): one angle for each position and each pair. Then `0::2` means "every second column, from column 0", and `1::2` "every second column, from column 1". So the sines go into the even dimensions and the cosines into the odd ones.
+
+**Method 2** is the model's frozen table. We also build Marian's order, all sines first, and add the positions to our embeddings:
+
+```python
+with torch.no_grad():
+    PE = positional_encoding(n, d_model)                                 # (12, 512)
+    PE_marian = torch.cat([PE[:, 0::2], PE[:, 1::2]], dim=1)             # Marian: all 256 sines, then all 256 cosines
+    PE_lib = enc.embed_positions(ids.shape)                              # Method 2: the model's frozen table
+log('')
+log('== 2. sinusoidal position encoding')
+log(f'  PE {tuple(PE.shape)}; position 1, dims 0-3: {[round(v, 4) for v in PE[1, :4].tolist()]}')
+log(f'  max |our formula (paper order) - model table| = {diff(PE.float(), PE_lib):.2f}  (different order)')
+log(f'  max |our formula (sines first) - model table| = {diff(PE_marian.float(), PE_lib):.2e}')
+with torch.no_grad():
+    x0 = x_ours + PE_marian.float()                                      # (1, 12, 512): the input of layer 1
+    eo = enc(input_ids=ids, output_hidden_states=True)
+```
+
+```text
+== 2. sinusoidal position encoding
+  PE (12, 512); position 1, dims 0-3: [0.8415, 0.5403, 0.8219, 0.5697]
+  max |our formula (paper order) - model table| = 2.00  (different order)
+  max |our formula (sines first) - model table| = 0.00e+00
+  input of layer 1 = embedding + PE (1, 12, 512); max |ours - library| = 0.00e+00
+```
+
+In the paper's order, our table differs from the model's by 2.00. That is the largest possible gap between two numbers from -1 to 1. In Marian's order, the difference is exactly 0. This is a real trap for a learner who loads released weights into their own code. Both orders are correct versions of §3.5, but a trained model only works with the order that it learned. The last line shows that embedding plus position, by our code, is exactly the input of the library's layer 1.
+
 > [!PAPER] · §3.5
 > [![The last paragraph of Section 3.5, with nearly identical results and extrapolate to sequence lengths longer highlighted](/img/papers/transformer/p2-pe-3.png)](/img/papers/transformer/p2-pe-3.png)
 >
@@ -434,6 +643,113 @@ Each row has four equal numbers. The starting position does not matter; only the
 > The other choice is a learned table, like the word embedding: one row of 512 free numbers for each position. Training fills the rows. It worked just as well, which tells us that the exact form of the label is not critical. The model mostly needs some distinct label for each position.
 >
 > The sine version has one advantage in theory. A learned table has rows only for the positions seen in training; a sentence longer than that has no label. The formula gives a value for any position, even position 10,000. Note the word "may": the paper does not test this claim. [Part 6](part-6-results-and-impact.md) reads row E of Table 3.
+
+## One encoder layer from our own pieces
+
+We now have every block of the encoder except attention. [Part 3](part-3-attention.md) explains attention line by line. Here we only need a working version, so that we can build a full layer. The comments give the shapes for our 12 tokens:
+
+```python
+def self_attention(x, attn):
+    """Method 1: softmax(Q K^T / sqrt(d_k)) V in h = 8 heads, then the output projection W_O."""
+    B, n, _ = x.shape
+    Q = x @ attn.q_proj.weight.T + attn.q_proj.bias              # (1, n, 512)
+    K = x @ attn.k_proj.weight.T + attn.k_proj.bias              # (1, n, 512)
+    V = x @ attn.v_proj.weight.T + attn.v_proj.bias              # (1, n, 512)
+    Q = Q.view(B, n, h, d_k).transpose(1, 2)                     # (1, 8, n, 64): 8 heads of 64 numbers
+    K = K.view(B, n, h, d_k).transpose(1, 2)
+    V = V.view(B, n, h, d_k).transpose(1, 2)
+    scores = Q @ K.transpose(-2, -1) / math.sqrt(d_k)            # (1, 8, n, n): every token against every token
+    weights = torch.softmax(scores, dim=-1)                      # each row adds up to 1
+    heads = weights @ V                                          # (1, 8, n, 64)
+    concat = heads.transpose(1, 2).reshape(B, n, d_model)        # (1, n, 512): the 8 heads side by side
+    return concat @ attn.out_proj.weight.T + attn.out_proj.bias  # (1, n, 512)
+```
+
+The only new idea for this part is the shape (1, 8, 12, 64). The 512 numbers of each token are cut into 8 heads of 64 numbers, and each head computes its own 12 × 12 table of scores. At the end, the 8 heads are put side by side again, back to 512 numbers.
+
+```text
+== 5. multi-head self-attention (shapes; Part 3 explains the formula)
+  x (1, 12, 512) -> Q, K, V (1, 12, 512) -> 8 heads (1, 8, 12, 64) -> scores (1, 8, 12, 12) -> output (1, 12, 512)
+  max |ours - library attention| = 1.43e-06
+```
+
+Now the whole layer is two calls of our residual wrapper. The first wraps attention, and the second wraps the feed-forward network. Each sub-layer has its own layer norm, with its own $$\gamma$$ and $$\beta$$:
+
+```python
+def encoder_layer(x, L):
+    """One encoder layer from our own pieces, with the weights of the Marian layer L."""
+    ln1 = lambda t: layer_norm(t, L.self_attn_layer_norm.weight, L.self_attn_layer_norm.bias)
+    ln2 = lambda t: layer_norm(t, L.final_layer_norm.weight, L.final_layer_norm.bias)
+    attn = lambda t: self_attention(t, L.self_attn)
+    ff = lambda t: ffn(t, L.fc1.weight.T, L.fc1.bias, L.fc2.weight.T, L.fc2.bias, swish)
+    x = add_and_norm(x, attn, ln1)        # sub-layer 1: tokens exchange information
+    x = add_and_norm(x, ff, ln2)          # sub-layer 2: each token alone
+    return x
+```
+
+A `lambda` is a small function without a name. `ln1` is "our layer norm with the first set of $$\gamma$$ and $$\beta$$", and so on. The last three lines are Figure 1's grey box: attention with Add & Norm, then feed-forward with Add & Norm.
+
+```text
+== 6. Add & Norm, and encoder layer 1 from our pieces
+  x (1, 12, 512): norm of token 1 ("▁cat") 18.9; attention adds a change of norm 3.7
+  x + Sublayer(x) (1, 12, 512); after the layer norm, norm 22.6 = sqrt(512) before gamma and beta
+  our encoder layer (1, 12, 512); max |ours - Marian layer 1| = 1.91e-06
+```
+
+The first line puts numbers on the residual idea. The vector of "cat" has a length of 18.9, and attention adds a change of length 3.7. So the layer edits the vector, it does not replace it. After the layer norm, the length is 22.6, which is $$\sqrt{512}$$. A vector of 512 numbers with mean 0 and standard deviation 1 always has this length. Our full layer equals the Marian layer to $$2 \times 10^{-6}$$.
+
+### The whole encoder
+
+The encoder is our layer six times, each time with the weights of the next Marian layer. The input is our embedding plus our position table:
+
+```python
+with torch.no_grad():
+    z = embed(ids, E) + PE_marian.float()            # (1, 12, 512)
+    for i, L in enumerate(enc.layers, 1):
+        z = encoder_layer(z, L)                       # six layers, each with its own weights
+        log(f'  ours, after layer {i}: {tuple(z.shape)}; max |ours - library| = {diff(z, eo.hidden_states[i]):.2e}')
+log(f'  encoder output z {tuple(z.shape)}; max |ours - library encoder| = {diff(z, eo.last_hidden_state):.2e}')
+```
+
+```text
+== 7. the whole encoder: our layer six times, with the weights of each Marian layer
+  ours, after layer 1: (1, 12, 512); max |ours - library| = 1.91e-06
+  ours, after layer 2: (1, 12, 512); max |ours - library| = 2.03e-06
+  ours, after layer 3: (1, 12, 512); max |ours - library| = 1.91e-06
+  ours, after layer 4: (1, 12, 512); max |ours - library| = 2.15e-06
+  ours, after layer 5: (1, 12, 512); max |ours - library| = 2.38e-06
+  ours, after layer 6: (1, 12, 512); max |ours - library| = 1.43e-06
+  encoder output z (1, 12, 512); max |ours - library encoder| = 1.43e-06
+```
+
+The difference stays near $$2 \times 10^{-6}$$ after every layer: it does not grow. So our six functions, about 50 lines in all, are the encoder of a released translation model. The only things that we took from the library are the trained numbers. [Part 7](part-7-build-it-from-scratch.md) puts the whole model, encoder and decoder, into one file of this kind.
+
+### What goes wrong when one detail is missing
+
+A from-scratch model can run, give tensors of the right shape, and still be wrong. To show how much each detail matters, we break one detail at a time and run the whole encoder again:
+
+```python
+def encode(ids, scale=math.sqrt(d_model), pe=PE_marian.float(), use_pe=True):
+    z = E[ids] * scale + (pe if use_pe else 0)
+    for L in enc.layers:
+        z = encoder_layer(z, L)
+    return z
+```
+
+```text
+== 9. the usual mistakes, measured on the encoder output z
+  forget the sqrt(d_model) scale                 max difference   8.72, mean cosine with the right z 0.113
+  positions in the paper order, not sines first  max difference   4.12, mean cosine with the right z 0.776
+  no position encoding at all                    max difference   1.99, mean cosine with the right z 0.641
+  the decoder reads our correct z and writes:  Die Katze saß auf der Matte, weil sie müde war.
+  the decoder reads the unscaled z and writes: s s ow en s  in s ow s s , s  in s
+```
+
+The cosine compares each wrong vector with the right one: 1 would mean "same direction". Without the $$\sqrt{d_{\text{model}}}$$ scale, the mean cosine falls to 0.113: the encoder output has almost nothing in common with the right one. The word vectors are a whisper next to the positions, as the section on the scale predicted, so the encoder mostly sees positions.
+
+The last two lines give the same decoder both versions of $$z$$. From our correct $$z$$, it writes the correct German sentence. From the unscaled $$z$$, it writes nonsense. One missing multiplication breaks the translation completely.
+
+The other two rows are smaller, but they are still bugs. The wrong order of sines and cosines gives a mean cosine of 0.776. Without positions, it is 0.641, and the model sees a bag of words. None of these bugs gives an error message. The only safe test is the one that we used all through this part: compare your numbers with a trusted model.
 
 ## What our model cannot show
 
@@ -448,17 +764,20 @@ MarianMT has the paper's shapes and the paper's order of operations, and it shar
 > - **The $$\sqrt{512} = 22.63$$ scale** lifts the small embedding rows (median length 1.08) above the position vectors (length 16).
 > - **Without positions, attention sees a bag of words.** Swapping two tokens only swapped the outputs.
 > - **The position encoding is a clock with 256 hands,** with wavelengths from 6.3 to about 60,612 positions. A shift by $$k$$ is a fixed rotation, and the dot product of two positions depends only on their distance.
+> - **Every block fits in a few lines of our own code.** Our embedding, position table, layer norm, feed-forward network and attention, stacked six times, gave the library's encoder output to $$1.43 \times 10^{-6}$$.
+> - **Small details are not optional.** Without the $$\sqrt{d_{\text{model}}}$$ scale, the encoder output had a mean cosine of 0.113 with the right one, and the decoder wrote nonsense. None of these bugs gives an error message.
 
 **Next, in Part 3:** attention itself. The scaled dot-product formula, why it divides by $$\sqrt{d_k}$$, the 8 heads and the mask of the decoder.
 
 <details>
 <summary>Run it yourself</summary>
 
-The script [`code/papers/transformer/tx_part2.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/transformer/tx_part2.py) loads the released English to German model, counts its weights and translates one sentence. It rebuilds encoder layer 1 by hand, tests the feed-forward network token by token and checks the shared table. It also computes the position encoding from the formula and tests the rotation rule. Every number of this part is in `results/part2_stdout.txt`.
+The script [`code/papers/transformer/tx_part2.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/transformer/tx_part2.py) loads the released English to German model, counts its weights and translates one sentence. It rebuilds encoder layer 1 by hand, tests the feed-forward network token by token and checks the shared table. It also computes the position encoding from the formula and tests the rotation rule. The second script, [`tx_part2_scratch.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/transformer/tx_part2_scratch.py), holds all the code blocks of this page. Every number of this part is in `results/part2_stdout.txt` and `results/part2_scratch_stdout.txt`.
 
 ```bash
 pip install torch transformers sentencepiece
-python tx_part2.py        # uses Helsinki-NLP/opus-mt-en-de (about 300 MB), CPU, a few seconds
+python tx_part2.py           # uses Helsinki-NLP/opus-mt-en-de (about 300 MB), CPU, a few seconds
+python tx_part2_scratch.py   # every block by hand against the library, the full encoder and the usual mistakes
 ```
 
 <figure><img src="/img/papers/transformer/part2-run.png" alt="Terminal output of tx_part2.py: the configuration and weight counts, the translation of one sentence, the shapes through the encoder, layer 1 rebuilt by hand, the feed-forward and shared-table checks, and the position encoding table" loading="lazy" /><figcaption>The first part of the output of tx_part2.py, as it ran for this article.</figcaption></figure>

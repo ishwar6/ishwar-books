@@ -1,0 +1,54 @@
+$ python tx_part4b.py
+== 1. Work per layer, n = 27, d = 512, k = 3: our count from the shapes vs FlopCounterMode / 2
+part of the layer                               our count  counter / 2  equal
+self-attention core (QK^T and weights V)          746,496      746,496  True
+self-attention projections W_Q W_K W_V W_O     28,311,552   28,311,552  True
+recurrent chain h U (n steps)                   7,077,888    7,077,888  True
+recurrent input x W                             7,077,888    7,077,888  True
+convolution, k = 3                             21,233,664   21,233,664  True
+separable convolution, k = 3                    7,119,360    7,119,360  True
+Table 1 terms: n^2 d = 373,248, n d^2 = 7,077,888, k n d^2 = 21,233,664, k n d + n d^2 = 7,119,360
+
+separable convolution with k = n against self-attention + feed-forward (Table 1 terms, d = 512)
+  n = k =  27: separable k n d + n d^2 =    7,451,136   self-attention n^2 d + feed-forward n d^2 =    7,451,136
+  n = k = 512: separable k n d + n d^2 =  268,435,456   self-attention n^2 d + feed-forward n d^2 =  268,435,456
+
+== 2. Sequential operations: longest chain in the autograd graph (d = 64)
+     n  self-attention  recurrent
+     4               7         20
+    16               7         80
+    64               7        320
+   256               7       1280
+
+== 3. Maximum path length (Method 1: dependency graph, layers until the last output depends on the first input)
+    n  self-attn  recurrent  conv k=3  dilated k=3  restricted r=5  r=17
+    8          1          7         4            2               4     1
+   27          1         26        13            3              13     4
+   64          1         63        32            4              32     8
+  100          1         99        50            5              50    13
+Method 2: real stacks of random Conv1d layers, n = 27, |d out_27 / d x_1|
+  contiguous 12 layers: 0.000e+00  (not connected)
+  contiguous 13 layers: 7.305e-05  (connected)
+  dilated     2 layers: 0.000e+00  (not connected)
+  dilated     3 layers: 3.317e-02  (connected)
+
+== 4. Restricted self-attention: a window of r = 5 centred on each position (n = 10)
+window mask (1 = may look):
+   1 1 1 0 0 0 0 0 0 0
+   1 1 1 1 0 0 0 0 0 0
+   1 1 1 1 1 0 0 0 0 0
+   0 1 1 1 1 1 0 0 0 0
+   0 0 1 1 1 1 1 0 0 0
+   0 0 0 1 1 1 1 1 0 0
+   0 0 0 0 1 1 1 1 1 0
+   0 0 0 0 0 1 1 1 1 1
+   0 0 0 0 0 0 1 1 1 1
+   0 0 0 0 0 0 0 1 1 1
+allowed pairs: 44 of 100 (at most r = 5 per row)
+masked (ours) vs F.scaled_dot_product_attention(attn_mask): max abs difference 0.0e+00
+banded (n * r scores) vs masked (n * n scores):              max abs difference 1.2e-07
+FLOPs of the two versions, d = 64, r = 17 (FlopCounterMode, matrix products only)
+     n   masked n x n  banded n x r  ratio
+   256     16,777,216     1,114,112     15
+  1024    268,435,456     4,456,448     60
+  4096  4,294,967,296    17,825,792    241

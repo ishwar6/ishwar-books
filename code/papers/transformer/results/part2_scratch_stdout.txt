@@ -1,0 +1,59 @@
+sentence: The cat sat on the mat because it was tired.
+ids (1, 12): [36, 12064, 10369, 32, 4, 19160, 433, 56, 58, 15871, 3, 0]
+
+== 1. embedding: row lookup times sqrt(d_model)
+  table E (58101, 512), ids (1, 12) -> vectors (1, 12, 512)
+  row 12064 ("▁cat") first 4 numbers: [0.0251, 0.0315, -0.0259, 0.0201]
+  after the scale x 22.627:          [0.5674, 0.7125, -0.5864, 0.4555]
+  max |ours - library| = 0.00e+00
+
+== 2. sinusoidal position encoding
+  PE (12, 512); position 1, dims 0-3: [0.8415, 0.5403, 0.8219, 0.5697]
+  max |our formula (paper order) - model table| = 2.00  (different order)
+  max |our formula (sines first) - model table| = 0.00e+00
+  input of layer 1 = embedding + PE (1, 12, 512); max |ours - library| = 0.00e+00
+
+== 3. layer normalization
+  input (1, 12, 512): token 1 ("▁cat") mean 0.255, std 0.794
+  after normalising (before gamma, beta): mean -2.6e-08, std 1.0000
+  gamma: mean 1.167, range 0.113 to 1.997; beta: mean -0.006
+  max |ours - nn.LayerNorm| = 7.15e-07
+  mistake, dividing by d - 1 (torch.var default): max |wrong - nn.LayerNorm| = 3.70e-03
+
+== 4. position-wise feed-forward network
+  W1 (512, 2048)  b1 (2048,)  W2 (2048, 512)  b2 (512,)
+  x (1, 12, 512) -> x W1 + b1 (1, 12, 2048) -> act -> times W2 + b2 (1, 12, 512)
+  max |ours (swish) - library fc1, SiLU, fc2| = 7.63e-06
+  swish(z) = z * sigmoid(z): swish(-2) = -0.238, swish(0) = 0, swish(2) = 1.762
+  with ReLU in place of swish: 93.2% of the 2048 hidden numbers are exactly 0; output changes by up to 1.59
+
+== 5. multi-head self-attention (shapes; Part 3 explains the formula)
+  x (1, 12, 512) -> Q, K, V (1, 12, 512) -> 8 heads (1, 8, 12, 64) -> scores (1, 8, 12, 12) -> output (1, 12, 512)
+  max |ours - library attention| = 1.43e-06
+
+== 6. Add & Norm, and encoder layer 1 from our pieces
+  x (1, 12, 512): norm of token 1 ("▁cat") 18.9; attention adds a change of norm 3.7
+  x + Sublayer(x) (1, 12, 512); after the layer norm, norm 22.6 = sqrt(512) before gamma and beta
+  our encoder layer (1, 12, 512); max |ours - Marian layer 1| = 1.91e-06
+
+== 7. the whole encoder: our layer six times, with the weights of each Marian layer
+  ours, after layer 1: (1, 12, 512); max |ours - library| = 1.91e-06
+  ours, after layer 2: (1, 12, 512); max |ours - library| = 2.03e-06
+  ours, after layer 3: (1, 12, 512); max |ours - library| = 1.91e-06
+  ours, after layer 4: (1, 12, 512); max |ours - library| = 2.15e-06
+  ours, after layer 5: (1, 12, 512); max |ours - library| = 2.38e-06
+  ours, after layer 6: (1, 12, 512); max |ours - library| = 1.43e-06
+  encoder output z (1, 12, 512); max |ours - library encoder| = 1.43e-06
+
+== 8. the output layer reuses the embedding table
+  decoder vectors (1, 14, 512) @ E^T (512, 58101) -> logits (1, 14, 58101)
+  max |ours - model logits| = 0.00e+00
+  position 0 (after the start token), top 3: ▁Die 0.768, ▁Der 0.033, ▁Sie 0.015
+  position 1: the row of ▁Katze gets score rank 1 of 58,101
+
+== 9. the usual mistakes, measured on the encoder output z
+  forget the sqrt(d_model) scale                 max difference   8.72, mean cosine with the right z 0.113
+  positions in the paper order, not sines first  max difference   4.12, mean cosine with the right z 0.776
+  no position encoding at all                    max difference   1.99, mean cosine with the right z 0.641
+  the decoder reads our correct z and writes:  Die Katze saß auf der Matte, weil sie müde war.
+  the decoder reads the unscaled z and writes: s s ow en s  in s ow s s , s  in s

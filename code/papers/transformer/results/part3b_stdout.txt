@@ -1,0 +1,97 @@
+$ python tx_part3b.py
+== 1. Method 1a: Equation 1 in NumPy, three tokens, d_k = 2
+Q K^T  shape (3, 3)
+     2.000   0.000   1.000
+     0.000   2.000   1.000
+     2.000   2.000   2.000
+Q K^T / sqrt(d_k)  shape (3, 3)
+     1.414   0.000   0.707
+     0.000   1.414   0.707
+     1.414   1.414   1.414
+weights = softmax(rows)  shape (3, 3)
+     0.576   0.140   0.284
+     0.140   0.576   0.284
+     0.333   0.333   0.333
+row sums: [1.0, 1.0, 1.0]
+output = weights V  shape (3, 2)
+      7.18    2.82
+      2.82    7.18
+      5.00    5.00
+== 2. Method 1b (our PyTorch function) against Method 2 (F.scaled_dot_product_attention)
+three tokens, ours   : [[7.1797, 2.8203], [2.8203, 7.1797], [5.0, 5.0]]
+three tokens, library: [[7.1797, 2.8203], [2.8203, 7.1797], [5.0, 5.0]]
+max abs difference: 4.8e-07
+random (batch 2, heads 8, n 10, d_k 64): output (2, 8, 10, 64), max abs difference 6.0e-07
+== 3. The causal mask, built by hand (n = 5, d_k = 4)
+same as torch.tril(ones): True
+allowed (1 = may look, 0 = future)  shape (5, 5)
+    1  0  0  0  0
+    1  1  0  0  0
+    1  1  1  0  0
+    1  1  1  1  0
+    1  1  1  1  1
+scores before the mask  shape (5, 5)
+    -0.212   0.955   0.141   0.252  -0.031
+    -0.057   0.968   0.105   0.652  -1.325
+     0.165   0.101  -0.190   0.419  -0.887
+     0.589  -1.212  -0.498   0.380  -1.627
+    -0.513   0.422   0.423   0.672  -0.942
+scores after the mask  shape (5, 5)
+    -0.212    -inf    -inf    -inf    -inf
+    -0.057   0.968    -inf    -inf    -inf
+     0.165   0.101  -0.190    -inf    -inf
+     0.589  -1.212  -0.498   0.380    -inf
+    -0.513   0.422   0.423   0.672  -0.942
+weights  shape (5, 5)
+     1.000   0.000   0.000   0.000   0.000
+     0.264   0.736   0.000   0.000   0.000
+     0.379   0.355   0.266   0.000   0.000
+     0.432   0.071   0.146   0.351   0.000
+     0.100   0.254   0.255   0.326   0.065
+ours vs library is_causal=True: max abs difference 1.5e-07
+ours vs library attn_mask=allowed: max abs difference 1.5e-07
+== 4. Multi-head attention from scratch, shape after every line (batch 2, n 5, d_model 16, h 4)
+x                                    (2, 5, 16)   (batch, n, d_model)
+Q = x W_Q + b_Q                      (2, 5, 16)   (batch, n, d_model)
+Q.view(batch, n, h, d_k)             (2, 5, 4, 4)   (batch, n, h, d_k)
+.transpose(1, 2)                     (2, 4, 5, 4)   (batch, h, n, d_k)
+K, V the same way                    (2, 4, 5, 4)   (batch, h, n, d_k)
+Q K^T / sqrt(d_k)                    (2, 4, 5, 5)   (batch, h, n, n)
+softmax over the last axis           (2, 4, 5, 5)   (batch, h, n, n)
+weights V                            (2, 4, 5, 4)   (batch, h, n, d_k)
+.transpose(1, 2)                     (2, 5, 4, 4)   (batch, n, h, d_k)
+.reshape(batch, n, h * d_k)          (2, 5, 16)   (batch, n, d_model)
+concat W_O + b_O                     (2, 5, 16)   (batch, n, d_model)
+step by step vs multi_head_attention(): max abs difference 0.0e+00
+== 4b. Method 2: torch.nn.MultiheadAttention with the same weights
+library output (2, 5, 16), weights (2, 4, 5, 5)
+output : max abs difference 4.8e-07
+weights: max abs difference 1.2e-07
+with the causal mask (library gets ~mask): max abs difference 3.6e-07
+parameters: 1088 = 4 x 16 x 16 + 4 x 16
+== 5. Our multi_head_attention() on the weights of Helsinki-NLP/opus-mt-en-de
+source 12 tokens, decoder input 14 tokens
+encoder self-attention : x (1, 12, 512) -> weights (1, 8, 12, 12), max abs difference 1.5e-06
+decoder self-attention : x (1, 14, 512) -> weights (1, 8, 14, 14), max abs difference 3.3e-06
+cross-attention        : queries (1, 14, 512) from the decoder, keys and values (1, 12, 512) from the encoder
+                         -> weights (1, 8, 14, 12) -> output (1, 14, 512), max abs difference 1.2e-05
+largest output value of each block: encoder self-attention 4.3, decoder self-attention 8.0, cross-attention 26.2
+cross-attention layer 1, query "Katze", mean of 8 heads, top keys: [('</s>', 0.64), ('▁cat', 0.15), ('.', 0.05)]
+== 6. Common mistakes (encoder layer 1 of Marian, and the 5-token causal example)
+mistake 1, no scale:
+  query "it", head 1: top weight 0.75 with the scale, 1.00 without
+  largest weight in any row, all heads: 0.866 with the scale, 1.000 without
+  output: max abs difference from the library 3.36
+mistake 2, mask after the softmax (5-token example of section 3):
+  weights, mask after softmax  shape (5, 5)
+     0.119   0.000   0.000   0.000   0.000
+     0.137   0.383   0.000   0.000   0.000
+     0.234   0.219   0.164   0.000   0.000
+     0.413   0.068   0.139   0.335   0.000
+     0.100   0.254   0.255   0.326   0.065
+  row sums: [0.119, 0.52, 0.617, 0.955, 1.0]  (correct: all 1.0)
+  variant: masked scores set to 0, not -inf; weight on the future per row: [0.832, 0.456, 0.391, 0.193, 0.0]
+mistake 3, wrong axes:
+  split with view(batch, h, n, d_k), no transpose: shapes (1, 8, 12, 64) (look right), max abs difference 3.84
+  right split, but merge with reshape and no transpose: output (1, 12, 512), max abs difference 4.57
+  right split and right merge: max abs difference 1.5e-06

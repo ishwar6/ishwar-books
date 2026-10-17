@@ -1,0 +1,234 @@
+{
+ "work": [
+  {
+   "name": "self-attention core (QK^T and weights V)",
+   "ours": 746496,
+   "counter": 746496
+  },
+  {
+   "name": "self-attention projections W_Q W_K W_V W_O",
+   "ours": 28311552,
+   "counter": 28311552
+  },
+  {
+   "name": "recurrent chain h U (n steps)",
+   "ours": 7077888,
+   "counter": 7077888
+  },
+  {
+   "name": "recurrent input x W",
+   "ours": 7077888,
+   "counter": 7077888
+  },
+  {
+   "name": "convolution, k = 3",
+   "ours": 21233664,
+   "counter": 21233664
+  },
+  {
+   "name": "separable convolution, k = 3",
+   "ours": 7119360,
+   "counter": 7119360
+  }
+ ],
+ "separable_eq": true,
+ "depth": [
+  {
+   "n": 4,
+   "attn": 7,
+   "rnn": 20
+  },
+  {
+   "n": 16,
+   "attn": 7,
+   "rnn": 80
+  },
+  {
+   "n": 64,
+   "attn": 7,
+   "rnn": 320
+  },
+  {
+   "n": 256,
+   "attn": 7,
+   "rnn": 1280
+  }
+ ],
+ "paths": [
+  {
+   "n": 8,
+   "attn": 1,
+   "rnn": 7,
+   "conv": 4,
+   "dilated": 2,
+   "local": 4,
+   "local17": 1
+  },
+  {
+   "n": 27,
+   "attn": 1,
+   "rnn": 26,
+   "conv": 13,
+   "dilated": 3,
+   "local": 13,
+   "local17": 4
+  },
+  {
+   "n": 64,
+   "attn": 1,
+   "rnn": 63,
+   "conv": 32,
+   "dilated": 4,
+   "local": 32,
+   "local17": 8
+  },
+  {
+   "n": 100,
+   "attn": 1,
+   "rnn": 99,
+   "conv": 50,
+   "dilated": 5,
+   "local": 50,
+   "local17": 13
+  }
+ ],
+ "local_mask": [
+  [
+   1,
+   1,
+   1,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   1,
+   1,
+   1,
+   1,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   1,
+   1,
+   1,
+   1,
+   1,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   0,
+   1,
+   1,
+   1,
+   1,
+   1,
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   0,
+   0,
+   1,
+   1,
+   1,
+   1,
+   1,
+   0,
+   0,
+   0
+  ],
+  [
+   0,
+   0,
+   0,
+   1,
+   1,
+   1,
+   1,
+   1,
+   0,
+   0
+  ],
+  [
+   0,
+   0,
+   0,
+   0,
+   1,
+   1,
+   1,
+   1,
+   1,
+   0
+  ],
+  [
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   1,
+   1,
+   1,
+   1
+  ],
+  [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   1,
+   1,
+   1
+  ],
+  [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   1,
+   1
+  ]
+ ],
+ "local_flops": [
+  {
+   "n": 256,
+   "masked": 16777216,
+   "banded": 1114112
+  },
+  {
+   "n": 1024,
+   "masked": 268435456,
+   "banded": 4456448
+  },
+  {
+   "n": 4096,
+   "masked": 4294967296,
+   "banded": 17825792
+  }
+ ]
+}

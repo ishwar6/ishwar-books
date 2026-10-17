@@ -28,6 +28,20 @@ JOBS = [
     dict(name='p4-interpret', anchor='As side benefit, self-attention could yield more interpretable',
          highlight=['more interpretable models', 'individual attention', 'syntactic', 'semantic structure'],
          above=4, end='structure of the sentences.'),
+    dict(name='p4-shapes', anchor='In this section we compare various aspects of self-attention',
+         highlight=['another sequence of equal length (z1, ..., zn)', 'xi, zi ∈Rd', 'hidden layer in a typical sequence transduction encoder or decoder'],
+         above=4, end='three desiderata.'),
+    dict(name='p4-long-range', anchor='The third is the path length between long-range dependencies',
+         highlight=['key challenge in many sequence transduction tasks', 'paths forward and backward signals have to traverse in the network'],
+         above=4, end='traverse in the network.'),
+    dict(name='p4-dilated', anchor='A single convolutional layer with kernel width',
+         highlight=['O(n/k) convolutional layers in the case of contiguous kernels', 'O(logk(n)) in the case of dilated convolutions',
+                    'increasing the length of the longest paths'],
+         above=4, end='between any two positions in the network.'),
+    dict(name='p4-separable', anchor='Separable convolutions [6], however, decrease',
+         highlight=['decrease the complexity considerably', 'Even with k = n',
+                    'equal to the combination of a self-attention layer and a point-wise feed-forward layer'],
+         above=4, end='the approach we take in our model.'),
 ]
 
 if __name__ == '__main__':

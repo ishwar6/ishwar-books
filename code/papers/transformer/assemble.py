@@ -16,6 +16,7 @@ SLUGS = {
     '4': 'part-4-why-self-attention',
     '5': 'part-5-training',
     '6': 'part-6-results-and-impact',
+    '7': 'part-7-build-it-from-scratch',
 }
 EM_DASH = chr(0x2014)   # never allowed in the site's text
 BANNED = ['Alammar', 'ChatGPT', 'Miro ', 'lecture', 'YouTube', 'Vizuara', 'Claude']

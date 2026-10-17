@@ -81,5 +81,49 @@ def grad():
 
 
 F['p4_grad'] = grad()
+
+
+# ---------------------------------------------------------------- 3. restricted attention: the window mask and its band
+B = json.load(open(os.path.join(HERE, 'results', 'part4b.json')))
+
+
+def local():
+    M = B['local_mask']
+    n, cell = len(M), 24
+    r, half = 5, 2
+    x0, y0 = 50, 60
+    b = [text(20, 24, 'Restricted self-attention, n = 10, window r = 5', 't-title')]
+    b.append(text(x0, y0 - 12, 'mask: all n x n = 100 pairs', 't-note'))
+    for i in range(n):
+        b.append(text(x0 - 8, y0 + i * cell + 16, f'q{i + 1}', 't-tick', 'end'))
+        for j in range(n):
+            cls = 'box-1' if M[i][j] else 'box-ghost'
+            b.append(box(x0 + j * cell + 1, y0 + i * cell + 1, cell - 2, cell - 2, cls, 3))
+    for j in range(n):
+        b.append(text(x0 + j * cell + cell / 2, y0 + n * cell + 16, f'k{j + 1}', 't-tick', 'middle'))
+    ax = x0 + n * cell + 24
+    b.append(line(ax, y0 + n * cell / 2, ax + 60, y0 + n * cell / 2, 'edge-on', 'ah-on'))
+    b.append(text(ax + 30, y0 + n * cell / 2 - 10, 'keep the band', 't-tick', 'middle'))
+    x1 = ax + 100
+    b.append(text(x1, y0 - 12, 'band: n x r = 50 slots', 't-note'))
+    for i in range(n):
+        b.append(text(x1 - 8, y0 + i * cell + 16, f'q{i + 1}', 't-tick', 'end'))
+        for t in range(r):
+            j = i + t - half
+            ok = 0 <= j < n
+            b.append(box(x1 + t * cell + 1, y0 + i * cell + 1, cell - 2, cell - 2, 'box-1' if ok else 'box-ghost', 3))
+            if ok:
+                b.append(text(x1 + t * cell + cell / 2, y0 + i * cell + 16, f'{j + 1}', 't-tick', 'middle'))
+    for t in range(r):
+        b.append(text(x1 + t * cell + cell / 2, y0 + n * cell + 16, f'{t - half:+d}' if t != half else '0', 't-tick', 'middle'))
+    b.append(text(20, y0 + n * cell + 44, 'Left: a mask still computes all 100 scores and hides 56. Right: the band computes only the 44 '
+                  'real ones (number = key position);', 't-muted'))
+    b.append(text(20, y0 + n * cell + 60, 'the 6 empty slots at the ends are padding. The work falls from n x n to n x r.', 't-muted'))
+    return svg(x1 + r * cell + 330, y0 + n * cell + 72, 'Restricted self-attention for 10 tokens and a window of 5. On the left, the 10 by 10 mask, '
+               'with a diagonal band of 44 allowed pairs. On the right, the same band stored as 10 rows of 5 slots, so only the scores inside the window '
+               'are computed.', b)
+
+
+F['p4_local'] = local()
 json.dump(F, open(os.path.join(HERE, 'results', 'figs_part4.json'), 'w'), indent=1)
 print('wrote', list(F))

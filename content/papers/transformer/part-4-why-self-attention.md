@@ -1,6 +1,6 @@
 ---
 title: "Why Self-Attention: Cost, Steps and Paths"
-description: "Section 4 compares self-attention with recurrent and convolutional layers on three measures: work per layer, steps that must wait for each other, and the distance a signal must travel. We work out Table 1 with real numbers and measure all three on a laptop CPU."
+description: "Section 4 compares self-attention with recurrent and convolutional layers on three measures: work per layer, steps that must wait for each other, and the distance a signal must travel. We compute every column of Table 1 in Python, check the counts with a FLOP counter, and build the restricted attention window in code."
 part: 4
 covers: "§4, Table 1"
 date: 2026-10-18
@@ -29,6 +29,17 @@ Parts 2 and 3 showed what the Transformer is. Section 4 answers a different ques
 
 > [!DEFINITION] Sequence length $$n$$
 > The number of tokens in the input. A token is one word or one piece of a word. The sentence "The cat sat on the mat." is 8 tokens for the tokenizer of the translation model that we use below.
+
+> [!PAPER] · §4
+> [![The first sentence of Section 4, with another sequence of equal length (z1, ..., zn), xi and zi in R to the d, and hidden layer in a typical sequence transduction encoder or decoder highlighted](/img/papers/transformer/p4-shapes.png)](/img/papers/transformer/p4-shapes.png)
+>
+> **What it says:** each layer maps $$(x_1, ..., x_n)$$ to "another sequence of equal length $$(z_1, ..., z_n)$$", with $$x_i, z_i \in \mathbb{R}^d$$, "such as a hidden layer in a typical sequence transduction encoder or decoder".
+>
+> **What it means:**
+>
+> $$x_i \in \mathbb{R}^d$$ says that each input is a list of $$d$$ real numbers. The same is true of each output. So in code, all three layers take a tensor of shape $$(n, d)$$ and give back a tensor of shape $$(n, d)$$. You could take one layer out of a network and put another kind in its place, and the layers around it would not notice.
+>
+> This is what makes the comparison fair. The layers differ only in how the $$n$$ positions share information inside. "A hidden layer in a typical ... encoder or decoder" says where such a layer lives: in the middle of a stack, like one block of Part 2. The paper compares one layer of each kind here, not whole models.
 
 > [!PAPER] · §4
 > [![The paragraphs of Section 4 that name the three measures: total computational complexity per layer, minimum number of sequential operations required, and the path length between long-range dependencies](/img/papers/transformer/p4-desiderata.png)](/img/papers/transformer/p4-desiderata.png)
@@ -98,6 +109,104 @@ For a sentence of 27 tokens, the attention core needs about 19 times less work t
 
 One honest note. Table 1 counts only the part that differs between the layers. A real attention layer also multiplies every vector by the matrices $$W^Q$$, $$W^K$$, $$W^V$$ and $$W^O$$ of Part 3. That adds about $$4 \cdot n \cdot d^2$$, the same size as a recurrent layer. A real recurrent layer, such as an LSTM, also has several matrices. So the table compares the parts that grow differently, and leaves out the shared $$n \cdot d^2$$ terms.
 
+### Counting the work in code
+
+The counts above came from formulas. Now we count them from code, in two ways. Method 1 reads the shapes and multiplies, with one comment for each term. Method 2 runs the real layers under `FlopCounterMode`, a tool of PyTorch that watches every matrix product and adds up its cost.
+
+```python
+def count_self_attention(n, d):
+    """Multiply-adds of one self-attention layer, from the shapes (one head, as in Table 1)."""
+    scores = n * n * d          # Q K^T: n x n dot products, d multiply-adds each
+    mix = n * n * d             # weights V: n output rows, each a sum of n value vectors of d numbers
+    proj = 4 * n * d * d        # x W_Q, x W_K, x W_V and the output W_O: n vectors times a d x d matrix, four times
+    return scores + mix, proj
+
+def count_recurrent(n, d):
+    """Multiply-adds of one recurrent layer h_t = tanh(x_t W + h_{t-1} U)."""
+    chain = n * d * d           # h_{t-1} U: one d x d product per position, one after another
+    inp = n * d * d             # x_t W: the input part, also d x d per position
+    return chain, inp
+
+def count_conv(n, d, k):
+    """Multiply-adds of one convolution with kernel width k, d channels in and out."""
+    return k * n * d * d        # each of n outputs mixes k input vectors, each with a d x d matrix
+
+def count_separable(n, d, k):
+    """Multiply-adds of a depthwise separable convolution: a per-channel window, then a d x d mix."""
+    depthwise = k * n * d       # each channel has its own k numbers: no mixing across channels
+    pointwise = n * d * d       # a 1 x 1 convolution mixes the d channels at each position
+    return depthwise + pointwise
+
+def flops(fn, *args):
+    """FLOPs that PyTorch's own counter sees (it counts 2 FLOPs per multiply-add)."""
+    with FlopCounterMode(display=False) as fc:
+        fn(*args)
+    return fc.get_total_flops()
+```
+
+> [!DEFINITION] FLOP and multiply-add
+> A **FLOP** is one floating-point operation: one addition or one multiplication of two decimal numbers. A dot product of two vectors of $$d$$ numbers needs $$d$$ multiplications and about $$d$$ additions: about $$2d$$ FLOPs, or $$d$$ **multiply-adds**. PyTorch's counter reports FLOPs, so we divide its result by 2.
+
+> [!DEFINITION] Separable convolution
+> A convolution split into two steps. In the depthwise step, each of the $$d$$ channels slides its own window of $$k$$ numbers along the sentence. In the pointwise step, a $$d \times d$$ matrix at each position mixes the channels. The two steps cost $$k \cdot n \cdot d$$ and $$n \cdot d^2$$.
+
+The layers themselves are short functions. `attention_core` is the part of self-attention that Table 1 counts. `recurrent_chain` is the part of a recurrent layer that must wait. The convolutions come from PyTorch.
+
+```python
+def attention_core(q, k, v):
+    """The part of self-attention that Table 1 counts: the scores and the mix. q, k, v: (n, d)."""
+    return torch.softmax(q @ k.T / math.sqrt(q.shape[1]), dim=-1) @ v       # (n, d)
+
+def recurrent_chain(xw, U):
+    """The part of a recurrent layer that must wait: h_t = tanh(xw_t + h_(t-1) U), one position after another."""
+    h = torch.zeros(xw.shape[1])
+    for t in range(xw.shape[0]):        # h_t needs h_(t-1): no way to compute the steps at the same time
+        h = torch.tanh(xw[t] + h @ U)
+    return h                             # the last memory (d,)
+
+n, d, k = 27, 512, 3                                                       # 27 tokens, the base model's d
+x = torch.randn(n, d)                                                      # the input: n vectors of d numbers
+Wq, Wk, Wv, Wo, W, U = (torch.randn(d, d) / math.sqrt(d) for _ in range(6))
+conv = torch.nn.Conv1d(d, d, k, padding=1, bias=False)                     # contiguous kernel of width 3
+depthwise = torch.nn.Conv1d(d, d, k, padding=1, groups=d, bias=False)      # one small window per channel
+pointwise = torch.nn.Conv1d(d, d, 1, bias=False)                           # mixes the channels
+xc = x.T.unsqueeze(0)                                                      # Conv1d wants (batch, channels d, length n)
+```
+
+Then we count each part both ways, with $$n = 27$$ tokens and $$d = 512$$:
+
+```python
+core, proj = count_self_attention(n, d)
+chain, inp = count_recurrent(n, d)
+with torch.no_grad():
+    q, kk, v = x @ Wq, x @ Wk, x @ Wv
+    rows = [  # (part of the layer, Method 1: our count, Method 2: what PyTorch's counter sees)
+        ('self-attention core (QK^T and weights V)', core, flops(attention_core, q, kk, v)),
+        ('self-attention projections W_Q W_K W_V W_O', proj, flops(lambda: (x @ Wq, x @ Wk, x @ Wv, x @ Wo))),
+        ('recurrent chain h U (n steps)', chain, flops(recurrent_chain, x @ W, U)),
+        ('recurrent input x W', inp, flops(lambda: x @ W)),
+        ('convolution, k = 3', count_conv(n, d, k), flops(conv, xc)),
+        ('separable convolution, k = 3', count_separable(n, d, k), flops(lambda: pointwise(depthwise(xc)))),
+    ]
+```
+
+```text
+part of the layer                               our count  counter / 2  equal
+self-attention core (QK^T and weights V)          746,496      746,496  True
+self-attention projections W_Q W_K W_V W_O     28,311,552   28,311,552  True
+recurrent chain h U (n steps)                   7,077,888    7,077,888  True
+recurrent input x W                             7,077,888    7,077,888  True
+convolution, k = 3                             21,233,664   21,233,664  True
+separable convolution, k = 3                    7,119,360    7,119,360  True
+Table 1 terms: n^2 d = 373,248, n d^2 = 7,077,888, k n d^2 = 21,233,664, k n d + n d^2 = 7,119,360
+```
+
+Every row agrees to the last digit. So the formulas of Table 1 are not estimates. They are exact counts of the matrix products, without the constant factors. One of those factors is worth seeing. The attention core costs $$2 n^2 d = 746{,}496$$, not $$n^2 d = 373{,}248$$, because it has two products of that size: the scores and the mix. Big-O notation drops the 2.
+
+The second lesson is the honest note above, now in numbers. The four projections of attention cost 28,311,552 multiply-adds, the attention core only 746,496. For a short sentence, the projections are most of the cost of a real attention layer, and the $$n^2$$ term is small. Table 1 leaves them out, because a recurrent layer has the same kind of term. It is the input product $$x W$$, the row with 7,077,888.
+
+[![Terminal output of tx_part4b.py, the code walkthroughs of this page](/img/papers/transformer/part4b-run.png)](/img/papers/transformer/part4b-run.png)
+
 > [!PAPER] · §4
 > [![The lines of Section 4 that say a self-attention layer connects all positions with a constant number of sequentially executed operations, a recurrent layer requires O(n), and self-attention is faster when the sequence](/img/papers/transformer/p4-constant.png)](/img/papers/transformer/p4-constant.png)
 >
@@ -108,6 +217,59 @@ One honest note. Table 1 counts only the part that differs between the layers. A
 > Picture a relay race and a swimming race. In a relay, runner 2 cannot start before runner 1 hands over the baton. Four runners take four legs of time. In a swimming race, all swimmers start at the same moment. Eight swimmers take the time of one length.
 >
 > A recurrent layer is a relay: the memory after word $$t$$ needs the memory after word $$t-1$$. Self-attention is the swimming race. The scores of all $$n \times n$$ pairs are independent, so one large matrix product computes them all at once. That is why "sequential operations" is $$O(n)$$ for one and $$O(1)$$ for the other.
+
+### Counting the waiting steps in code
+
+We can measure this column too. PyTorch records every operation of a computation in a graph, to compute the gradients later. Each operation points to the operations whose results it used. The longest chain in that graph is the number of steps that must run one after another, whatever the hardware.
+
+> [!DEFINITION] Autograd graph
+> The record that PyTorch keeps of a computation: one node for each operation, with links to the operations that made its inputs. PyTorch walks it backwards to compute gradients. Its longest chain shows which steps must wait for each other.
+
+```python
+def graph_depth(t):
+    """The longest chain of operations from the output back to the inputs, in PyTorch's autograd graph.
+    Operations on one chain must run one after another; operations on different chains can run in parallel."""
+    memo = {}
+
+    def depth(node):
+        if node is None:
+            return 0
+        if node not in memo:
+            parents = [p for p, _ in node.next_functions]
+            memo[node] = 1 + max([depth(p) for p in parents] or [0])
+        return memo[node]
+    return depth(t.grad_fn)
+
+def self_attention_layer(x, Wq, Wk, Wv):
+    """A whole self-attention layer (one head): the projections, then the core."""
+    return attention_core(x @ Wq, x @ Wk, x @ Wv)                            # (n, d)
+
+def recurrent_layer(x, W, U):
+    """A whole recurrent layer: the input part x W for all positions at once, then the chain."""
+    return recurrent_chain(x @ W, U)
+```
+
+We give the weights `requires_grad=True`, so that PyTorch records the graph. Then we measure both layers for four lengths:
+
+```python
+dd = 64
+Aq, Ak, Av, Wr, Ur = (torch.randn(dd, dd, requires_grad=True) for _ in range(5))
+for n2 in [4, 16, 64, 256]:
+    xs = torch.randn(n2, dd)
+    da = graph_depth(self_attention_layer(xs, Aq, Ak, Av))
+    dr = graph_depth(recurrent_layer(xs, Wr, Ur))
+```
+
+```text
+== 2. Sequential operations: longest chain in the autograd graph (d = 64)
+     n  self-attention  recurrent
+     4               7         20
+    16               7         80
+    64               7        320
+   256               7       1280
+```
+
+For self-attention, the longest chain has 7 operations at every length: a few matrix products, the scale and the softmax. A longer sentence makes each product larger, but it does not add a link to the chain. The recurrent chain grows in step with $$n$$: 20 operations for 4 tokens, 1,280 for 256 tokens. This is the second column of Table 1, measured: $$O(1)$$ against $$O(n)$$. A GPU can run the many multiplications inside one attention product at the same time. It cannot start step 2 of the recurrent chain before step 1 ends.
 
 > [!PAPER] · §4
 > [![The lines of Section 4 that end the sentence: the sequence length n is smaller than the representation dimensionality d, which is most often the case, with word-piece and byte-pair representations](/img/papers/transformer/p4-n-smaller-d.png)](/img/papers/transformer/p4-n-smaller-d.png)
@@ -160,6 +322,20 @@ Two limits apply to this test. It ran on a laptop CPU with 4 threads, in PyTorch
 
 ## The path between two words {§4}
 
+> [!PAPER] · §4
+> [![The lines of Section 4 about long-range dependencies, with key challenge in many sequence transduction tasks and paths forward and backward signals have to traverse in the network highlighted](/img/papers/transformer/p4-long-range.png)](/img/papers/transformer/p4-long-range.png)
+>
+> **What it says:** "Learning long-range dependencies is a key challenge in many sequence transduction tasks." One key factor is "the length of the paths forward and backward signals have to traverse in the network".
+>
+> **What it means:**
+>
+> A long-range dependency is a link between two words far apart, like "keys ... are" above. The network must carry information along a path from one word to the other. The forward signal is the information itself, on its way to the output. The backward signal is the gradient, on its way back from the loss to the weights that must change.
+>
+> Both signals pass through every step of the path, and each step can weaken or blur them. So the paper measures a layer by the longest path it creates between two positions. It does not count the work along the path, only the number of steps.
+
+> [!DEFINITION] Long-range dependency
+> A link between two positions far apart in a sequence, where one affects the other. In "The keys that the man left on the table are lost", the verb "are" depends on "keys", eight words back.
+
 The third column of Table 1 is about learning, not speed. The figure below draws the three layers for a sentence of 8 words. The bold lines show the shortest route from word 1 to the output at word 8.
 
 <figure class="fig"><svg viewBox="0 0 780 326" role="img" aria-label="Three ways to connect 8 words. A recurrent layer passes the signal from word 1 through a chain of 7 steps. A dilated convolution with kernel 3 needs 2 layers. A self-attention layer connects every word to the output in 1 step."><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0,0L10,5L0,10z"/></marker><marker id="ah-on" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-on" d="M0,0L10,5L0,10z"/></marker><marker id="ah-2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-2" d="M0,0L10,5L0,10z"/></marker></defs><text class="t-title" x="20.0" y="24.0" text-anchor="start">How many steps from word 1 to the output at word 8?</text><text class="t-note" x="32.0" y="52.0" text-anchor="start">Recurrent: 7 steps, one after another</text><line class="edge-on" x1="53.0" y1="165.0" x2="59.0" y2="165.0"/><line class="edge-on" x1="81.0" y1="165.0" x2="87.0" y2="165.0"/><line class="edge-on" x1="109.0" y1="165.0" x2="115.0" y2="165.0"/><line class="edge-on" x1="137.0" y1="165.0" x2="143.0" y2="165.0"/><line class="edge-on" x1="165.0" y1="165.0" x2="171.0" y2="165.0"/><line class="edge-on" x1="193.0" y1="165.0" x2="199.0" y2="165.0"/><line class="edge-on" x1="221.0" y1="165.0" x2="227.0" y2="165.0"/><line class="edge-on" x1="42.0" y1="239.0" x2="42.0" y2="176.0"/><rect class="box" x="31.0" y="239.0" width="22.0" height="22.0" rx="11"/><rect class="box-1" x="31.0" y="154.0" width="22.0" height="22.0" rx="11"/><line class="edge-dim" x1="70.0" y1="239.0" x2="70.0" y2="176.0"/><rect class="box" x="59.0" y="239.0" width="22.0" height="22.0" rx="11"/><rect class="box-1" x="59.0" y="154.0" width="22.0" height="22.0" rx="11"/><line class="edge-dim" x1="98.0" y1="239.0" x2="98.0" y2="176.0"/><rect class="box" x="87.0" y="239.0" width="22.0" height="22.0" rx="11"/><rect class="box-1" x="87.0" y="154.0" width="22.0" height="22.0" rx="11"/><line class="edge-dim" x1="126.0" y1="239.0" x2="126.0" y2="176.0"/><rect class="box" x="115.0" y="239.0" width="22.0" height="22.0" rx="11"/><rect class="box-1" x="115.0" y="154.0" width="22.0" height="22.0" rx="11"/><line class="edge-dim" x1="154.0" y1="239.0" x2="154.0" y2="176.0"/><rect class="box" x="143.0" y="239.0" width="22.0" height="22.0" rx="11"/><rect class="box-1" x="143.0" y="154.0" width="22.0" height="22.0" rx="11"/><line class="edge-dim" x1="182.0" y1="239.0" x2="182.0" y2="176.0"/><rect class="box" x="171.0" y="239.0" width="22.0" height="22.0" rx="11"/><rect class="box-1" x="171.0" y="154.0" width="22.0" height="22.0" rx="11"/><line class="edge-dim" x1="210.0" y1="239.0" x2="210.0" y2="176.0"/><rect class="box" x="199.0" y="239.0" width="22.0" height="22.0" rx="11"/><rect class="box-1" x="199.0" y="154.0" width="22.0" height="22.0" rx="11"/><line class="edge-dim" x1="238.0" y1="239.0" x2="238.0" y2="176.0"/><rect class="box" x="227.0" y="239.0" width="22.0" height="22.0" rx="11"/><rect class="box-1" x="227.0" y="154.0" width="22.0" height="22.0" rx="11"/><line class="edge-on" x1="238.0" y1="154.0" x2="238.0" y2="91.0"/><rect class="box-3" x="227.0" y="69.0" width="22.0" height="22.0" rx="11"/><text class="t-note" x="292.0" y="52.0" text-anchor="start">Dilated convolution (k = 3): 2 layers</text><line class="edge-on" x1="302.0" y1="239.0" x2="330.0" y2="176.0"/><line class="edge-dim" x1="330.0" y1="239.0" x2="330.0" y2="176.0"/><line class="edge-dim" x1="358.0" y1="239.0" x2="330.0" y2="176.0"/><line class="edge-on" x1="330.0" y1="154.0" x2="498.0" y2="91.0"/><line class="edge-dim" x1="386.0" y1="239.0" x2="414.0" y2="176.0"/><line class="edge-dim" x1="414.0" y1="239.0" x2="414.0" y2="176.0"/><line class="edge-dim" x1="442.0" y1="239.0" x2="414.0" y2="176.0"/><line class="edge-dim" x1="414.0" y1="154.0" x2="498.0" y2="91.0"/><line class="edge-dim" x1="470.0" y1="239.0" x2="498.0" y2="176.0"/><line class="edge-dim" x1="498.0" y1="239.0" x2="498.0" y2="176.0"/><line class="edge-dim" x1="498.0" y1="154.0" x2="498.0" y2="91.0"/><rect class="box" x="291.0" y="239.0" width="22.0" height="22.0" rx="11"/><rect class="box" x="319.0" y="239.0" width="22.0" height="22.0" rx="11"/><rect class="box" x="347.0" y="239.0" width="22.0" height="22.0" rx="11"/><rect class="box" x="375.0" y="239.0" width="22.0" height="22.0" rx="11"/><rect class="box" x="403.0" y="239.0" width="22.0" height="22.0" rx="11"/><rect class="box" x="431.0" y="239.0" width="22.0" height="22.0" rx="11"/><rect class="box" x="459.0" y="239.0" width="22.0" height="22.0" rx="11"/><rect class="box" x="487.0" y="239.0" width="22.0" height="22.0" rx="11"/><rect class="box-1" x="319.0" y="154.0" width="22.0" height="22.0" rx="11"/><rect class="box-1" x="403.0" y="154.0" width="22.0" height="22.0" rx="11"/><rect class="box-1" x="487.0" y="154.0" width="22.0" height="22.0" rx="11"/><rect class="box-3" x="487.0" y="69.0" width="22.0" height="22.0" rx="11"/><text class="t-note" x="552.0" y="52.0" text-anchor="start">Self-attention: 1 step from every word</text><line class="edge-on" x1="562.0" y1="239.0" x2="758.0" y2="91.0"/><rect class="box" x="551.0" y="239.0" width="22.0" height="22.0" rx="11"/><line class="edge-dim" x1="590.0" y1="239.0" x2="758.0" y2="91.0"/><rect class="box" x="579.0" y="239.0" width="22.0" height="22.0" rx="11"/><line class="edge-dim" x1="618.0" y1="239.0" x2="758.0" y2="91.0"/><rect class="box" x="607.0" y="239.0" width="22.0" height="22.0" rx="11"/><line class="edge-dim" x1="646.0" y1="239.0" x2="758.0" y2="91.0"/><rect class="box" x="635.0" y="239.0" width="22.0" height="22.0" rx="11"/><line class="edge-dim" x1="674.0" y1="239.0" x2="758.0" y2="91.0"/><rect class="box" x="663.0" y="239.0" width="22.0" height="22.0" rx="11"/><line class="edge-dim" x1="702.0" y1="239.0" x2="758.0" y2="91.0"/><rect class="box" x="691.0" y="239.0" width="22.0" height="22.0" rx="11"/><line class="edge-dim" x1="730.0" y1="239.0" x2="758.0" y2="91.0"/><rect class="box" x="719.0" y="239.0" width="22.0" height="22.0" rx="11"/><line class="edge-dim" x1="758.0" y1="239.0" x2="758.0" y2="91.0"/><rect class="box" x="747.0" y="239.0" width="22.0" height="22.0" rx="11"/><rect class="box-3" x="747.0" y="69.0" width="22.0" height="22.0" rx="11"/><text class="t-tick" x="42.0" y="280.0" text-anchor="middle">word 1</text><text class="t-tick" x="238.0" y="280.0" text-anchor="middle">word 8</text><text class="t-tick" x="302.0" y="280.0" text-anchor="middle">word 1</text><text class="t-tick" x="498.0" y="280.0" text-anchor="middle">word 8</text><text class="t-tick" x="562.0" y="280.0" text-anchor="middle">word 1</text><text class="t-tick" x="758.0" y="280.0" text-anchor="middle">word 8</text><text class="t-muted" x="20.0" y="312.0" text-anchor="start">Bold lines: the shortest path from word 1 to the output at word 8. The longer the path, the harder the signal is to learn.</text></svg><figcaption>The maximum path length of Table 1, drawn for 8 words. A recurrent layer passes word 1 through a chain of 7 memory updates. A dilated convolution with kernel 3 reaches it in 2 layers. Self-attention reaches it in 1 step.</figcaption></figure>
@@ -190,6 +366,66 @@ The numbers tell the story of the third column. In the recurrent network, the fi
 
 This test has limits too. The weights are random, not trained. A trained LSTM keeps gradients much better than our plain tanh network, because its gates were designed for this problem. And the input at distance 0 is larger in attention because it also feeds the query of the last position. The test shows the shape of the effect, not the size it has in a real trained model.
 
+### The path length in code
+
+The figure above draws the paths for 8 words. Code can count them for any length. The idea is to describe one layer by a table of links. Entry $$(i, j)$$ is True if output $$i$$ reads input $$j$$ directly. A stack of layers is the product of their tables, with True and False in place of numbers. We stack layers until the last output depends on the first input.
+
+```python
+def window_links(n, offsets):
+    """links[i, j] = True if output i of one layer reads input j directly, for j = i + offset.
+    A one-sided kernel of width 3 has offsets (0, -1, -2); dilated by 3 it has (0, -3, -6)."""
+    links = torch.zeros(n, n, dtype=torch.bool)
+    for i in range(n):
+        for o in offsets:
+            if 0 <= i + o < n:
+                links[i, i + o] = True
+    return links
+
+def layers_to_connect(n, layer_links):
+    """Stack layers until the last output depends on the first input; return how many layers that takes.
+    layer_links(L) gives the links of layer L. The dependency of a stack is the boolean product of its layers."""
+    reach = torch.eye(n, dtype=torch.bool)           # before any layer, each position depends only on itself
+    for L in range(1, 10 * n):
+        reach = (layer_links(L).int() @ reach.int()) > 0
+        if reach[n - 1, 0]:                          # output n now depends on input 1
+            return L
+    return None
+
+def recurrent_path(n):
+    """x_1 enters the memory at h_1. To reach the output z_n = h_n, it must pass h_1 -> h_2 -> ... -> h_n."""
+    t, hops = 1, 0                        # x_1 is now inside h_1
+    while t < n:
+        t += 1                            # one recurrent step: h_t is computed from h_(t-1)
+        hops += 1
+    return hops
+```
+
+Each layer type is one table of links. Self-attention links every pair. A convolution with kernel 3 links each output to its own position and the two before it. A dilated convolution spreads the same three links further apart in each layer: 1, 3 and 9 positions. Restricted attention links each output to the $$r$$ inputs centred on it.
+
+```python
+k = 3
+for n2 in [8, 27, 64, 100]:
+    full = torch.ones(n2, n2, dtype=torch.bool)
+    p_attn = layers_to_connect(n2, lambda L: full)                                       # every query sees every key
+    p_conv = layers_to_connect(n2, lambda L: window_links(n2, [0, -1, -2]))               # kernel 3, contiguous
+    p_dil = layers_to_connect(n2, lambda L: window_links(n2, [0, -k ** (L - 1), -2 * k ** (L - 1)]))   # dilation 1, 3, 9, ...
+    p_loc = layers_to_connect(n2, lambda L: window_links(n2, range(-2, 3)))               # window of r = 5, centred
+    p_loc17 = layers_to_connect(n2, lambda L: window_links(n2, range(-8, 9)))             # window of r = 17, centred
+    p_rnn = recurrent_path(n2)
+```
+
+```text
+    n  self-attn  recurrent  conv k=3  dilated k=3  restricted r=5  r=17
+    8          1          7         4            2               4     1
+   27          1         26        13            3              13     4
+   64          1         63        32            4              32     8
+  100          1         99        50            5              50    13
+```
+
+Read the row for $$n = 27$$. Self-attention needs 1 layer, the recurrent layer 26 steps, the contiguous convolution 13 layers and the dilated convolution 3. These are the counts of Table 1: $$O(1)$$, $$O(n)$$, $$O(n/k)$$ and $$O(\log_k n)$$. The last two columns are restricted attention. With a window of 5, it needs 13 layers, because each layer reaches only 2 positions further. A window of 17 reaches 8 positions per layer and needs 4: the $$O(n/r)$$ of the last row of Table 1.
+
+Our convolutions are one-sided: each output looks only at its own position and earlier ones. The decoder of ByteNet, reference [18] of the paper, works this way. Their reach matches the $$\log_k(n)$$ of the paper exactly. A centred kernel reaches as many positions, but half of them on each side.
+
 ## When sentences get long {§4}
 
 > [!PAPER] · §4
@@ -205,6 +441,97 @@ This test has limits too. The weights are random, not trained. A trained LSTM ke
 >
 > "Future work" turned out to be a large field. Many later models for long text use some form of local or sparse attention, often with a few global tokens to keep paths short. The trade-off in this one sentence is the same trade-off they all balance.
 
+### Restricted attention in code
+
+The window is one more mask, like the decoder mask of Part 3. Query $$i$$ may look at key $$j$$ only if the two are at most $$\lfloor r/2 \rfloor$$ positions apart. Here is the mask for 10 tokens and a window of $$r = 5$$, built with two loops:
+
+```python
+n2, r = 10, 5
+half = r // 2
+local = torch.zeros(n2, n2, dtype=torch.bool)
+for i in range(n2):
+    for j in range(n2):
+        local[i, j] = abs(i - j) <= half        # key j is inside the window of query i
+```
+
+```text
+window mask (1 = may look):
+   1 1 1 0 0 0 0 0 0 0
+   1 1 1 1 0 0 0 0 0 0
+   1 1 1 1 1 0 0 0 0 0
+   0 1 1 1 1 1 0 0 0 0
+   0 0 1 1 1 1 1 0 0 0
+   0 0 0 1 1 1 1 1 0 0
+   0 0 0 0 1 1 1 1 1 0
+   0 0 0 0 0 1 1 1 1 1
+   0 0 0 0 0 0 1 1 1 1
+   0 0 0 0 0 0 0 1 1 1
+allowed pairs: 44 of 100 (at most r = 5 per row)
+```
+
+The mask is a band along the diagonal. Each row has at most 5 ones. The rows at the two ends have fewer, because their window runs past the end of the sentence. Our attention function with this mask gives the same output as the library with the same mask.
+
+```python
+def masked_attention(q, k, v, mask):
+    """Equation 1 with a mask: computes all n x n scores, then hides the ones outside the window."""
+    scores = q @ k.T / math.sqrt(q.shape[-1])
+    scores = scores.masked_fill(~mask, float('-inf'))
+    return torch.softmax(scores, dim=-1) @ v
+```
+
+There is a catch. The masked version still computes all $$n \times n$$ scores, and then throws most of them away. It saves no work at all. To get the $$r \cdot n \cdot d$$ of Table 1, the code must compute only the scores inside the window. `banded_attention` does that. For each query, it cuts out the $$r$$ keys and values of its window with `unfold`, and computes $$r$$ dot products.
+
+```python
+def banded_attention(q, k, v, r):
+    """The same result, but each query computes only its r scores: n * r work in place of n * n."""
+    n, d = q.shape
+    half = r // 2
+    kp = F.pad(k, (0, 0, half, half))                # (n + 2 half, d): zero rows before the start and after the end
+    vp = F.pad(v, (0, 0, half, half))
+    k_win = kp.unfold(0, r, 1)                       # (n, d, r): for query i, the keys i - half ... i + half
+    v_win = vp.unfold(0, r, 1)                       # (n, d, r)
+    scores = (q.unsqueeze(1) @ k_win).squeeze(1) / math.sqrt(d)    # (n, r): r dot products per query
+    pos = torch.arange(n).unsqueeze(1) + torch.arange(r) - half      # (n, r): the real position of each window slot
+    scores = scores.masked_fill((pos < 0) | (pos >= n), float('-inf'))   # slots outside the sentence are padding
+    w = torch.softmax(scores, dim=-1)                # (n, r)
+    return (v_win @ w.unsqueeze(2)).squeeze(2)       # (n, d): mix the r values of each window
+
+q, kk, v = torch.randn(n2, 16), torch.randn(n2, 16), torch.randn(n2, 16)
+o_mask = masked_attention(q, kk, v, local)
+o_lib = F.scaled_dot_product_attention(q, kk, v, attn_mask=local)
+o_band = banded_attention(q, kk, v, r)
+d_lib = (o_mask - o_lib).abs().max().item()       # Method 1 (our mask) against Method 2 (the library)
+d_band = (o_band - o_mask).abs().max().item()     # the banded version against the masked one
+```
+
+```text
+masked (ours) vs F.scaled_dot_product_attention(attn_mask): max abs difference 0.0e+00
+banded (n * r scores) vs masked (n * n scores):              max abs difference 1.2e-07
+```
+
+<figure class="fig"><svg viewBox="0 0 864 372" role="img" aria-label="Restricted self-attention for 10 tokens and a window of 5. On the left, the 10 by 10 mask, with a diagonal band of 44 allowed pairs. On the right, the same band stored as 10 rows of 5 slots, so only the scores inside the window are computed."><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0,0L10,5L0,10z"/></marker><marker id="ah-on" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-on" d="M0,0L10,5L0,10z"/></marker><marker id="ah-2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-2" d="M0,0L10,5L0,10z"/></marker></defs><text class="t-title" x="20.0" y="24.0" text-anchor="start">Restricted self-attention, n = 10, window r = 5</text><text class="t-note" x="50.0" y="48.0" text-anchor="start">mask: all n x n = 100 pairs</text><text class="t-tick" x="42.0" y="76.0" text-anchor="end">q1</text><rect class="box-1" x="51.0" y="61.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="75.0" y="61.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="99.0" y="61.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="123.0" y="61.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="147.0" y="61.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="171.0" y="61.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="195.0" y="61.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="219.0" y="61.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="243.0" y="61.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="267.0" y="61.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="42.0" y="100.0" text-anchor="end">q2</text><rect class="box-1" x="51.0" y="85.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="75.0" y="85.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="99.0" y="85.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="123.0" y="85.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="147.0" y="85.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="171.0" y="85.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="195.0" y="85.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="219.0" y="85.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="243.0" y="85.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="267.0" y="85.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="42.0" y="124.0" text-anchor="end">q3</text><rect class="box-1" x="51.0" y="109.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="75.0" y="109.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="99.0" y="109.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="123.0" y="109.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="147.0" y="109.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="171.0" y="109.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="195.0" y="109.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="219.0" y="109.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="243.0" y="109.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="267.0" y="109.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="42.0" y="148.0" text-anchor="end">q4</text><rect class="box-ghost" x="51.0" y="133.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="75.0" y="133.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="99.0" y="133.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="123.0" y="133.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="147.0" y="133.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="171.0" y="133.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="195.0" y="133.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="219.0" y="133.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="243.0" y="133.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="267.0" y="133.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="42.0" y="172.0" text-anchor="end">q5</text><rect class="box-ghost" x="51.0" y="157.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="75.0" y="157.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="99.0" y="157.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="123.0" y="157.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="147.0" y="157.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="171.0" y="157.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="195.0" y="157.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="219.0" y="157.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="243.0" y="157.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="267.0" y="157.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="42.0" y="196.0" text-anchor="end">q6</text><rect class="box-ghost" x="51.0" y="181.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="75.0" y="181.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="99.0" y="181.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="123.0" y="181.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="147.0" y="181.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="171.0" y="181.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="195.0" y="181.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="219.0" y="181.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="243.0" y="181.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="267.0" y="181.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="42.0" y="220.0" text-anchor="end">q7</text><rect class="box-ghost" x="51.0" y="205.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="75.0" y="205.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="99.0" y="205.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="123.0" y="205.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="147.0" y="205.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="171.0" y="205.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="195.0" y="205.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="219.0" y="205.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="243.0" y="205.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="267.0" y="205.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="42.0" y="244.0" text-anchor="end">q8</text><rect class="box-ghost" x="51.0" y="229.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="75.0" y="229.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="99.0" y="229.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="123.0" y="229.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="147.0" y="229.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="171.0" y="229.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="195.0" y="229.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="219.0" y="229.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="243.0" y="229.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="267.0" y="229.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="42.0" y="268.0" text-anchor="end">q9</text><rect class="box-ghost" x="51.0" y="253.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="75.0" y="253.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="99.0" y="253.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="123.0" y="253.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="147.0" y="253.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="171.0" y="253.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="195.0" y="253.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="219.0" y="253.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="243.0" y="253.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="267.0" y="253.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="42.0" y="292.0" text-anchor="end">q10</text><rect class="box-ghost" x="51.0" y="277.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="75.0" y="277.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="99.0" y="277.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="123.0" y="277.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="147.0" y="277.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="171.0" y="277.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="195.0" y="277.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="219.0" y="277.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="243.0" y="277.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="267.0" y="277.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="62.0" y="316.0" text-anchor="middle">k1</text><text class="t-tick" x="86.0" y="316.0" text-anchor="middle">k2</text><text class="t-tick" x="110.0" y="316.0" text-anchor="middle">k3</text><text class="t-tick" x="134.0" y="316.0" text-anchor="middle">k4</text><text class="t-tick" x="158.0" y="316.0" text-anchor="middle">k5</text><text class="t-tick" x="182.0" y="316.0" text-anchor="middle">k6</text><text class="t-tick" x="206.0" y="316.0" text-anchor="middle">k7</text><text class="t-tick" x="230.0" y="316.0" text-anchor="middle">k8</text><text class="t-tick" x="254.0" y="316.0" text-anchor="middle">k9</text><text class="t-tick" x="278.0" y="316.0" text-anchor="middle">k10</text><line class="edge-on" x1="314.0" y1="180.0" x2="374.0" y2="180.0" marker-end="url(#ah-on)"/><text class="t-tick" x="344.0" y="170.0" text-anchor="middle">keep the band</text><text class="t-note" x="414.0" y="48.0" text-anchor="start">band: n x r = 50 slots</text><text class="t-tick" x="406.0" y="76.0" text-anchor="end">q1</text><rect class="box-ghost" x="415.0" y="61.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="439.0" y="61.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="463.0" y="61.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="474.0" y="76.0" text-anchor="middle">1</text><rect class="box-1" x="487.0" y="61.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="498.0" y="76.0" text-anchor="middle">2</text><rect class="box-1" x="511.0" y="61.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="522.0" y="76.0" text-anchor="middle">3</text><text class="t-tick" x="406.0" y="100.0" text-anchor="end">q2</text><rect class="box-ghost" x="415.0" y="85.0" width="22.0" height="22.0" rx="3"/><rect class="box-1" x="439.0" y="85.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="450.0" y="100.0" text-anchor="middle">1</text><rect class="box-1" x="463.0" y="85.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="474.0" y="100.0" text-anchor="middle">2</text><rect class="box-1" x="487.0" y="85.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="498.0" y="100.0" text-anchor="middle">3</text><rect class="box-1" x="511.0" y="85.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="522.0" y="100.0" text-anchor="middle">4</text><text class="t-tick" x="406.0" y="124.0" text-anchor="end">q3</text><rect class="box-1" x="415.0" y="109.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="426.0" y="124.0" text-anchor="middle">1</text><rect class="box-1" x="439.0" y="109.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="450.0" y="124.0" text-anchor="middle">2</text><rect class="box-1" x="463.0" y="109.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="474.0" y="124.0" text-anchor="middle">3</text><rect class="box-1" x="487.0" y="109.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="498.0" y="124.0" text-anchor="middle">4</text><rect class="box-1" x="511.0" y="109.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="522.0" y="124.0" text-anchor="middle">5</text><text class="t-tick" x="406.0" y="148.0" text-anchor="end">q4</text><rect class="box-1" x="415.0" y="133.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="426.0" y="148.0" text-anchor="middle">2</text><rect class="box-1" x="439.0" y="133.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="450.0" y="148.0" text-anchor="middle">3</text><rect class="box-1" x="463.0" y="133.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="474.0" y="148.0" text-anchor="middle">4</text><rect class="box-1" x="487.0" y="133.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="498.0" y="148.0" text-anchor="middle">5</text><rect class="box-1" x="511.0" y="133.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="522.0" y="148.0" text-anchor="middle">6</text><text class="t-tick" x="406.0" y="172.0" text-anchor="end">q5</text><rect class="box-1" x="415.0" y="157.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="426.0" y="172.0" text-anchor="middle">3</text><rect class="box-1" x="439.0" y="157.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="450.0" y="172.0" text-anchor="middle">4</text><rect class="box-1" x="463.0" y="157.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="474.0" y="172.0" text-anchor="middle">5</text><rect class="box-1" x="487.0" y="157.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="498.0" y="172.0" text-anchor="middle">6</text><rect class="box-1" x="511.0" y="157.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="522.0" y="172.0" text-anchor="middle">7</text><text class="t-tick" x="406.0" y="196.0" text-anchor="end">q6</text><rect class="box-1" x="415.0" y="181.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="426.0" y="196.0" text-anchor="middle">4</text><rect class="box-1" x="439.0" y="181.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="450.0" y="196.0" text-anchor="middle">5</text><rect class="box-1" x="463.0" y="181.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="474.0" y="196.0" text-anchor="middle">6</text><rect class="box-1" x="487.0" y="181.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="498.0" y="196.0" text-anchor="middle">7</text><rect class="box-1" x="511.0" y="181.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="522.0" y="196.0" text-anchor="middle">8</text><text class="t-tick" x="406.0" y="220.0" text-anchor="end">q7</text><rect class="box-1" x="415.0" y="205.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="426.0" y="220.0" text-anchor="middle">5</text><rect class="box-1" x="439.0" y="205.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="450.0" y="220.0" text-anchor="middle">6</text><rect class="box-1" x="463.0" y="205.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="474.0" y="220.0" text-anchor="middle">7</text><rect class="box-1" x="487.0" y="205.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="498.0" y="220.0" text-anchor="middle">8</text><rect class="box-1" x="511.0" y="205.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="522.0" y="220.0" text-anchor="middle">9</text><text class="t-tick" x="406.0" y="244.0" text-anchor="end">q8</text><rect class="box-1" x="415.0" y="229.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="426.0" y="244.0" text-anchor="middle">6</text><rect class="box-1" x="439.0" y="229.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="450.0" y="244.0" text-anchor="middle">7</text><rect class="box-1" x="463.0" y="229.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="474.0" y="244.0" text-anchor="middle">8</text><rect class="box-1" x="487.0" y="229.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="498.0" y="244.0" text-anchor="middle">9</text><rect class="box-1" x="511.0" y="229.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="522.0" y="244.0" text-anchor="middle">10</text><text class="t-tick" x="406.0" y="268.0" text-anchor="end">q9</text><rect class="box-1" x="415.0" y="253.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="426.0" y="268.0" text-anchor="middle">7</text><rect class="box-1" x="439.0" y="253.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="450.0" y="268.0" text-anchor="middle">8</text><rect class="box-1" x="463.0" y="253.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="474.0" y="268.0" text-anchor="middle">9</text><rect class="box-1" x="487.0" y="253.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="498.0" y="268.0" text-anchor="middle">10</text><rect class="box-ghost" x="511.0" y="253.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="406.0" y="292.0" text-anchor="end">q10</text><rect class="box-1" x="415.0" y="277.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="426.0" y="292.0" text-anchor="middle">8</text><rect class="box-1" x="439.0" y="277.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="450.0" y="292.0" text-anchor="middle">9</text><rect class="box-1" x="463.0" y="277.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="474.0" y="292.0" text-anchor="middle">10</text><rect class="box-ghost" x="487.0" y="277.0" width="22.0" height="22.0" rx="3"/><rect class="box-ghost" x="511.0" y="277.0" width="22.0" height="22.0" rx="3"/><text class="t-tick" x="426.0" y="316.0" text-anchor="middle">-2</text><text class="t-tick" x="450.0" y="316.0" text-anchor="middle">-1</text><text class="t-tick" x="474.0" y="316.0" text-anchor="middle">0</text><text class="t-tick" x="498.0" y="316.0" text-anchor="middle">+1</text><text class="t-tick" x="522.0" y="316.0" text-anchor="middle">+2</text><text class="t-muted" x="20.0" y="344.0" text-anchor="start">Left: a mask still computes all 100 scores and hides 56. Right: the band computes only the 44 real ones (number = key position);</text><text class="t-muted" x="20.0" y="360.0" text-anchor="start">the 6 empty slots at the ends are padding. The work falls from n x n to n x r.</text></svg><figcaption>Restricted self-attention for 10 tokens and a window of 5. Left: the mask, a band of 44 allowed pairs in a table of 100. Right: the same band stored as 10 rows of 5 slots, so that only the scores inside the window are computed. The number in each slot is the position of its key; empty slots at the two ends are padding.</figcaption></figure>
+
+The banded version matches the masked one to $$1.2 \times 10^{-7}$$, and the masked one matches the library exactly. Now count the work. We ran both versions under the FLOP counter, with $$d = 64$$ and a window of 17:
+
+```python
+d3, r3 = 64, 17
+for n3 in [256, 1024, 4096]:
+    q, kk, v = torch.randn(n3, d3), torch.randn(n3, d3), torch.randn(n3, d3)
+    mask = (torch.arange(n3).unsqueeze(1) - torch.arange(n3)).abs() <= r3 // 2
+    fm = flops(masked_attention, q, kk, v, mask)
+    fb = flops(banded_attention, q, kk, v, r3)               # window of 17: 8 on each side and the centre
+```
+
+```text
+FLOPs of the two versions, d = 64, r = 17 (FlopCounterMode, matrix products only)
+     n   masked n x n  banded n x r  ratio
+   256     16,777,216     1,114,112     15
+  1024    268,435,456     4,456,448     60
+  4096  4,294,967,296    17,825,792    241
+```
+
+At 256 tokens, the band does 15 times less work than the full table. At 4,096 tokens, it does 241 times less, and the gap keeps growing with $$n$$. That is the gain the authors had in mind. The price is the path: the table of the previous section showed that a window of 17 needs 13 layers to connect 100 tokens.
+
 ## Why not convolutions? {§4}
 
 > [!PAPER] · §4
@@ -218,7 +545,7 @@ This test has limits too. The weights are random, not trained. A trained LSTM ke
 >
 > The cost is $$k$$ times the recurrent cost, because each output mixes $$k$$ input vectors with a $$d \times d$$ matrix each. ConvS2S and ByteNet, the models from Part 1 that used convolutions, paid this cost to get rid of the waiting steps of recurrence. Self-attention removes the waiting steps too, and also makes the path short.
 >
-> The last sentence is a neat argument. A separable convolution splits the work into a cheap per-channel window and a $$d \times d$$ mix. With a window as wide as the whole sentence, its cost equals one attention layer plus one feed-forward layer. That pair is exactly one Transformer block from Part 2. So the Transformer reaches the full sentence for the price of the most efficient convolution.
+> The last two sentences, about separable convolutions, get their own box below, with a count in code.
 
 > [!DEFINITION] Dilated convolution
 > A convolution whose window has gaps. With kernel 3 and dilation 3, an output looks at positions $$t - 3$$, $$t$$ and $$t + 3$$. Stacking layers with dilations 1, 3, 9, ... lets $$L$$ layers see $$3^L$$ positions.
@@ -234,6 +561,60 @@ Our script counts the layers that a kernel of width 3 needs to connect the first
 ```
 
 The formulas behind the counts: $$L$$ contiguous layers reach $$1 + L(k-1)$$ positions, and $$L$$ dilated layers reach $$k^L$$. For $$n = 27$$, contiguous layers need $$\lceil 26 / 2 \rceil = 13$$, and dilated layers need $$\log_3 27 = 3$$, because $$3^3 = 27$$. Self-attention needs 1 layer for every $$n$$.
+
+> [!PAPER] · §4
+> [![The lines of Section 4 on stacking convolutions, with O(n/k) convolutional layers in the case of contiguous kernels, O(logk(n)) in the case of dilated convolutions and increasing the length of the longest paths highlighted](/img/papers/transformer/p4-dilated.png)](/img/papers/transformer/p4-dilated.png)
+>
+> **What it says:** connecting all positions "requires a stack of $$O(n/k)$$ convolutional layers in the case of contiguous kernels, or $$O(\log_k(n))$$ in the case of dilated convolutions [18], increasing the length of the longest paths between any two positions in the network."
+>
+> **What it means:**
+>
+> The key words are at the end: "increasing the length of the longest paths". A stack of convolutions does connect word 1 and word 27 in the end. But the connection runs through every layer of the stack, so the path is as long as the stack. Dilation makes the stack short, but its height still grows with $$n$$.
+>
+> Reference [18] is ByteNet, a translation model built from dilated convolutions. Its reach doubles or triples with each layer, which is why its path grows only as a logarithm of $$n$$.
+
+The tables of links in the path section are one method to count these layers. A second method uses real layers. We build a stack of random one-sided convolutions and ask autograd whether the last output depends on the first input at all. If the gradient is exactly 0, no path exists.
+
+```python
+def conv_stack_grad(n, L, dilated=False):
+    """Method 2: a real stack of L random one-sided Conv1d layers (kernel 3). Is d out_n / d x_1 zero?"""
+    g = torch.Generator().manual_seed(L)
+    x = torch.randn(1, 8, n, generator=g, requires_grad=True)         # 8 channels, n positions
+    h = x
+    for l in range(L):
+        dil = 3 ** l if dilated else 1
+        w = torch.randn(8, 8, 3, generator=g)
+        h = F.pad(h, (2 * dil, 0))                                     # pad on the left only: output t reads t, t - dil, t - 2 dil
+        h = torch.tanh(F.conv1d(h, w, dilation=dil))
+    h[0, :, n - 1].sum().backward()                                    # the last output ...
+    return x.grad[0, :, 0].abs().sum().item()                          # ... and its gradient at the first input
+
+for L, dil in [(12, False), (13, False), (2, True), (3, True)]:
+    gsum = conv_stack_grad(27, L, dil)
+```
+
+```text
+Method 2: real stacks of random Conv1d layers, n = 27, |d out_27 / d x_1|
+  contiguous 12 layers: 0.000e+00  (not connected)
+  contiguous 13 layers: 7.305e-05  (connected)
+  dilated     2 layers: 0.000e+00  (not connected)
+  dilated     3 layers: 3.317e-02  (connected)
+```
+
+With 12 contiguous layers, the gradient is exactly 0: no path exists from word 1 to the output at word 27. With 13 layers, a path appears. The dilated stack connects in 3 layers and not in 2. Both methods give the counts of the formulas above.
+
+> [!PAPER] · §4
+> [![The lines of Section 4 on separable convolutions, with decrease the complexity considerably, Even with k = n, and equal to the combination of a self-attention layer and a point-wise feed-forward layer highlighted](/img/papers/transformer/p4-separable.png)](/img/papers/transformer/p4-separable.png)
+>
+> **What it says:** "Separable convolutions [6], however, decrease the complexity considerably, to $$O(k \cdot n \cdot d + n \cdot d^2)$$. Even with $$k = n$$, however, the complexity of a separable convolution is equal to the combination of a self-attention layer and a point-wise feed-forward layer, the approach we take in our model."
+>
+> **What it means:**
+>
+> This is a neat argument. A separable convolution splits the work into a cheap per-channel window and a $$d \times d$$ mix. With a window as wide as the whole sentence, its cost equals one attention layer plus one feed-forward layer. That pair is exactly one Transformer block from Part 2. So the Transformer reaches the full sentence for the price of the most efficient convolution.
+>
+> Our count table above has a row for it. With $$k = 3$$ and 27 tokens, the separable convolution needs 7,119,360 multiply-adds, against 21,233,664 for the ordinary one. The FLOP counter agrees on both.
+
+With $$k = n$$, the term $$k \cdot n \cdot d$$ becomes $$n^2 \cdot d$$, the cost of self-attention, and $$n \cdot d^2$$ is the cost of a point-wise feed-forward layer. The Transformer pays what the cheapest full-width convolution would pay, and gets a path of length 1.
 
 ## A side benefit: we can look inside {§4}
 
@@ -270,6 +651,9 @@ For sentences, self-attention wins all three columns. That is the whole argument
 > - Convolutions need a stack of layers to connect distant words: 13 contiguous or 3 dilated layers for 27 tokens with $$k = 3$$.
 > - Restricted attention with a window $$r$$ cuts the cost to $$O(r \cdot n \cdot d)$$ but makes the path $$O(n / r)$$.
 > - Table 1 counts only the parts that grow differently. The projections add about $$4 \cdot n \cdot d^2$$ to a real attention layer.
+> - Counted from the shapes in code, every layer matched PyTorch's FLOP counter exactly. For 27 tokens, the attention core is 746,496 multiply-adds and its four projections 28,311,552.
+> - The longest chain in the autograd graph stayed at 7 operations for self-attention and grew to 1,280 for a recurrent layer of 256 tokens.
+> - A mask alone does not make restricted attention cheap. A banded version that computes only the window did 241 times less work at 4,096 tokens.
 
 ## The paper and the code
 

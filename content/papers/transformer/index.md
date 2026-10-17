@@ -1,7 +1,7 @@
 ---
 title: "Attention Is All You Need"
 short: Transformer
-description: "The 2017 paper that replaced recurrence with attention and gave us the Transformer, the design behind every large language model today. Six parts, with the paper's own text, worked equations and real code on a released translation model."
+description: "The 2017 paper that replaced recurrence with attention and gave us the Transformer, the design behind every large language model today. Seven parts, with the paper's own text, worked equations, the whole model written from scratch in Python, and real code on a released translation model."
 authors: [Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Łukasz Kaiser, Illia Polosukhin]
 org: Google Brain, Google Research, University of Toronto
 year: 2017
@@ -10,7 +10,7 @@ arxiv: "1706.03762"
 code: https://github.com/tensorflow/tensor2tensor
 accent: "#e0a458"
 date: 2026-10-18
-parts: 6
+parts: 7
 tags: [transformer, attention, machine-translation, deep-learning, nlp]
 learn:
   - "Why recurrent networks were slow to train, and how attention removes the step-by-step loop"
@@ -20,6 +20,7 @@ learn:
   - "Sine and cosine position encodings, and why they let the model read word order"
   - "The training recipe: the learning-rate warm-up, dropout and label smoothing"
   - "What the results and the model variations show, and what the paper started"
+  - "How to write the whole Transformer yourself in Python, check it against a released model, and train a small one"
 ---
 
 ## Why this paper
@@ -28,7 +29,7 @@ Before 2017, the best translation systems read a sentence one word at a time. Ea
 
 The Transformer translated better than the systems before it and trained in a fraction of the time. The same design now runs every large language model, many image models and speech models.
 
-## How the six parts are organised
+## How the seven parts are organised
 
 **Before Part 1 (optional): [The Road to the Transformer](background-the-road-to-the-transformer.md).** Recurrent networks, encoder-decoder translation, and the first attention mechanism.
 
@@ -40,6 +41,7 @@ Each part follows the paper's own sections:
 4. **[Why Self-Attention](part-4-why-self-attention.md)**: §4 and Table 1. Cost per layer, steps in sequence and path length, against recurrent and convolutional layers.
 5. **[Training](part-5-training.md)**: §5. The data, batching, hardware, the learning-rate schedule, dropout and label smoothing.
 6. **[Results, Variations and Impact](part-6-results-and-impact.md)**: §6, §7, Tables 2 to 4 and the attention pictures of the appendix. What the paper showed, and what came after.
+7. **Build It from Scratch** (coming soon): the whole Transformer in about 300 lines of PyTorch, one block at a time. We load the released model's weights into our own code, get the same translation, and train a small Transformer on your laptop.
 
 ## How to read the boxes
 
