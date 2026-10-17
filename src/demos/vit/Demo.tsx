@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import DemoTabs from '../../components/DemoTabs'
 import {
   BASE, LIVE_BYTES, loadPictures, loadModel, loadSaved, fullAttention, pixelsOf, live, runLive, runExperiment,
   type Picture, type Result, type Timing, type Experiment, type Model,
@@ -164,34 +165,35 @@ export default function Demo() {
 
   return (
     <div className="vit-demo">
-      <p className="vit-demo-intro">
+      <details className="demo-disclosure vit-demo-intro"><summary>What happens inside a Vision Transformer?</summary><p>
         A Vision Transformer (ViT) cuts a picture into small squares, turns each square into a list of numbers, lets the
         squares exchange information through attention, and reads the class from one extra token. Every panel below
         is one step of that path, with the real numbers of the model. The series explains each step in{' '}
         <Link to={P1}>Part 1</Link> and <Link to={P2}>Part 2</Link>.
-      </p>
+      </p></details>
 
       <div className="vit-demo-pick">
-        <div className="vit-demo-thumbs" role="radiogroup" aria-label="Picture">
+        <section className="vit-demo-images"><div className="demo-control-heading"><span>01</span><h2>Choose an image</h2></div>
+        <div className="vit-demo-thumbs" role="group" aria-label="Picture">
           {pictures.map((p) => (
             <button
               key={p.slug}
               type="button"
-              role="radio"
-              aria-checked={source.kind === 'picture' && source.slug === p.slug}
+              aria-pressed={source.kind === 'picture' && source.slug === p.slug}
               className="vit-demo-thumb"
+              disabled={expBusy}
               onClick={() => setSource({ kind: 'picture', slug: p.slug })}
               title={p.name}
             >
-              <img src={`${BASE}img/${p.slug}.png`} alt={p.name} width={72} height={72} />
+              <img src={`${BASE}img/${p.slug}.png`} alt="" width={72} height={72} /><span>{p.name}</span>
             </button>
           ))}
           <label className={`vit-demo-thumb vit-demo-upload${source.kind === 'upload' ? ' is-on' : ''}`}>
-            <input type="file" accept="image/*" onChange={(e) => { onFile(e.target.files?.[0]); e.target.value = '' }} />
-            <span>Your photo</span>
+            <input type="file" aria-label="Use your own photo" disabled={expBusy} accept="image/*" onChange={(e) => { onFile(e.target.files?.[0]); e.target.value = '' }} />
+            <span className="vit-demo-upload-plus" aria-hidden="true">+</span><span>Your photo</span>
           </label>
         </div>
-        <p className="vit-demo-source">
+        <details className="demo-disclosure vit-demo-credit"><summary>{pic?.name ?? (source.kind === 'upload' ? source.name : 'Photo details')} · photo details</summary><p className="vit-demo-source">
           {pic ? (
             <>
               {pic.name}. Photo from <a href={pic.flickr} target="_blank" rel="noreferrer">Flickr</a>, in the COCO 2017
@@ -202,20 +204,21 @@ export default function Demo() {
           ) : (
             <>Your photo: {source.kind === 'upload' ? source.name : ''}. It stays in this browser. Nothing is uploaded; the model runs on your device.</>
           )}
-        </p>
+        </p></details></section>
 
-        <div className="vit-demo-models">
+        <section className="vit-demo-models"><div className="demo-control-heading"><span>02</span><h2>Choose how to explore</h2></div>
           {source.kind === 'picture' && (
-            <div className="vit-demo-seg" role="radiogroup" aria-label="Model">
-              <button type="button" role="radio" aria-checked={!useLive} onClick={() => setUseLive(false)}>
-                ViT-B/16, saved run
+            <div className="vit-demo-model-options" role="group" aria-label="Model">
+              <button type="button" aria-pressed={!useLive} disabled={expBusy} onClick={() => setUseLive(false)}>
+                <strong>Explore a saved run</strong><span>ViT-B/16 · ready-made results</span>
               </button>
-              <button type="button" role="radio" aria-checked={useLive} onClick={() => setUseLive(true)}>
-                DeiT-Ti/16, live in your browser
+              <button type="button" aria-pressed={useLive} disabled={expBusy} onClick={() => setUseLive(true)}>
+                <strong>Run on my device</strong><span>DeiT-Ti/16 · 11.6 MB download</span>
               </button>
             </div>
           )}
-          <p className="vit-demo-modelnote">
+          {source.kind === 'upload' && <p className="vit-demo-local-note">Your photo stays on this device. The live model runs here in your browser.</p>}
+          <details className="demo-disclosure"><summary>About {isLive ? 'the live model' : 'the saved results'}</summary><p className="vit-demo-modelnote">
             {isLive ? (
               <>
                 <b>Running here:</b> DeiT-Ti/16 (facebook/deit-tiny-patch16-224), the same ViT design at a smaller width:
@@ -229,9 +232,9 @@ export default function Demo() {
                 live model, or use your own photo, to run a ViT in this browser.
               </>
             )}
-          </p>
+          </p></details>
           {isLive && liveState.phase === 'loading' && (
-            <div className="vit-demo-progress" role="progressbar" aria-valuemin={0} aria-valuemax={liveState.total} aria-valuenow={liveState.done}>
+            <div className="vit-demo-progress" role="progressbar" aria-label="Downloading the live model" aria-valuemin={0} aria-valuemax={liveState.total} aria-valuenow={liveState.done}>
               <i style={{ width: `${(100 * liveState.done) / liveState.total}%` }} />
               <span>Downloading the model: {(liveState.done / 1e6).toFixed(1)} of {(liveState.total / 1e6).toFixed(1)} MB</span>
             </div>
@@ -243,31 +246,36 @@ export default function Demo() {
               {firstRun != null && <> First prediction {sec(firstRun)} after the page opened.</>}
             </p>
           )}
-        </div>
+        </section>
       </div>
 
-      {error && <div className="vit-demo-error" role="alert">{error}</div>}
-      {busy && <div className="vit-demo-busy" aria-live="polite">{busy}…</div>}
+      {error && <div className="vit-demo-error demo-error" role="alert"><strong>Something couldn’t load.</strong><p>{error}</p><button className="vit-demo-btn" onClick={() => window.location.reload()}>Reload demo</button></div>}
+      {busy && <div className="demo-loading" role="status"><span className="demo-loading-dot" />{busy}…</div>}
+      {expBusy && <div className="demo-running" role="status"><span className="demo-loading-dot" />Comparing the shuffled patches…<Link to="?view=experiment">View experiment →</Link></div>}
 
       {ready && m && rgba && (
         <>
-          <PatchStep rgba={rgba} sel={sel} setSel={setSel} hover={hover} setHover={setHover} patchSize={patchSize} setPatchSize={setPatchSize} />
-          <EmbedStep r={result!} sel={sel} afterPos={afterPos} setAfterPos={setAfterPos} />
-          <PosStep m={m} sel={posSel} setSel={setPosSel} />
-          <EncoderStep r={result!} rgba={rgba} att={att} layer={layer} setLayer={setLayer} head={head} setHead={setHead} query={query} setQuery={setQuery} />
-          <RolloutStep r={result!} rgba={rgba} />
-          <HeadStep r={result!} />
-          <ExperimentStep
-            r={result!}
-            rgba={rgba}
-            exp={exp ?? result!.exp}
-            busy={expBusy}
-            onRun={async () => {
-              setExpBusy(true)
-              try { setExp(await runExperiment(rgba, m.labels)) } catch (e) { setError((e as Error).message) }
-              setExpBusy(false)
-            }}
-          />
+          <div className="vit-demo-overview">
+            <div><span className="demo-overline">Model prediction</span><strong>{result!.top5[0][1]}</strong></div>
+            <span className="vit-demo-confidence">{pct(result!.top5[0][2])}<small>model probability</small></span>
+            <span className="vit-demo-run-label">{result!.live ? 'Computed on your device' : 'Saved ViT-B/16 run'}</span>
+            <Link to="?view=head">See the top predictions →</Link>
+          </div>
+          <DemoTabs id="vit" label="Follow the image through the model" tabs={[
+            { id: 'patches', label: 'Patches', content: <PatchStep rgba={rgba} sel={sel} setSel={setSel} hover={hover} setHover={setHover} patchSize={patchSize} setPatchSize={setPatchSize} /> },
+            { id: 'embed', label: 'Embeddings', content: <EmbedStep r={result!} sel={sel} afterPos={afterPos} setAfterPos={setAfterPos} /> },
+            { id: 'positions', label: 'Positions', content: <PosStep m={m} sel={posSel} setSel={setPosSel} /> },
+            { id: 'encoder', label: 'Attention', content: <EncoderStep r={result!} rgba={rgba} att={att} layer={layer} setLayer={setLayer} head={head} setHead={setHead} query={query} setQuery={setQuery} /> },
+            { id: 'rollout', label: 'Rollout', content: <RolloutStep r={result!} rgba={rgba} /> },
+            { id: 'head', label: 'Prediction', content: <HeadStep r={result!} /> },
+            { id: 'experiment', label: 'Experiment', content: <ExperimentStep
+              r={result!} rgba={rgba} exp={exp ?? result!.exp} busy={expBusy}
+              onRun={async () => {
+                setExpBusy(true)
+                try { setExp(await runExperiment(rgba, m.labels)) } catch (e) { setError((e as Error).message) }
+                setExpBusy(false)
+              }} /> },
+          ]} />
         </>
       )}
     </div>
@@ -307,9 +315,9 @@ function PatchStep({ rgba, sel, setSel, hover, setHover, patchSize, setPatchSize
           </p>
           <Strip values={nums} color={color} label="The 768 numbers of the patch" />
           <p className="vit-demo-mono">[{Array.from(nums.slice(0, 6)).map((v) => v.toFixed(3)).join(', ')}, …, {nums[767].toFixed(3)}]</p>
-          <div className="vit-demo-seg" role="radiogroup" aria-label="Patch size">
+          <div className="vit-demo-seg" role="group" aria-label="Patch size">
             {[8, 16, 32].map((p) => (
-              <button key={p} type="button" role="radio" aria-checked={patchSize === p} onClick={() => setPatchSize(p)}>{p} × {p}</button>
+              <button key={p} type="button" aria-pressed={patchSize === p} onClick={() => setPatchSize(p)}>{p} × {p}</button>
             ))}
           </div>
           <table className="vit-demo-table">
@@ -368,9 +376,9 @@ function EmbedStep({ r, sel, afterPos, setAfterPos }: { r: Result; sel: number; 
       </p>
       <div className="vit-demo-rowhead">
         <p className="vit-demo-label">The whole sequence: {T} tokens × {D} numbers ({fmt(T * D)} numbers)</p>
-        <div className="vit-demo-seg" role="radiogroup" aria-label="Sequence">
-          <button type="button" role="radio" aria-checked={!afterPos} onClick={() => setAfterPos(false)}>[x_class; x_p E]</button>
-          <button type="button" role="radio" aria-checked={afterPos} onClick={() => setAfterPos(true)}>z₀ = … + E_pos</button>
+        <div className="vit-demo-seg" role="group" aria-label="Sequence">
+          <button type="button" aria-pressed={!afterPos} onClick={() => setAfterPos(false)}>[x_class; x_p E]</button>
+          <button type="button" aria-pressed={afterPos} onClick={() => setAfterPos(true)}>z₀ = … + E_pos</button>
         </div>
       </div>
       <div className="vit-demo-matrixwrap">
@@ -462,11 +470,11 @@ function EncoderStep({ r, rgba, att, layer, setLayer, head, setHead, query, setQ
           <span>Layer {layer + 1}</span>
           <input type="range" min={1} max={L} value={layer + 1} onChange={(e) => setLayer(Number(e.target.value) - 1)} aria-label="Layer" />
         </label>
-        <div className="vit-demo-seg vit-demo-heads" role="radiogroup" aria-label="Head">
+        <div className="vit-demo-seg vit-demo-heads" role="group" aria-label="Head">
           {Array.from({ length: H }, (_, h) => (
-            <button key={h} type="button" role="radio" aria-checked={head === h} onClick={() => setHead(h)}>{h + 1}</button>
+            <button key={h} type="button" aria-pressed={head === h} onClick={() => setHead(h)}>{h + 1}</button>
           ))}
-          <button type="button" role="radio" aria-checked={head === -1} onClick={() => setHead(-1)}>mean</button>
+          <button type="button" aria-pressed={head === -1} onClick={() => setHead(-1)}>mean</button>
         </div>
         <button type="button" className={`vit-demo-btn${query === -1 ? ' is-on' : ''}`} onClick={() => setQuery(-1)} aria-pressed={query === -1}>
           Query: [class] token

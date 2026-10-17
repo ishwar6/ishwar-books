@@ -141,3 +141,74 @@
   .sam-demo-card0 { grid-template-columns: 84px minmax(0, 1fr); }
   .sam-demo-seg button { padding: 7px 8px; font-size: 13px; }
 }
+
+/* Input, canvas, and results form a focused workbench. */
+.sam-demo .demo-explorer { margin-top: 0; }
+.sam-demo-photo-panel { padding: 18px 20px; border: 1px solid var(--border); border-radius: 12px; background: var(--bg-soft); margin-bottom: 18px; }
+.sam-demo .demo-control-heading h2 { font-size: 14px; margin: 0; }
+.sam-demo-photos { padding: 2px 2px 6px; gap: 10px; }
+.sam-demo-thumb { width: 94px; border-radius: 7px; background: var(--surface); font-size: 10px; padding: 4px; }
+.sam-demo-thumb img { height: 56px; border-radius: 4px; }
+.sam-demo-thumb.on { border-color: var(--paper-ink); box-shadow: 0 0 0 1px var(--paper-ink); background: var(--paper-soft); }
+.sam-demo-thumb:disabled { cursor: wait; opacity: .65; }
+.sam-demo-main { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 18px; }
+.sam-demo-stage, .sam-demo-side { padding: 20px; border: 1px solid var(--border); border-radius: 12px; background: var(--bg-soft); gap: 14px; }
+.sam-demo-stage > .demo-control-heading, .sam-demo-side > .demo-control-heading { margin-bottom: 0; }
+.sam-demo-toolbar { gap: 8px; }
+.sam-demo-toolbar .sam-demo-seg { margin-right: auto; }
+.sam-demo-seg button, .sam-demo-btn { min-height: 40px; font-size: 12px; }
+.sam-demo-btn { border-radius: 7px; }
+.sam-demo-seg { border-radius: 7px; }
+.sam-demo-help, .sam-demo-credit, .sam-demo-timing { font-size: 11px; line-height: 1.7; }
+.sam-demo-credit { border-top: 1px solid var(--border); padding-top: 10px; }
+.sam-demo-hint { font-size: 12px; line-height: 1.7; background: var(--paper-soft); border-color: var(--paper-line); }
+.sam-demo-hint strong { display: block; margin-bottom: 3px; }
+.sam-demo-masks h3 { color: var(--text-strong); font-size: 14px; margin: 0 0 7px; font-weight: 600; }
+.sam-demo-masks > .sam-demo-sub { font-size: 12px; line-height: 1.7; }
+.sam-demo-cards { gap: 7px; }
+.sam-demo-card { padding: 6px; border-radius: 8px; font-size: 10px; gap: 7px; }
+.sam-demo-card.on { border-color: var(--paper-ink); box-shadow: 0 0 0 1px var(--paper-ink); background: var(--paper-soft); }
+.sam-demo-card-row { gap: 4px; }
+.sam-demo-badge { font-size: 8px; background: var(--paper-ink); color: var(--bg); border-radius: 3px; }
+.sam-demo-card0 { margin-top: 12px; grid-template-columns: 80px minmax(0, 1fr); }
+.sam-demo-card0 .sam-demo-muted { display: block; margin-top: 4px; font-size: 10px; }
+.sam-demo-switch { font-size: 12px; }
+.sam-demo-timing { padding-top: 10px; border-top: 1px solid var(--border); }
+.sam-demo-status { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; background: var(--bg-soft); font-size: 12px; padding: 14px 18px; }
+.sam-demo-status progress { flex-basis: 100%; height: 5px; }
+.sam-demo-panel { padding: 24px; }
+.sam-demo-panel h2 { font-size: 22px; letter-spacing: -.4px; margin-bottom: 12px; line-height: 1.3; }
+.sam-demo-panel > .sam-demo-sub { font-size: 14px; line-height: 1.75; margin-bottom: 22px; }
+.sam-demo-pipe { margin-bottom: 18px; }
+.sam-demo-step { background: var(--bg-soft); padding: 18px; gap: 8px; }
+.sam-demo-step-kicker { font-size: 10px; color: var(--paper-ink); }
+.sam-demo-step-note, .sam-demo-step a { font-size: 12px; }
+.sam-demo-shape { font-size: 11px; }
+.sam-demo-notes p { font-size: 14px; line-height: 1.8; }
+.sam-demo-inside { gap: 24px; }
+.sam-demo-stats > div, .sam-demo-iou > div { border-radius: 7px; padding: 14px; }
+.sam-demo-stats span { font-size: 11px; }
+.sam-demo-stats strong { font-size: 18px; }
+.sam-demo-stats em { font-size: 11px; }
+.sam-demo-funnel { width: 100%; font-size: 12px; }
+.sam-demo-funnel td { padding: 10px 8px; }
+.sam-demo-funnel tr:nth-child(odd) { background: var(--surface); }
+@media (max-width: 950px) {
+  .sam-demo-main { grid-template-columns: minmax(0, 1fr); }
+  .sam-demo-side .sam-demo-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .sam-demo-card { font-size: 12px; }
+}
+@media (max-width: 560px) {
+  .sam-demo-photo-panel, .sam-demo-stage, .sam-demo-side, .sam-demo-panel { padding: 16px; }
+  .sam-demo-photos { gap: 8px; }
+  .sam-demo-thumb { width: 80px; }
+  .sam-demo-panel h2 { font-size: 20px; }
+  .sam-demo-card { font-size: 10px; padding: 4px; }
+  .sam-demo-toolbar { gap: 6px; }
+  .sam-demo-seg button, .sam-demo-btn { padding: 8px 10px; }
+  .sam-demo-dot { width: 7px; height: 7px; }
+  .sam-demo-funnel td { padding: 8px 5px; font-size: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sam-demo-spinner { animation: none; }
+}

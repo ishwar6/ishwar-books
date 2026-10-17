@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
 import type { CSSProperties } from 'react'
 import { papers, type Paper } from '../lib/content'
+import { Arrow } from './icons'
+import { demoGuides } from '../demos/catalog'
 import '../styles/demo.css'
 
 const BASE = import.meta.env.BASE_URL
@@ -21,14 +23,16 @@ export function Play() {
 /** A card for one demo: its picture, its name, what it does. */
 export function DemoCard({ paper }: { paper: Paper }) {
   if (!paper.demo) return null
+  const guide = demoGuides[paper.slug]
   return (
     <Link to={`/${paper.route}/demo`} className="demo-card" style={accentStyle(paper)}>
-      <img src={`${BASE}demos/${paper.slug}/thumb.jpg`} alt="" loading="lazy" width={800} height={420} />
+      <span className="dc-preview"><img src={`${BASE}demos/${paper.slug}/thumb.jpg`} alt="" loading="lazy" width={800} height={420} /><span className="dc-model">{paper.short}</span><span className="dc-preview-arrow"><Arrow /></span></span>
       <span className="dc-body">
-        <span className="dp-kicker"><Play /> Interactive demo · {paper.short}</span>
-        <span className="dp-title">{paper.demo.title}</span>
-        <span className="dp-text">{paper.demo.description}</span>
-        <span className="dc-go">Open the demo →</span>
+        <span className="dp-kicker">{guide?.category ?? 'Interactive demo'}</span>
+        <span className="dp-title">{guide?.title ?? paper.demo.title}</span>
+        <span className="dp-text">{guide?.summary ?? paper.demo.description}</span>
+        {guide && <span className="dc-actions">{guide.actions.map((action) => <span key={action}>{action}</span>)}</span>}
+        <span className="dc-foot"><span>{guide?.mode ?? 'In your browser'}</span><span className="dc-go">Explore demo <Arrow /></span></span>
       </span>
     </Link>
   )

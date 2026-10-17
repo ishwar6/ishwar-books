@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import DemoTabs from '../../components/DemoTabs'
 import { SamClient, fetchWithProgress, type Box, type Decoded, type Prompts, type AmgMask, type AmgCounts } from './client'
 import { LOW, frameOf, iou as maskIou, maskStats, toMask, unpack } from './samMath'
 import './sam-demo.css'
@@ -185,7 +186,7 @@ export default function Demo() {
     }
   }, [ready, photos, embKey])
 
-  if (error) return <div className="sam-demo-error" role="alert">The demo could not start: {error}</div>
+  if (error) return <div className="sam-demo-error demo-error" role="alert"><strong>The model couldn’t load.</strong><p>{error}</p><button className="sam-demo-btn" onClick={() => window.location.reload()}>Reload demo</button></div>
 
   const w = photo?.width ?? 640, h = photo?.height ?? 480
   const fr = frameOf(w, h)
@@ -193,123 +194,115 @@ export default function Demo() {
 
   return (
     <div className="sam-demo">
-      <p className="sam-demo-intro">
-        This page runs the real SAM ViT-H, the model of the paper, on your clicks. The heavy image encoder ran once for
-        each photo on our computer; your browser downloads its output. The prompt encoder and the mask decoder run here,
-        in your browser, for every click. Each step below links to the part of the series that explains it.
-      </p>
-
-      <Pipeline result={result} nTokens={nTokens} w={w} h={h} rw={fr.rw} rh={fr.rh} busy={busy} />
-
-      <div className="sam-demo-photos" role="radiogroup" aria-label="Photo">
-        {photos.map((p) => (
-          <button key={p.key} type="button" role="radio" aria-checked={p.key === key}
-            className={`sam-demo-thumb${p.key === key ? ' on' : ''}`} onClick={() => !busy && !amgRunning && setKey(p.key)}
-            title={`${p.title}: ${p.why}`}>
-            <img src={BASE + p.file} alt="" loading="lazy" />
-            <span>{p.title}</span>
-          </button>
-        ))}
-      </div>
-
-      <div className="sam-demo-main">
-        <div className="sam-demo-stage">
-          <div className="sam-demo-toolbar">
-            <div className="sam-demo-seg" role="radiogroup" aria-label="Kind of click">
-              <button type="button" role="radio" aria-checked={mode === 'fg'} className={mode === 'fg' ? 'on' : ''} onClick={() => setMode('fg')}>
-                <i className="sam-demo-dot fg" /> Foreground point
-              </button>
-              <button type="button" role="radio" aria-checked={mode === 'bg'} className={mode === 'bg' ? 'on' : ''} onClick={() => setMode('bg')}>
-                <i className="sam-demo-dot bg" /> Background point
-              </button>
+      {status && <div className="sam-demo-status" role="status"><span className="demo-loading-dot" /><span>{status.text}</span>{status.frac !== undefined && <progress aria-label="Model download progress" max={1} value={status.frac} />}</div>}
+      {amgRunning && <div className="demo-running" role="status"><span className="demo-loading-dot" />Finding objects across the photo…<Link to="?view=automatic">View progress or stop →</Link></div>}
+      <DemoTabs id="sam" label="Explore Segment Anything" tabs={[
+        { id: 'segment', label: 'Segment', content: <>
+          <div className="sam-demo-photo-panel">
+            <div className="demo-control-heading"><span>01</span><h2>Choose a photo</h2><span className="demo-control-caption">Click a sample to begin</span></div>
+            <div className="sam-demo-photos" role="group" aria-label="Photo">
+              {photos.map((p) => (
+                <button key={p.key} type="button" aria-pressed={p.key === key}
+                  className={`sam-demo-thumb${p.key === key ? ' on' : ''}`} disabled={busy || amgRunning} onClick={() => setKey(p.key)}
+                  title={`${p.title}: ${p.why}`}>
+                  <img src={BASE + p.file} alt="" loading="lazy" />
+                  <span>{p.title}</span>
+                </button>
+              ))}
             </div>
-            <button type="button" className="sam-demo-btn" onClick={undo} disabled={!history.length || busy || amgRunning}>Undo</button>
-            <button type="button" className="sam-demo-btn" onClick={clear} disabled={!history.length || busy || amgRunning}>Clear</button>
           </div>
-          <PhotoCanvas img={img} w={w} h={h} prompts={prompts} mask={current?.mask ?? null} mode={mode} busy={busy || amgRunning}
-            onPoint={(x, y, label) => addPrompt({ points: [...prompts.points, { x, y, label }], box: prompts.box })}
-            onBox={(b) => addPrompt({ points: prompts.points, box: b })} />
-          <p className="sam-demo-help">
-            Click or tap to add a point. Right-click, or press and hold on a phone, for a background point. Drag to draw a
-            box (one box at a time). <Link to={`${P2}#what-a-prompt-can-be`}>Part 2: what a prompt can be</Link>
-          </p>
-          {photo && (
-            <p className="sam-demo-credit">
-              {photo.why} Photo: <a href={photo.url} rel="noopener">{photo.source}</a>
-              {photo.licence && <>, licence <a href={photo.licence_url} rel="noopener license">{photo.licence}</a></>}. {w} × {h} pixels.
-            </p>
-          )}
-          {status && (
-            <div className="sam-demo-status" role="status">
-              <span>{status.text}</span>
-              {status.frac !== undefined && <progress max={1} value={status.frac} />}
+          <div className="sam-demo-main">
+            <div className="sam-demo-stage"><div className="demo-control-heading"><span>02</span><h2>Mark an object</h2></div>
+              <div className="sam-demo-toolbar">
+                <div className="sam-demo-seg" role="group" aria-label="Kind of click">
+                  <button type="button" aria-pressed={mode === 'fg'} className={mode === 'fg' ? 'on' : ''} onClick={() => setMode('fg')}>
+                    <i className="sam-demo-dot fg" /> Include
+                  </button>
+                  <button type="button" aria-pressed={mode === 'bg'} className={mode === 'bg' ? 'on' : ''} onClick={() => setMode('bg')}>
+                    <i className="sam-demo-dot bg" /> Exclude
+                  </button>
+                </div>
+                <button type="button" className="sam-demo-btn" onClick={undo} disabled={!history.length || busy || amgRunning}>Undo</button>
+                <button type="button" className="sam-demo-btn" onClick={clear} disabled={!history.length || busy || amgRunning}>Clear</button>
+              </div>
+              <PhotoCanvas img={img} w={w} h={h} prompts={prompts} mask={current?.mask ?? null} mode={mode} busy={busy || amgRunning}
+                onPoint={(x, y, label) => addPrompt({ points: [...prompts.points, { x, y, label }], box: prompts.box })}
+                onBox={(b) => addPrompt({ points: prompts.points, box: b })} />
+              <p className="sam-demo-help">
+                Click to include an area. Use Exclude to remove one. Drag to draw a box. <Link to={`${P2}#what-a-prompt-can-be`}>Part 2: what a prompt can be</Link>
+              </p>
+              {photo && (
+                <p className="sam-demo-credit">
+                  {photo.why} Photo: <a href={photo.url} rel="noopener">{photo.source}</a>
+                  {photo.licence && <>, licence <a href={photo.licence_url} rel="noopener license">{photo.licence}</a></>}. {w} × {h} pixels.
+                </p>
+              )}
             </div>
-          )}
-        </div>
 
-        <div className="sam-demo-side">
-          {isPreset && result && photo && (
-            <div className="sam-demo-hint">
-              <strong>Why three masks?</strong> We clicked once for you, at ({photo.click![0]}, {photo.click![1]}).
-              One point can mean a part, a larger part or the whole object, so SAM returns one mask for each level and
-              a score for each. <Link to={`${P2}#figure-3-one-point-three-valid-masks`}>Part 2, Figure 3</Link>
+            <div className="sam-demo-side"><div className="demo-control-heading"><span>03</span><h2>Choose a mask</h2></div>
+              {isPreset && result && photo && (
+                <div className="sam-demo-hint">
+                  <strong>A first click to get you started.</strong> The blue area is the selected mask. Try another mask, or add a point on the photo. <Link to={`${P2}#figure-3-one-point-three-valid-masks`}>Part 2, Figure 3</Link>
+                </div>
+              )}
+              <MaskCards result={result} img={img} w={w} h={h} chosen={chosen} ranked={ranked}
+                onPick={(k) => { setChosen(k); setThr(0) }} />
+              <details className="demo-disclosure"><summary>Refinement settings</summary><label className="sam-demo-switch">
+                <input type="checkbox" checked={feedback} onChange={(e) => setFeedback(e.target.checked)} />
+                <span>
+                  Feed the chosen mask back as a prompt on the next click. Its 256 × 256 logits go into the prompt encoder,
+                  as in the game of clicks of training. <Link to={`${P3}#training-a-game-of-clicks`}>Part 3</Link>
+                </span>
+              </label></details>
+              {result && (
+                <p className="sam-demo-timing">
+                  Decoder in this browser: <strong>{result.ms.toFixed(0)} ms</strong> for this prompt
+                  ({result.tokens} prompt tokens{result.usedMask ? ', plus the previous mask' : ''}), one thread of
+                  WebAssembly. Upscaling the four masks to {w} × {h}: {result.upMs.toFixed(0)} ms.
+                </p>
+              )}
             </div>
-          )}
-          <MaskCards result={result} img={img} w={w} h={h} chosen={chosen} ranked={ranked}
-            onPick={(k) => { setChosen(k); setThr(0) }} />
-          <label className="sam-demo-switch">
-            <input type="checkbox" checked={feedback} onChange={(e) => setFeedback(e.target.checked)} />
-            <span>
-              Feed the chosen mask back as a prompt on the next click. Its 256 × 256 logits go into the prompt encoder,
-              as in the game of clicks of training. <Link to={`${P3}#training-a-game-of-clicks`}>Part 3</Link>
-            </span>
-          </label>
-          {result && (
-            <p className="sam-demo-timing">
-              Decoder in this browser: <strong>{result.ms.toFixed(0)} ms</strong> for this prompt
-              ({result.tokens} prompt tokens{result.usedMask ? ', plus the previous mask' : ''}), one thread of
-              WebAssembly. Upscaling the four masks to {w} × {h}: {result.upMs.toFixed(0)} ms.
+          </div>
+        </> },
+        { id: 'inside', label: 'Inside the mask', content: <>
+          <Pipeline result={result} nTokens={nTokens} w={w} h={h} rw={fr.rw} rh={fr.rh} busy={busy} />
+          {result && current && photo && img ? (
+            <Inside result={result} chosen={chosen} thr={thr} setThr={setThr} current={current} prompts={prompts}
+              w={w} h={h} rw={fr.rw} rh={fr.rh} s={fr.s} />
+          ) : <div className="demo-empty-state"><h2>First, choose a mask.</h2><p>Open Segment and click an object. Then come here to inspect its scores and adjust the cut-off.</p><Link to="?view=segment">Go to the photo →</Link></div>}
+        </> },
+        { id: 'compare', label: 'Compare', content: <>{photo && img ? (
+          <Compare current={current?.mask ?? null} saved={saved} photoKey={photo.key} img={img} w={w} h={h}
+            onSave={() => current && setSaved({ key: photo.key, mask: current.mask.slice(), area: current.stats.area,
+              label: `${photo.title}, mask ${chosen === 0 ? '0 (single)' : chosen}, ${prompts.points.length} point${prompts.points.length === 1 ? '' : 's'}${prompts.box ? ' and a box' : ''}` })} />
+        ) : <div className="demo-empty-state"><h2>Your photo is getting ready.</h2><p>Once it loads, you can save a mask and compare it with another.</p></div>}</> },
+        { id: 'automatic', label: 'Automatic masks', content: <>{photo && img && ready && embKey === photo.key ? (
+          <Everything key={photo.key} client={client.current!} img={img} w={w} h={h} disabled={busy} msPerRun={result?.ms} onRunning={setAmgRunning} />
+        ) : <div className="demo-empty-state"><h2>Preparing the photo…</h2><p>Once the model is ready, scan the photo for objects automatically.</p></div>}</> },
+        { id: 'about', label: 'How it works', content: (
+          <section className="sam-demo-panel sam-demo-notes">
+            <h2>How this page was made</h2>
+            <p>
+              The image encoder of ViT-H has 637 million weights and needs 5.96 trillion floating-point operations (TFLOPs)
+              for one photo. In our run of Part 3 on an Apple M5 Pro, it took 2,999 ms on the laptop GPU and 6,779 ms on the
+              CPU. The prompt encoder and the mask decoder need 3.62 billion operations, 0.06% of that: 6.5 ms on the same
+              GPU. <Link to={`${P3}#efficiency`}>Part 3: efficiency</Link>
             </p>
-          )}
-        </div>
-      </div>
-
-      {result && current && photo && img && (
-        <Inside result={result} chosen={chosen} thr={thr} setThr={setThr} current={current} prompts={prompts}
-          w={w} h={h} rw={fr.rw} rh={fr.rh} s={fr.s} />
-      )}
-
-      {photo && img && (
-        <Compare current={current?.mask ?? null} saved={saved} photoKey={photo.key} img={img} w={w} h={h}
-          onSave={() => current && setSaved({ key: photo.key, mask: current.mask.slice(), area: current.stats.area,
-            label: `${photo.title}, mask ${chosen === 0 ? '0 (single)' : chosen}, ${prompts.points.length} point${prompts.points.length === 1 ? '' : 's'}${prompts.box ? ' and a box' : ''}` })} />
-      )}
-
-      {photo && img && ready && embKey === photo.key && (
-        <Everything key={photo.key} client={client.current!} img={img} w={w} h={h} disabled={busy} msPerRun={result?.ms} onRunning={setAmgRunning} />
-      )}
-
-      <section className="sam-demo-panel sam-demo-notes">
-        <h2>How this page was made</h2>
-        <p>
-          The image encoder of ViT-H has 637 million weights and needs 5.96 trillion floating-point operations (TFLOPs)
-          for one photo. In our run of Part 3 on an Apple M5 Pro, it took 2,999 ms on the laptop GPU and 6,779 ms on the
-          CPU. The prompt encoder and the mask decoder need 3.62 billion operations, 0.06% of that: 6.5 ms on the same
-          GPU. <Link to={`${P3}#efficiency`}>Part 3: efficiency</Link>
-        </p>
-        <p>
-          So we ran the encoder once for each photo, in Python, and saved its 256 × 64 × 64 output as float16 numbers
-          (2 MB a photo). Float16 changes the masks very little: in our check, the lowest IoU against the float32
-          embedding was 0.997. The prompt encoder and the mask decoder of the same model are one ONNX file of
-          {loadMs ? ` ${(loadMs.modelBytes / 1e6).toFixed(1)} MB` : ' 16.5 MB'}, run by onnxruntime-web.
-          {loadMs && <> On this visit, the download and start of the decoder took {(loadMs.model / 1000).toFixed(1)} s{loadMs.first !== undefined && <>, and the first masks came {(loadMs.first / 1000).toFixed(1)} s after the page opened</>}.</>}
-        </p>
-        <p>
-          The scripts that made every file of this page are in{' '}
-          <a href="https://github.com/ishwar6/ishwar-books/tree/main/code/papers/sam/demo" rel="noopener">code/papers/sam/demo</a>.
-          The masks of this page agree with the Python model (transformers' SamModel) on the same prompts.
-        </p>
-      </section>
+            <p>
+              So we ran the encoder once for each photo, in Python, and saved its 256 × 64 × 64 output as float16 numbers
+              (2 MB a photo). Float16 changes the masks very little: in our check, the lowest IoU against the float32
+              embedding was 0.997. The prompt encoder and the mask decoder of the same model are one ONNX file of
+              {loadMs ? ` ${(loadMs.modelBytes / 1e6).toFixed(1)} MB` : ' 16.5 MB'}, run by onnxruntime-web.
+              {loadMs && <> On this visit, the download and start of the decoder took {(loadMs.model / 1000).toFixed(1)} s{loadMs.first !== undefined && <>, and the first masks came {(loadMs.first / 1000).toFixed(1)} s after the page opened</>}.</>}
+            </p>
+            <p>
+              The scripts that made every file of this page are in{' '}
+              <a href="https://github.com/ishwar6/ishwar-books/tree/main/code/papers/sam/demo" rel="noopener">code/papers/sam/demo</a>.
+              The masks of this page agree with the Python model (transformers' SamModel) on the same prompts.
+            </p>
+          </section>
+        ) },
+      ]} />
     </div>
   )
 }
@@ -515,10 +508,9 @@ function MaskCards({ result, img, w, h, chosen, ranked, onPick }: {
   const areas = useMemo(() => result?.up.map((u) => maskStats(u, 0).area) ?? [], [result])
   return (
     <section className="sam-demo-masks" aria-label="The masks of the decoder">
-      <h2>Three masks and their scores</h2>
+      <h3>Three possible interpretations</h3>
       <p className="sam-demo-sub">
-        The number is SAM's predicted IoU: its own guess of how good the mask is. SAM ranks the mask with the highest
-        score first. Pick a mask to show it on the photo. <Link to={`${P3}#resolving-ambiguity`}>Part 3: resolving ambiguity</Link>
+        Pick a mask to show it on the photo. Higher scores mean SAM expects a better match. <Link to={`${P3}#resolving-ambiguity`}>Part 3: resolving ambiguity</Link>
       </p>
       <div className="sam-demo-cards">
         {[1, 2, 3].map((k) => (
@@ -527,7 +519,7 @@ function MaskCards({ result, img, w, h, chosen, ranked, onPick }: {
             <Thumb img={img} logits={result ? result.up[k] : null} w={w} h={h} />
             <span className="sam-demo-card-row">
               <strong>Mask {k}</strong>
-              {result && ranked === k && <em className="sam-demo-badge">SAM's first</em>}
+              {result && ranked === k && <em className="sam-demo-badge">Top score</em>}
             </span>
             <span className="sam-demo-card-row">
               <span>score {result ? result.iou[k].toFixed(3) : '…'}</span>
@@ -543,7 +535,7 @@ function MaskCards({ result, img, w, h, chosen, ranked, onPick }: {
           <strong>Mask 0, the single-mask output</strong> · score {result ? result.iou[0].toFixed(3) : '…'}
           {result && ` · ${fmt(areas[0])} px`}
           <br />
-          <span className="sam-demo-muted">A fourth output token. SAM uses it when several points remove the ambiguity. <Link to={`${P3}#resolving-ambiguity`}>Part 3</Link></span>
+          <span className="sam-demo-muted">Used when several points remove the ambiguity.</span>
         </span>
       </button>
     </section>
@@ -787,9 +779,9 @@ function Everything({ client, img, w, h, disabled, msPerRun, onRunning }: { clie
         skips the zoomed-in crops and the clean-up of small pieces. <Link to={`${P4}#the-whole-funnel`}>Part 4: the whole funnel</Link>
       </p>
       <div className="sam-demo-toolbar">
-        <div className="sam-demo-seg" role="radiogroup" aria-label="Grid size">
+        <div className="sam-demo-seg" role="group" aria-label="Grid size">
           {[8, 16].map((k) => (
-            <button key={k} type="button" role="radio" aria-checked={n === k} className={n === k ? 'on' : ''}
+            <button key={k} type="button" aria-pressed={n === k} className={n === k ? 'on' : ''}
               onClick={() => setN(k)} disabled={state === 'running'}>{k} × {k} points</button>
           ))}
         </div>

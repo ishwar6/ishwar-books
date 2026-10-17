@@ -3,7 +3,8 @@ import { Link, useParams } from 'react-router-dom'
 import { papers } from '../lib/content'
 import { useTitle } from '../lib/hooks'
 import { accentStyle } from '../components/PaperBits'
-import { Chevron } from '../components/icons'
+import { Arrow } from '../components/icons'
+import { demoGuides } from '../demos/catalog'
 import NotFound from './NotFound'
 import '../styles/demo.css'
 
@@ -24,15 +25,15 @@ export default function PaperDemo() {
   return (
     <div className="demo-page paper-theme" style={accentStyle(paper)}>
       <header className="demo-head">
-        <nav className="breadcrumbs">
-          <Link to="/">Home</Link><span className="sep"><Chevron /></span>
-          <Link to="/papers">Research papers</Link><span className="sep"><Chevron /></span>
-          <Link to={`/${paper.route}`}>{paper.short}</Link>
+        <nav className="demo-breadcrumbs" aria-label="Demo navigation">
+          <Link to="/demos">← All demos</Link>
+          <Link to={`/${paper.route}`}>Read the {paper.short} series <Arrow /></Link>
         </nav>
+        <span className="demo-kicker"><i />Interactive lab <span>/</span> {demoGuides[paper.slug]?.category ?? paper.short}</span>
         <h1>{paper.demo.title}</h1>
-        <p className="lede">{paper.demo.description}</p>
+        <p>{demoGuides[paper.slug]?.summary ?? paper.demo.description}</p>
       </header>
-      <Suspense fallback={<div className="demo-loading">Loading the demo…</div>}>
+      <Suspense fallback={<div className="demo-loading" role="status"><span className="demo-loading-dot" />Preparing your workspace…</div>}>
         <Demo />
       </Suspense>
     </div>
