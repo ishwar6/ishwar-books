@@ -7,7 +7,8 @@
 //   - the excerpt (from the `find` block down to the `upto` block) gets 1 px links .../start/<shot name>/0 and
 //     .../end/<shot name>/0 where its text starts and ends, and invisible links .../box/<shot name>/<k> over
 //     its first and last block (they give its width),
-//   - every highlighted phrase is painted yellow and wrapped in a link to https://reader.invalid/hl/<shot name>.
+//   - every highlighted phrase is painted yellow and wrapped in a link to https://reader.invalid/hl/<shot name>
+//     (hl/<name>,<name> on words that several excerpts highlight).
 // Chrome writes these links into the PDF with their exact rectangles (one per page or per line); reader.py reads
 // them, draws the numbered markers and removes the links.
 //
@@ -44,6 +45,7 @@ await p.evaluate(async () => {
 
 const report = await p.evaluate((shots) => {
   const out = []
+  const found = new Map()         // text node -> [{a, b, name}]: the phrases to paint, as character ranges
   const BLOCK = 'p, li, figure, h1, h2, h3, d-title, table, ul, ol, .l-body, d-math[block], .d-byline .published, div.math-grid'
   const norm = (t) => t.replace(/\s+/g, ' ')
   const findBlock = (phrase) => {
@@ -101,7 +103,9 @@ const report = await p.evaluate((shots) => {
     }
     edge(top, 'start')
     edge(bottom, 'end')
-    // the key phrases: yellow, like the screenshots (first match in the excerpt, as paper_shots.mjs does)
+    // the key phrases: yellow, like the screenshots (first match in the excerpt, as paper_shots.mjs does). They are
+    // only found here; the painting waits until every excerpt is found (below), so that two excerpts that quote the
+    // same words both get them, as both screenshots do.
     let marks = 0
     for (const phrase of s.mark || []) {
       let done = false
@@ -110,16 +114,33 @@ const report = await p.evaluate((shots) => {
         let node
         while ((node = w.nextNode())) {
           const i = node.data.indexOf(phrase)
-          if (i < 0 || node.parentElement.closest('a.rd-hl')) continue
-          const r = document.createRange(); r.setStart(node, i); r.setEnd(node, i + phrase.length)
-          const m = document.createElement('a'); m.className = 'rd-hl'; m.href = `https://reader.invalid/hl/${name}`
-          r.surroundContents(m); marks++; done = true
+          if (i < 0) continue
+          if (!found.has(node)) found.set(node, [])
+          found.get(node).push({ a: i, b: i + phrase.length, name })
+          marks++; done = true
           break
         }
         if (done) break
       }
     }
     out.push(`${name}: ${scope.length} block(s), ${marks}/${(s.mark || []).length} highlights`)
+  }
+  // Paint the phrases. Where phrases of several excerpts overlap, the text is cut at every phrase edge and each piece
+  // links to all the excerpts that hold it (https://reader.invalid/hl/<name>,<name>), so each excerpt gets exactly
+  // its own words. The pieces of a node are wrapped from right to left, so the offsets on the left stay valid.
+  for (const [node, rs] of found) {
+    const cuts = [...new Set(rs.flatMap((r) => [r.a, r.b]))].sort((x, y) => y - x)
+    for (let j = 1; j < cuts.length; j++) {
+      const a = cuts[j], b = cuts[j - 1]
+      const names = [...new Set(rs.filter((r) => r.a <= a && r.b >= b).map((r) => r.name))]
+      if (!names.length) continue
+      const r = document.createRange(); r.setStart(node, a); r.setEnd(node, b)
+      const m = document.createElement('a'); m.className = 'rd-hl'; m.href = `https://reader.invalid/hl/${names.join(',')}`
+      // a cut inside yellow text (where another piece goes on) gets no padding and square corners: no seam
+      if (rs.some((x) => x.a < a && x.b >= a)) m.style.cssText += ';padding-left:0;border-top-left-radius:0;border-bottom-left-radius:0'
+      if (rs.some((x) => x.a <= b && x.b > b)) m.style.cssText += ';padding-right:0;border-top-right-radius:0;border-bottom-right-radius:0'
+      r.surroundContents(m)
+    }
   }
   return out
 }, shots)

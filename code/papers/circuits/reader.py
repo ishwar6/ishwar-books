@@ -65,8 +65,9 @@ def norm(t):
 
 
 def has_words(text, phrase):
-    """True if the words of `phrase` (maths dropped) appear in order in `text`."""
-    got = ' '.join(norm(text))
+    """True if the words of `phrase` (maths dropped) appear in order in `text`. Spaces are ignored, because a word
+    with a hyphen can break across two lines in the PDF ("V-" / "composition")."""
+    got = ''.join(norm(text))
     runs, run = [], []
     for w in phrase.split():
         if re.search(r'[_^\\]', w):          # a TeX symbol such as W_O: printed as maths, not as these letters
@@ -74,7 +75,7 @@ def has_words(text, phrase):
         else:
             run.append(w)
     runs.append(run)
-    return all(' '.join(norm(' '.join(r))) in got for r in runs if r)
+    return all(''.join(norm(' '.join(r))) in got for r in runs if r)
 
 
 def tighten(pg, r):
@@ -118,8 +119,9 @@ def main():
         for ln in pg.get_links():
             u = ln.get('uri') or ''
             if u.startswith(TAG):
-                kind, name, *k = u[len(TAG):].split('/')
-                tags[(kind, name)][int(k[0]) if k else 0].append((pno, fitz.Rect(ln['from'])))
+                kind, names, *k = u[len(TAG):].split('/')
+                for name in names.split(','):              # hl/<name>,<name>: words that several excerpts highlight
+                    tags[(kind, name)][int(k[0]) if k else 0].append((pno, fitz.Rect(ln['from'])))
 
     def spans(name):
         """page -> the rectangle the excerpt covers on that page, from the line where it starts to where it ends."""
