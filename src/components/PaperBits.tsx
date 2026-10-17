@@ -12,7 +12,7 @@ export const accentStyle = (paper: Paper) => ({ '--paper': paper.accent } as CSS
 export const authorLine = (authors: string[]) => authors.join(', ')
 
 /** The paper's title card: a small "sheet of paper" with the citation, links and (optionally) what you will learn. */
-export function PaperSheet({ paper, compact = false }: { paper: Paper; compact?: boolean }) {
+export function PaperSheet({ paper, compact = false, part }: { paper: Paper; compact?: boolean; part?: string }) {
   return (
     <section className={`paper-sheet${compact ? ' compact' : ''}`} aria-label="About the paper">
       <div className="paper-sheet-top">
@@ -30,6 +30,7 @@ export function PaperSheet({ paper, compact = false }: { paper: Paper; compact?:
         {paper.year && <span className="paper-org"> · {paper.year}</span>}
       </div>
       <div className="paper-links">
+        {paper.reader && <Link to={`/${paper.route}/read${part ? `?part=${part}` : ''}`} className="paper-read">Read beside the paper <Arrow /></Link>}
         {paper.arxiv && <a href={arxivAbs(paper.arxiv)} target="_blank" rel="noreferrer">arXiv page <Arrow /></a>}
         {paper.arxiv && <a href={arxivPdf(paper.arxiv)} target="_blank" rel="noreferrer">PDF <Arrow /></a>}
         {paper.url && <a href={paper.url} target="_blank" rel="noreferrer">Paper <Arrow /></a>}

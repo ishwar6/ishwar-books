@@ -180,3 +180,5 @@
 
 /* paper screenshots keep their natural size (no blurry upscaling of one-column crops) */
 .paper-theme .prose > h2:first-child { border-top: 0; padding-top: 0; }
+.paper-links a.paper-read { background: var(--paper); border-color: var(--paper); color: #0d1512; }
+.paper-links a.paper-read:hover { filter: brightness(1.08); }

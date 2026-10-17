@@ -147,6 +147,12 @@ for (const p of papers) {
         <nav>${prev ? `<a href="${BASE}${prev.route}/">Previous: ${prev.partLabel}, ${esc(prev.title)}</a>` : ''} ${next ? `<a href="${BASE}${next.route}/">Next: ${next.partLabel}, ${esc(next.title)}</a>` : ''}</nav></article>`,
     })
   })
+  if (p.reader) pages.push({
+    route: `${p.route}/read`, title: `${p.short}, read beside the paper · ${site.name}`, image: ogImage(`paper-${p.slug}`), type: 'website',
+    description: `Read the ${p.short} paper with its explanation beside it: scroll the paper, and the explanation of each highlighted passage follows.`,
+    ld: [crumbs([['Home', ''], ['Research papers', 'papers'], [p.short, p.route], ['Read beside the paper', `${p.route}/read`]])],
+    body: `<h1>${esc(p.short)}, read beside the paper</h1><p>The paper and its explanation side by side.</p>${list(p.parts.filter((x) => x.partNumber).map((x) => [`${BASE}${x.route}/`, `${x.partLabel}: ${x.title}`, x.description]))}`,
+  })
 }
 
 const videos = manifest.videos ?? []

@@ -1,0 +1,106 @@
+/* ---------- side-by-side reader (/papers/<paper>/read): the paper on the left, the explanation on the right ---------- */
+html.pr-lock, html.pr-lock body { overflow: hidden; }
+html.pr-lock .site-footer { display: none; }
+
+.pr-root {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
+  display: flex; flex-direction: column; background: var(--bg);
+  --split: 50%;
+}
+
+/* the toolbar */
+.pr-bar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px;
+  padding: 8px max(16px, env(safe-area-inset-left, 0px)); border-bottom: 1px solid var(--border-soft);
+  font-size: 13.5px; color: var(--muted); background: var(--bg-soft);
+}
+.pr-back { font-weight: 700; color: var(--text-strong); white-space: nowrap; }
+.pr-back:hover { color: var(--paper-ink); }
+.pr-jump {
+  font: inherit; color: var(--text-strong); background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; padding: 4px 8px; max-width: 280px;
+}
+.pr-where { margin-left: auto; white-space: nowrap; }
+.pr-where b { color: var(--paper-ink); }
+.pr-zoom { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.pr-zoom button {
+  font: inherit; font-weight: 700; color: var(--text-strong); background: var(--surface); border: 0;
+  padding: 4px 10px; cursor: pointer; min-width: 34px;
+}
+.pr-zoom button + button { border-left: 1px solid var(--border); }
+.pr-zoom button:hover { background: var(--surface-2); }
+.pr-dl { font-weight: 700; color: var(--paper-ink); white-space: nowrap; }
+
+/* the two panes */
+.pr-split { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, var(--split)) 8px minmax(0, 1fr); }
+.pr-paper, .pr-notes { overflow: auto; overscroll-behavior: contain; outline: none; }
+.pr-paper { background: color-mix(in srgb, var(--bg) 70%, #000); }
+.pr-handle { cursor: col-resize; background: var(--border-soft); position: relative; touch-action: none; }
+.pr-handle::after {
+  content: ''; position: absolute; left: 2px; right: 2px; top: 50%; height: 40px; margin-top: -20px;
+  border-radius: 4px; background: var(--border);
+}
+.pr-handle:hover, .pr-handle:active { background: var(--paper-line); }
+
+/* the paper */
+.pr-pages { margin: 0 auto; padding: 16px; display: grid; gap: 16px; min-width: 0; box-sizing: border-box; }
+.pr-page {
+  position: relative; width: 100%; background: #fff; border-radius: 3px;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.35);
+}
+.pr-page canvas { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 3px; }
+.pr-pno {
+  position: absolute; right: 8px; bottom: 6px; font-size: 11px; font-weight: 700; color: #64748b;
+  background: rgba(255, 255, 255, 0.85); padding: 1px 6px; border-radius: 6px;
+}
+.pr-region {
+  position: absolute; display: block; padding: 0; border: 0; background: transparent; cursor: pointer;
+  border-radius: 4px; transition: box-shadow 0.2s, background 0.2s;
+}
+.pr-region:hover { background: rgba(91, 184, 166, 0.07); box-shadow: 0 0 0 1.5px rgba(91, 184, 166, 0.45); }
+.pr-region.on { background: rgba(91, 184, 166, 0.09); box-shadow: 0 0 0 2.5px var(--paper), 0 0 22px rgba(91, 184, 166, 0.35); }
+.pr-hl {
+  position: absolute; border-radius: 2px; pointer-events: none;
+  box-shadow: 0 0 0 1.5px rgba(214, 150, 0, 0.9); background: rgba(255, 200, 0, 0.18);
+}
+.pr-msg { padding: 24px; color: var(--muted); }
+
+/* the notes */
+.pr-notes-in { max-width: var(--measure, 860px); margin: 0 auto; padding: 8px clamp(16px, 3vw, 36px) 45vh; }
+.pr-part { padding-top: 18px; }
+.pr-part + .pr-part { margin-top: 40px; border-top: 1px dashed var(--border); }
+.pr-part-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin: 6px 0 4px; }
+.pr-part-label { font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--paper-ink); }
+.pr-part-title { font-family: var(--serif); font-size: 26px; font-weight: 700; color: var(--text-strong); line-height: 1.25; }
+.pr-part-title:hover { color: var(--paper-ink); }
+
+/* a box of this paper: the screenshot is not needed, the paper is on the left */
+.pr-notes .prose .callout-paper.pr-box .pp-shot { display: none; }
+.pr-notes .prose .callout-paper.pr-box { transition: box-shadow 0.2s; scroll-margin-top: 20px; }
+.pr-notes .prose .callout-paper.pr-box.on { box-shadow: 0 0 0 2px var(--paper); }
+.pr-tag {
+  display: inline-flex; align-items: center; gap: 6px; margin-right: 8px; padding: 2px 9px 2px 3px;
+  border: 1px solid var(--paper-line); border-radius: 999px; background: var(--paper-soft); color: var(--muted);
+  font: inherit; font-size: 12px; font-weight: 700; cursor: pointer;
+}
+.pr-tag b {
+  display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 4px; border-radius: 999px;
+  background: var(--paper); color: #0d1512; font-size: 11.5px;
+}
+.pr-tag:hover { border-color: var(--paper-ink); color: var(--text-strong); }
+
+/* phones and narrow windows: the paper on top, the notes under it */
+@media (max-width: 900px) {
+  .pr-split { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 42fr) 6px minmax(0, 58fr); }
+  .pr-handle { cursor: default; }
+  .pr-handle::after { display: none; }
+  .pr-pages { padding: 8px; gap: 8px; }
+  .pr-where { margin-left: 0; }
+  .pr-jump { max-width: 100%; }
+  .pr-dl { display: none; }
+}
+
+/* the notes pane is narrower than an article: a slightly smaller text size fits it */
+.pr-notes .prose { font-size: calc(var(--prose-size) * 0.86); }
+.pr-notes .prose h2 { font-size: 1.45em; }
+@media (max-width: 640px) { .pr-notes .prose { font-size: calc(var(--prose-size) * 0.8); } .pr-part-title { font-size: 21px; } }

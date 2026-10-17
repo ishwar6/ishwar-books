@@ -56,6 +56,8 @@ export type Paper = {
   tags: string[]
   date?: string
   plannedParts: number
+  /** the map of the side-by-side reader (public/papers/pdf/<paper>.json), when the paper has one */
+  reader?: string
   minutes: number
   parts: PageMeta[]
 }

@@ -1,4 +1,4 @@
-import { StrictMode } from 'react'
+import { StrictMode, lazy, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import 'katex/dist/katex.min.css'
@@ -23,6 +23,8 @@ import Paper from './pages/Paper'
 import PaperPart from './pages/PaperPart'
 import NotFound from './pages/NotFound'
 
+const PaperRead = lazy(() => import('./pages/PaperRead'))   // pdf.js is large: load it only on this page
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter basename={import.meta.env.BASE_URL}>
@@ -36,6 +38,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="books/:book/:chapter" element={<Chapter />} />
           <Route path="papers" element={<Papers />} />
           <Route path="papers/:paper" element={<Paper />} />
+          <Route path="papers/:paper/read" element={<Suspense fallback={null}><PaperRead /></Suspense>} />
           <Route path="papers/:paper/:part" element={<PaperPart />} />
           <Route path="videos" element={<Videos />} />
           <Route path="videos/:slug" element={<Video />} />

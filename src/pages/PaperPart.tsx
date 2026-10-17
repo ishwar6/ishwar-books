@@ -27,7 +27,7 @@ export default function PaperPart() {
               <Link to="/papers">Research papers</Link><span className="sep"><Chevron /></span>
               <Link to={`/${paper.route}`}>{paper.short}</Link>
             </nav>
-            <PaperSheet paper={paper} compact />
+            <PaperSheet paper={paper} compact part={meta.partNumber ? meta.slug : undefined} />
             <div className="part-label">{meta.partOf}{meta.covers ? <span className="covers"> · Covers {meta.covers}</span> : null}</div>
             <h1>{meta.title}</h1>
             {meta.description && <p className="lede">{meta.description}</p>}

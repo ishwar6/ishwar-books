@@ -489,6 +489,8 @@ const paperList = papers.map((x) => {
     arxiv: d.arxiv ? String(d.arxiv) : undefined, url: d.url, code: d.code, accent: d.accent ?? '#4fc3d9',
     learn: d.learn ?? [], tags: d.tags ?? [], date: toDate(d.date), updated: toDate(d.updated), order: d.order ?? 1e9,
     plannedParts: d.parts ?? x.parts.length,
+    // the side-by-side reader exists when code/papers/<paper>/reader.py has written its map
+    ...(fs.existsSync(path.join(ROOT, 'public', 'papers', 'pdf', `${x.slug}.json`)) ? { reader: `papers/pdf/${x.slug}.json` } : {}),
     minutes: x.parts.reduce((n, p) => n + p.meta.minutes, 0),
     parts: x.parts.map((p) => p.meta),
   }

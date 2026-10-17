@@ -58,14 +58,15 @@ def find(pg, phrase, nth=0):
 
 
 def shot(name, arxiv_id=SAM, highlight=(), anchor=None, page=None, above=40, below=40, dpi=190, snap=True, band=None,
-         figure=False, column=None, nth=0, hl_nth=None, fig_top=None, end=None):
+         figure=False, column=None, nth=0, hl_nth=None, fig_top=None, end=None, dry=False):
     """Render one highlighted excerpt.
     anchor: phrase that positions the crop (defaults to the first highlight); nth picks a later match on the page.
     above/below: points of context kept around the anchor (text mode).
     figure=True: the anchor is a caption; the crop is the figure graphics above it plus the whole caption.
     column: None = automatic (one column of a two-column paper if the anchor sits in one), or 'full'.
     band: (dy0, dy1) points below the anchor's bottom to mark as a highlighted band (equations, table rows).
-    end: a phrase where the excerpt stops (the crop ends at the line holding its last word; `below` is then ignored)."""
+    end: a phrase where the excerpt stops (the crop ends at the line holding its last word; `below` is then ignored).
+    dry=True: render nothing; return where the excerpt is (page, crop and highlight rectangles in PDF points)."""
     doc = pdf(arxiv_id)
     anchor = anchor or highlight[0]
     pages = [page] if page is not None else range(len(doc))
@@ -99,15 +100,18 @@ def shot(name, arxiv_id=SAM, highlight=(), anchor=None, page=None, above=40, bel
         if not rects:
             raise SystemExit(f'{name}: highlight not found on page {pno + 1}: {phrase!r}')
         for r in rects:
-            pg.add_highlight_annot(r).set_colors(stroke=YELLOW); found.append(r)
-            pg.annots
+            if not dry:
+                pg.add_highlight_annot(r).set_colors(stroke=YELLOW)
+            found.append(r)
     if band:
         y0b, y1b = box.y1 + band[0], box.y1 + band[1]
         xs = [w for w in pg.get_text('words') if w[2] > x0 and w[0] < x1 and w[3] > y0b and w[1] < y1b]
         xs = xs or [w for w in pg.get_text('words') if w[2] > x0 and w[0] < x1]
         bx0, bx1 = min(w[0] for w in xs) - 8, max(w[2] for w in xs) + 8
         r = fitz.Rect(bx0, box.y1 + band[0], bx1, box.y1 + band[1])
-        pg.draw_rect(r, color=(0.95, 0.7, 0.0), fill=YELLOW, fill_opacity=0.28, width=1.2, overlay=False)
+        found.append(r)
+        if not dry:
+            pg.draw_rect(r, color=(0.95, 0.7, 0.0), fill=YELLOW, fill_opacity=0.28, width=1.2, overlay=False)
 
     if figure:
         cap = blk
@@ -151,6 +155,9 @@ def shot(name, arxiv_id=SAM, highlight=(), anchor=None, page=None, above=40, bel
                 nxt = [a for a, b in lines if a >= b0 - 0.5 and b > b0 + 0.5]
                 bot = min(b0 + 4, (min(nxt) + b0) / 2 if nxt else b0 + 4)
         clip = fitz.Rect(x0, top, x1, bot)
+    if dry:
+        return dict(name=name, arxiv=arxiv_id, page=pno, clip=[round(v, 2) for v in clip],
+                    hl=[[round(v, 2) for v in r] for r in found])
     os.makedirs(OUT, exist_ok=True)
     pix = pg.get_pixmap(clip=clip, dpi=dpi, annots=True)
     pix.save(os.path.join(OUT, name + '.png'))

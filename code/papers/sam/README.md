@@ -13,6 +13,7 @@ Every number in the articles that does not come from the paper comes from one of
 | `paper_shots.py`, `shots_partN.py` | download the paper, highlight phrases and crop excerpts into `public/img/papers/sam/` |
 | `figlib.py`, `samfig.py`, `alammar.py`, `figs_partN.py` | draw the SVG figures from the results (theme-aware CSS classes, no hard-coded colours) |
 | `termshot.py` | renders a saved log as a terminal screenshot PNG |
+| `reader.py` | builds the side-by-side reader (/papers/sam/read): our annotated copy of the paper (highlights and numbered markers drawn in, images made smaller) and the map from each box to its place in the PDF, in `public/papers/pdf/` |
 | `assemble.py` | turns `partN.md` into `content/papers/sam/<slug>.md`, inserting the figures; checks images, em dashes, banned words and the ASD-STE100 writing rules (sentence and paragraph length, unapproved words) |
 | `check_md.mjs` | renders a page's maths with KaTeX and reports errors (run from the repo root) |
 | `results/` | the JSON and text output every number in the articles comes from |
