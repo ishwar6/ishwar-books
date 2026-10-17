@@ -1,0 +1,24 @@
+== A. A SKIP-TRIGRAM IN FACTORED FORM: push on out = (attention of destination on " keep") x (OV of " keep")
+  OV column of " keep": {'mind': 2.0, 'bay': 6.0}; attention on " keep" from " in" 0.5, from " at" 0.8
+  destination 'in': mind 0.5 x 2.0 = 1.0, bay 0.5 x 6.0 = 3.0  (bay / mind = 3.0)
+  destination 'at': mind 0.8 x 2.0 = 1.6, bay 0.8 x 6.0 = 4.8  (bay / mind = 3.0)
+  wanted: " in" -> mind, " at" -> bay. The ratio bay / mind is 3.0 for every destination, so one head cannot do it.
+
+== B. EIGENVALUES OF SMALL OV CIRCUITS (columns = source token, rows = out token)
+  copy         M = [[2.0, 1.0], [1.0, 2.0]]: " cat" and " Cat" each raise themselves (2) and each other (1)
+               eigenvalues +3.000, +1.000; copy score +1.000; trace +4.0 = sum of eigenvalues +4.0; diagonal [2.0, 2.0]
+               eigenvectors [[0.707, 0.707], [0.707, -0.707]] (angle between them 90.0 degrees)
+  swap         M = [[0.0, 1.0], [1.0, 0.0]]: " cat" raises " cats" and " cats" raises " cat"
+               eigenvalues +1.000, -1.000; copy score +0.000; trace +0.0 = sum of eigenvalues +0.0; diagonal [0.0, 0.0]
+               eigenvectors [[0.707, 0.707], [0.707, -0.707]] (angle between them 90.0 degrees)
+  rotate       M = [[0.0, -1.0], [1.0, 0.0]]: token 1 raises token 2, token 2 lowers token 1
+               eigenvalues +0.000+1.000i, +0.000-1.000i; copy score +0.000; trace +0.0 = sum of eigenvalues +0.0; diagonal [0.0, 0.0]
+  pathological M = [[-1.0, 6.0], [-1.0, 4.0]]: all eigenvalues positive, yet token 1 lowers its own logit
+               eigenvalues +2.000, +1.000; copy score +1.000; trace +3.0 = sum of eigenvalues +3.0; diagonal [-1.0, 4.0]
+               eigenvectors [[0.894, 0.447], [0.949, 0.316]] (angle between them 8.1 degrees)
+  check by hand: copy matrix times (1, 1) = [3.0, 3.0] = 3 x (1, 1)
+  pathological: reading token 1 gives logits [-1.0, -1.0]: token 1 goes down by 1
+
+== D. AB AND BA HAVE THE SAME NON-ZERO EIGENVALUES
+  A = [1.0, 2.0, 0.0] (column), B = [1.0, 1.0, 1.0] (row)
+  AB = [[1.0, 1.0, 1.0], [2.0, 2.0, 2.0], [0.0, 0.0, 0.0]] (3 x 3) has eigenvalues [3.0, 0.0, 0.0]; BA = [[3.0]] (1 x 1)

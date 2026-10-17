@@ -1,0 +1,81 @@
+== 1. HOW BIG THE EXPANDED CIRCUITS ARE (attn-only-1l)
+  vocabulary 48,262 tokens, 8 heads; one expanded circuit is 48,262 x 48,262 = 2.33 billion numbers
+  QK + OV for all 8 heads: 37.3 billion numbers; the model stores 51.0 million weights
+
+== 2. SKIP-TRIGRAMS READ FROM THE WEIGHTS: fix a source, top destinations (QK) and top out tokens (OV)
+  head 0.0  source ' perfect'  dest [' looks', 'Exper', ' look', ' equally', "'),"]  out ['sembled', 'perfect', ' perfect', ' perfection', 'Perfect']
+  head 0.0  source ' large'    dest ['>{{', '="{{', ' appliances', ' reagents', '(*']  out ['large', 'small', 'Large', ' smaller', 'sized']
+  head 0.0  source ' Ralph'    dest ['R', 'Van', ' Van', ' van', 'J']  out ['alph', ' MERCHANTABILITY', ' Ralph', ' deprec', ' deduction']
+  head 0.0  source ' Lloyd'    dest ['Stephen', ' Ethan', ' Sam', 'Andrew', ' Andrew']  out [' Lloyd', ' insured', ' reins', ' privat', ' insurer']
+  head 0.6  source ' two'      dest ['(),', "'],", ' \n     ', '"},', '"],']  out ['Two', 'Three', ' one', ' two', ' another']
+  head 0.6  source ' couldn'   dest [' they', ' we', ' technicians', ' They', ' We']  out [' couldn', ' hadn', ' wasn', ' didn', ' seemed']
+  head 0.7  source ' Paris'    dest ['Sche', 'Pal', ' protector', '()`', ' Dou']  out ['Germ', ' Frankfurt', ' Amsterdam', ' Milan', ' Lyon']
+  head 0.7  source ' two'      dest [' valves', ' kits', ' dresses', ' rentals', ' meals']  out [' half', 'three', ' three', ' thirty', ' eighteen']
+  scale: 0.0 ' perfect': top QK 3.79 (median -0.03), top OV 7.12 (median -0.02); 0.0 ' large': top QK 3.42 (median -0.1), top OV 12.38 (median 0.02); 0.0 ' Ralph': top QK 5.29 (median -0.01), top OV 7.09 (median 0.01)
+
+== 3. SKIP-TRIGRAMS AT WORK IN THE WHOLE MODEL (probability of the next token)
+  'My friend Ralph called me today.\n"R'     p('alph') = 0.8278   |   'My friend Bob called me today.\n"R'     p('alph') = 0.0203
+  'We visited Ralph and his dog.\n"R'        p('alph') = 0.7899   |   'We visited Tom and his dog.\n"R'        p('alph') = 0.0154
+  'The perfect gift for her. It looks'       p(' perfect') = 0.0492   |   'The nice gift for her. It looks'        p(' perfect') = 0.0030
+  tokens: ['<|BOS|>', 'My', ' friend', ' Ralph', ' called', ' me', ' today', '.', '\n', '"', 'R']
+  each head's push on the logit of "alph" at the last token: 0.0: +8.18, 0.1: +1.60, 0.2: -0.18, 0.3: +0.16, 0.4: +0.27, 0.5: +0.60, 0.6: +1.67, 0.7: -0.24
+  head 0.0 at "R" puts 0.59 of its attention on " Ralph"
+
+== 4. PRIMARILY POSITIONAL HEADS
+  attention from the position embeddings alone (query at position 200; weight on the same token, 1 back, 2 back):
+    head 0.0: [0.064, 0.065, 0.056]
+    head 0.1: [0.913, 0.087, 0.0]
+    head 0.2: [0.557, 0.334, 0.071]
+    head 0.3: [0.031, 0.032, 0.031]
+    head 0.4: [0.013, 0.014, 0.014]
+    head 0.5: [0.936, 0.064, 0.0]
+    head 0.6: [0.105, 0.097, 0.079]
+    head 0.7: [0.88, 0.119, 0.001]
+  real pattern on 1000 tokens of text (Part 1 of this series), mean weight on 0, 1, 2, 3 tokens back (positions 100+):
+    head 0.0: [0.017, 0.021, 0.019, 0.019]
+    head 0.1: [0.107, 0.152, 0.072, 0.034]
+    head 0.2: [0.056, 0.115, 0.095, 0.074]
+    head 0.3: [0.009, 0.015, 0.015, 0.013]
+    head 0.4: [0.007, 0.007, 0.008, 0.009]
+    head 0.5: [0.157, 0.26, 0.098, 0.041]
+    head 0.6: [0.015, 0.022, 0.021, 0.02]
+    head 0.7: [0.069, 0.206, 0.105, 0.045]
+  OV of head 0.5, source ' corresponding' -> [' to', 'rians', ' thereto', 'ements', 'ments']
+  OV of head 0.5, source ' couldn'       -> ['t', 'yon', 'pute', 'itate', 'receive']
+  OV of head 0.5, source ' shouldn'      -> ['t', 'thood', 'rio', 'catch', 'googleapis']
+  OV of head 0.1, source ' couldn'       -> [' thereof', ' resist', ' guessed', ' blame', 'って']
+  OV of head 0.1, source ' shouldn'      -> [' testament', 'GER', ' granted', ' guessed', ' subpoena']
+
+== 5. A SKIP-TRIGRAM BUG: head 0.2 and " keep"
+  OV column " keep": {' mind': 3.64, ' bay': 8.89, ' toes': 6.55, ' wraps': 2.71, ' forefront': 9.41}  (median over all tokens -0.09); top [' forefront', ' bay', '\n                   ', ' foreseeable', ' toes', ' slipping']
+  QK column " keep": {' in': 1.78, ' at': 2.77, ' on': 1.74, ' under': 1.51, ' going': 3.58}  (median 0.12); top destinations [' looking', ' going', ' coming', ' searching', ' trying', ' happy']
+  'You need to keep this in': head 0.2 puts 0.27 on " keep"; through " keep" it pushes mind +1.78, bay +5.28  (ratio bay/mind 2.96); whole head: mind +3.17, bay +4.76
+      whole model: p(mind) = 0.6416, p(bay) = 0.000014; top 3 [' mind', ' the', ' your']; head 0.7 pushes mind +4.45
+  'You need to keep the dogs at': head 0.2 puts 0.38 on " keep"; through " keep" it pushes mind +2.43, bay +7.19  (ratio bay/mind 2.96); whole head: mind +2.49, bay +7.49
+      whole model: p(mind) = 0.0000, p(bay) = 0.318783; top 3 [' bay', ' the', ' home']; head 0.7 pushes mind +2.03
+
+== 6. THE OV CIRCUIT IS LOW-RANK: ITS NON-ZERO EIGENVALUES LIVE IN A 64 x 64 MATRIX
+  OV circuit (row form) = (W_E W_V)(W_O W_U): [48,262 x 64] times [64 x 48,262], so its rank is at most 64 of 48,262
+  eigenvalues of AB and BA are the same (apart from zeros), so we take those of (W_O W_U)(W_E W_V): 64 x 64
+  check on a 300-token piece of head 0.0: 300 x 300 has 300 eigenvalues; the 64 largest match the 64 x 64 ones to 3.8e-13; the other 236 are at most 6.8e-14
+
+== 7. EIGENVALUES OF EACH HEAD'S OV CIRCUIT (whole vocabulary), AND OTHER COPYING MEASURES
+  head 0.0: copy score sum(l)/sum(|l|) = +0.998; 64/64 with positive real part (26 real and positive, 38 complex); trace 353,117 = sum of diagonal 353,117
+  head 0.1: copy score sum(l)/sum(|l|) = -0.418; 21/64 with positive real part (3 real and positive, 54 complex); trace -26,596 = sum of diagonal -26,596
+  head 0.2: copy score sum(l)/sum(|l|) = +0.707; 42/64 with positive real part (14 real and positive, 46 complex); trace 93,844 = sum of diagonal 93,844
+  head 0.3: copy score sum(l)/sum(|l|) = +1.000; 64/64 with positive real part (16 real and positive, 48 complex); trace 358,507 = sum of diagonal 358,507
+  head 0.4: copy score sum(l)/sum(|l|) = +0.974; 61/64 with positive real part (19 real and positive, 44 complex); trace 235,602 = sum of diagonal 235,602
+  head 0.5: copy score sum(l)/sum(|l|) = -0.365; 15/64 with positive real part (5 real and positive, 52 complex); trace -19,782 = sum of diagonal -19,782
+  head 0.6: copy score sum(l)/sum(|l|) = +0.915; 61/64 with positive real part (13 real and positive, 50 complex); trace 155,782 = sum of diagonal 155,782
+  head 0.7: copy score sum(l)/sum(|l|) = +0.970; 57/64 with positive real part (17 real and positive, 46 complex); trace 121,358 = sum of diagonal 121,358
+  other measures (diagonal over all 48,262 tokens; top-1 and top-5 self share over tokens 1000..2999):
+    head 0.0: diagonal > 0 for 0.99 of tokens; top-1 self 0.37; top-5 self 0.51
+    head 0.1: diagonal > 0 for 0.37 of tokens; top-1 self 0.00; top-5 self 0.00
+    head 0.2: diagonal > 0 for 0.91 of tokens; top-1 self 0.00; top-5 self 0.01
+    head 0.3: diagonal > 0 for 0.98 of tokens; top-1 self 0.34; top-5 self 0.43
+    head 0.4: diagonal > 0 for 0.96 of tokens; top-1 self 0.26; top-5 self 0.34
+    head 0.5: diagonal > 0 for 0.38 of tokens; top-1 self 0.00; top-5 self 0.00
+    head 0.6: diagonal > 0 for 0.92 of tokens; top-1 self 0.12; top-5 self 0.21
+    head 0.7: diagonal > 0 for 0.96 of tokens; top-1 self 0.00; top-5 self 0.02
+  heads with copy score above 0.5: 6 of 8
+  20 random Gaussian heads of the same shapes: copy score from -0.035 to +0.070 (mean -0.002); positive real part 29 to 35 of 64; complex 54 to 60 of 64

@@ -1,0 +1,240 @@
+[
+ {
+  "out": "p4-split.png",
+  "find": "The key thing to notice is that these terms consist of two separable operations",
+  "upto": "It describes how a given",
+  "mark": [
+   "two separable operations",
+   "query-key (QK) circuit",
+   "how much a given query token",
+   "Output-Value (OV) circuit",
+   "how a given token will affect the output logits if attended to"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p4-source-only.png",
+  "find": "but once a destination",
+  "mark": [
+   "the effect on the output is solely a function of that source token"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p4-skip-trigrams.png",
+  "find": "One of the core challenges of mechanistic interpretability",
+  "mark": [
+   "simple linear or bilinear functions on tokens",
+   "skip-trigram",
+   "and the \"out\" is modified"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p4-not-trivial.png",
+  "find": "this doesn't mean that interpretation is trivial",
+  "mark": [
+   "compressed Chinese room",
+   "giant pile of cards",
+   "fungibility between variables",
+   "QK weights aren't comparable between different query vectors"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p4-copying.png",
+  "find": "One of the most striking things about looking at these matrices",
+  "upto": "Thus, tokens are copied",
+  "mark": [
+   "enormous fraction of their capacity to copying",
+   "increase the probability of that token",
+   "only attends back to tokens which could plausibly be the next token",
+   "only to places where bigram-ish statistics make them seem plausible"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p4-fig-copying.png",
+  "figure": 10,
+  "pad": 10
+ },
+ {
+  "out": "p4-tokenization.png",
+  "find": "We also see more subtle kinds of copying",
+  "upto": "It's quite common to see skip-trigram entries",
+  "mark": [
+   "Tokenizers typically merge spaces onto the start of words",
+   "split when there isn't",
+   "attend back to tokens which might be the complete word with a space",
+   "predict"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p4-fig-ralph.png",
+  "figure": 11,
+  "pad": 10
+ },
+ {
+  "out": "p4-patterns.png",
+  "find": "We can summarize this copying behavior",
+  "upto": "All of these can be seen as a kind of very primitive in-context learning",
+  "mark": [
+   "very primitive in-context learning",
+   "much more interesting and powerful algorithm"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p4-other.png",
+  "find": "In LaTeX, every",
+  "upto": "Common phrases and constructions",
+  "mark": [
+   "left … \\ → right",
+   "keep … [in → mind / at → bay / under → wraps]"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p4-positional.png",
+  "find": "the one-layer models tend to have a small number of attention heads that are primarily",
+  "mark": [
+   "primarily positional",
+   "strongly preferring certain relative positions",
+   "either attends to the present token or the previous token"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p4-fig-positional.png",
+  "figure": 13,
+  "pad": 10
+ },
+ {
+  "out": "p4-bugs.png",
+  "find": "Our one-layer models represent skip-trigrams in a",
+  "upto": "We frequently observe these in attention heads",
+  "mark": [
+   "factored form",
+   "They can't really capture the three way interactions flexibly",
+   "keep… in bay",
+   "in some sense, a bug"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p4-fig-bugs.png",
+  "figure": 14,
+  "pad": 10
+ },
+ {
+  "out": "p4-bugs-early.png",
+  "find": "Even though these particular bugs seem in some sense trivial",
+  "mark": [
+   "early demonstration of using interpretability to understand model failures",
+   "how much performance"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p4-summarizing.png",
+  "find": "We've turned the problem of understanding one-layer attention-only transformers",
+  "upto": "It seems like it should be possible to formalize this",
+  "mark": [
+   "enormous, with easily billions of entries",
+   "extremely low-rank",
+   "cluster structure",
+   "Copying behavior is widespread in OV matrices"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p4-detect.png",
+  "find": "The type of behavior we're most excited to detect in an automated way is copying",
+  "mark": [
+   "mapping the same vector to itself",
+   "summary statistic",
+   "copying is actually a more complex concept than it might first appear"
+  ],
+  "padx": 40,
+  "pady": 6,
+  "upto": "So copying is actually a more complex concept"
+ },
+ {
+  "out": "p4-eigen.png",
+  "find": "One natural approach might be to use eigenvectors and eigenvalues",
+  "upto": "apparently mirroring the copying structure",
+  "mark": [
+   "eigenvectors and eigenvalues",
+   "mutually increase their own probability",
+   "equal number of positive and negative eigenvalues",
+   "copying requires positive eigenvalues"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p4-fig-eigs.png",
+  "figure": 15,
+  "pad": 10
+ },
+ {
+  "out": "p4-hist.png",
+  "find": "One can even collapse that down further",
+  "upto": "It appears that 10 out of 12 heads are significantly copying",
+  "mark": [
+   "10 out of 12 heads are significantly copying"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p4-pathological.png",
+  "find": "But while copying matrices must have positive eigenvalues",
+  "upto": "in all senses one might reasonably mean",
+  "mark": [
+   "eigenvectors aren't necessarily orthogonal",
+   "copying on average",
+   "dispositive proof"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p4-trace.png",
+  "find": "One might try to formalize",
+  "upto": "For the purposes of this paper",
+  "mark": [
+   "look at the diagonal",
+   "the sum of the eigenvalues is equal to the trace is equal to the sum of the diagonal",
+   "eigenvalue-based summary statistic"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p4-fully.png",
+  "find": "But that claim really depends on what one means by fully understood",
+  "upto": "Given that regular one layer neural networks",
+  "mark": [
+   "giant linear regression",
+   "There's no longer any algorithmic mystery",
+   "far too much there for one to hold the model in their head",
+   "a single attention layer is mostly one as well"
+  ],
+  "padx": 40,
+  "pady": 6
+ }
+]
