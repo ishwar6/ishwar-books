@@ -491,6 +491,8 @@ const paperList = papers.map((x) => {
     plannedParts: d.parts ?? x.parts.length,
     // the side-by-side reader exists when code/papers/<paper>/reader.py has written its map
     ...(fs.existsSync(path.join(ROOT, 'public', 'papers', 'pdf', `${x.slug}.json`)) ? { reader: `papers/pdf/${x.slug}.json` } : {}),
+    // the interactive demo exists when src/demos/<paper>/meta.json does
+    ...(fs.existsSync(path.join(ROOT, 'src', 'demos', x.slug, 'meta.json')) ? { demo: JSON.parse(fs.readFileSync(path.join(ROOT, 'src', 'demos', x.slug, 'meta.json'), 'utf8')) } : {}),
     minutes: x.parts.reduce((n, p) => n + p.meta.minutes, 0),
     parts: x.parts.map((p) => p.meta),
   }

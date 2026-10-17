@@ -24,6 +24,7 @@ import PaperPart from './pages/PaperPart'
 import NotFound from './pages/NotFound'
 
 const PaperRead = lazy(() => import('./pages/PaperRead'))   // pdf.js is large: load it only on this page
+const PaperDemo = lazy(() => import('./pages/PaperDemo'))   // each demo loads its models on its own page
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -39,6 +40,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="papers" element={<Papers />} />
           <Route path="papers/:paper" element={<Paper />} />
           <Route path="papers/:paper/read" element={<Suspense fallback={null}><PaperRead /></Suspense>} />
+          <Route path="papers/:paper/demo" element={<Suspense fallback={null}><PaperDemo /></Suspense>} />
           <Route path="papers/:paper/:part" element={<PaperPart />} />
           <Route path="videos" element={<Videos />} />
           <Route path="videos/:slug" element={<Video />} />

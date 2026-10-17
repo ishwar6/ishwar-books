@@ -147,6 +147,12 @@ for (const p of papers) {
         <nav>${prev ? `<a href="${BASE}${prev.route}/">Previous: ${prev.partLabel}, ${esc(prev.title)}</a>` : ''} ${next ? `<a href="${BASE}${next.route}/">Next: ${next.partLabel}, ${esc(next.title)}</a>` : ''}</nav></article>`,
     })
   })
+  if (p.demo) pages.push({
+    route: `${p.route}/demo`, title: `${p.demo.title} · ${p.short} · ${site.name}`, image: ogImage(`paper-${p.slug}`), type: 'website',
+    description: p.demo.description,
+    ld: [crumbs([['Home', ''], ['Research papers', 'papers'], [p.short, p.route], [p.demo.title, `${p.route}/demo`]])],
+    body: `<h1>${esc(p.demo.title)}</h1><p>${esc(p.demo.description)}</p><p><a href="${BASE}${p.route}/">${esc(p.short)}, explained</a></p>`,
+  })
   if (p.reader) pages.push({
     route: `${p.route}/read`, title: `${p.short}, read beside the paper · ${site.name}`, image: ogImage(`paper-${p.slug}`), type: 'website',
     description: `Read the ${p.short} paper with its explanation beside it: scroll the paper, and the explanation of each highlighted passage follows.`,

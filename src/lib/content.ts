@@ -58,6 +58,8 @@ export type Paper = {
   plannedParts: number
   /** the map of the side-by-side reader (public/papers/pdf/<paper>.json), when the paper has one */
   reader?: string
+  /** the interactive demo (src/demos/<paper>/), when the paper has one */
+  demo?: { title: string; description: string }
   minutes: number
   parts: PageMeta[]
 }

@@ -1,0 +1,16 @@
+/* The shell of a paper's interactive demo page (/papers/<paper>/demo) and its link on the series page.
+   Each demo styles its own insides in src/demos/<paper>/; colours come from the theme tokens. */
+.demo-page { max-width: 1180px; margin: 0 auto; padding: 24px 16px 64px; }
+.demo-head { max-width: 760px; margin-bottom: 28px; }
+.demo-head h1 { margin: 10px 0 8px; }
+.demo-loading { padding: 48px 0; color: var(--muted); }
+
+.demo-promo {
+  display: grid; gap: 4px; margin: 18px 0 0; padding: 16px 18px; border-radius: 12px; text-decoration: none;
+  border: 1px solid color-mix(in srgb, var(--paper) 45%, transparent);
+  background: color-mix(in srgb, var(--paper) 8%, transparent); color: inherit;
+}
+.demo-promo:hover { background: color-mix(in srgb, var(--paper) 14%, transparent); }
+.dp-kicker { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--paper); }
+.dp-title { font-size: 18px; font-weight: 700; }
+.dp-text { color: var(--muted); font-size: 15px; }

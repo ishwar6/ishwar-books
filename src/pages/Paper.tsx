@@ -4,6 +4,7 @@ import { useTitle } from '../lib/hooks'
 import Article from '../components/Article'
 import { PaperSheet, PartNav, ReaderPromo, accentStyle } from '../components/PaperBits'
 import { Chevron } from '../components/icons'
+import { DemoPromo } from '../components/DemoPromo'
 import NotFound from './NotFound'
 
 export default function Paper() {
@@ -26,6 +27,7 @@ export default function Paper() {
             <p className="lede">{paper.description}</p>
             <PaperSheet paper={paper} />
             {paper.reader && <ReaderPromo paper={paper} compact />}
+            <DemoPromo slug={paper.slug} />
           </header>
         }
         footer={
