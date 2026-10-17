@@ -27,3 +27,21 @@ python circuits_part2.py && python circuits_part2_toy.py
 node paper_shots.mjs shots_part2.json
 python figs_part2.py && python assemble.py 2
 ```
+
+## The side-by-side reader
+
+`/papers/transformer-circuits/read` shows the paper on the left and the explanations on the right, scrolling in step.
+The paper is a web page, not a PDF, so we print our own copy.
+
+| File | What it does |
+|---|---|
+| `paper_pdf.mjs` | opens the paper's web page with Playwright, waits for the maths, fonts and figures, and prints it to `~/.cache/papers/circuits-framework.pdf` (US Letter, one column, figures fitted to the text width, the site's top bar hidden). It finds every excerpt of `shots_part*.json` with the same rules as `paper_shots.mjs`, paints its key phrases yellow, and tags the excerpt with invisible links, so that its exact place in the PDF is known |
+| `reader.py` | for every unnamed `> [!PAPER] ·` box of the numbered parts, in article order: reads the excerpt's place from the tags, checks that its `find` and `upto` words are there, draws a numbered teal dot and bar in the left margin, removes the tags, down-samples the images, and writes `public/papers/pdf/transformer-circuits.pdf` and `transformer-circuits.json` (same format as `sam.json`, with `url` in place of `arxiv`) |
+
+```bash
+python reader.py            # re-run after every new part (uses the cached print)
+python reader.py --fresh    # print the web page again first (needs network and Playwright)
+```
+
+A new part needs nothing else: its boxes use screenshots listed in `shots_partN.json`, which `paper_pdf.mjs` reads.
+Run `npm run content` afterwards; the site turns the reader on because the JSON file exists.
