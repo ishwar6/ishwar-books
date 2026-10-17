@@ -20,8 +20,25 @@ type Side = 'paper' | 'notes'
 
 const LINE = 0.28          // the "reading line": this fraction of a pane's height, from its top
 const pct = (v: number, of: number) => `${(100 * v) / of}%`
-/** One box in scroll coordinates: its span in the notes, and its passages in the paper (x: centre, 0..1 of the page). */
-type Spot = { n: number; top: number; bot: number; regs: { top: number; bot: number; x: number }[] }
+/** One box in scroll coordinates: its span in the notes, and its passages in the paper (x: centre, 0..1 of the page).
+ *  part: the index of its part. aside: the box quotes a passage out of the paper's order (a footnote, an appendix,
+ *  a figure already shown), so the panes do not follow it; its number tag still shows it. */
+type Spot = { n: number; top: number; bot: number; part: number; aside: boolean; regs: { top: number; bot: number; x: number }[] }
+
+/** The boxes of one part that follow the paper's order: the longest run whose passages go down the paper.
+ *  The others are asides. Returns the box numbers on the run. */
+function inOrder(list: Spot[]) {
+  const pos = list.map((s) => s.regs[0]?.top ?? -1)
+  const len = pos.map(() => 1), prev = pos.map(() => -1)
+  for (let i = 0; i < pos.length; i++) {
+    if (pos[i] < 0) continue
+    for (let j = 0; j < i; j++) if (pos[j] >= 0 && pos[j] <= pos[i] && len[j] + 1 > len[i]) { len[i] = len[j] + 1; prev[i] = j }
+  }
+  const keep = new Set<number>()
+  let i = len.reduce((b, l, k) => (pos[k] >= 0 && l > (len[b] ?? 0) ? k : b), -1)
+  for (; i >= 0; i = prev[i]) keep.add(list[i].n)
+  return keep
+}
 
 /** One page of the PDF: a box of the right shape at once, the drawing when it comes near the screen. */
 function PdfPage({ doc, index, size, boxes, active, onPick }: {
@@ -104,6 +121,9 @@ function Reader({ paper }: { paper: Paper }) {
     const spots = useRef<Spot[]>([])
   const pointerX = useRef(0.25)
   const moved = useRef(false)    // nothing follows until the reader moves a pane
+  const activeRef = useRef(0)
+  activeRef.current = active
+  const [asides, setAsides] = useState('')
   const parts = useMemo(() => paper.parts.filter((p) => p.partNumber), [paper])
 
   // the reader fills the window under the site header; the page itself does not scroll
@@ -154,10 +174,17 @@ function Reader({ paper }: { paper: Paper }) {
         return [{ top: pr.top + (r.clip[1] / h) * pr.height - pTop, bot: pr.top + (r.clip[3] / h) * pr.height - pTop, x: (r.clip[0] + r.clip[2]) / 2 / w }]
       })
       const er = el.getBoundingClientRect()
-      list.push({ n: box.n, top: er.top - nTop, bot: er.bottom - nTop, regs })
+      const part = parts.findIndex((p) => p.slug === box.part)
+      list.push({ n: box.n, top: er.top - nTop, bot: er.bottom - nTop, part, aside: false, regs })
+    }
+    for (let p = 0; p < parts.length; p++) {
+      const mine = list.filter((s) => s.part === p)
+      const keep = inOrder(mine)
+      for (const s of mine) s.aside = s.regs.length > 0 && !keep.has(s.n)
     }
     spots.current = list
-  }, [map, byN])
+    setAsides(list.filter((s) => s.aside).map((s) => s.n).join(','))
+  }, [map, byN, parts])
 
   /** Move a pane: small steps at once (it follows the hand), large jumps smoothly. */
   const put = (el: HTMLElement, top: number) => {
@@ -174,7 +201,15 @@ function Reader({ paper }: { paper: Paper }) {
     if (!P || !N) return
     if (from === 'paper') {
       const line = P.scrollTop + LINE * P.clientHeight
-      const hits = spots.current.flatMap((s) => s.regs.map((r, k) => ({ s, r, k }))).filter(({ r }) => r.top <= line && line <= r.bot)
+      let hits = spots.current.flatMap((s) => (s.aside ? [] : s.regs.map((r, k) => ({ s, r, k })))).filter(({ r }) => r.top <= line && line <= r.bot)
+      // stay with the part being read while it still has a passage on screen; the paper's later pages bring the next part
+      const cur = spots.current.find((s) => s.n === activeRef.current)?.part ?? -1
+      const view0 = P.scrollTop, view1 = P.scrollTop + P.clientHeight
+      const curOnScreen = cur >= 0 && spots.current.some((s) => s.part === cur && !s.aside && s.regs.some((r) => r.bot >= view0 && r.top <= view1))
+      if (curOnScreen) {
+        hits = hits.filter((h) => h.s.part === cur)
+        if (!hits.length) { setLater(0); return }
+      }
       if (!hits.length) {
         // a page that no part explains yet: say so, and leave the notes where they are
         const lineY = P.getBoundingClientRect().top + LINE * P.clientHeight
@@ -185,7 +220,9 @@ function Reader({ paper }: { paper: Paper }) {
       }
       setLater(0)
       // two columns can both cross the line: take the one under the pointer, else the first in reading order
-      hits.sort((a, b) => Math.abs(a.r.x - pointerX.current) - Math.abs(b.r.x - pointerX.current) || a.s.n - b.s.n)
+      // then the part nearest the one being read (the next one first)
+      const far = (s: Spot) => (cur < 0 ? s.part : s.part >= cur ? 2 * (s.part - cur) : 2 * (cur - s.part) + 1)
+      hits.sort((a, b) => Math.abs(a.r.x - pointerX.current) - Math.abs(b.r.x - pointerX.current) || far(a.s) - far(b.s) || a.s.n - b.s.n)
       const { s, r, k } = hits[0]
       const share = 1 / s.regs.length
       const f = (k + (line - r.top) / Math.max(1, r.bot - r.top)) * share
@@ -194,14 +231,22 @@ function Reader({ paper }: { paper: Paper }) {
     } else {
       const line = N.scrollTop + LINE * N.clientHeight
       let last = 0
+      let lastPart = -1
       for (const s of spots.current) {
         if (s.top > line) break
         last = s.n
-        if (line > s.bot || !s.regs.length) continue
+        lastPart = s.part
+        // an aside quotes another place in the paper: the paper stays, the number tag can show it
+        if (line > s.bot || !s.regs.length || s.aside) continue
         const f = ((line - s.top) / Math.max(1, s.bot - s.top)) * s.regs.length
         const k = Math.min(s.regs.length - 1, Math.floor(f)), r = s.regs[k]
         put(P, r.top + (f - k) * (r.bot - r.top) - LINE * P.clientHeight)
       }
+      // at the start of a part, before its first box: name that part's first box, not the last box of the part before
+      const nTop = N.getBoundingClientRect().top - N.scrollTop
+      let partAt = -1
+      N.querySelectorAll<HTMLElement>('[data-part]').forEach((sec, i) => { if (sec.getBoundingClientRect().top - nTop <= line) partAt = i })
+      if (partAt >= 0 && partAt !== lastPart) last = spots.current.find((s) => s.part === partAt)?.n ?? last
       setActive(last)
       setLater(0)
     }
@@ -276,8 +321,8 @@ function Reader({ paper }: { paper: Paper }) {
     if (!N || !P || !sec) return
     driver.current = 'notes'
     N.scrollTo({ top: sec.offsetTop - 8, behavior })
-    const first = sec.querySelector<HTMLElement>('[data-box]')
-    const s = first && spots.current.find((x) => x.n === Number(first.dataset.box))
+    const idx = parts.findIndex((p) => p.slug === slug)
+    const s = spots.current.find((x) => x.part === idx && !x.aside && x.regs.length) ?? spots.current.find((x) => x.part === idx)
     if (s?.regs[0]) P.scrollTo({ top: s.regs[0].top - 40, behavior })
     if (s) setActive(s.n)
   }
@@ -322,7 +367,7 @@ function Reader({ paper }: { paper: Paper }) {
           <option value="" disabled>Go to a part</option>
           {parts.map((p) => <option key={p.slug} value={p.slug}>{p.partLabel}: {p.title}</option>)}
         </select>
-        <span className="pr-where">{later ? <>Page {later}: a later part explains it</> : activeBox ? <>Box <b>{activeBox.n}</b> of {map?.boxes.length} · page {activeBox.regions[0].page + 1}</> : 'Scroll the paper or the notes'}</span>
+        <span className="pr-where">{later ? <>Page {later}: a later part explains it</> : activeBox ? <>Box <b>{activeBox.n}</b> of {map?.boxes.length} · page {activeBox.regions[0].page + 1}{asides.split(',').includes(String(activeBox.n)) && <>: click its number to see it</>}</> : 'Scroll the paper or the notes'}</span>
         <span className="pr-zoom" role="group" aria-label="Paper size">
           <button type="button" onClick={() => setZoom((z) => Math.max(0.6, +(z - 0.1).toFixed(2)))} aria-label="Smaller paper">−</button>
           <button type="button" onClick={() => setZoom(1)} aria-label="Fit the paper to the pane">{Math.round(zoom * 100)}%</button>
