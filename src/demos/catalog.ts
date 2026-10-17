@@ -15,4 +15,11 @@ export const demoGuides: Record<string, DemoGuide> = {
     mode: 'Saved runs + live model',
     actions: ['Inspect image patches', 'Explore attention', 'Try your own photo'],
   },
+  transformer: {
+    category: 'Translation',
+    title: 'Watch a Transformer write, one token at a time.',
+    summary: 'Type a date and follow it through a small Transformer in your browser, look inside a real English to German translator, and work attention by hand.',
+    mode: 'Live model + saved runs',
+    actions: ['Step through the decoder', 'Explore attention heads', 'Break the positions or the mask'],
+  },
 }

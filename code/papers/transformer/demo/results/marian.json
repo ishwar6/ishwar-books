@@ -1,0 +1,205 @@
+{
+ "model": "Helsinki-NLP/opus-mt-en-de",
+ "torch": "2.14.1",
+ "checks": [
+  {
+   "slug": "cat",
+   "de": "Die Katze saß auf der Matte, weil sie müde war.",
+   "enc": {
+    "max_abs_diff": 0.0019324419554322958,
+    "argmax_equal_rows": 576,
+    "rows": 576,
+    "future_weight_max": null
+   },
+   "cross": {
+    "max_abs_diff": 0.0019029844552278519,
+    "argmax_equal_rows": 672,
+    "rows": 672,
+    "future_weight_max": null
+   },
+   "dec": {
+    "max_abs_diff": 0.0019227871671319008,
+    "argmax_equal_rows": 672,
+    "rows": 672,
+    "future_weight_max": 0.0
+   }
+  },
+  {
+   "slug": "animal-tired",
+   "de": "Das Tier hat die Straße nicht überquert, weil es zu müde war.",
+   "enc": {
+    "max_abs_diff": 0.0019321441650390625,
+    "argmax_equal_rows": 720,
+    "rows": 720,
+    "future_weight_max": null
+   },
+   "cross": {
+    "max_abs_diff": 0.0018974770791828632,
+    "argmax_equal_rows": 720,
+    "rows": 720,
+    "future_weight_max": null
+   },
+   "dec": {
+    "max_abs_diff": 0.0019234749488532543,
+    "argmax_equal_rows": 719,
+    "rows": 720,
+    "future_weight_max": 0.0
+   }
+  },
+  {
+   "slug": "animal-wide",
+   "de": "Das Tier hat die Straße nicht überquert, weil es zu breit war.",
+   "enc": {
+    "max_abs_diff": 0.0019472305430099368,
+    "argmax_equal_rows": 719,
+    "rows": 720,
+    "future_weight_max": null
+   },
+   "cross": {
+    "max_abs_diff": 0.001937591703608632,
+    "argmax_equal_rows": 720,
+    "rows": 720,
+    "future_weight_max": null
+   },
+   "dec": {
+    "max_abs_diff": 0.001935808453708887,
+    "argmax_equal_rows": 720,
+    "rows": 720,
+    "future_weight_max": 0.0
+   }
+  },
+  {
+   "slug": "trophy",
+   "de": "Die Trophäe passte nicht in den Koffer, weil sie zu groß war.",
+   "enc": {
+    "max_abs_diff": 0.0019009843235835433,
+    "argmax_equal_rows": 815,
+    "rows": 816,
+    "future_weight_max": null
+   },
+   "cross": {
+    "max_abs_diff": 0.0019506629323586822,
+    "argmax_equal_rows": 912,
+    "rows": 912,
+    "future_weight_max": null
+   },
+   "dec": {
+    "max_abs_diff": 0.0018992987461388111,
+    "argmax_equal_rows": 912,
+    "rows": 912,
+    "future_weight_max": 0.0
+   }
+  },
+  {
+   "slug": "suitcase",
+   "de": "Die Trophäe passte nicht in den Koffer, weil sie zu klein war.",
+   "enc": {
+    "max_abs_diff": 0.0019302465952932835,
+    "argmax_equal_rows": 814,
+    "rows": 816,
+    "future_weight_max": null
+   },
+   "cross": {
+    "max_abs_diff": 0.001931557198986411,
+    "argmax_equal_rows": 911,
+    "rows": 912,
+    "future_weight_max": null
+   },
+   "dec": {
+    "max_abs_diff": 0.0019305229652673006,
+    "argmax_equal_rows": 912,
+    "rows": 912,
+    "future_weight_max": 0.0
+   }
+  },
+  {
+   "slug": "making",
+   "de": "In diesem Sinne hat eine Mehrheit der amerikanischen Regierungen seit 2009 neue Gesetze verabschiedet, die den Registrierungs- oder Abstimmungsprozess erschweren.",
+   "enc": {
+    "max_abs_diff": 0.0019044941291213036,
+    "argmax_equal_rows": 1294,
+    "rows": 1296,
+    "future_weight_max": null
+   },
+   "cross": {
+    "max_abs_diff": 0.001930078724399209,
+    "argmax_equal_rows": 1248,
+    "rows": 1248,
+    "future_weight_max": null
+   },
+   "dec": {
+    "max_abs_diff": 0.0019551522564142942,
+    "argmax_equal_rows": 1247,
+    "rows": 1248,
+    "future_weight_max": 0.0
+   }
+  },
+  {
+   "slug": "law",
+   "de": "Das Gesetz wird nie perfekt sein, aber seine Anwendung sollte gerecht sein - das ist es, was wir vermissen, meiner Meinung nach.",
+   "enc": {
+    "max_abs_diff": 0.001917693647556007,
+    "argmax_equal_rows": 1247,
+    "rows": 1248,
+    "future_weight_max": null
+   },
+   "cross": {
+    "max_abs_diff": 0.0019053863361477852,
+    "argmax_equal_rows": 1342,
+    "rows": 1344,
+    "future_weight_max": null
+   },
+   "dec": {
+    "max_abs_diff": 0.0019360299920663238,
+    "argmax_equal_rows": 1344,
+    "rows": 1344,
+    "future_weight_max": 0.0
+   }
+  },
+  {
+   "slug": "attention",
+   "de": "Achtung ist alles, was du brauchst.",
+   "enc": {
+    "max_abs_diff": 0.0019348196219652891,
+    "argmax_equal_rows": 336,
+    "rows": 336,
+    "future_weight_max": null
+   },
+   "cross": {
+    "max_abs_diff": 0.0018877354450523853,
+    "argmax_equal_rows": 432,
+    "rows": 432,
+    "future_weight_max": null
+   },
+   "dec": {
+    "max_abs_diff": 0.0019513400038704276,
+    "argmax_equal_rows": 432,
+    "rows": 432,
+    "future_weight_max": 0.0
+   }
+  },
+  {
+   "slug": "agreement",
+   "de": "Das Abkommen über den Europäischen Wirtschaftsraum wurde im August 1992 unterzeichnet.",
+   "enc": {
+    "max_abs_diff": 0.0019241501577198505,
+    "argmax_equal_rows": 624,
+    "rows": 624,
+    "future_weight_max": null
+   },
+   "cross": {
+    "max_abs_diff": 0.0019183309050276875,
+    "argmax_equal_rows": 623,
+    "rows": 624,
+    "future_weight_max": null
+   },
+   "dec": {
+    "max_abs_diff": 0.0019455067813396454,
+    "argmax_equal_rows": 624,
+    "rows": 624,
+    "future_weight_max": 0.0
+   }
+  }
+ ],
+ "overall_max_abs_diff": 0.0019551522564142942
+}

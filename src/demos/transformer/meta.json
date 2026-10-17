@@ -1,0 +1,4 @@
+{
+  "title": "The Transformer, step by step",
+  "description": "Type a date and follow it through our own small Transformer, live in your browser: tokens, positions, every attention head, and the decoder writing one token at a time. Then look inside a real English to German translator, and work Equation 1 by hand."
+}

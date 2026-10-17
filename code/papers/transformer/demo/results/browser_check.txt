@@ -1,0 +1,13 @@
+page http://localhost:4174/papers/transformer/demo; first result 1023 ms after navigation (playwright, this machine)
+toy model: browser (onnxruntime-web 1.22, wasm, float32) vs PyTorch (scratch/model.py), greedy decoding
+  2021-03-12 -> browser "12 March 2021", Python "12 March 2021"  same tokens: true  max |logit diff| over 14 x 41: 5.72e-6
+  1969-07-20 -> browser "20 July 1969", Python "20 July 1969"  same tokens: true  max |logit diff| over 13 x 41: 5.19e-6
+  2000-01-01 -> browser "1 January 2000", Python "1 January 2000"  same tokens: true  max |logit diff| over 15 x 41: 5.30e-6
+  1999-12-31 -> browser "31 December 1999", Python "31 December 1999"  same tokens: true  max |logit diff| over 17 x 41: 5.29e-6
+  2045-11-05 -> browser "5 November 2045", Python "5 November 2045"  same tokens: true  max |logit diff| over 16 x 41: 6.20e-6
+  same output 5/5; max |logit difference| 6.20e-6
+saved translator runs: weights shown in the page (8-bit levels, row scale) vs float32 model weights
+  cat, cross, layer 3, 8 heads x 3 rows: running max |difference| 0.0018
+  making, enc, layer 5, 8 heads x 3 rows: running max |difference| 0.0019
+  "making", encoder layer 5, head 3 in the page: head 3 difficult 0.71, more 0.29, It 0.00 (Part 6 prints: difficult 0.71, more 0.29, process 0.00)
+console errors: none

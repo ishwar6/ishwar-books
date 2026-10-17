@@ -1,0 +1,12 @@
+/* Links from the demo to the parts of the series that explain each step. */
+const S = '/papers/transformer/'
+export const BG = S + 'background-the-road-to-the-transformer'
+export const P1 = S + 'part-1-the-big-idea'
+export const P2 = S + 'part-2-the-architecture'
+export const P3 = S + 'part-3-attention'
+export const P4 = S + 'part-4-why-self-attention'
+export const P5 = S + 'part-5-training'
+export const P6 = S + 'part-6-results-and-impact'
+export const P7 = S + 'part-7-build-it-from-scratch'
+export const CODE = 'https://github.com/ishwar6/ishwar-books/blob/main/code/papers/transformer/scratch/model.py'
+export const DEMO_CODE = 'https://github.com/ishwar6/ishwar-books/tree/main/code/papers/transformer/demo'

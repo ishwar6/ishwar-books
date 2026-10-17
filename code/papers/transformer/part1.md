@@ -559,6 +559,9 @@ python tx_part1_scratch.py   # the loop and the matrix product, teacher forcing 
 
 </details>
 
+> [!TIP] Try it
+> Follow a date through a small Transformer in your browser, step by step, and look inside the attention of a real translator: [the interactive demo](/papers/transformer/demo).
+
 ## The paper and the code
 
 [Attention Is All You Need](https://arxiv.org/abs/1706.03762) (NeurIPS 2017) · [official code (tensor2tensor)](https://github.com/tensorflow/tensor2tensor) · [our scripts for this part](https://github.com/ishwar6/ishwar-books/tree/main/code/papers/transformer)
