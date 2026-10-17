@@ -37,7 +37,7 @@ The paper also gave the field its vocabulary: the **residual stream**, **virtual
 4. **[One-Layer Models: Skip-Trigrams, Copying and Their Bugs](part-4-one-layer-models.md)**: reading the bigram and skip-trigram tables from the weights of a one-layer model.
 5. **[Two-Layer Models: How Heads Compose](part-5-two-layer-models.md)**: Q-, K- and V-composition, and virtual attention heads.
 6. **[Induction Heads](part-6-induction-heads.md)**: the two-head circuit behind in-context copying, and how the paper checks it.
-7. **What the Paper Left Out, and What Came After** (coming soon): MLPs, superposition, dictionary learning and circuit tracing.
+7. **[What the Paper Left Out, and What Came After](part-7-after-the-paper.md)**: MLPs, superposition, dictionary learning and circuit tracing.
 
 ## How to read the boxes
 

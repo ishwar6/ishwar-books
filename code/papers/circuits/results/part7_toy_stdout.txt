@@ -1,0 +1,21 @@
+== A. GeLU IS NOT LINEAR
+  GeLU(1) = 0.841, GeLU(-1) = -0.159, their sum = 0.683
+  GeLU(1 + (-1)) = GeLU(0) = 0.000  -> not the same, so the path terms of an MLP cannot be split apart
+
+== B. TWO FEATURES IN ONE DIMENSION: W = [1, -1], b = [0, 0]
+  x = [0.7, 0.0]: h = W x = 0.7; W^T h = [0.7, -0.7]; ReLU(W^T h) = [0.7, 0.0]
+  x = [0.0, 0.4]: h = W x = -0.4; W^T h = [-0.4, 0.4]; ReLU(W^T h) = [0.0, 0.4]
+  x = [0.7, 0.4]: h = W x = 0.3; W^T h = [0.3, -0.3]; ReLU(W^T h) = [0.3, 0.0]
+
+== C. TURNING A PRODUCT AROUND: X Y versus Y X
+  X Y = [[1.0, 2.0], [1.0, 2.0]] (2 x 2); Y X = [[1.0, 2.0, 0.0], [0.0, 1.0, 1.0], [1.0, 3.0, 1.0]] (3 x 3)
+  trace: 3 and 3; eigenvalues: [3.0, 0.0] and [3.0, 0.0, 0.0]
+  Frobenius norm: |X Y| = sqrt(10) = 3.162; |Y X| = sqrt(18) = 4.243  -> different
+
+== D. ONE SPARSE AUTOENCODER FEATURE BY HAND (2 dimensions, b_dec = 0)
+  x = [0.3, 0.4]: e . x + b_enc = 0.400; f = ReLU(...) = 0.400; x_hat = f d = [0.24, 0.32]; |x - x_hat|^2 = 0.0100; L1 part = 0.5 x 0.400 = 0.200
+  x = [0.04, -0.03]: e . x + b_enc = -0.100; f = ReLU(...) = 0.000; x_hat = f d = [0.0, 0.0]; |x - x_hat|^2 = 0.0025; L1 part = 0.5 x 0.000 = 0.000
+
+== E. IN-CONTEXT LEARNING SCORE OF THREE MADE-UP WINDOWS
+  loss at token 50: [5.0, 4.0, 6.0] (mean 5.00); at token 500: [4.5, 3.2, 5.8] (mean 4.50)
+  score = 4.50 - 5.00 = -0.50 nats

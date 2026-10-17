@@ -1,0 +1,86 @@
+[
+ {
+  "out": "p7-leave-us.png",
+  "find": "One reason is that normal transformers contain some circuits which appear to be primarily attentional",
+  "upto": "a topic we'll discuss in our next paper",
+  "mark": [
+   "primarily attentional",
+   "large models form many induction heads",
+   "K-composition with a previous token head, just as we saw here",
+   "central driver of in-context learning"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p7-mlp-share.png",
+  "find": "That said, we can probably only understand a small portion of large language models this way",
+  "mark": [
+   "MLP layers make up 2/3rds of a standard transformer's parameters",
+   "even smaller than 1/3rd",
+   "individually interpretable neurons, which we've had limited success finding"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p7-mlp-eq.png",
+  "find": "Recall that an MLP layer",
+  "upto": "We’ve focused this paper on understanding attention heads",
+  "mark": [
+   "we can’t linearize through MLP layers as we did attention layers",
+   "understanding what the neurons represent, how they’re computed, and how they’re used",
+   "four times larger than the residual stream",
+   "much harder to develop hypotheses for"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p7-mlp-path.png",
+  "find": "Path Expansion of MLP Layer in One-Layer Model",
+  "upto": "It’s a simple linear function!",
+  "mark": [
+   "essentially the same equation",
+   "tells us how much different tokens encourage or inhibit this neuron through the residual stream",
+   "tells us how the activation of each neuron affects the logits"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p7-criticism.png",
+  "find": "Induction heads offer an object lesson",
+  "mark": [
+   "both be very informative and also misleading",
+   "totally reliant on a previous token head in the prior layer, through K-composition",
+   "totally misunderstand the role of the previous token head"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p7-followup.png",
+  "find": "Since the publication of this paper, a significant amount of follow-up work",
+  "upto": "The biggest weakness of this paper has been",
+  "mark": [
+   "as of February 2023",
+   "The biggest weakness of this paper has been that we have little traction on understanding MLP layers",
+   "We speculated this was due to the phenomenon of superposition"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p7-correction.png",
+  "find": "we became aware of a bug in an underlying library",
+  "upto": "accelerate computing the Frobenius norm",
+  "mark": [
+   "This only affected",
+   "composition going on in that model than it seemed",
+   "We accidentally applied an analogous identity to accelerate computing the Frobenius norm"
+  ],
+  "padx": 40,
+  "pady": 6
+ }
+]

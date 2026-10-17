@@ -1,0 +1,80 @@
+== 1. HOW MANY PARAMETERS ARE IN THE MLP LAYERS? (embedding and unembedding not counted)
+  attn-only-1l  layers  1  d_model 512  attention   1,050,624  MLP           0  MLP share 0.000
+  attn-only-2l  layers  2  d_model 512  attention   2,101,248  MLP           0  MLP share 0.000
+  gelu-1l       layers  1  d_model 512  attention   1,050,624  MLP   2,099,712  MLP share 0.667  (d_mlp = 2048 = 4 x d_model)
+  gelu-2l       layers  2  d_model 512  attention   2,101,248  MLP   4,199,424  MLP share 0.667  (d_mlp = 2048 = 4 x d_model)
+  gpt2          layers 12  d_model 768  attention  28,348,416  MLP  56,669,184  MLP share 0.667  (d_mlp = 3072 = 4 x d_model)
+  gpt2, one layer by hand: attention 4 x 768 x 768 + biases = 2,362,368; MLP 2 x 768 x 3072 + biases = 4,722,432
+
+== 2. IN-CONTEXT LEARNING SCORE: LOSS AT TOKEN 500 MINUS LOSS AT TOKEN 50 (wikitext-103 test, 512-token windows)
+  attn-only-1l  300 windows  loss at token 50: 5.537  at token 500: 4.855  score -0.682 (+/- 0.269)  [tokens 41-60 vs 491-510: -0.187]
+  attn-only-2l  300 windows  loss at token 50: 5.229  at token 500: 4.205  score -1.024 (+/- 0.265)  [tokens 41-60 vs 491-510: -0.620]
+  gelu-1l       300 windows  loss at token 50: 5.172  at token 500: 4.528  score -0.644 (+/- 0.260)  [tokens 41-60 vs 491-510: -0.216]
+  gelu-2l       300 windows  loss at token 50: 4.843  at token 500: 3.826  score -1.017 (+/- 0.261)  [tokens 41-60 vs 491-510: -0.575]
+  gpt2          300 windows  loss at token 50: 3.631  at token 500: 3.177  score -0.453 (+/- 0.225)  [tokens 41-60 vs 491-510: -0.748]
+  loss by token index (mean over windows):
+  index              1      2      5     10     20     50    100    200    300    400    500
+  attn-only-1l    9.78   6.88   6.36   6.20   5.77   5.54   5.30   5.39   5.45   5.14   4.86
+  attn-only-2l    9.80   6.81   6.45   6.00   5.39   5.23   4.61   4.60   4.74   4.44   4.20
+  gelu-1l         9.61   7.04   6.36   5.94   5.54   5.17   4.88   5.01   5.16   4.80   4.53
+  gelu-2l         9.56   7.00   6.23   5.76   5.10   4.84   4.25   4.25   4.40   4.13   3.83
+  gpt2           10.22   8.15   5.86   5.54   4.76   3.63   3.46   3.44   3.36   3.33   3.18
+
+== 3. MLP NEURONS OF gelu-1l READ FROM THE WEIGHTS (TransformerLens folds the layer norm weights into W_in)
+  gelu-1l: d_model 512, d_mlp 2048 neurons, vocabulary 48,262; W_I is (2048, 512) and W_O is (512, 2048) in the paper's shapes
+  activations on 102,000 tokens of Wikipedia text
+  neuron 847: fires (> 0.1) on 10.7% of tokens; largest activation 2.34
+    W_U W_O (what it writes): raises ' Friday' +1.10, ' Tuesday' +1.07, ' Monday' +1.07, ' Thursday' +1.06, ' Saturday' +1.02, ' Wednesday' +0.99, ' September' +0.97, ' November' +0.95
+                              lowers 'oric' -1.07, 'inity' -1.01, 'bbe' -1.01, 'zzles' -1.00, 'ños' -0.99
+    W_I W_E (tokens that excite it directly): ' Ez' 0.74, ' redox' 0.70, ' voter' 0.69, ' mot' 0.68, ' Gree' 0.67, ' Royal' 0.67, ' Ras' 0.66, ' Trading' 0.65
+    where it fires most (text before | the token):
+       2.34  ' experience in crisis management at' | ' US'
+       2.15  ' \n Kershaw struck' | ' out'
+       2.15  ' . Kershaw struck' | ' out'
+       2.03  'ondyls into E' | 'us'
+       1.98  ' to national attention . Pe' | 'pp'
+       1.92  ' , according to Michael Pe' | 'pp'
+       1.92  ' hearing on the charges at' | ' a'
+       1.92  ' , Kershaw struck' | ' out'
+       1.91  ' innings in which he struck' | ' out'
+       1.89  ' Kershaw struck out' | ' a'
+  neuron 1996: fires (> 0.1) on 4.2% of tokens; largest activation 6.05
+    W_U W_O (what it writes): raises ' ATT' +1.44, ' LOSS' +1.42, ' OF' +1.42, ' CONTR' +1.41, ' SOFTWARE' +1.40, ' METHODS' +1.39, ' COMP' +1.39, ' GOODS' +1.38
+                              lowers 'ica' -1.37, 'alia' -1.33, 'ique' -1.28, 'quez' -1.25, 'istas' -1.23
+    W_I W_E (tokens that excite it directly): ' COURT' 1.37, ' RUN' 1.34, ' CHECK' 1.34, 'CREATE' 1.33, ' TEST' 1.32, ' FILE' 1.31, 'TEST' 1.30, 'SHORT' 1.29
+    where it fires most (text before | the token):
+       6.05  ' OF LARGE DEV' | 'EL'
+       5.75  ' LARGE DEVEL' | 'OP'
+       5.43  ' INTENSITY HAS ONLY' | ' BE'
+       5.37  ' HAS ONLY BEEN IN' | 'CRE'
+       5.05  'EN INCREASED' | ' TO'
+       4.83  'IAL INTENSITY HAS' | ' ONLY'
+       4.80  ' ONLY BEEN INCRE' | 'AS'
+       4.75  ' SYSTEMS LIKE THIS ONE' | ' WILL'
+       4.69  ' HOURS BEHIND' | ' THE'
+       4.62  ' 12 HOURS BE' | 'H'
+
+== 4. TOY MODEL OF SUPERPOSITION: 5 FEATURES, 2 DIMENSIONS, x' = ReLU(W^T W x + b), importance I_i = 0.9^i
+  ReLU model, S = 0.0  (1-S = 1.00): features represented 2/5; |W_i| = [1.0, 0.997, 0.018, 0.008, 0.018]; angles (deg) = [287.8, 197.6, 174.7, 63.4, 273.5]; b = [-0.004, -0.007, 0.496, 0.502, 0.505]; loss 0.1830
+  ReLU model, S = 0.7  (1-S = 0.30): features represented 4/5; |W_i| = [1.027, 1.014, 0.991, 1.001, 0.006]; angles (deg) = [336.2, 66.8, 156.7, 246.4, 336.2]; b = [0.012, 0.013, 0.021, 0.02, 0.151]; loss 0.1019
+  ReLU model, S = 0.9  (1-S = 0.10): features represented 5/5; |W_i| = [1.121, 1.079, 1.105, 1.091, 1.073]; angles (deg) = [31.1, 247.0, 104.5, 319.1, 175.8]; b = [-0.207, -0.212, -0.207, -0.205, -0.211]; loss 0.0217
+  ReLU model, S = 0.97 (1-S = 0.03): features represented 5/5; |W_i| = [1.149, 1.144, 1.142, 1.152, 1.147]; angles (deg) = [32.6, 249.0, 105.4, 321.4, 177.1]; b = [-0.256, -0.274, -0.274, -0.253, -0.264]; loss 0.0035
+  linear model, S = 0.9: features represented 2/5; |W_i| = [1.0, 1.0, 0.037, 0.02, 0.015]; angles = [357.9, 267.9, 220.7, 92.8, 220.5]; loss 0.0676
+  ReLU, S = 0.9: W^T W (5 x 5) = [[1.26, -0.98, 0.35, 0.38, -0.98], [-0.98, 1.16, -0.95, 0.36, 0.37], [0.35, -0.95, 1.22, -0.99, 0.38], [0.38, 0.36, -0.99, 1.19, -0.94], [-0.98, 0.37, 0.38, -0.94, 1.15]]
+  ReLU, S = 0.9: the two hidden numbers, as rows of W (how much each feature moves each one):
+    hidden 1: [0.961, -0.421, -0.277, 0.825, -1.071]
+    hidden 2: [0.579, -0.993, 1.069, -0.715, 0.078]
+
+== 5. A SPARSE AUTOENCODER ON A BIGGER TOY MODEL: 40 FEATURES IN 10 DIMENSIONS (S = 0.95, all importances 1)
+  toy model: 40 of 40 features represented (|W_i| > 0.5) in 10 dimensions; loss 0.1525
+  features that move each of the 10 neurons by more than 0.3: [18, 17, 15, 18, 16, 14, 17, 21, 16, 17]
+  best |cosine| between a feature direction and any single neuron: median 0.578, largest 0.927  (1 would mean "this neuron is this feature")
+  sparse autoencoder: 40 features, L1 weight 0.3, 15,000 steps of 4,096 hidden vectors
+  true features with a learned direction at cosine > 0.99: 32 of 40; > 0.9: 34 of 40; median best cosine 0.9982; worst 0.612
+  the reconstruction keeps 82.8% of the variance of h; on average 1.99 true features are on per input, and the autoencoder turns on 2.86 of its features
+
+== 6. THE "AUNT SALLY" PROMPT ON ONE-LAYER AND TWO-LAYER ATTENTION-ONLY MODELS
+  attn-only-1l: tokens 15; next-token top 5: ' Sally' 0.294, 'ie' 0.144, ' Mary' 0.028, ' Sue' 0.025, ' I' 0.012
+    P(" Sally") = 0.294 (rank 1); strongest head of layer 0 on " Sally": 0.3 with weight 0.28
+  attn-only-2l: tokens 15; next-token top 5: ' Sally' 0.779, 'ie' 0.015, ' Susan' 0.009, ' Sue' 0.009, ' Mary' 0.006
+    P(" Sally") = 0.779 (rank 1); strongest head of layer 1 on " Sally": 1.6 with weight 0.40
