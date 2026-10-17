@@ -37,8 +37,8 @@ The paper has three linked parts. A new task: promptable segmentation. A new mod
 Each part follows the paper's own sections:
 
 1. **[The Big Idea: Segment Anything](part-1-the-big-idea.md)**: the title, Figure 1, the abstract and §1. What a mask is, what a foundation model is, and the three parts of the project. With a real run of SAM on one picture.
-2. **The Task: Promptable Segmentation** (coming soon): §2 and Figure 3. Prompts, valid masks, ambiguity, pre-training and zero-shot transfer.
-3. **The Model: Encoder, Prompts and Decoder** (coming soon): §3, Figure 4, Figure 14 and Appendix A. Every block of SAM with the real numbers of the released models, the losses and the training loop.
+2. **[The Task: Promptable Segmentation](part-2-the-task.md)**: §2 and Figure 3. Prompts, valid masks, ambiguity, pre-training and zero-shot transfer.
+3. **[The Model: Encoder, Prompts and Decoder](part-3-the-model.md)**: §3, Figure 4, Figure 14 and Appendix A. Every block of SAM with the real numbers of the released models, the losses and the training loop.
 4. **The Data Engine and SA-1B** (coming soon): §4, §5, §6 and Appendices B and C. Three stages of labelling, the automatic mask generator, and the analysis of the dataset.
 5. **Zero-Shot Experiments** (coming soon): §7 and Appendix D. Points to masks on 23 datasets, edges, object proposals, instance segmentation, text to mask, and the ablations.
 6. **After SAM: Impact, Limits and Summary** (coming soon): §8 and the work that came later.

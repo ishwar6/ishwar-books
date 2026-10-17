@@ -1,0 +1,171 @@
+== 1. the image encoders of the three released models ==
+model    blocks  width  heads head dim    MLP  window  global-attention blocks (0-based)
+ViT-B        12    768     12       64   3072      14  [2, 5, 8, 11]
+ViT-L        24   1024     16       64   4096      14  [5, 11, 17, 23]
+ViT-H        32   1280     16       80   5120      14  [7, 15, 23, 31]
+
+weights inside each image encoder:
+model     patch embed  pos. embed  window block  global block      neck         total
+ViT-B         590,592   3,145,728     7,091,328     7,104,128   787,456    89,670,912
+ViT-L         787,456   4,194,304    12,599,680    12,612,480   852,992   308,278,272
+ViT-H         984,320   5,242,880    19,681,760    19,697,760   918,528   637,026,048
+check ViT-H: 984,320 + 5,242,880 + 28 x 19,681,760 + 4 x 19,697,760 + 918,528 = 637,026,048
+the 32 blocks hold 629,880,320 weights = 98.9% of the encoder; one windowed block = 3,039 x the whole prompt encoder (6,476)
+pixels: 1024 x 1024 / (224 x 224) = 20.9 times the input of a standard ViT
+a global block has 16,000 more weights than a windowed block: its relative-position tables cover 2 x 64 - 1 = 127 offsets, not 2 x 14 - 1 = 27
+
+== 2. ViT-H: the shape of the data at each step of the image encoder ==
+  pixel values                                     (1, 3, 1024, 1024)          3,145,728 numbers
+  patch embedding (16 x 16 conv, stride 16)        (1, 64, 64, 1280)           5,242,880 numbers
+  + absolute position embedding                    (1, 64, 64, 1280)           5,242,880 numbers
+  windowed block: pad 64 -> 70, cut into windows   (25, 14, 14, 1280)          6,272,000 numbers
+  after 32 blocks                                  (1, 64, 64, 1280)           5,242,880 numbers
+  neck: 1 x 1 conv 1280 -> 256 + layer norm        (1, 256, 64, 64)            1,048,576 numbers
+  neck: 3 x 3 conv 256 -> 256 + layer norm         (1, 256, 64, 64)            1,048,576 numbers
+  our step-by-step embedding vs get_image_embeddings: max difference 0.00e+00
+
+windowed attention: the 64 x 64 grid is padded to 70 x 70 (804 padding cells), then cut into 5 x 5 = 25 windows of 14 x 14 = 196 tokens
+  score pairs per head: windowed 25 x 196^2 = 960,400;  global 4096^2 = 16,777,216;  ratio 17.5
+
+== 3. the prompt encoder: the click on the ear ==
+random matrix G: shape (2, 128), mean -0.100, std 1.043  (drawn once at random, then kept fixed)
+click (275, 62) in the photo -> x 1.6 -> (440.0, 99.2) in the 1024 frame -> +0.5 (pixel centre) / 1024 -> (0.4302, 0.0974) -> 2u - 1 -> (-0.1396, -0.8053)
+  column 0: g = (-0.483, +1.120);  c . g = -0.1396 x -0.483 + -0.8053 x +1.120 = -0.8343;  angle 2 pi x -0.8343 = -5.242;  sin +0.863, cos +0.505
+  column 1: g = (-0.663, -0.098);  c . g = -0.1396 x -0.663 + -0.8053 x -0.098 = +0.1717;  angle 2 pi x +0.1717 = +1.079;  sin +0.881, cos +0.472
+  column 2: g = (+0.062, -0.613);  c . g = -0.1396 x +0.062 + -0.8053 x -0.613 = +0.4848;  angle 2 pi x +0.4848 = +3.046;  sin +0.095, cos -0.995
+positional encoding: 128 sines + 128 cosines = 256 numbers; first four: +0.863, +0.881, +0.095, +0.977
+stripe width (period) of each of the 128 frequencies, in pixels of the 1024 frame: shortest 157.8, median 400.1, longest 5188
+sparse prompt embedding from the model: (1, 1, 2, 256)  (image, prompts, tokens, 256): the click + one padding token
+  token 1 = positional encoding + learned "foreground point" vector: max difference to ours 2.38e-07
+  token 2 = the learned "not a point" vector (padding): max difference 0.00e+00
+dense prompt embedding (no mask given): (1, 256, 64, 64): one learned "no mask" vector copied to all 64 x 64 cells
+the learned type vectors (256 numbers each): length, and its ratio to the length of a positional encoding (11.31)
+  foreground point         length   1.86   ratio 0.16
+  background point         length   3.24   ratio 0.29
+  box top-left corner      length   3.29   ratio 0.29
+  box bottom-right corner  length   3.19   ratio 0.28
+  not a point              length   2.96   ratio 0.26
+cosine similarity of the click encoding with the grid encodings: at the click cell (27, 6) 0.999; 1 cell away 0.979; 4 cells away 0.701; 16 cells away -0.016; far corner 0.034
+box [5, 53, 317, 472]: sparse embedding (1, 1, 2, 256): two tokens, top-left corner and bottom-right corner
+mask prompt 256 x 256: conv 2x2 stride 2 -> (1, 4, 128, 128); conv 2x2 stride 2 -> (1, 16, 64, 64); conv 1x1 -> (1, 256, 64, 64); then added to the image embedding cell by cell
+weights of the prompt encoder: random matrix G (2 x 128) 256, point and corner types (4 x 256) 1,024, "not a point" (256) 256, "no mask" (256) 256, mask convolutions 4,684; total 6,476
+
+== 4. the mask decoder, step by step (ViT-H, the click on the ear) ==
+weights of the mask decoder:
+  output tokens (1 IoU + 4 mask, x 256)           1,280
+  two-way layer 1                             1,579,520
+  two-way layer 2                             1,579,520
+  final token-to-image attention + norm         132,224
+  upscaling (2 transposed convs + norm)          73,952
+  4 mask MLPs (256 -> 256 -> 256 -> 32)         559,232
+  IoU head (256 -> 256 -> 256 -> 4)             132,612
+  total                                       4,058,340
+  inside one two-way layer: self-attention 263,168, token-to-image attention 131,712, MLP 256 -> 2048 -> 256 1,050,880, image-to-token attention 131,712, 4 layer norms 2,048
+attention widths: self-attention q, k, v = 256 (8 heads of 32); cross-attention q, k, v = 128 (8 heads of 16)
+tokens: 5 output tokens (1 IoU + 4 mask) + 2 prompt tokens = (1, 7, 256)
+image: embedding + dense prompt, flattened: (1, 4096, 256)  (the 64 x 64 grid as 4,096 vectors)
+  layer 1, step 1: self-attention among the 7 tokens         (1, 7, 256)
+  layer 1, step 2: tokens attend to the 4,096 image vectors  (1, 7, 256)
+  layer 1, step 3: MLP on each token                         (1, 7, 256)
+  layer 1, step 4: image vectors attend to the tokens        (1, 4096, 256)
+  layer 2, step 1: self-attention among the 7 tokens         (1, 7, 256)
+  layer 2, step 2: tokens attend to the 4,096 image vectors  (1, 7, 256)
+  layer 2, step 3: MLP on each token                         (1, 7, 256)
+  layer 2, step 4: image vectors attend to the tokens        (1, 4096, 256)
+  final: tokens attend to the image once more                (1, 7, 256)
+  upscale: transposed conv 2x2, stride 2                     (1, 64, 128, 128)
+  upscale: transposed conv 2x2, stride 2                     (1, 32, 256, 256)
+  4 mask tokens through their MLPs                           (1, 4, 32)
+  dot product with every pixel vector -> 4 masks             (1, 4, 256, 256)
+  IoU token through the IoU head -> 4 scores                 (1, 4)
+our hand-written decoder vs the model: masks max difference 3.66e-04, scores max difference 1.19e-07
+
+the dynamic dot product: mask logit at pixel = (32 numbers from the mask token) . (32 numbers of the upscaled pixel)
+  mask token 1, first 4 numbers w = -139.524, -5.909, -194.530, +5.933;  pixel at the ear, first 4 numbers f = -0.053, +0.129, -0.145, +0.372
+  the 3 largest products w_i f_i: i=20: +278.544 x +0.109 = +30.370, i=2: -194.530 x -0.145 = +28.284, i=13: +191.332 x +0.139 = +26.634
+  ear       photo (275, 62)   -> 256 grid (110,  24):  mask 1 (ear) logit  +33.97 -> p 1.000;   mask 3 (cat) logit   +9.90 -> p 1.000
+  cat body  photo (120, 220)  -> 256 grid ( 48,  88):  mask 1 (ear) logit  -22.51 -> p 0.000;   mask 3 (cat) logit   +4.14 -> p 0.984
+  blanket   photo (250, 400)  -> 256 grid (100, 160):  mask 1 (ear) logit  -35.86 -> p 0.000;   mask 3 (cat) logit  -10.85 -> p 0.000
+
+the four mask tokens for the single ear click (token 0 is the single-mask output for several prompts):
+  token 0: predicted IoU 0.926       465 pixels
+  token 1: predicted IoU 0.946       427 pixels
+  token 2: predicted IoU 0.944       470 pixels
+  token 3: predicted IoU 0.980    49,520 pixels
+  mask token 1 attention: strongest cell (26, 7) = pixel about (260, 70) of the photo, weight 0.2150
+  mask token 2 attention: strongest cell (26, 7) = pixel about (260, 70) of the photo, weight 0.2171
+  mask token 3 attention: strongest cell (26, 6) = pixel about (260, 60) of the photo, weight 0.0227
+
+== 5. compute (FLOPs) and time of each part (time: the fastest of several runs) ==
+image encoder ViT-H: 5.96 TFLOPs per picture
+prompt encoder + mask decoder: 3.62 GFLOPs per prompt = 0.06% of the encoder
+encoder / (prompt encoder + decoder) = 1,645
+one windowed block 176.9 GFLOPs, one global block 248.3 GFLOPs (1.40 x)
+  of which attention scores and mixing (2 matrix products, 2 FLOPs per multiply-add): global 4 x 4096^2 x 1280 = 85.9 GFLOPs, windowed 4 x 25 x 196^2 x 1280 = 4.9 GFLOPs
+if all 32 blocks were global: 7.96 TFLOPs (1.34 x)
+MPS  image encoder  2999.4 ms  (patch embed 7.0, windowed block 81.9, global block 217.5, neck 2.7)   prompt encoder 0.40 ms   mask decoder 6.02 ms   both 6.49 ms
+CPU  image encoder  6779.2 ms  (patch embed 19.2, windowed block 245.7, global block 358.0, neck 8.7)   prompt encoder 0.05 ms   mask decoder 14.44 ms   both 15.82 ms
+
+== 6. the training loss by hand, on real SAM outputs ==
+stand-in references (we have no hand-drawn mask): "the cat" = SAM's mask for the box [5, 53, 317, 472]: 50,517 pixels;
+  "the ear" = SAM's mask for the box [258, 51, 294, 81]: 465 pixels
+target: the ear
+  mask    pixels    focal  20 x focal    dice  mask loss  true IoU  pred. IoU  (pred - true)^2  CE (for comparison)
+  1          427   0.0001      0.0027  0.0472     0.0498     0.914      0.946           0.0010               0.0006
+  2          470   0.0000      0.0006  0.0145     0.0152     0.981      0.944           0.0013               0.0001
+  3       49,520   0.4899      9.7974  0.9820    10.7793     0.009      0.980           0.9431               0.6826
+  the minimum mask loss is mask 2: 0.0152. Only mask 2 gets a gradient from the mask loss.
+  IoU term (mean over the 3 masks): 0.3152;  total = 0.0152 + 1.0 x 0.3152 = 0.3303
+target: the cat
+  mask    pixels    focal  20 x focal    dice  mask loss  true IoU  pred. IoU  (pred - true)^2  CE (for comparison)
+  1          427   1.0322     20.6436  0.9839    21.6275     0.008      0.946           0.8804               4.1283
+  2          470   0.9960     19.9192  0.9819    20.9011     0.009      0.944           0.8750               3.9836
+  3       49,520   0.0008      0.0157  0.0314     0.0471     0.976      0.980           0.0000               0.0128
+  the minimum mask loss is mask 3: 0.0471. Only mask 3 gets a gradient from the mask loss.
+  IoU term (mean over the 3 masks): 0.5851;  total = 0.0471 + 1.0 x 0.5851 = 0.6323
+one output that averages "ear" and "cat" (probability 0.5 on the cat body):
+  against the ear: mask loss 1.3399  (best of the three masks: 0.0152)
+  against the cat: mask loss 0.5388  (best of the three masks: 0.0471)
+  ratio to the best mask: ear 88 x, cat 11.4 x
+  pixels with a probability between 0.4 and 0.6: 46,982 (a blurred, unsure mask)
+
+tiny worked examples:
+  p = 0.9, y = 1: p_t = 0.9; CE = -log 0.9 = 0.1054; (1 - p_t)^2 = 0.0100; focal (alpha_t = 0.25) = 0.25 x 0.0100 x 0.1054 = 0.00026
+  p = 0.3, y = 1: p_t = 0.3; CE = -log 0.3 = 1.2040; (1 - p_t)^2 = 0.4900; focal (alpha_t = 0.25) = 0.25 x 0.4900 x 1.2040 = 0.14749
+  p = 0.6, y = 0: p_t = 0.4; CE = -log 0.4 = 0.9163; (1 - p_t)^2 = 0.3600; focal (alpha_t = 0.75) = 0.75 x 0.3600 x 0.9163 = 0.24740
+  hard (p = 0.3) / easy (p = 0.9): cross-entropy 11.4 x, focal 560 x
+  dice on 4 pixels p = [0.9, 0.8, 0.3, 0.1], y = [1, 1, 1, 0]: 2 x sum(p y) = 4.0; sum(p) + sum(y) = 2.1 + 3 = 5.1; dice = 0.7843; loss = 0.2157
+  IoU head: predicted 0.90, true 0.80 -> (0.90 - 0.80)^2 = 0.0100
+  attention: q = (1, 0), k1 = (2, 0), k2 = (0, 2): scores q.k / sqrt(2) = 1.414, 0.000; softmax = e^1.414 / (e^1.414 + e^0) = 0.804, 0.196; output = 0.804 x (10, 0) + 0.196 x (0, 10) = (8.04, 1.96)
+  Fourier, g = 3: x = 0.10 -> angle 2 pi x 3 x 0.10 = 1.885 -> (sin, cos) = (+0.951, -0.309)
+  Fourier, g = 3: x = 0.12 -> angle 2 pi x 3 x 0.12 = 2.262 -> (sin, cos) = (+0.771, -0.637)
+  Fourier, g = 3: x = 0.30 -> angle 2 pi x 3 x 0.30 = 5.655 -> (sin, cos) = (-0.588, +0.809)
+  dot product: w = (2, -1, 0.5), f = (0.3, 0.2, 0.4): logit = +0.60 -> sigmoid = 0.646
+  dot product: w = (2, -1, 0.5), f = (-0.1, 0.5, 0.0): logit = -0.70 -> sigmoid = 0.332
+
+== 7. the simulated interactive game of training, played with the released model ==
+target: the left cat (50,517 pixels). Rounds without a new point: [8, 11]
+  round  1: first point (233, 105), foreground                                             points 1  IoU 0.953  predicted 1.005
+  round  2: point (188, 298) from the error region (2,391 px), foreground (missed pixel)   points 2  IoU 0.995  predicted 1.015
+  round  3: point (77, 164) from the error region (253 px), background (extra pixel)       points 3  IoU 0.995  predicted 1.002
+  round  4: point (280, 126) from the error region (253 px), foreground (missed pixel)     points 4  IoU 0.995  predicted 1.001
+  round  5: point (163, 344) from the error region (243 px), foreground (missed pixel)     points 5  IoU 0.995  predicted 1.001
+  round  6: point (92, 365) from the error region (241 px), foreground (missed pixel)      points 6  IoU 0.995  predicted 1.001
+  round  7: point (214, 302) from the error region (236 px), background (extra pixel)      points 7  IoU 0.996  predicted 1.000
+  round  8: no new point: only the previous mask                                           points 7  IoU 0.996  predicted 1.001
+  round  9: point (260, 60) from the error region (195 px), foreground (missed pixel)      points 8  IoU 0.996  predicted 1.001
+  round 10: point (88, 78) from the error region (208 px), foreground (missed pixel)       points 9  IoU 0.996  predicted 1.001
+  round 11: no new point: only the previous mask                                           points 9  IoU 0.996  predicted 1.002
+noisy box for training: sides 312 x 419 px -> noise std 20.0, 20.0 px (10% of the side, at most 20); box [5, 53, 317, 472] -> [1, 13, 312, 455]; IoU with the target 0.995
+
+== 8. the training recipe in numbers (from Appendix A) ==
+90,000 iterations x 256 images = 23,040,000 pictures seen = 2.09 passes over 11M pictures
+masks: up to 64 per GPU, 1 picture per GPU (256 pictures on 256 GPUs) -> up to 704 decoder runs per picture per iteration (64 masks x 11 rounds)
+learning rate: it 0: 3.2e-06; it 125: 4.0e-04; it 249: 8.0e-04; it 1,000: 8.0e-04; it 59,999: 8.0e-04; it 60,000: 8.0e-05; it 86,665: 8.0e-05; it 86,666: 8.0e-06; it 89,999: 8.0e-06
+layer-wise decay 0.8: with the usual rule (rate x 0.8^(33 - layer), layer 1..32 = blocks, 0 = patch embedding):
+  mask decoder and neck  8e-4 x 0.8^0  = 8.00e-04
+  block 32 (last)        8e-4 x 0.8^1  = 6.40e-04
+  block 16               8e-4 x 0.8^17 = 1.80e-05
+  block 1 (first)        8e-4 x 0.8^32 = 6.34e-07
+  patch embedding        8e-4 x 0.8^33 = 5.07e-07
+  decoder rate / first-block rate = 1,262
