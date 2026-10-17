@@ -1,0 +1,117 @@
+[
+ {
+  "out": "p3-takeaways.png",
+  "find": "Attention-only models can be written as a sum of interpretable end-to-end functions",
+  "upto": "One can learn a lot simply by breaking apart sums and multiplying together chains of matrices",
+  "mark": [
+   "Attention-only models can be written as a sum of interpretable end-to-end functions ",
+   "and are linear if one freezes the attention patterns",
+   "Transformers have an enormous amount of linear structure."
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p3-claim.png",
+  "find": "We claim that one-layer attention-only transformers can be understood as an ensemble",
+  "upto": "The goal of this section is to rigorously show this correspondence",
+  "mark": [
+   "an ensemble of a bigram model and several \"skip-trigram\" models",
+   "selectively attend from the present token (\"B\") to a previous token (\"A\")",
+   "convert the raw weights of a transformer into interpretable tables"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p3-recall.png",
+  "find": "Recall that a one-layer attention-only transformer consists of a token embedding",
+  "upto": "we can represent the transformer as a product of three terms",
+  "mark": [
+   "a token embedding, followed by an attention layer",
+   "finally an unembedding",
+   "a product of three terms"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p3-product.png",
+  "figure": 7,
+  "pad": 12
+ },
+ {
+  "out": "p3-expand.png",
+  "find": "Our key trick is to simply expand the product",
+  "upto": "We claim each of these end-to-end path terms is tractable to understand",
+  "mark": [
+   "Our key trick is to simply expand the product.",
+   "a sum where every term corresponds to an end-to-end path",
+   "tractable to understand, can be reasoned about independently, and additively combine to create model behavior"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p3-direct.png",
+  "find": "also occurred when we looked at the zero-layer transformer",
+  "upto": "The more interesting terms are the attention head terms",
+  "mark": [
+   "also occurred when we looked at the zero-layer transformer",
+   "Because it doesn’t move information between positions",
+   "the only thing it can contribute to is the bigram statistics",
+   "fill in missing gaps that other terms don’t handle"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p3-head-term.png",
+  "find": "How can we map these terms to model behavior?",
+  "mark": [
+   "How can we map these terms to model behavior?",
+   "why do we get these particular products of matrices on our equations?"
+  ],
+  "padx": 40,
+  "pady": 8
+ },
+ {
+  "out": "p3-separable.png",
+  "find": "once a destination token has decided how much to attend to a source token",
+  "mark": [
+   "once a destination token has decided how much to attend to a source token, the effect on the output is solely a function of that source token",
+   "the source token will have the same effect on the logits"
+  ],
+  "padx": 40,
+  "pady": 8
+ },
+ {
+  "out": "p3-freeze.png",
+  "find": "Thinking of the OV and QK circuits separately can be very useful",
+  "upto": "We find this a very powerful way to think about transformers",
+  "mark": [
+   "is it really principled to think about them independently?",
+   "imagine running the model twice",
+   "This only depends on the QK circuit.",
+   "This gives you a function where the logits are a linear function of the tokens!"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p3-two-layer-fig.png",
+  "figure": 17,
+  "pad": 12
+ },
+ {
+  "out": "p3-two-layer.png",
+  "find": "Two of these terms, the direct path term and individual head terms",
+  "mark": [
+   "are identical to the one-layer model",
+   "corresponds to V-Composition",
+   "they tend to not play a significant role in small two-layer models"
+  ],
+  "padx": 40,
+  "pady": 8
+ }
+]

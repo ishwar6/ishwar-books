@@ -1,0 +1,65 @@
+== 1. THE ONE-LAYER MODEL AS A PRODUCT OF THREE TERMS (attn-only-1l)
+  prompt: ['<|BOS|>', 'I', ' like', ' green', ' tea', ',', ' so', ' I', ' drink', ' green']  (10 tokens); the model predicts ' tea' next
+  embed -> (Id + sum of 8 heads) -> unembed, by hand at all 10 positions: |by hand - model logits| max = 2.6e-05
+  layer-norm scales at the last position: before attention 0.238, before the unembedding 0.493
+
+== 2. EXPAND THE PRODUCT: A SUM OF END-TO-END PATHS (logits at the last position, " green")
+  12 terms: the direct path, 8 head terms (the paper's 9 terms), and 3 parts the paper leaves out
+  |sum of the terms - model logits| max over all 48,262 logits = 2.1e-05
+  term                        adds to logit of tea   tokens it pushes up most
+  direct path (token)                       +5.501   ['ery', 'houses', 'belt', 'wich']
+  head 0.0 (tokens)                         +1.321   [' moderation', 'avour', 'mented', ' replen']
+  head 0.1 (tokens)                         -1.466   ['ated', 'ided', 'rices', 'istant']
+  head 0.2 (tokens)                         +1.545   [' moderation', ' wouldn', ' gotta', '))))']
+  head 0.3 (tokens)                         +5.465   [' tea', ' Tea', ' teac', ' brew']
+  head 0.4 (tokens)                         +0.012   ['\n\n\n       ', '\n\n\n\n', '\n    ', '\n\n        ']
+  head 0.5 (tokens)                         +1.146   ['MENT', 'MENTS', 'vent', ' WARRANTIES']
+  head 0.6 (tokens)                         +0.317   [')],', '”).', ']),', '”)']
+  head 0.7 (tokens)                         +3.353   [' vinegar', ' snacks', ' cigarettes', ' candles']
+  direct path (position)                    +0.653   [' yang', '”),', '?”', '”).']
+  heads (positions)                         -1.215   ['aliana', 'gmail', 'visors', 'vironments']
+  biases b_O and b_U                        +3.495   [',', '.', ' and', ' in']
+  sum                                      +20.128   (model logit of " tea": 20.128)
+  probability of " tea": 0.897
+
+== 3. ONE HEAD TERM IN TOKENS: A^h (x) W_U W_OV^h W_E (head 0.3, destination = last " green")
+  each source token j adds  A[last, j] x (column t_j of the OV circuit)  to the logits; its effect on " tea":
+    j=0 '<|BOS|>'  weight 0.366 x column value  -0.456 = -0.167
+    j=1 'I'        weight 0.003 x column value  +3.673 = +0.011
+    j=2 ' like'    weight 0.001 x column value  -6.281 = -0.008
+    j=3 ' green'   weight 0.013 x column value  +6.110 = +0.077
+    j=4 ' tea'     weight 0.370 x column value +12.150 = +4.497
+    j=5 ','        weight 0.087 x column value  +0.040 = +0.003
+    j=6 ' so'      weight 0.001 x column value  +2.496 = +0.001
+    j=7 ' I'       weight 0.002 x column value  +1.022 = +0.002
+    j=8 ' drink'   weight 0.147 x column value  +6.649 = +0.979
+    j=9 ' green'   weight 0.011 x column value  +6.281 = +0.070
+  sum = +5.465  (term "head 0.3 (tokens)" above: +5.465)
+
+== 4. FREEZE THE ATTENTION PATTERNS: THE LOGITS BECOME LINEAR IN THE TOKENS
+  frozen    : g(a + b) vs g(a) + g(b): max diff 4.4e-05;  g(2a) vs 2 g(a): max diff 5.4e-05  (typical |g(a)| = 1.73)
+  not frozen: g(a + b) vs g(a) + g(b): max diff 1.7e+01;  g(2a) vs 2 g(a): max diff 2.7e+01  (typical |g(a)| = 2.14)
+  g(t) = logits(t) - logits(no tokens): the part of the logits that depends on the tokens; a = our prompt, b = "The cat sat on the mat and the dog"
+
+  swap source token 4 " tea" -> " coffee", patterns and scales frozen, watch the last position:
+    change of all logits = sum over heads of A[last, 4] x (OV column coffee - OV column tea): max diff 2.9e-05
+    frozen run: logit of " tea" changes by -2.361, logit of " coffee" by +2.739
+    the real model on "I like green coffee, so I drink green" predicts: [(' coffee', 0.562), (' tea', 0.241), (' and', 0.015)]
+
+== 5. ONE ROW OF THE PATTERN DEPENDS ON EVERY SOURCE TOKEN (softmax), head 0.3, last row
+  before: "I like green tea, so I drink green"   weight on " tea" 0.370, on BOS 0.366, on token 8 ' drink' 0.147
+  after : "I like green tea, so I want green"   weight on " tea" 0.434, on BOS 0.429, on token 8 ' want' 0.000
+  the raw score of " tea" is the same in both runs: 2.929 and 2.929
+
+== 6. TWO LAYERS IN OUTLINE (attn-only-2l): 1 + 16 + 64 PATH TERMS
+  same prompt; attn-only-2l predicts ' tea' after the last " green"
+  terms: direct path 1, layer-0 heads 8, layer-1 heads 8, virtual heads 64, positions and biases 92  (paper's terms: 1 + 16 + 64 = 81)
+  |sum of all terms - model logits| max = 2.7e-05
+  group                    adds to logit of ' tea'   spread of the 48,262 logits (std)
+  direct path                               +3.068                               0.907
+  layer-0 heads                             +0.376                               0.881
+  layer-1 heads                            +15.291                               2.002
+  virtual heads                             +1.061                               1.082
+  positions and biases                      +2.962                               2.933
+  sum                                      +22.758   (model logit 22.758, probability 0.986)
+  the 3 largest single virtual heads (std of their logits): [0.84, 0.515, 0.492]; the 64 together: 1.082

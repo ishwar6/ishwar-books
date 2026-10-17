@@ -1,0 +1,313 @@
+{
+ "prompt": "I like green tea, so I drink green",
+ "tokens": [
+  "<|BOS|>",
+  "I",
+  " like",
+  " green",
+  " tea",
+  ",",
+  " so",
+  " I",
+  " drink",
+  " green"
+ ],
+ "pred": " tea",
+ "product_diff": 2.5510787963867188e-05,
+ "sum_diff": 2.0503997802734375e-05,
+ "terms": {
+  "direct path (token)": {
+   "tea": 5.501,
+   "top": [
+    "ery",
+    "houses",
+    "belt",
+    "wich"
+   ],
+   "size": 1.19
+  },
+  "head 0.0 (tokens)": {
+   "tea": 1.321,
+   "top": [
+    " moderation",
+    "avour",
+    "mented",
+    " replen"
+   ],
+   "size": 0.9
+  },
+  "head 0.1 (tokens)": {
+   "tea": -1.466,
+   "top": [
+    "ated",
+    "ided",
+    "rices",
+    "istant"
+   ],
+   "size": 0.98
+  },
+  "head 0.2 (tokens)": {
+   "tea": 1.545,
+   "top": [
+    " moderation",
+    " wouldn",
+    " gotta",
+    "))))"
+   ],
+   "size": 0.752
+  },
+  "head 0.3 (tokens)": {
+   "tea": 5.465,
+   "top": [
+    " tea",
+    " Tea",
+    " teac",
+    " brew"
+   ],
+   "size": 0.69
+  },
+  "head 0.4 (tokens)": {
+   "tea": 0.012,
+   "top": [
+    "\n\n\n       ",
+    "\n\n\n\n",
+    "\n    ",
+    "\n\n        "
+   ],
+   "size": 0.358
+  },
+  "head 0.5 (tokens)": {
+   "tea": 1.146,
+   "top": [
+    "MENT",
+    "MENTS",
+    "vent",
+    " WARRANTIES"
+   ],
+   "size": 0.65
+  },
+  "head 0.6 (tokens)": {
+   "tea": 0.317,
+   "top": [
+    ")],",
+    "\u201d).",
+    "]),",
+    "\u201d)"
+   ],
+   "size": 0.368
+  },
+  "head 0.7 (tokens)": {
+   "tea": 3.353,
+   "top": [
+    " vinegar",
+    " snacks",
+    " cigarettes",
+    " candles"
+   ],
+   "size": 1.169
+  },
+  "direct path (position)": {
+   "tea": 0.653,
+   "top": [
+    " yang",
+    "\u201d),",
+    "?\u201d",
+    "\u201d)."
+   ],
+   "size": 0.582
+  },
+  "heads (positions)": {
+   "tea": -1.215,
+   "top": [
+    "aliana",
+    "gmail",
+    "visors",
+    "vironments"
+   ],
+   "size": 1.205
+  },
+  "biases b_O and b_U": {
+   "tea": 3.495,
+   "top": [
+    ",",
+    ".",
+    " and",
+    " in"
+   ],
+   "size": 2.862
+  }
+ },
+ "tea_logit": 20.128360748291016,
+ "p_tea": 0.8968160152435303,
+ "head3_sources": [
+  {
+   "tok": "<|BOS|>",
+   "a": 0.366,
+   "col_tea": -0.456,
+   "contrib": -0.167
+  },
+  {
+   "tok": "I",
+   "a": 0.003,
+   "col_tea": 3.673,
+   "contrib": 0.011
+  },
+  {
+   "tok": " like",
+   "a": 0.001,
+   "col_tea": -6.281,
+   "contrib": -0.008
+  },
+  {
+   "tok": " green",
+   "a": 0.013,
+   "col_tea": 6.11,
+   "contrib": 0.077
+  },
+  {
+   "tok": " tea",
+   "a": 0.37,
+   "col_tea": 12.15,
+   "contrib": 4.497
+  },
+  {
+   "tok": ",",
+   "a": 0.087,
+   "col_tea": 0.04,
+   "contrib": 0.003
+  },
+  {
+   "tok": " so",
+   "a": 0.001,
+   "col_tea": 2.496,
+   "contrib": 0.001
+  },
+  {
+   "tok": " I",
+   "a": 0.002,
+   "col_tea": 1.022,
+   "contrib": 0.002
+  },
+  {
+   "tok": " drink",
+   "a": 0.147,
+   "col_tea": 6.649,
+   "contrib": 0.979
+  },
+  {
+   "tok": " green",
+   "a": 0.011,
+   "col_tea": 6.281,
+   "contrib": 0.07
+  }
+ ],
+ "prompt_b": "The cat sat on the mat and the dog",
+ "freeze": {
+  "frozen": {
+   "sum": 4.38690185546875e-05,
+   "double": 5.3882598876953125e-05,
+   "size": 1.7290301322937012
+  },
+  "not frozen": {
+   "sum": 16.534709930419922,
+   "double": 26.533857345581055,
+   "size": 2.1393632888793945
+  }
+ },
+ "swap_formula_diff": 2.8967857360839844e-05,
+ "swap": {
+  "tea": -2.361,
+  "coffee": 2.739
+ },
+ "swap_real_top": [
+  [
+   " coffee",
+   0.562
+  ],
+  [
+   " tea",
+   0.241
+  ],
+  [
+   " and",
+   0.015
+  ]
+ ],
+ "row_before": [
+  0.366,
+  0.003,
+  0.001,
+  0.013,
+  0.37,
+  0.087,
+  0.001,
+  0.002,
+  0.147,
+  0.011
+ ],
+ "row_after": [
+  0.429,
+  0.003,
+  0.001,
+  0.015,
+  0.434,
+  0.102,
+  0.001,
+  0.002,
+  0.0,
+  0.013
+ ],
+ "tokens_d": [
+  "<|BOS|>",
+  "I",
+  " like",
+  " green",
+  " tea",
+  ",",
+  " so",
+  " I",
+  " want",
+  " green"
+ ],
+ "two": {
+  "sum_diff": 2.6702880859375e-05,
+  "counts": {
+   "direct path": 1,
+   "layer-0 heads": 8,
+   "layer-1 heads": 8,
+   "virtual heads": 64,
+   "positions and biases": 92
+  },
+  "pred": " tea",
+  "groups": {
+   "direct path": {
+    "pred": 3.068,
+    "std": 0.907
+   },
+   "layer-0 heads": {
+    "pred": 0.376,
+    "std": 0.881
+   },
+   "layer-1 heads": {
+    "pred": 15.291,
+    "std": 2.002
+   },
+   "virtual heads": {
+    "pred": 1.061,
+    "std": 1.082
+   },
+   "positions and biases": {
+    "pred": 2.962,
+    "std": 2.933
+   }
+  },
+  "logit": 22.757675170898438,
+  "p": 0.9862794876098633,
+  "top_virtual": [
+   0.84,
+   0.515,
+   0.492
+  ]
+ },
+ "seconds": 6.0983428955078125
+}
