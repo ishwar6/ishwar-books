@@ -1,0 +1,254 @@
+{
+ "core_days": {
+  "eight_cores_30_days": 240,
+  "bit_over_l16": 14.56,
+  "bit_over_h14": 3.96,
+  "ns_over_h14": 4.92,
+  "h14_over_l16": 3.68
+ },
+ "errors": {
+  "ImageNet": {
+   "h14": 11.45,
+   "l16": 12.24,
+   "bit": 12.46,
+   "cut": 0.081
+  },
+  "ImageNet ReaL": {
+   "h14": 9.28,
+   "l16": 9.46,
+   "bit": 9.46,
+   "cut": 0.019
+  },
+  "CIFAR-10": {
+   "h14": 0.5,
+   "l16": 0.58,
+   "bit": 0.63,
+   "cut": 0.206
+  },
+  "CIFAR-100": {
+   "h14": 5.45,
+   "l16": 6.1,
+   "bit": 6.49,
+   "cut": 0.16
+  },
+  "Oxford-IIIT Pets": {
+   "h14": 2.44,
+   "l16": 2.68,
+   "bit": 3.38,
+   "cut": 0.278
+  },
+  "Oxford Flowers-102": {
+   "h14": 0.32,
+   "l16": 0.26,
+   "bit": 0.37,
+   "cut": 0.135
+  },
+  "VTAB (19 tasks)": {
+   "h14": 22.37,
+   "l16": 23.72,
+   "bit": 23.71,
+   "cut": 0.057
+  }
+ },
+ "l16_vs_bit": {
+  "ImageNet": {
+   "gap": 0.22,
+   "std": 0.03,
+   "verdict": "ViT-L/16 higher"
+  },
+  "ImageNet ReaL": {
+   "gap": 0.0,
+   "std": 0.03,
+   "verdict": "equal"
+  },
+  "CIFAR-10": {
+   "gap": 0.05,
+   "std": 0.06,
+   "verdict": "ViT-L/16 higher"
+  },
+  "CIFAR-100": {
+   "gap": 0.39,
+   "std": 0.08,
+   "verdict": "ViT-L/16 higher"
+  },
+  "Oxford-IIIT Pets": {
+   "gap": 0.7,
+   "std": 0.23,
+   "verdict": "ViT-L/16 higher"
+  },
+  "Oxford Flowers-102": {
+   "gap": 0.11,
+   "std": 0.03,
+   "verdict": "ViT-L/16 higher"
+  },
+  "VTAB (19 tasks)": {
+   "gap": -0.01,
+   "std": 1.7,
+   "verdict": "BiT-L higher"
+  }
+ },
+ "l16_wins": 5,
+ "h14_minus_l16": {
+  "ImageNet": 0.79,
+  "ImageNet ReaL": 0.18,
+  "CIFAR-10": 0.08,
+  "CIFAR-100": 0.65,
+  "Oxford-IIIT Pets": 0.24,
+  "Oxford Flowers-102": -0.06,
+  "VTAB (19 tasks)": 1.35
+ },
+ "polyak": {
+  "ViT-H/14 (JFT)": 0.51,
+  "ViT-L/16 (JFT)": 0.64,
+  "ViT-L/16 (I21k)": 0.15
+ },
+ "table5": {
+  "ImageNet": {
+   "imagenet": [
+    77.91,
+    73.38,
+    76.53,
+    71.16,
+    null
+   ],
+   "order": [
+    "ViT-B/16",
+    "ViT-L/16",
+    "ViT-B/32",
+    "ViT-L/32"
+   ],
+   "l16_minus_b16": -1.38
+  },
+  "ImageNet-21k": {
+   "imagenet": [
+    83.97,
+    81.28,
+    85.15,
+    80.99,
+    85.13
+   ],
+   "order": [
+    "ViT-L/16",
+    "ViT-H/14",
+    "ViT-B/16",
+    "ViT-B/32",
+    "ViT-L/32"
+   ],
+   "l16_minus_b16": 1.18
+  },
+  "JFT-300M": {
+   "imagenet": [
+    84.15,
+    80.73,
+    87.12,
+    84.37,
+    88.04
+   ],
+   "order": [
+    "ViT-H/14",
+    "ViT-L/16",
+    "ViT-L/32",
+    "ViT-B/16",
+    "ViT-B/32"
+   ],
+   "l16_minus_b16": 2.97
+  }
+ },
+ "table5_gain": {
+  "b16": 6.24,
+  "l16": 10.59
+ },
+ "vtab": {
+  "ViT-H/14 (JFT)": {
+   "mean": 77.63,
+   "table_mean": 77.6,
+   "groups": {
+    "Natural": 86.69,
+    "Specialized": 87.0,
+    "Structured": 65.03
+   },
+   "lowest": [
+    "sNORB-Azim",
+    33.2
+   ]
+  },
+  "ViT-L/16 (JFT)": {
+   "mean": 76.29,
+   "table_mean": 76.3,
+   "groups": {
+    "Natural": 85.56,
+    "Specialized": 86.72,
+    "Structured": 62.96
+   },
+   "lowest": [
+    "sNORB-Azim",
+    36.2
+   ]
+  },
+  "ViT-L/16 (I21k)": {
+   "mean": 72.71,
+   "table_mean": 72.7,
+   "groups": {
+    "Natural": 83.27,
+    "Specialized": 84.65,
+    "Structured": 57.5
+   },
+   "lowest": [
+    "sNORB-Azim",
+    30.5
+   ]
+  }
+ },
+ "vtab_gap_top": [
+  [
+   "Clevr-Count",
+   21.4
+  ],
+  [
+   "DMLab",
+   11.2
+  ],
+  [
+   "sNORB-Elev",
+   9.5
+  ],
+  [
+   "SVHN",
+   8.0
+  ]
+ ],
+ "vtab_gap_bottom": [
+  [
+   "Camelyon",
+   0.8
+  ],
+  [
+   "Flowers102",
+   0.4
+  ],
+  [
+   "dSpr-Ori",
+   -1.6
+  ]
+ ],
+ "table7": {
+  "avg": [
+   89.33,
+   88.79,
+   94.01,
+   93.72
+  ],
+  "adam_minus_sgd": [
+   0.54,
+   0.29
+  ],
+  "adam_wins": 7
+ },
+ "objectnet": {
+  "top1": 61.7,
+  "top5": 82.1,
+  "drop": 26.85,
+  "bit_top1": 58.7,
+  "bit_top5": 80.0
+ }
+}

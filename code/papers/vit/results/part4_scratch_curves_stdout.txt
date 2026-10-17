@@ -1,0 +1,7 @@
+== the training curves of vit_part4_scratch.py: validation accuracy (%) and smoothed training loss ==
+   1,000 images  ViT    step 500: 36.0% / loss 1.272  step 1500: 37.7% / loss 0.080  step 2500: 38.6% / loss 0.004   best 39.0% at step 2000
+   1,000 images  ResNet step 500: 47.5% / loss 0.360  step 1500: 53.3% / loss 0.003  step 2500: 54.1% / loss 0.001   best 54.6% at step 2000
+   5,000 images  ViT    step 500: 43.1% / loss 1.592  step 1500: 55.6% / loss 1.044  step 2500: 56.8% / loss 0.676   best 57.4% at step 2000
+   5,000 images  ResNet step 500: 63.2% / loss 0.911  step 1500: 72.5% / loss 0.277  step 2500: 76.5% / loss 0.060   best 76.5% at step 2250
+  50,000 images  ViT    step 500: 41.5% / loss 1.657  step 1500: 57.7% / loss 1.230  step 2500: 63.8% / loss 1.059   best 63.8% at step 2500
+  50,000 images  ResNet step 500: 55.0% / loss 1.047  step 1500: 79.7% / loss 0.594  step 2500: 84.2% / loss 0.432   best 84.2% at step 2500

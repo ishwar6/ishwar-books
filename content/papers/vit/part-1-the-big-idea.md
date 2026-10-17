@@ -720,7 +720,7 @@ The exact numbers are in the paper's Table 5 (appendix), which Part 4 redraws in
 >
 > **What it means:**
 >
-> Table 5 sits in Appendix D and holds the numbers behind Figure 3 of the main text. All models here were fine-tuned on pictures of 384 pixels.
+> Table 5 sits in Appendix C and holds the numbers behind Figure 3 of the main text. All models here were fine-tuned on pictures of 384 pixels.
 >
 > Compare the two highlighted model rows. With 1.3 million pictures, the larger model (L/16) is *worse* than the smaller one (B/16). With 14 million or 303 million pictures, it is *better*. That is "large scale training trumps inductive bias" in five numbers: a bigger, freer model needs more data before its freedom pays.
 

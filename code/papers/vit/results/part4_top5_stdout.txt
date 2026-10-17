@@ -1,0 +1,16 @@
+== top-1 and top-5 accuracy over all 1000 ImageNet classes, on the 3,925 Imagenette validation pictures ==
+  the 10 classes: 0, 217, 482, 491, 497, 566, 569, 571, 574, 701
+  ViT-B/16     top-1 83.13%   top-5 96.66%   top-1 wrong on 662 pictures, of which 531 have the label in the top 5
+  ViT-L/16     top-1 84.92%   top-5 97.63%   top-1 wrong on 592 pictures, of which 499 have the label in the top 5
+  ResNet-50    top-1 79.36%   top-5 95.95%   top-1 wrong on 810 pictures, of which 651 have the label in the top 5
+
+  ViT-L/16, pictures whose top-1 is not the label but whose top-5 contains it (8 picked at random, seed 3):
+    n02102040_2700.JPEG          label: English springer top-1: Boston bull            label at rank 3
+    n02102040_8260.JPEG          label: English springer top-1: German short-haired pointer label at rank 3
+    n02102040_880.JPEG           label: English springer top-1: Sussex spaniel         label at rank 2
+    n02979186_15511.JPEG         label: cassette player  top-1: cassette               label at rank 2
+    n03028079_26940.JPEG         label: church           top-1: bell cote              label at rank 2
+    n03028079_9481.JPEG          label: church           top-1: monastery              label at rank 2
+    n03028079_9560.JPEG          label: church           top-1: vault                  label at rank 3
+    n03394916_38702.JPEG         label: French horn      top-1: cornet                 label at rank 2
+  saved p4-top5-misses.png (930x562)
