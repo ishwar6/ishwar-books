@@ -1,0 +1,45 @@
+"""Highlighted excerpts of the Transformer paper for Part 2 (the architecture): §3 intro, Figure 1, §3.1, §3.3, §3.4, §3.5."""
+from paper_shots import run
+
+JOBS = [
+    dict(name='p2-encoder-decoder', page=1, anchor='Most competitive neural sequence transduction models',
+         highlight=['encoder-decoder structure', 'continuous representations z = (z1, ..., zn)',
+                    'one element at a time', 'auto-regressive'],
+         above=14, end='when generating the next.'),
+    dict(name='p2-figure1', page=2, anchor='Figure 1: The Transformer - model architecture.',
+         highlight=[], figure=True, column='full', below=0),
+    dict(name='p2-overall', page=2, anchor='The Transformer follows this overall architecture',
+         highlight=['stacked self-attention and point-wise, fully', 'left and right halves of Figure 1'],
+         above=4, end='respectively.'),
+    dict(name='p2-encoder', page=2, anchor='The encoder is composed of a stack',
+         highlight=['N = 6 identical layers', 'multi-head self-attention mechanism', 'position-',
+                    'residual connection [11]', 'LayerNorm(x + Sublayer(x))', 'dmodel = 512'],
+         above=4, end='dimension dmodel = 512.'),
+    dict(name='p2-decoder', page=2, anchor='The decoder is also composed of a stack',
+         highlight=['inserts a third sub-layer', 'over the output of the encoder stack',
+                    'prevent positions from attending to subsequent positions', 'offset by one position'],
+         above=4, end='at positions less than i.'),
+    dict(name='p2-ffn', page=4, anchor='Position-wise Feed-Forward Networks',
+         highlight=['applied to each position separately and identically', 'two linear transformations with a ReLU activation',
+                    'different parameters', 'two convolutions with kernel size 1', 'dff = 2048'],
+         above=4, end='dff = 2048.'),
+    dict(name='p2-embeddings', page=4, anchor='Embeddings and Softmax',
+         highlight=['learned embeddings', 'predicted next-token probabilities',
+                    'share the same weight matrix between the two embedding layers and the pre-softmax',
+                    'multiply those weights by √dmodel'],
+         above=4, end='by √dmodel.'),
+    dict(name='p2-pe-1', page=5, anchor='Positional Encoding',
+         highlight=['no recurrence and no convolution', 'relative or absolute position', 'add "positional encodings"',
+                    'same dimension dmodel'],
+         above=4, end='learned and fixed [9].'),
+    dict(name='p2-pe-2', page=5, anchor='In this work, we use sine and cosine functions',
+         highlight=['geometric progression from 2π to 10000 · 2π', 'attend by', 'relative positions',
+                    'PEpos+k can be represented as a linear function'],
+         above=4, end='PEpos.'),
+    dict(name='p2-pe-3', page=5, anchor='We also experimented with using learned positional embeddings',
+         highlight=['nearly identical results', 'extrapolate to sequence lengths longer'],
+         above=4, end='during training.'),
+]
+
+if __name__ == '__main__':
+    run(JOBS)

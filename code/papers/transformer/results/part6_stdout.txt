@@ -1,0 +1,47 @@
+== 1. Training cost in FLOPs (Table 2, footnote 5) ==
+base :  12.0 h x 3600 s x 8 GPUs x 9.5e12 FLOP/s = 3.28e+18 FLOPs
+big  :  84.0 h x 3600 s x 8 GPUs x 9.5e12 FLOP/s = 2.30e+19 FLOPs
+
+== 2. Parameters from the shapes (Table 3), shared vocabulary of 37,000 tokens ==
+row                             ours (M) paper (M)
+base                                63.1        65
+(A) h=1, dk=dv=512                  63.1      same
+(A) h=16, dk=dv=32                  63.1      same
+(B) dk=16                           56.0        58
+(C) N=2                             33.7        36
+(C) N=8                             77.8        80
+(C) d_model=256, dk=dv=32           26.8        28
+(C) d_model=1024, dk=dv=128        163.9       168
+(C) d_ff=4096                       88.3        90
+big                                214.2       213
+base split: encoder 18.9 M, decoder 25.2 M, shared embedding 18.9 M
+
+== 3. A released base-size Transformer: Helsinki-NLP/opus-mt-en-de ==
+layers 6+6, d_model 512, heads 8, d_ff 2048, vocabulary 58101, parameters 74.4 M
+source (15 tokens): The law will never be perfect, but its application should be just.
+greedy          : Das Gesetz wird nie perfekt sein, aber seine Anwendung sollte gerecht sein.
+beam 4, alpha .6: Das Gesetz wird nie perfekt sein, aber seine Anwendung sollte gerecht sein.
+output limit = input length + 50 = 65 tokens; used 15
+
+== 4. Encoder self-attention, layer 5 of 6, the sentences of Figures 3 and 4 ==
+sentence: It is in this spirit that a majority of American governments have passed new laws since 2009 making the registration or voting process more difficult.
+27 tokens; query token "▁making" at position 17
+  head 1: ▁making 0.60, ▁difficult 0.19, ▁passed 0.07   | weight on tokens 5 or more away: 0.34
+  head 2: ▁laws 0.18, </s> 0.13, ▁passed 0.12   | weight on tokens 5 or more away: 0.45
+  head 3: ▁difficult 0.71, ▁more 0.29, ▁process 0.00   | weight on tokens 5 or more away: 1.00
+  head 4: ▁making 0.19, </s> 0.14, ▁passed 0.08   | weight on tokens 5 or more away: 0.47
+  head 5: ▁more 0.29, . 0.18, </s> 0.13   | weight on tokens 5 or more away: 0.77
+  head 6: ▁difficult 0.69, ▁more 0.12, </s> 0.04   | weight on tokens 5 or more away: 0.91
+  head 7: ▁making 0.99, ▁difficult 0.01, ▁the 0.00   | weight on tokens 5 or more away: 0.01
+  head 8: </s> 0.36, . 0.22, ▁making 0.07   | weight on tokens 5 or more away: 0.77
+
+sentence: The Law will never be perfect, but its application should be just - this is what we are missing, in my opinion.
+26 tokens; query token "▁its" at position 8
+  head 1: ▁its 0.82, ▁The 0.14, ▁Law 0.02   | weight on tokens 5 or more away: 0.17
+  head 2: ▁but 0.32, , 0.27, </s> 0.12   | weight on tokens 5 or more away: 0.22
+  head 3: ▁application 0.88, </s> 0.04, ▁just 0.03   | weight on tokens 5 or more away: 0.05
+  head 4: </s> 0.27, ▁its 0.14, ▁be 0.09   | weight on tokens 5 or more away: 0.60
+  head 5: ▁be 0.46, ▁- 0.23, ▁should 0.11   | weight on tokens 5 or more away: 0.32
+  head 6: ▁its 0.29, </s> 0.27, ▁application 0.27   | weight on tokens 5 or more away: 0.34
+  head 7: ▁its 0.55, ▁be 0.17, ▁is 0.10   | weight on tokens 5 or more away: 0.21
+  head 8: </s> 0.34, ▁but 0.14, , 0.07   | weight on tokens 5 or more away: 0.50

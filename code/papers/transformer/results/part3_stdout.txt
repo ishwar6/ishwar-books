@@ -1,0 +1,63 @@
+$ python tx_part3.py
+== 1. Eq. 1 on three tokens, d_k = 2
+scores QK^T/sqrt(2): [[1.414, 0.0, 0.707], [0.0, 1.414, 0.707], [1.414, 1.414, 1.414]]
+weights (softmax, row 1): [0.576, 0.14, 0.284]
+output row 1: [7.18, 2.82]
+== 2. dot products of random vectors (mean 0, variance 1), 100,000 pairs each
+d_k=   4  mean +0.003  variance     3.99  std   2.00  scaled std 0.999
+d_k=  16  mean +0.012  variance    15.92  std   3.99  scaled std 0.997
+d_k=  64  mean -0.034  variance    64.01  std   8.00  scaled std 1.000
+d_k= 512  mean -0.077  variance   514.16  std  22.68  scaled std 1.002
+== softmax over 10 keys, one query, d_k = 64 (same random draw, scaled and not scaled)
+unscaled64  scores range [-15.8, +9.5]  top weight 0.8407  largest gradient entry 0.1339
+scaled64    scores range [-2.0, +1.2]  top weight 0.2484  largest gradient entry 0.1867
+== softmax over 10 keys, one query, d_k = 512 (same random draw, scaled and not scaled)
+unscaled512 scores range [-60.1, +46.0]  top weight 1.0000  largest gradient entry 0.0000
+scaled512   scores range [-2.7, +2.0]  top weight 0.5176  largest gradient entry 0.2497
+== 3. Helsinki-NLP/opus-mt-en-de (MarianMT)
+d_model 512, heads 8, d_k = d_v = 64, encoder layers 6, decoder layers 6
+  q_proj   weight (512, 512)
+  k_proj   weight (512, 512)
+  v_proj   weight (512, 512)
+  out_proj weight (512, 512)
+parameters in one multi-head attention block: 1,050,624 (4 x 512 x 512 + 4 x 512 = 1,050,624)
+source tokens: ['▁The', '▁cat', '▁sat', '▁on', '▁the', '▁mat', '▁because', '▁it', '▁was', '▁tired', '.', '</s>']
+translation (greedy): Die Katze saß auf der Matte, weil sie müde war.
+== 4. encoder layer 1 self-attention rebuilt by hand
+x (12, 512) -> Q,K,V per head (8, 12, 64) -> weights (8, 12, 12) -> heads (8, 12, 64) -> concat (12, 512) -> W^O -> (12, 512)
+largest difference from the library output: 0.0e+00
+layer 1, query "it" (position 7): top key per head
+  head 1: [('▁tired', 0.75), ('</s>', 0.08)]
+  head 2: [('▁it', 0.2), ('▁tired', 0.19)]
+  head 3: [('</s>', 0.6), ('▁the', 0.1)]
+  head 4: [('▁was', 0.33), ('▁mat', 0.17)]
+  head 5: [('</s>', 0.41), ('▁the', 0.18)]
+  head 6: [('</s>', 0.19), ('▁tired', 0.18)]
+  head 7: [('</s>', 0.26), ('.', 0.2)]
+  head 8: [('▁was', 0.68), ('</s>', 0.09)]
+== 5. the three uses (full forward pass on the source and the translation)
+decoder input tokens: ['<pad>', '▁Die', '▁Katze', '▁saß', '▁auf', '▁der', '▁Matt', 'e', ',', '▁weil', '▁sie', '▁müde', '▁war', '.']
+encoder self-attention weights per layer: (1, 8, 12, 12)  (batch, heads, n_src, n_src)
+decoder self-attention weights per layer: (1, 8, 14, 14)  (batch, heads, n_tgt, n_tgt)
+cross-attention weights per layer:        (1, 8, 14, 12)  (batch, heads, n_tgt, n_src)
+decoder self-attention, weight above the diagonal (future tokens): max 0.0e+00
+decoder self-attention, last layer, mean of heads, first 5 rows x 5 columns:
+  1.00 0.00 0.00 0.00 0.00   <- query <pad>
+  0.59 0.41 0.00 0.00 0.00   <- query ▁Die
+  0.63 0.04 0.32 0.00 0.00   <- query ▁Katze
+  0.53 0.04 0.12 0.31 0.00   <- query ▁saß
+  0.52 0.06 0.06 0.12 0.25   <- query ▁auf
+cross-attention, decoder layer 3, mean of heads: the source token each German token attends to most
+  query ▁Die         -> ▁The       (0.31)
+  query ▁Katze       -> ▁cat       (0.25)
+  query ▁saß         -> </s>       (0.37)
+  query ▁auf         -> ▁on        (0.31)
+  query ▁der         -> ▁the       (0.26)
+  query ▁Matt        -> ▁mat       (0.43)
+  query e            -> ▁mat       (0.27)
+  query ,            -> ▁because   (0.55)
+  query ▁weil        -> </s>       (0.27)
+  query ▁sie         -> ▁it        (0.30)
+  query ▁müde        -> ▁tired     (0.33)
+  query ▁war         -> </s>       (0.37)
+  query .            -> .          (0.52)

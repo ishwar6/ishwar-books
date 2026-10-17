@@ -1,0 +1,91 @@
+{
+ "model": {
+  "layers": [
+   6,
+   6
+  ],
+  "d_model": 512,
+  "heads": 8,
+  "d_ff": 2048,
+  "vocab": 58101,
+  "params": 74410496,
+  "src": "The dog sat on the mat because it was tired.",
+  "de": "Der Hund sa\u00df auf der Matte, weil er m\u00fcde war."
+ },
+ "recurrence": [
+  0.7616,
+  0.3634,
+  0.1797,
+  0.0896,
+  0.0448,
+  0.0224
+ ],
+ "timing": [
+  {
+   "n": 16,
+   "gru_ms": 2.3,
+   "att_ms": 0.7,
+   "ratio": 3.3
+  },
+  {
+   "n": 64,
+   "gru_ms": 6.8,
+   "att_ms": 2.0,
+   "ratio": 3.4
+  },
+  {
+   "n": 256,
+   "gru_ms": 18.4,
+   "att_ms": 4.8,
+   "ratio": 3.8
+  },
+  {
+   "n": 1024,
+   "gru_ms": 75.5,
+   "att_ms": 39.1,
+   "ratio": 1.9
+  }
+ ],
+ "teacher_forcing": {
+  "m": 14,
+  "logits": [
+   1,
+   14,
+   58101
+  ],
+  "loss": 0.203,
+  "one_ms": 67,
+  "gen_ms": 146,
+  "same": true
+ },
+ "paths": [
+  {
+   "d": 2,
+   "rnn": 2,
+   "conv": 1,
+   "bytenet": 2,
+   "attention": 1
+  },
+  {
+   "d": 10,
+   "rnn": 10,
+   "conv": 5,
+   "bytenet": 4,
+   "attention": 1
+  },
+  {
+   "d": 50,
+   "rnn": 50,
+   "conv": 25,
+   "bytenet": 6,
+   "attention": 1
+  },
+  {
+   "d": 200,
+   "rnn": 200,
+   "conv": 100,
+   "bytenet": 8,
+   "attention": 1
+  }
+ ]
+}

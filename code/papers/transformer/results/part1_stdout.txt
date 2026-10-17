@@ -1,0 +1,39 @@
+== 1. A released Transformer: Helsinki-NLP/opus-mt-en-de
+encoder layers 6, decoder layers 6, d_model 512, heads 8, d_ff 2048, vocabulary 58,101
+parameters: 74,410,496
+English: The dog sat on the mat because it was tired.
+source tokens (12): ['▁The', '▁dog', '▁sat', '▁on', '▁the', '▁mat', '▁because', '▁it', '▁was', '▁tired', '.', '</s>']
+German : Der Hund saß auf der Matte, weil er müde war.
+output tokens (15): ['<pad>', '▁Der', '▁Hund', '▁saß', '▁auf', '▁der', '▁Matt', 'e', ',', '▁weil', '▁er', '▁müde', '▁war', '.', '</s>']
+
+== 2. The recurrence h_t = tanh(w * h_(t-1) + u * x_t), with w = 0.5, u = 1.0, h_0 = 0
+  t=1: x=1  h = tanh(0.5 x 0.0000 + 1.0 x 1) = tanh(1.0000) = 0.7616
+  t=2: x=0  h = tanh(0.5 x 0.7616 + 1.0 x 0) = tanh(0.3808) = 0.3634
+  t=3: x=0  h = tanh(0.5 x 0.3634 + 1.0 x 0) = tanh(0.1817) = 0.1797
+  t=4: x=0  h = tanh(0.5 x 0.1797 + 1.0 x 0) = tanh(0.0899) = 0.0896
+  t=5: x=0  h = tanh(0.5 x 0.0896 + 1.0 x 0) = tanh(0.0448) = 0.0448
+  t=6: x=0  h = tanh(0.5 x 0.0448 + 1.0 x 0) = tanh(0.0224) = 0.0224
+  the trace of word 1 shrinks by about half at each step: it must pass through every later state
+
+== 3. One GRU layer (a loop over the words) against one self-attention layer (all words at once)
+   width 512, batch 32, device mps (Apple M5 Pro laptop GPU), forward pass only, fastest of 20 runs
+ words n  GRU steps   GRU ms  attention steps  attention ms  GRU / attention
+      16         16      2.3                1           0.7             3.3x
+      64         64      6.8                1           2.0             3.4x
+     256        256     18.4                1           4.8             3.8x
+    1024       1024     75.5                1          39.1             1.9x
+check: the library GRU equals our step-by-step loop, max difference 3.3e-07
+
+== 4. Marian: score a known German sentence in one call, or write it one token per call
+German tokens m = 14
+teacher forcing: 1 decoder call gives logits of shape (1, 14, 58101) (one row per position), 67 ms
+  the 14 predicted tokens equal the generated ones: True; mean loss 0.203
+generation: 14 decoder calls, one per token, 146 ms
+
+== 5. Layers a signal crosses between two words d positions apart
+   ConvS2S: kernel width 3, each layer reaches 2 more words back; ByteNet: kernel width 2, dilations 1, 2, 4, ...
+    d  recurrent  ConvS2S  ByteNet  self-attention
+    2          2        1        2               1
+   10         10        5        4               1
+   50         50       25        6               1
+  200        200      100        8               1

@@ -1,0 +1,73 @@
+== 1. configuration of Helsinki-NLP/opus-mt-en-de
+  d_model                    512
+  encoder_layers             6
+  decoder_layers             6
+  encoder_attention_heads    8
+  encoder_ffn_dim            2048
+  vocab_size                 58101
+  activation_function        swish
+  scale_embedding            True
+  max_position_embeddings    512
+  encoder layer 1 modules: self_attn, self_attn_layer_norm, activation_fn, fc1, fc2, final_layer_norm
+== parameters
+  shared embedding matrix   58,101 x 512 = 29,747,712
+  encoder layer: attention 1,050,624  feed-forward 2,099,712  layer norms 2,048  total 3,152,384
+  feed-forward share of an encoder layer: 66.6%
+  decoder layer total 4,204,032 (one more attention block: 1,051,648)
+  6 encoder layers 18,914,304; 6 decoder layers 25,224,192; whole model 74,410,496
+== 2. one sentence through the model
+  input  : The cat sat on the mat because it was tired.
+  tokens : ▁The ▁cat ▁sat ▁on ▁the ▁mat ▁because ▁it ▁was ▁tired . </s> (12 tokens)
+  ids    : [36, 12064, 10369, 32, 4, 19160, 433, 56, 58, 15871, 3, 0]
+  output : Die Katze saß auf der Matte, weil sie müde war.
+  output tokens: <pad> ▁Die ▁Katze ▁saß ▁auf ▁der ▁Matt e , ▁weil ▁sie ▁müde ▁war . </s>
+  embedding lookup           (1, 12, 512)
+  times sqrt(d_model) = 22.627, plus positions (12, 512)  -> (1, 12, 512)
+  after encoder layer 1      (1, 12, 512)
+  after encoder layer 2      (1, 12, 512)
+  after encoder layer 3      (1, 12, 512)
+  after encoder layer 4      (1, 12, 512)
+  after encoder layer 5      (1, 12, 512)
+  after encoder layer 6      (1, 12, 512)
+  encoder output z           (1, 12, 512)  (one vector of 512 numbers per input token)
+  max |our input - library input| = 0.00e+00
+== 3. encoder layer 1 rebuilt by hand: LayerNorm(x + Sublayer(x))
+  x (layer input) norm per token: 19.5 18.9 19.6 19.7 14.0 18.3 19.8 20.2 20.3 18.5 15.0 11.4
+  attention output norm per token: 9.7 3.7 3.7 9.3 9.3 3.2 3.9 10.4 6.5 2.9 10.1 7.2
+  token 2 (▁sat): x + attn has mean 0.208 and std 0.836
+  max |layer norm by hand - library layer norm| = 4.77e-07
+  max |our layer 1 output - library layer 1 output| = 0.00e+00
+  cosine(x, LayerNorm(x + attn)) per token: 0.67 0.71 0.76 0.71 0.62 0.74 0.77 0.72 0.81 0.74 0.66 0.68
+== 4. the feed-forward network is position-wise
+  W1 (512, 2048)  b1 (2048,)  W2 (2048, 512)  b2 (512,)
+  one token: 512 -> 2048 -> 512
+  max |each token alone - whole sentence at once| = 5.72e-05
+  hidden units near zero (|h| < 0.001) for this sentence: 0.2% (Marian uses swish, the paper uses ReLU)
+== 5. one matrix for three jobs
+  encoder embedding is the shared matrix: True; decoder embedding: True; output layer: True
+  without sharing: 3 x 29,747,712 = 89,243,136 numbers; with sharing: 29,747,712
+  embedding row norm: median 1.08  (min 0.00, max 2.21)
+  times sqrt(512) = 22.63: median 24.5
+  position vector norm: 16.00 at pos 0, 16.00 at pos 10, sqrt(256) = 16
+== 6. sinusoidal position encoding
+  max |paper formula (reordered) - model table| = 2.98e-08
+  pos  dim0 sin   dim1 cos   dim2 sin   dim3 cos  ...  dim510 sin  dim511 cos
+    0    0.0000    1.0000    0.0000    1.0000  ...   0.000000   1.000000
+    1    0.8415    0.5403    0.8219    0.5697  ...   0.000104   1.000000
+    2    0.9093   -0.4161    0.9364   -0.3509  ...   0.000207   1.000000
+    3    0.1411   -0.9900    0.2451   -0.9695  ...   0.000311   1.000000
+   10   -0.5440   -0.8391   -0.2200   -0.9755  ...   0.001037   0.999999
+   50   -0.2624    0.9650   -0.8953   -0.4454  ...   0.005183   0.999987
+  wavelengths (positions per full turn) for i = 0, 1, 2, 32, 64, 128, 192, 255: 6.3, 6.5, 6.8, 19.9, 62.8, 628.3, 6,283.2, 60,611.5
+  shortest 2*pi = 6.28; longest limit 10000*2*pi = 62,832
+  PE(pos + 5) = rotation(k=5) applied to PE(pos), max error over pos 0..49 and all 256 pairs: 6.2e-15
+  dot product PE(pos) . PE(pos + k) for pos = 0, 7, 20, 40:
+    k =  0:  256.00   256.00   256.00   256.00
+    k =  1:  249.10   249.10   249.10   249.10
+    k =  2:  231.73   231.73   231.73   231.73
+    k =  5:  189.60   189.60   189.60   189.60
+    k = 10:  173.79   173.79   173.79   173.79
+    k = 20:  157.57   157.57   157.57   157.57
+== 7. without positions, word order is invisible
+  swap tokens 0 and 3 (▁The <-> ▁on), no positions: outputs are the same vectors, swapped; max difference 1.4e-06
+  same swap with positions added: max difference 2.67
