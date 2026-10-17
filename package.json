@@ -9,7 +9,8 @@
     "dev": "npm run content && vite",
     "build": "npm run content && vite build && node scripts/postbuild.mjs",
     "preview": "vite preview",
-    "typecheck": "npm run content && tsc --noEmit"
+    "typecheck": "npm run content && tsc --noEmit",
+    "check:map": "npm run content && node scripts/check-topic-map.mjs"
   },
   "dependencies": {
     "katex": "0.16.47",

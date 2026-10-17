@@ -1,0 +1,26 @@
+[
+  {
+    "id": "understand-transformers",
+    "title": "Understand Transformers",
+    "description": "From one attention head to the model around it.",
+    "topics": ["self-attention", "multi-head", "transformer", "position-embeddings", "bert"]
+  },
+  {
+    "id": "serve-an-llm",
+    "title": "Serve an LLM",
+    "description": "Follow a request from the first token to production.",
+    "topics": ["prefill-decode", "kv-cache", "vllm", "goodput-slo", "capacity-cost"]
+  },
+  {
+    "id": "build-retrieval",
+    "title": "Build better retrieval",
+    "description": "Find the right context, then measure what helps.",
+    "topics": ["embeddings", "vector-search", "hybrid-search", "rerankers", "rag-eval"]
+  },
+  {
+    "id": "build-agents",
+    "title": "Build reliable agents",
+    "description": "Tools, control flow, and checks you can trust.",
+    "topics": ["agent-loop", "building-blocks", "workflow-patterns", "react", "guardrails"]
+  }
+]

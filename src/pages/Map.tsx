@@ -1,150 +1,172 @@
-import { useMemo, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
+import { Arrow, Chevron, SearchIcon } from '../components/icons'
 import graph from '../data/graph.json'
+import paths from '../data/learning-paths.json'
 import { useTitle } from '../lib/hooks'
+import '../styles/topic-map.css'
 
-type Node = { id: string; label: string; group: keyof typeof graph.groups; route: string; blurb: string }
-type Pos = { x: number; y: number }
-const W = 960, H = 760
+type Group = keyof typeof graph.groups
+type Topic = { id: string; label: string; group: Group; route: string; blurb: string }
+const topics = graph.nodes as Topic[]
+const groups = Object.entries(graph.groups) as [Group, { label: string; color: string }][]
+const byId = new Map(topics.map((topic) => [topic.id, topic]))
+const accent = (group: Group) => ({ '--topic-color': graph.groups[group].color }) as CSSProperties
+const normalize = (value: string) => value.toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim()
+const resourceType = (topic: Topic) => topic.route.startsWith('books/') ? 'Book' : topic.route.startsWith('papers/') ? 'Paper breakdown' : topic.route.startsWith('videos/') ? 'Video' : 'Article'
+const topicHref = (topic: Topic) => {
+  const [route, hash] = topic.route.split('#')
+  return `/${route.replace(/\/$/, '')}/${hash ? `#${hash}` : ''}`
+}
 
-/** A small force-directed layout: springs on edges, repulsion between every pair, a pull to the centre.
- *  Deterministic (seeded by group and index), so the map looks the same on every visit. */
-function layout(nodes: Node[], edges: string[][]): Record<string, Pos> {
-  const groups = Object.keys(graph.groups)
-  const pos: Record<string, Pos & { vx: number; vy: number }> = {}
-  nodes.forEach((n, i) => {
-    const a = (groups.indexOf(n.group) / groups.length) * Math.PI * 2 + i * 0.37
-    pos[n.id] = { x: W / 2 + Math.cos(a) * (180 + (i % 5) * 22), y: H / 2 + Math.sin(a) * (130 + (i % 3) * 20), vx: 0, vy: 0 }
-  })
-  const deg: Record<string, number> = {}
-  edges.forEach(([a, b]) => { deg[a] = (deg[a] ?? 0) + 1; deg[b] = (deg[b] ?? 0) + 1 })
-  for (let it = 0; it < 420; it++) {
-    const t = 1 - it / 420
-    for (const a of nodes) for (const b of nodes) {
-      if (a.id >= b.id) continue
-      const pa = pos[a.id], pb = pos[b.id]
-      let dx = pa.x - pb.x, dy = pa.y - pb.y
-      const d2 = Math.max(dx * dx + dy * dy, 1), d = Math.sqrt(d2)
-      const f = 15000 / d2
-      dx /= d; dy /= d
-      pa.vx += dx * f; pa.vy += dy * f; pb.vx -= dx * f; pb.vy -= dy * f
-    }
-    for (const [a, b] of edges) {
-      const pa = pos[a], pb = pos[b]
-      const dx = pb.x - pa.x, dy = pb.y - pa.y, d = Math.max(Math.sqrt(dx * dx + dy * dy), 1)
-      const f = (d - 150) * 0.02
-      pa.vx += (dx / d) * f; pa.vy += (dy / d) * f; pb.vx -= (dx / d) * f; pb.vy -= (dy / d) * f
-    }
-    for (const n of nodes) {
-      const p = pos[n.id]
-      p.vx += (W / 2 - p.x) * 0.004; p.vy += (H / 2 - p.y) * 0.006
-      p.x += p.vx * 0.5 * (0.3 + t); p.y += p.vy * 0.5 * (0.3 + t); p.vx *= 0.6; p.vy *= 0.6
-      const r = 10 + 2 * (deg[n.id] ?? 1)
-      p.x = Math.min(W - 70 - r, Math.max(70 + r, p.x)); p.y = Math.min(H - 40 - r, Math.max(40 + r, p.y))
-    }
-  }
-  // push apart nodes whose label boxes overlap (labels sit under the dot, up to two lines)
-  const box = (n: Node) => {
-    const r = 10 + 2 * (deg[n.id] ?? 1), words = n.label.split(' ')
-    const longest = words.length > 3 ? Math.max(words.slice(0, Math.ceil(words.length / 2)).join(' ').length, words.slice(Math.ceil(words.length / 2)).join(' ').length) : n.label.length
-    return { w: Math.max(2 * r, longest * 7.4) + 10, top: r, bottom: r + 18 + (words.length > 3 ? 15 : 0) + 6 }
-  }
-  for (let it = 0; it < 80; it++) {
-    for (const a of nodes) for (const b of nodes) {
-      if (a.id >= b.id) continue
-      const pa = pos[a.id], pb = pos[b.id], ba = box(a), bb = box(b)
-      const ox = (ba.w + bb.w) / 2 - Math.abs(pa.x - pb.x)
-      const oy = Math.min(pa.y + ba.bottom, pb.y + bb.bottom) - Math.max(pa.y - ba.top, pb.y - bb.top)
-      if (ox > 0 && oy > 0) {
-        if (ox < oy) { const s = Math.sign(pa.x - pb.x) || 1; pa.x += s * ox / 2; pb.x -= s * ox / 2 }
-        else { const s = Math.sign(pa.y - pb.y) || 1; pa.y += s * oy / 2; pb.y -= s * oy / 2 }
-      }
-    }
-    for (const n of nodes) { const p = pos[n.id], b = box(n); p.x = Math.min(W - b.w / 2 - 6, Math.max(b.w / 2 + 6, p.x)); p.y = Math.min(H - b.bottom - 16, Math.max(b.top + 8, p.y)) }
-  }
-  return pos
+function GroupLabel({ group }: { group: Group }) {
+  return <span className="tm-group-label" style={accent(group)}><i aria-hidden="true" />{graph.groups[group].label}</span>
 }
 
 export default function TopicMap() {
-  useTitle('Topic map', 'Every important topic on this site, as one connected map: attention, BERT, ViT, LLM inference, RAG, agents and GPUs. Click a topic to read about it.')
-  const nodes = graph.nodes as Node[]
-  const edges = graph.edges
-  const pos = useMemo(() => layout(nodes, edges), [nodes, edges])
-  const deg = useMemo(() => { const d: Record<string, number> = {}; edges.forEach(([a, b]) => { d[a] = (d[a] ?? 0) + 1; d[b] = (d[b] ?? 0) + 1 }); return d }, [edges])
-  const [active, setActive] = useState<string | null>(null)
-  const [pinned, setPinned] = useState<string | null>(null)
-  const navigate = useNavigate()
-  const sel = pinned ?? active
-  const near = useMemo(() => { const s = new Set<string>(); if (sel) { s.add(sel); edges.forEach(([a, b]) => { if (a === sel) s.add(b); if (b === sel) s.add(a) }) } return s }, [sel, edges])
-  const selNode = nodes.find((n) => n.id === sel)
-  const color = (n: Node) => graph.groups[n.group].color
+  useTitle('Topic map', 'Find a learning path through attention, LLM inference, RAG, agents and GPUs. Search topics, explore their connections, and jump to the exact explanation.')
+  const [params, setParams] = useSearchParams()
+  const [copyStatus, setCopyStatus] = useState('')
+  const explorerRef = useRef<HTMLElement>(null)
+  const detailRef = useRef<HTMLElement>(null)
+  const listRef = useRef<HTMLDivElement>(null)
+  const query = params.get('q') ?? ''
+  const groupParam = params.get('group')
+  const group = groups.some(([id]) => id === groupParam) ? groupParam as Group : 'all'
+  const path = paths.find((item) => item.id === params.get('path'))
+  const words = normalize(query).split(' ').filter(Boolean)
+  const candidates = path ? path.topics.map((id) => byId.get(id)!) : topics.filter((topic) => group === 'all' || topic.group === group)
+  const visible = candidates.filter((topic) => words.every((word) => normalize(`${topic.label} ${topic.blurb} ${graph.groups[topic.group].label}`).includes(word)))
+  const selected = visible.find((topic) => topic.id === params.get('topic')) ?? visible[0]
+  const neighborIds = new Set(graph.edges.flatMap(([a, b]) => a === selected?.id ? [b] : b === selected?.id ? [a] : []))
+  const relatedGroups = groups.map(([id, value]) => ({ id, ...value, topics: topics.filter((topic) => topic.group === id && neighborIds.has(topic.id)) })).filter((item) => item.topics.length)
+  const pathIndex = selected && path ? path.topics.indexOf(selected.id) : -1
+  const nextTopic = path && pathIndex >= 0 ? byId.get(path.topics[pathIndex + 1]) : undefined
+  const listTitle = path?.title ?? (group === 'all' ? 'All topics' : graph.groups[group].label)
+
+  // Keep deep links, connected topics, and browser back/forward visible in the list.
+  useEffect(() => {
+    const list = listRef.current
+    const item = list?.querySelector<HTMLElement>('[aria-pressed="true"]')
+    if (!list || !item) return
+    const bounds = list.getBoundingClientRect()
+    const row = item.getBoundingClientRect()
+    if (row.top < bounds.top) list.scrollTop += row.top - bounds.top - 8
+    else if (row.bottom > bounds.bottom) list.scrollTop += row.bottom - bounds.bottom + 8
+    setCopyStatus('')
+  }, [selected?.id])
+
+  function resetList() {
+    setCopyStatus('')
+    listRef.current?.scrollTo({ top: 0 })
+  }
+  function chooseGroup(id: string) {
+    setParams(id === 'all' ? {} : { group: id })
+    resetList()
+  }
+  function choosePath(id: string) {
+    setParams({ path: id })
+    resetList()
+    requestAnimationFrame(() => explorerRef.current?.scrollIntoView({ behavior: 'instant', block: 'start' }))
+  }
+  function chooseTopic(topic: Topic, connected = false) {
+    const next = connected ? new URLSearchParams({ group: topic.group }) : new URLSearchParams(params)
+    next.set('topic', topic.id)
+    setParams(next)
+    setCopyStatus('')
+    if (connected) listRef.current?.scrollTo({ top: 0 })
+    requestAnimationFrame(() => {
+      if (window.matchMedia('(max-width: 720px)').matches) detailRef.current?.scrollIntoView({ behavior: 'instant', block: 'start' })
+      detailRef.current?.focus({ preventScroll: true })
+    })
+  }
+  function search(value: string) {
+    setParams(value ? { q: value } : {}, { replace: true })
+    resetList()
+  }
+  async function copyLink() {
+    if (!selected) return
+    const url = new URL(window.location.href)
+    url.searchParams.set('topic', selected.id)
+    try {
+      await navigator.clipboard.writeText(url.toString())
+      setCopyStatus('Link copied')
+    } catch {
+      setCopyStatus('Copy the page address to share this view.')
+    }
+  }
 
   return (
-    <div className="container">
-      <header className="page-head">
-        <span className="eyebrow">Topic map</span>
-        <h1>Everything on this site, connected</h1>
-        <p>Each dot is one important idea from the writings, books, videos and paper breakdowns. Lines join ideas that depend on each other. Hover to see what a topic is; click to read about it.</p>
+    <div className="container topic-map">
+      <header className="tm-intro">
+        <div>
+          <span className="eyebrow">Topic map</span>
+          <h1>Find your way through AI.</h1>
+          <p>Start with a learning path, or follow an idea that interests you. Every topic leads to an explanation and the ideas around it.</p>
+          <div className="tm-stats"><span><strong>{topics.length}</strong> connected topics</span><span><strong>{groups.length}</strong> areas to explore</span></div>
+        </div>
+        <div className="tm-motif" aria-hidden="true">
+          <svg viewBox="0 0 210 120"><path d="M22 60H76L126 23H188M76 60H188M76 60L126 97H188" />{[[22, 60, 'attention'], [76, 60, 'pretrain'], [126, 23, 'agents'], [188, 23, 'agents'], [126, 60, 'inference'], [188, 60, 'inference'], [126, 97, 'retrieval'], [188, 97, 'retrieval']].map(([x, y, id], i) => <circle key={i} cx={x} cy={y} r={i === 1 ? 8 : 5} fill={graph.groups[id as Group].color} />)}</svg>
+          <span>One idea leads to another.</span>
+        </div>
       </header>
 
-      <div className="map-legend">
-        {Object.entries(graph.groups).map(([k, g]) => <span key={k} className="map-key"><i style={{ background: g.color }} />{g.label}</span>)}
-      </div>
-
-      <div className="map-wrap">
-        <div className="map-canvas">
-        <svg className="map-svg" viewBox={`0 0 ${W} ${H}`} role="img" aria-label="A graph of the site's topics, grouped by colour and joined by lines" onMouseLeave={() => setActive(null)}>
-          {edges.map(([a, b]) => {
-            const on = sel ? a === sel || b === sel : false
-            const dim = sel ? !on : false
-            return <line key={a + b} className={`map-edge${on ? ' on' : ''}${dim ? ' dim' : ''}`} x1={pos[a].x} y1={pos[a].y} x2={pos[b].x} y2={pos[b].y} />
-          })}
-          {nodes.map((n) => {
-            const p = pos[n.id], r = 8 + 1.8 * (deg[n.id] ?? 1)
-            const dim = sel ? !near.has(n.id) : false
-            return (
-              <g key={n.id} className={`map-node${dim ? ' dim' : ''}${sel === n.id ? ' sel' : ''}`} transform={`translate(${p.x},${p.y})`}
-                 onMouseEnter={() => setActive(n.id)} onFocus={() => setActive(n.id)}
-                 onClick={(e) => { e.preventDefault(); if (pinned === n.id || window.matchMedia('(hover: hover)').matches) navigate(`/${n.route}`); else setPinned(n.id) }}
-                 tabIndex={0} role="link" aria-label={`${n.label}: ${n.blurb}`}>
-                <circle r={r + 5} className="map-halo" style={{ fill: color(n) }} />
-                <circle r={r} style={{ fill: color(n) }} />
-              </g>
-            )
-          })}
-        </svg>
-        <div className="map-labels" aria-hidden="true" onMouseLeave={() => setActive(null)}>
-          {nodes.map((n) => {
-            const p = pos[n.id], r = 8 + 1.8 * (deg[n.id] ?? 1)
-            const dim = sel ? !near.has(n.id) : false
-            return (
-              <span key={n.id} className={`map-tag${dim ? ' dim' : ''}`} style={{ left: `${(p.x / W) * 100}%`, top: `${((p.y + r + 4) / H) * 100}%` }}
-                    onMouseEnter={() => setActive(n.id)}
-                    onClick={() => { if (pinned === n.id || window.matchMedia('(hover: hover)').matches) navigate(`/${n.route}`); else setPinned(n.id) }}>{n.label}</span>
-            )
-          })}
+      <section className="tm-paths" aria-labelledby="tm-paths-heading">
+        <div className="tm-section-label"><h2 id="tm-paths-heading">Not sure where to start?</h2><span>Pick a learning path · 5 stops each</span></div>
+        <div className="tm-path-grid">
+          {paths.map((item, index) => (
+            <button key={item.id} className={`tm-path${path?.id === item.id ? ' is-active' : ''}`} aria-pressed={path?.id === item.id} onClick={() => choosePath(item.id)}>
+              <span className="tm-path-top"><span>0{index + 1}</span><Arrow /></span>
+              <strong>{item.title}</strong><span className="tm-path-description">{item.description}</span>
+              <span className="tm-trail" aria-hidden="true">{item.topics.map((id) => <i key={id} style={accent(byId.get(id)!.group)} />)}</span>
+            </button>
+          ))}
         </div>
-        </div>
-        <aside className={`map-panel${selNode ? ' show' : ''}`} aria-live="polite">
-          {selNode ? (
-            <>
-              <span className="map-key"><i style={{ background: color(selNode) }} />{graph.groups[selNode.group].label}</span>
-              <h3>{selNode.label}</h3>
-              <p>{selNode.blurb}</p>
-              <Link to={`/${selNode.route}`} className="more-link">Read about it →</Link>
-              {pinned && <button className="map-clear" onClick={() => setPinned(null)}>Clear</button>}
-            </>
-          ) : <p className="map-hint">Hover or tap a topic.</p>}
-        </aside>
-      </div>
+      </section>
 
-      <section className="map-list">
-        {Object.entries(graph.groups).map(([k, g]) => (
-          <div key={k} className="map-list-group">
-            <h2><i style={{ background: g.color }} />{g.label}</h2>
-            <ul>{nodes.filter((n) => n.group === k).map((n) => <li key={n.id}><Link to={`/${n.route}`}>{n.label}</Link><span>{n.blurb}</span></li>)}</ul>
+      <section className="tm-explorer" ref={explorerRef} aria-labelledby="tm-explorer-heading">
+        <div className="tm-explorer-head">
+          <div><h2 id="tm-explorer-heading">Explore the connections</h2><p>Choose a topic to see where it leads.</p></div>
+          <div className="tm-search"><SearchIcon /><input type="search" aria-label="Search all topics" placeholder="Search topics, e.g. KV cache" value={query} onChange={(event) => search(event.target.value)} />{query && <button onClick={() => search('')} aria-label="Clear search">×</button>}</div>
+        </div>
+        <div className="tm-mobile-filter"><label htmlFor="tm-area">Browse an area</label><select id="tm-area" value={path ? 'path' : group} onChange={(event) => chooseGroup(event.target.value)}>{path && <option value="path">Learning path: {path.title}</option>}<option value="all">All topics ({topics.length})</option>{groups.map(([id, value]) => <option key={id} value={id}>{value.label} ({topics.filter((topic) => topic.group === id).length})</option>)}</select></div>
+        <div className="tm-workspace">
+          <nav className="tm-areas" aria-label="Topic areas">
+            <span className="tm-overline">Browse by area</span>
+            <button className={!path && group === 'all' ? 'is-active' : ''} aria-pressed={!path && group === 'all'} onClick={() => chooseGroup('all')}><span>All topics</span><span className="tm-count">{topics.length}</span></button>
+            {groups.map(([id, value]) => <button key={id} style={accent(id)} className={!path && group === id ? 'is-active' : ''} aria-pressed={!path && group === id} onClick={() => chooseGroup(id)}><i aria-hidden="true" /><span>{value.label}</span><span className="tm-count">{topics.filter((topic) => topic.group === id).length}</span></button>)}
+            <p className="tm-area-hint">Explore freely. Connections show related ideas, so you can follow your curiosity.</p>
+          </nav>
+
+          <div className="tm-topic-column">
+            <div className="tm-list-head"><span className="tm-overline">{path ? 'Learning path' : query ? 'Search results' : 'Topics'}</span><h3>{query ? `Results for “${query}”` : listTitle}</h3><p role="status">{visible.length} {visible.length === 1 ? 'topic' : 'topics'}{path ? ' · follow the numbered stops' : ' · select to explore'}</p>{path && <button className="tm-text-button" onClick={() => chooseGroup('all')}>Browse all topics →</button>}</div>
+            <div className={`tm-topic-list${path ? ' is-path' : ''}`} ref={listRef} tabIndex={0} aria-label={path ? `${path.title} stops` : 'Topics'}>
+              {visible.length ? visible.map((topic, index) => (
+                <button key={topic.id} style={accent(topic.group)} className={`tm-topic${selected?.id === topic.id ? ' is-selected' : ''}`} aria-pressed={selected?.id === topic.id} onClick={() => chooseTopic(topic)}>
+                  <span className="tm-topic-marker" aria-hidden="true">{path ? index + 1 : <i />}</span>
+                  <span className="tm-topic-text"><strong>{topic.label}</strong><span>{path ? topic.blurb : graph.groups[topic.group].label}</span></span><Chevron />
+                </button>
+              )) : <div className="tm-empty"><SearchIcon /><strong>No topics found</strong><p>Try “attention”, “agents”, or a shorter search.</p><button className="tm-text-button" onClick={() => search('')}>Clear search →</button></div>}
+            </div>
           </div>
-        ))}
+
+          {selected ? <article className="tm-detail" ref={detailRef} tabIndex={-1} aria-labelledby="tm-topic-title" style={accent(selected.group)}>
+            <button className="tm-back tm-text-button" onClick={() => { listRef.current?.scrollIntoView({ behavior: 'instant', block: 'start' }); listRef.current?.focus({ preventScroll: true }) }}>← Back to topics</button>
+            <div className="tm-detail-body">
+              <GroupLabel group={selected.group} />
+              {path && <span className="tm-step">Stop {pathIndex + 1} of {path.topics.length}</span>}
+              <h2 id="tm-topic-title">{selected.label}</h2><p className="tm-blurb">{selected.blurb}</p>
+              <Link className="tm-read" to={topicHref(selected)}>Read the explanation <Arrow /></Link>
+              <div className="tm-source"><span>{resourceType(selected)}{selected.route.includes('#') ? ' · opens at this topic' : ''}</span><button onClick={copyLink}>Copy link</button></div>
+              <span className="tm-copy-status" role="status">{copyStatus}</span>
+            </div>
+            {path && <div className="tm-next"><span className="tm-overline">{nextTopic ? 'Next in this path' : 'Last stop in this path'}</span>{nextTopic ? <button onClick={() => chooseTopic(nextTopic)}>{nextTopic.label}<Chevron /></button> : <p>Keep exploring with a related topic below.</p>}</div>}
+            <div className="tm-connections"><div className="tm-related-heading"><h3>Connected ideas</h3><span>{neighborIds.size}</span></div><p>Follow a connection to explore further.</p>
+              {relatedGroups.map((item) => <div className="tm-related-group" key={item.id}><GroupLabel group={item.id} />{item.topics.map((topic) => <button key={topic.id} onClick={() => chooseTopic(topic, true)}><span>{topic.label}</span><Chevron /></button>)}</div>)}
+              {!relatedGroups.length && <p>Browse another area to find more ideas.</p>}
+            </div>
+          </article> : <div className="tm-detail tm-detail-empty"><span className="tm-overline">Room to explore</span><h2>Your next idea is out there.</h2><p>Search all {topics.length} topics, or choose an area to start again.</p></div>}
+        </div>
       </section>
     </div>
   )
