@@ -1,0 +1,65 @@
+== 1. THE MODEL AND THE NUMBER OF TERMS (attn-only-2l)
+  layers 2, heads per layer 8, d_model 512, d_head 64, vocabulary 48,262; d_head / d_model = 0.125
+  logit path expansion: 1 direct path + 16 single-head terms + 8 x 8 = 64 virtual-head terms = 81 terms
+  the paper's model has 12 heads per layer: 1 + 24 + 144 = 169 terms
+  text: WikiText-2 test, 24 sequences of 128 tokens (+ BOS), 3,072 predictions
+
+== 2. PATH EXPANSION OF THE LOGITS ON REAL TEXT (patterns and layer-norm scales frozen)
+  stream before layer 1 rebuilt from the terms: max |diff| = 5.7e-06
+  logits rebuilt as direct + 16 head terms + 64 virtual heads: max |diff| from the model = 4.2e-05 (logits range -18.2 .. 25.8)
+  mean size of the vector each group adds to the final stream: direct 13.4, heads_L0 6.3, heads_L1 16.2, virtual 12.9
+
+== 3. TERM IMPORTANCE: LOSS WHEN ONLY SOME TERMS ARE KEPT (nats per token, lower is better)
+  uniform guess over 48,262 tokens: ln(48262) = 10.78
+  order 0 (direct path only):                 10.11   marginal -0.68  (-0.68 per term, 1 term)
+  order <= 1 (+ 16 single-head terms):         6.06   marginal -4.04  (-0.253 per term)
+  order <= 2 (+ 64 virtual heads):            4.93   marginal -1.13  (-0.0177 per term)
+  the model itself:                           4.93
+  head terms split by layer:
+    layer-0 heads: -0.26 vs direct path only, -0.26 vs direct path + layer-1 heads
+    layer-1 heads: -3.78 vs direct path only, -3.78 vs direct path + layer-0 heads
+  remove ONE term from the full sum, loss goes up by:
+    largest virtual heads (h2 o h1): 1.7 o 0.7 +0.723, 1.7 o 0.3 +0.334, 1.7 o 0.4 +0.298, 1.7 o 0.5 +0.288, 1.7 o 0.2 +0.200
+    virtual heads: 51 of 64 above +0.01; median +0.0364
+    single heads, largest: 1.6 +0.605, 1.3 +0.496, 1.7 +0.463, 1.1 +0.419, 1.4 +0.406, 1.0 +0.371
+    single heads, smallest: 0.0 +0.029, 0.6 +0.004, 0.2 -0.002
+  virtual heads split by what the layer-0 head read (check 1.0e-05): from the start token -0.90, from real tokens -0.07 (each added alone to order <= 1)
+
+== 4. COMPOSITION SCORES  ||W_A W_B||_F / (||W_A||_F ||W_B||_F)  (paper shapes, layer-0 head h1 -> layer-1 head h2)
+  random baseline (two random rank-64 512 x 512 matrices, mean of 200): 0.0442
+  Q-composition: max 0.084 (head 1.3 reads head 0.4), mean 0.042, pairs above baseline + 0.05: 0 of 64
+  K-composition: max 0.124 (head 1.6 reads head 0.3), mean 0.040, pairs above baseline + 0.05: 1 of 64
+  V-composition: max 0.055 (head 1.1 reads head 0.5), mean 0.029, pairs above baseline + 0.05: 0 of 64
+  Q-composition, mean over the 8 layer-1 heads, per layer-0 head: 0.0 0.029, 0.1 0.041, 0.2 0.040, 0.3 0.029, 0.4 0.069, 0.5 0.046, 0.6 0.040, 0.7 0.044
+  K-composition, mean over the 8 layer-1 heads, per layer-0 head: 0.0 0.027, 0.1 0.035, 0.2 0.034, 0.3 0.035, 0.4 0.068, 0.5 0.037, 0.6 0.038, 0.7 0.041
+  layer-0 heads, mean attention to the previous token: 0.0 0.19, 0.1 0.06, 0.2 0.04, 0.3 0.49, 0.4 0.02, 0.5 0.15, 0.6 0.08, 0.7 0.01
+  K-composition with the previous-token head 0.3, per layer-1 head: 1.0 0.024, 1.1 0.016, 1.2 0.022, 1.3 0.019, 1.4 0.019, 1.5 0.019, 1.6 0.124, 1.7 0.041
+  layer-1 heads, induction score on repeated random tokens (Part 6): 1.0 0.00, 1.1 0.00, 1.2 0.00, 1.3 0.00, 1.4 0.00, 1.5 0.00, 1.6 0.71, 1.7 0.04
+
+== 5. PATH EXPANSION OF THE ATTENTION SCORES OF EACH LAYER-1 HEAD (same text, layer-0 patterns frozen)
+  no-composition + Q + K + Q-and-K terms vs the model's scores: max |diff| = 6.5e-05
+  how much the pattern changes (total variation, 0 = same, 1 = completely different) when a kind of term is removed:
+    head 1.0: without K terms 0.58, without Q terms 0.59, without Q-and-K 0.42; no-composition term alone 0.56
+    head 1.1: without K terms 0.51, without Q terms 0.80, without Q-and-K 0.73; no-composition term alone 0.80
+    head 1.2: without K terms 0.53, without Q terms 0.65, without Q-and-K 0.55; no-composition term alone 0.64
+    head 1.3: without K terms 0.53, without Q terms 0.81, without Q-and-K 0.56; no-composition term alone 0.80
+    head 1.4: without K terms 0.44, without Q terms 0.76, without Q-and-K 0.69; no-composition term alone 0.76
+    head 1.5: without K terms 0.51, without Q terms 0.74, without Q-and-K 0.50; no-composition term alone 0.72
+    head 1.6: without K terms 0.75, without Q terms 0.20, without Q-and-K 0.23; no-composition term alone 0.58
+    head 1.7: without K terms 0.45, without Q terms 0.24, without Q-and-K 0.15; no-composition term alone 0.38
+  without the K term of ONE layer-0 head (rows: layer-1 heads; columns: layer-0 heads 0..7):
+    1.0: 0.12 0.06 0.04 0.19 0.46 0.06 0.07 0.11
+    1.1: 0.07 0.06 0.04 0.18 0.39 0.08 0.06 0.10
+    1.2: 0.09 0.07 0.05 0.16 0.45 0.07 0.06 0.09
+    1.3: 0.09 0.07 0.05 0.22 0.37 0.08 0.11 0.13
+    1.4: 0.07 0.05 0.04 0.19 0.35 0.07 0.07 0.07
+    1.5: 0.09 0.06 0.07 0.18 0.39 0.05 0.05 0.12
+    1.6: 0.36 0.08 0.10 0.32 0.07 0.05 0.05 0.11
+    1.7: 0.12 0.06 0.14 0.12 0.32 0.04 0.04 0.11
+
+== 6. A VIRTUAL ATTENTION HEAD: PATTERN A^{h2} A^{h1}, OV MATRIX W_OV^{h2} W_OV^{h1}
+  8 x 8 = 64 virtual heads. Where heads look (mean weight on: start token, itself, 1 back, 2 back):
+    layer 0: 0.0 [0.13, 0.07, 0.19, 0.23]; 0.1 [0.3, 0.05, 0.05, 0.05]; 0.2 [0.47, 0.06, 0.03, 0.03]; 0.3 [0.38, 0.05, 0.49, 0.05]; 0.4 [0.65, 0.01, 0.01, 0.01]; 0.5 [0.77, 0.03, 0.15, 0.03]; 0.6 [0.4, 0.05, 0.07, 0.06]; 0.7 [0.6, 0.11, 0.0, 0.0]
+    layer 1: 1.0 [0.4, 0.14, 0.08, 0.05]; 1.1 [0.19, 0.35, 0.16, 0.09]; 1.2 [0.35, 0.22, 0.13, 0.07]; 1.3 [0.17, 0.17, 0.1, 0.08]; 1.4 [0.24, 0.38, 0.16, 0.07]; 1.5 [0.24, 0.18, 0.12, 0.06]; 1.6 [0.67, 0.02, 0.01, 0.01]; 1.7 [0.37, 0.02, 0.02, 0.02]
+  most important: 1.7 o 0.7: pattern [0.76, 0.0, 0.0, 0.0]; rows add up to 1 (max |sum - 1| 4.8e-07); future entries 0; V-composition score 0.036; removing it: loss +0.723
+  most two-back: 1.4 o 0.0: pattern [0.35, 0.03, 0.09, 0.12]; rows add up to 1 (max |sum - 1| 7.2e-07); future entries 0; V-composition score 0.015; removing it: loss +0.021

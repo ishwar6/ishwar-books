@@ -1,0 +1,193 @@
+[
+ {
+  "out": "p6-analyzing.png",
+  "find": "Recall that the key difference between a two-layer model and a one-layer model",
+  "upto": "where the only type of composition is K-composition between a single first layer head and some of the second layer heads",
+  "mark": [
+   "Without composition, the model is just a one-layer model with extra heads",
+   "the only type of composition is K-composition between a single first layer head and some of the second layer heads",
+   "it primarily attends to the previous token",
+   "The second layer heads are what we call"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p6-composition-fig.png",
+  "figure": 19,
+  "pad": 10
+ },
+ {
+  "out": "p6-most-heads.png",
+  "find": "One quick observation from this is that most attention heads are not involved in any substantive composition",
+  "mark": [
+   "most attention heads are not involved in any substantive composition",
+   "a larger collection of skip tri-grams"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p6-value-weighted.png",
+  "find": "The above diagram shows the value-weighted attention pattern for various attention heads; that is",
+  "mark": [
+   "attention weights scaled by the norm of the value vector at the source position",
+   "a kind of default or resting position"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p6-intro.png",
+  "find": "In small two-layer attention-only transformers, composition seems to be primarily used for one",
+  "mark": [
+   "the creation of what we call induction heads",
+   "a much more powerful mechanism for achieving in-context learning"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p6-function.png",
+  "find": "Induction heads search over the context for previous examples of the present token",
+  "mark": [
+   "Induction heads search over the context for previous examples of the present token",
+   "they attend to the first token",
+   "and copy it"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p6-compare.png",
+  "find": "It's useful to compare induction heads to the types of in-context learning",
+  "upto": "since it doesn't depend on learned statistics about whether one token can plausibly follow",
+  "mark": [
+   "it knows how the token was previously used and looks out for similar cases",
+   "less vulnerable to distributional shift"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p6-examples-fig.png",
+  "figure": 21,
+  "pad": 10
+ },
+ {
+  "out": "p6-random.png",
+  "find": "Given that we believe induction heads are attending to previous copies of the token and shifting",
+  "upto": "as long as the more abstract property that repeated sequences are more likely to reoccur holds true",
+  "mark": [
+   "they should be able to do this on",
+   "This is likely the hardest test one can give them",
+   "totally off distribution"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p6-random-fig.png",
+  "figure": 22,
+  "pad": 10
+ },
+ {
+  "out": "p6-trick.png",
+  "find": "The central trick to induction heads is that the key is computed from tokens shifted one token back",
+  "mark": [
+   "the key is computed from tokens shifted one token back",
+   "because keys are shifted, finds the next token"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p6-how-fig.png",
+  "figure": 23,
+  "pad": 10
+ },
+ {
+  "out": "p6-minimal.png",
+  "find": "The minimal way to create an induction head is to use K-composition with a previous token head",
+  "upto": "presumably to create a",
+  "mark": [
+   "The minimal way to create an induction head",
+   "the QK version of a",
+   "when the previous token before the source position is the same as the destination token"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p6-checking.png",
+  "find": "Our mechanistic theory suggests that induction heads must do two things",
+  "upto": "all the induction heads turn out to be in an extreme right hand corner",
+  "mark": [
+   "copying",
+   "same matching",
+   "all the induction heads turn out to be in an extreme right hand corner"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p6-scatter-fig.png",
+  "figure": 24,
+  "pad": 10
+ },
+ {
+  "out": "p6-circular.png",
+  "find": "One might wonder if this observation is circular",
+  "mark": [
+   "One might wonder if this observation is circular",
+   "extremely biased towards positive eigenvalues"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p6-correction.png",
+  "find": "It’s perhaps easiest to understand the consequence of this by considering the composition of an",
+  "mark": [
+   "the extent to which the induction head’s query is built from the same subspace that the previous token head moved data into"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p6-correction-fig.png",
+  "figure": 28,
+  "pad": 10
+ },
+ {
+  "out": "p6-correction-effect.png",
+  "find": "While the importance of K-composition with the previous token head remains unchanged",
+  "mark": [
+   "remains unchanged",
+   "two of the induction heads also rely on a head which attends to the last several tokens"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p6-misleading.png",
+  "find": "Induction heads offer an object lesson in how naive interpretation of attention patterns",
+  "mark": [
+   "both be very informative and also misleading",
+   "totally reliant on a previous token head in the prior layer",
+   "its softmax will be saturated"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p6-pointer.png",
+  "find": "Transformers can do \"pointer arithmetic\" type operations on positional embeddings",
+  "mark": [
+   "an induction head was implemented using this approach",
+   "rotating the positional embedding forward one token"
+  ],
+  "padx": 40,
+  "pady": 6
+ }
+]

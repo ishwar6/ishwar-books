@@ -1,0 +1,227 @@
+[
+ {
+  "out": "p5-intro.png",
+  "find": "Deep learning studies models that are deep",
+  "upto": "rather than look-up tables of skip-trigrams we saw in one-layer models",
+  "mark": [
+   "depth allows composition",
+   "Composition of attention heads is the key difference between one-layer and two-layer attention-only transformers",
+   "much more like a computer program running an algorithm"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p5-small-subspaces.png",
+  "find": "Recall that we think of the residual stream as a communication channel. Every attention head reads in subspaces",
+  "mark": [
+   "attention heads operate on small subspaces and can easily avoid significant interaction"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p5-three-kinds.png",
+  "find": "When attention heads do compose, there are three options",
+  "upto": "Q- and K-Composition are quite different from V-Composition",
+  "mark": [
+   "Q-Composition",
+   "K-Composition",
+   "V-Composition",
+   "Composing movement of information with movement of information gives movement of information"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p5-logits-intro.png",
+  "find": "The most basic question we can ask of a transformer is",
+  "mark": [
+   "how are the logits computed?",
+   "every term is an end-to-end path through the model"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p5-fig-logits.png",
+  "figure": 17,
+  "pad": 10
+ },
+ {
+  "out": "p5-logit-terms.png",
+  "find": "Two of these terms, the direct path term and individual head terms",
+  "mark": [
+   "identical to the one-layer model",
+   "virtual attention head",
+   "tend to not play a significant role in small two-layer models"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p5-qk-intro.png",
+  "find": "Just looking at the logit expansion misses",
+  "upto": "For first layer attention heads, the QK-circuit is just the same matrix",
+  "mark": [
+   "much more expressive second layer attention patterns",
+   "the same matrix we saw in the one-layer model"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p5-qk-second.png",
+  "find": "But for the second layer QK-circuit, both Q-composition and K-composition come into play",
+  "mark": [
+   "the residual stream after first layer attention heads",
+   "Then we apply our path expansion trick to the product"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p5-qk-tensor.png",
+  "find": "One complicating factor is that we have to write it as a 6-dimensional tensor",
+  "mark": [
+   "6-dimensional tensor",
+   "describes the movement of query-side information between tokens",
+   "describes the movement of key-side information between tokens"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p5-fig-qk.png",
+  "figure": 18,
+  "pad": 10
+ },
+ {
+  "out": "p5-simple-structure.png",
+  "find": "Small two-layer models seem to often (though not always) have a very simple structure of composition",
+  "mark": [
+   "the only type of composition is K-composition between a single first layer head and some of the second layer heads",
+   "it primarily attends to the previous token",
+   "induction heads"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p5-fig-composition.png",
+  "figure": 19,
+  "pad": 10
+ },
+ {
+  "out": "p5-comp-measure.png",
+  "find": "The above diagram shows Q-, K-, and V-Composition between attention heads in the first and second layer",
+  "mark": [
+   "Frobenius norm of the product of the relevant matrices, divided by the norms of the individual matrices",
+   "we subtract off the empirical expected amount for random matrices of the same shapes",
+   "there is only significant K-composition, and only with one layer 0 head"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p5-most-heads.png",
+  "find": "One quick observation from this is that most attention heads are not involved",
+  "mark": [
+   "most attention heads are not involved in any substantive composition",
+   "a larger collection of skip tri-grams"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p5-bug.png",
+  "find": "Following the publication of this paper, we became aware of a bug in an underlying library we wrote. This only affected one diagram",
+  "mark": [
+   "composition going on"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p5-fig-corr-new.png",
+  "figure": 28,
+  "pad": 10
+ },
+ {
+  "out": "p5-term-why.png",
+  "find": "Earlier, we decided to ignore all the",
+  "upto": "We could do this by trying to run the version of a transformer described in our equations",
+  "mark": [
+   "they matter in aggregate",
+   "an implicit term that only exists if you expand out the equations"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p5-term-algo.png",
+  "find": "But it turns out there's an algorithm which can determine the marginal effect",
+  "upto": "freezing the attention patterns to ground truth is what makes this ablation only target V-composition",
+  "mark": [
+   "replacing the present activations with activations from previous times you ran the model",
+   "replace it with a zero tensor of the same shape",
+   "freezing the attention patterns to ground truth"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p5-fig-term-order.png",
+  "figure": 25,
+  "pad": 10
+ },
+ {
+  "out": "p5-term-conclude.png",
+  "find": "We conclude that for understanding two-layer attention only models",
+  "mark": [
+   "second order",
+   "focus on the direct path",
+   "this says nothing about Q- and K-Composition"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p5-fig-term-layer.png",
+  "figure": 26,
+  "pad": 10
+ },
+ {
+  "out": "p5-virtual-def.png",
+  "find": "Where Q- and K-Composition affect the attention pattern, V-Composition creates these terms",
+  "mark": [
+   "performs one head operation and then the other",
+   "It has its own attention pattern",
+   "its own OV matrix"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p5-virtual-powerful.png",
+  "find": "Firstly, this kind of composition seems quite powerful",
+  "mark": [
+   "not heads who attend two tokens back",
+   "gained via virtual heads",
+   "attend to the subject of the previous clause"
+  ],
+  "padx": 40,
+  "pady": 6
+ },
+ {
+  "out": "p5-virtual-many.png",
+  "find": "Secondly, there are a lot of virtual attention heads",
+  "mark": [
+   "grows linearly in the number of layers",
+   "grows quadratically",
+   "normal attention heads are, in some sense, “large”"
+  ],
+  "padx": 40,
+  "pady": 6
+ }
+]

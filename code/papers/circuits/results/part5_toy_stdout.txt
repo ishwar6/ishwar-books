@@ -1,0 +1,19 @@
+== A. PATH EXPANSION: TWO LAYERS, ONE HEAD EACH, A 1-NUMBER STREAM, 3 TOKENS
+  x0 = [1.0, 2.0, 3.0]; x1 = x0 + w1 A1 x0 = [1.5, 2.5, 4.0]; x2 = x1 + w2 A2 x1 = [4.5, 6.5, 12.0]
+  direct x0 = [1.0, 2.0, 3.0]; head 1: w1 A1 x0 = [0.5, 0.5, 1.0]; head 2: w2 A2 x0 = [2.0, 3.0, 6.0]; virtual: w2 w1 (A2 A1) x0 = [1.0, 1.0, 2.0]
+  sum of the four terms = [4.5, 6.5, 12.0]  (same as x2)
+
+== B. TWO PREVIOUS-TOKEN HEADS MAKE A VIRTUAL HEAD THAT LOOKS TWO TOKENS BACK (4 tokens)
+  previous-token pattern P = [[1.0, 0.0, 0.0, 0.0], [1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0]]
+  P P = [[1.0, 0.0, 0.0, 0.0], [1.0, 0.0, 0.0, 0.0], [1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0]]  (token 4 now reads token 2; every row still adds up to 1)
+
+== C. ONE ATTENTION SCORE AS FOUR TERMS (2-number query and key vectors)
+  q = [1.0, 0.0] + [0.0, 1.0], k = [2.0, 1.0] + [1.0, 3.0]
+  no composition qd.kd = 2; Q-composition qh.kd = 1; K-composition qd.kh = 1; both qh.kh = 3
+  sum = 7 = (qd + qh).(kd + kh) = 7
+
+== D. COMPOSITION SCORES ON A 3-DIMENSIONAL STREAM
+  Frobenius norm of [[1.0, 2.0], [2.0, 0.0]]: sqrt(1 + 4 + 4 + 0) = 3
+  W_OV of head 1 = [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [2.0, 0.0, 0.0]] (reads dim 1, writes dim 3)
+  head 2 W_QK = [[0.0, 0.0, 1.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]: W_QK W_OV = [[2.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]], K-composition = 1.00, Q-composition = 0.00
+  head 3 W_QK = [[0.0, 1.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]] (key reads dim 2): K-composition = 0.00

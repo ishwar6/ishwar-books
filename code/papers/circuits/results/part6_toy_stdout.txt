@@ -1,0 +1,16 @@
+== A. AN INDUCTION HEAD BUILT BY HAND (tokens a, b, c; sequence a b c a)
+  stream before layer 0, one row per position: [[1.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0, 0.0, 0.0], [1.0, 0.0, 0.0, 0.0, 0.0, 0.0]]
+  layer-0 head pattern (row = destination): [[1.0, 0.0, 0.0, 0.0], [1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0]]
+  stream after layer 0 (first 3 = this token, last 3 = previous token): [[1.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0, 1.0, 0.0], [1.0, 0.0, 0.0, 0.0, 0.0, 1.0]]
+  scores from the last position (token a) to positions 1..4: [0.0, 4.0, 0.0, 0.0]
+  softmax: [0.017, 0.948, 0.017, 0.017]   (e^4 / (e^4 + 3) = 0.948)
+  induction head output read as logits for a, b, c: [0.035, 0.948, 0.017]  -> predicts 'b'
+
+== B. THE K-COMPOSITION TERM W_E^T W_QK W_OV^prev W_E (3 x 3, one row and column per token)
+  term = [[4.0, 0.0, 0.0], [0.0, 4.0, 0.0], [0.0, 0.0, 4.0]]; eigenvalues [4.0, 4.0, 4.0]; positivity 1.00
+  entry (row a, column a) = lam: "the destination is a" meets "the token before the source is a"
+
+== C. EIGENVALUE POSITIVITY sum(lambda) / sum(|lambda|)
+  copy : M = [[2.0, 0.0], [0.0, 1.0]], eigenvalues [2.0, 1.0], positivity 1.00
+  swap : M = [[0.0, 1.0], [1.0, 0.0]], eigenvalues [1.0, -1.0], positivity 0.00
+  mixed: M = [[2.0, 0.0], [0.0, -1.0]], eigenvalues [2.0, -1.0], positivity 0.33

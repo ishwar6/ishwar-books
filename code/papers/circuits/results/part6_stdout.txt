@@ -1,0 +1,87 @@
+== 1. THE MODEL: attn-only-2l (TransformerLens)
+  layers 2, heads per layer 8, d_model 512, d_head 64, vocabulary 48,262, context 1024
+  position: standard (learned position vectors added to the stream; the paper's model has none in the stream)
+  the paper's two-layer model has 12 heads per layer; ours has 8, so head numbers differ
+
+== 2. REPEATED RANDOM TOKENS: [BOS] t1 ... t50 t1 ... t50, 100 sequences, tokens drawn uniformly from the vocabulary
+  a model that guesses uniformly over 48,262 tokens has loss ln(48262) = 10.78 nats on every token
+  attn-only-1l: loss on the first copy 15.52, on the second copy 14.83 nats; top-1 right: first 0.0%, second 0.0%
+  attn-only-2l: loss on the first copy 15.04, on the second copy 3.41 nats; top-1 right: first 0.0%, second 55.9%
+  probability the 2-layer model gives the right token on the second copy, on average: exp(-3.41) = 0.03
+
+== 3. WHICH HEADS DO WHAT, MEASURED ON THE REPEATED SEQUENCES
+  previous-token score (average attention to the token just before):
+    layer 0: 0.0 0.20, 0.1 0.05, 0.2 0.03, 0.3 0.52, 0.4 0.02, 0.5 0.05, 0.6 0.08, 0.7 0.01
+    layer 1: 1.0 0.07, 1.1 0.10, 1.2 0.10, 1.3 0.09, 1.4 0.08, 1.5 0.04, 1.6 0.02, 1.7 0.03
+  induction score (on the second copy, average attention to the token after the earlier copy of the present token):
+    layer 0: 0.0 0.00, 0.1 0.00, 0.2 0.00, 0.3 0.00, 0.4 0.00, 0.5 0.00, 0.6 0.01, 0.7 0.00
+    layer 1: 1.0 0.00, 1.1 0.00, 1.2 0.00, 1.3 0.00, 1.4 0.00, 1.5 0.00, 1.6 0.66, 1.7 0.03
+  previous-token head: 0.3; induction head: 1.6 (the next best layer-1 head is 1.7 with 0.03)
+  a head that spread its weight evenly over the 51 to 100 earlier tokens would score about 0.013
+
+== 4. THE TWO PATTERNS ON A SHORT REPEATED SEQUENCE ([BOS] + 8 random tokens, twice)
+  tokens: ['BOS', '<17130>', '<16761>', '<7403>', '<10492>', '<12234>', '<16437>', '<11647>', '<11786>', '<17130>', '<16761>', '<7403>', '<10492>', '<12234>', '<16437>', '<11647>', '<11786>']
+  standing on position 12 (<10492>, second copy): head 0.3 gives 0.29 to position 11 (the token before); head 1.6 gives 0.31 to position 5 (<12234>, the token after the first <10492>)
+  head 1.6 on the first copy (nothing to find): weight on BOS, averaged over positions 2..8: 0.95
+  head 1.6 on the second copy: weight on the token after the earlier copy, averaged: 0.41
+
+== 5. COPYING: EIGENVALUE POSITIVITY OF THE OV CIRCUIT W_U W_OV W_E (1 = all eigenvalues positive, -1 = all negative)
+  layer 0 positivity: 0.0 +0.30, 0.1 +0.38, 0.2 +0.69, 0.3 -0.42, 0.4 +0.65, 0.5 -0.11, 0.6 +0.47, 0.7 +0.05
+  layer 0 share of tokens 1000..2999 whose top output is the token itself: 0.0 0.00, 0.1 0.00, 0.2 0.00, 0.3 0.00, 0.4 0.00, 0.5 0.00, 0.6 0.00, 0.7 0.00
+  layer 1 positivity: 1.0 +0.72, 1.1 +0.11, 1.2 +0.94, 1.3 +0.57, 1.4 +0.03, 1.5 +0.71, 1.6 +1.00, 1.7 +1.00
+  layer 1 share of tokens 1000..2999 whose top output is the token itself: 1.0 0.01, 1.1 0.00, 1.2 0.01, 1.3 0.01, 1.4 0.00, 1.5 0.00, 1.6 0.99, 1.7 0.26
+  OV of 1.6: attend to ' Paris' -> raises [' Paris', 'Paris', ' Geneva', ' São', ' Madrid']
+  OV of 1.6: attend to ' tea' -> raises [' tea', ' wells', ' te', '色', ' chemo']
+
+== 6. SAME MATCHING: EIGENVALUE POSITIVITY OF THE K-COMPOSITION TERM W_E^T W_QK^h W_OV^p W_E (p = a layer-0 head)
+  with the previous-token head 0.3: 1.0 +0.10, 1.1 -0.08, 1.2 -0.24, 1.3 +0.85, 1.4 -0.36, 1.5 -0.06, 1.6 +1.00, 1.7 +0.98
+  head 1.6 with each other layer-0 head: 0.0 +0.64, 0.1 +0.01, 0.2 -0.02, 0.4 -0.59, 0.5 +0.57, 0.6 +0.13, 0.7 -0.12
+  direct term W_E^T W_QK^h W_E (no layer-0 head): 1.0 +0.69, 1.1 +0.68, 1.2 +0.75, 1.3 +0.52, 1.4 +0.87, 1.5 +0.46, 1.6 -0.64, 1.7 -0.24
+  the scatter of the paper (layer-1 heads): x = OV positivity, y = K-composition positivity with the previous-token head
+    1.0: (+0.72, +0.10)  induction score 0.00
+    1.1: (+0.11, -0.08)  induction score 0.00
+    1.2: (+0.94, -0.24)  induction score 0.00
+    1.3: (+0.57, +0.85)  induction score 0.00
+    1.4: (+0.03, -0.36)  induction score 0.00
+    1.5: (+0.71, -0.06)  induction score 0.00
+    1.6: (+1.00, +1.00)  induction score 0.66
+    1.7: (+1.00, +0.98)  induction score 0.03
+
+== 7. K-COMPOSITION SCORE ||W_QK^h W_OV^p||_F / (||W_QK^h||_F ||W_OV^p||_F), INTO THE INDUCTION HEAD
+  into 1.6: 0.0 0.081, 0.1 0.067, 0.2 0.038, 0.3 0.124, 0.4 0.058, 0.5 0.044, 0.6 0.040, 0.7 0.045
+  the same measure for random rank-64 matrices of these shapes: 0.044 (average of 20)
+
+== 8. WHERE THE INDUCTION HEAD'S KEY COMES FROM (head 1.6, the repeated sequences)
+  share of the attention score, at the induction target vs averaged over all allowed sources:
+    from       0.3: target +6.30, average source +2.12, lift +4.18
+    from       0.0: target +3.01, average source +0.77, lift +2.24
+    from embed+pos: target +3.34, average source +3.09, lift +0.25
+    from       0.1: target +0.63, average source +0.39, lift +0.24
+    from       0.6: target +1.43, average source +1.33, lift +0.10
+    from       0.2: target +1.23, average source +1.16, lift +0.07
+    from       0.5: target -0.94, average source -0.96, lift +0.02
+    from      bias: target +9.76, average source +9.78, lift -0.02
+    from       0.4: target +1.41, average source +1.41, lift +0.00
+    from       0.7: target -0.74, average source -0.75, lift +0.00
+    key bias part: +5.49 (the same for every source, so the softmax ignores it)
+  sum of the parts at the target 30.93; the model's own score 30.93
+
+== 9. ABLATIONS: REPLACE ONE HEAD'S RESULT VECTORS WITH THEIR AVERAGE OVER ALL POSITIONS AND SEQUENCES
+  no ablation:            loss first 15.04, second 3.41; induction score of 1.6 0.66
+  ablate 0.3 (the previous-token head): loss first 13.68, second 11.85; induction score of 1.6 0.06
+  ablate 0.0 (the second most previous-token head): loss first 14.27, second 6.33; induction score of 1.6 0.37
+  ablate 0.7 (the least previous-token layer-0 head): loss first 17.97, second 4.15; induction score of 1.6 0.64
+  ablate 1.6 (the induction head): loss first 14.25, second 13.04; induction score of 1.6 0.66
+  ablate 1.7 (the second induction-like head): loss first 15.04, second 3.77; induction score of 1.6 0.66
+  ablate 1.1 (the least induction-like layer-1 head): loss first 14.86, second 3.33; induction score of 1.6 0.66
+
+== 10. A MADE-UP NAME IN A SENTENCE
+  tokens: ['<|BOS|>', 'The', ' new', ' teacher', ' was', ' Mrs', ' Br', 'indle', 'wick', '.', ' On', ' Monday', ' the', ' class', ' met', ' Mrs', ' Br', 'indle', 'wick']
+  attn-only-1l: at ' Mrs' (pos 15) the next token ' Br' gets probability 0.01
+  attn-only-1l: at ' Br' (pos 16) the next token 'indle' gets probability 0.82
+  attn-only-1l: at 'indle' (pos 17) the next token 'wick' gets probability 0.00
+  attn-only-2l: at ' Mrs' (pos 15) the next token ' Br' gets probability 0.63; head 1.6 reads '<|BOS|>' (pos 0) with 0.55, adds +4.84 to the logit of ' Br'
+  attn-only-2l: at ' Br' (pos 16) the next token 'indle' gets probability 0.93; head 1.6 reads 'indle' (pos 7) with 0.93, adds +11.95 to the logit of 'indle'
+  attn-only-2l: at 'indle' (pos 17) the next token 'wick' gets probability 0.98; head 1.6 reads 'wick' (pos 8) with 0.75, adds +13.82 to the logit of 'wick'
+
+saved results/part6.json
