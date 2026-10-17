@@ -167,7 +167,8 @@ function Reader({ paper }: { paper: Paper }) {
     for (const el of N.querySelectorAll<HTMLElement>('[data-box]')) {
       const box = byN.get(Number(el.dataset.box))
       if (!box) continue
-      const regs = box.regions.flatMap((r) => {
+      // follow only the passages next to the first one; a footnote or appendix far away would make the paper jump
+      const regs = box.regions.filter((r) => Math.abs(r.page - box.regions[0].page) <= 1).flatMap((r) => {
         const page = P.querySelector<HTMLElement>(`[data-page="${r.page}"]`)
         if (!page) return []
         const pr = page.getBoundingClientRect(), [w, h] = map.pages[r.page]

@@ -1,8 +1,11 @@
 """Build the files of the side-by-side reader (/papers/sam/read): our own annotated copy of the paper, and a map
 that ties each "From the paper" box of the articles to its place in the PDF.
 
-For each box of the numbered parts (in the order of the articles), the box's screenshot name is looked up in the
+For each box of the numbered parts (in the order of the articles), the box's screenshot names are looked up in the
 shots_partN.py job lists, and paper_shots.shot(dry=True) gives the page, the crop and the highlighted phrases.
+Many boxes show two or three screenshots (a passage that runs over a page or column break, or a passage and its
+footnote): each screenshot becomes one region of the box. The box's id is its first screenshot, which is how the
+reader page finds the box in the article.
 The PDF then gets, drawn into the page itself:
   - the same yellow highlights as the screenshots,
   - a number in the margin and a thin bar along the excerpt, so the reader can match the paper to the box.
@@ -29,7 +32,7 @@ def jobs():
 
 
 def boxes_in_order():
-    """(part slug, screenshot name) for every box of this paper, in the order the articles show them."""
+    """(part slug, [screenshot names]) for every box of this paper, in the order the articles show them."""
     parts = []
     for f in glob.glob(os.path.join(ROOT, 'content', 'papers', 'sam', 'part-*.md')):
         n = int(re.search(r'^part:\s*(\d+)', open(f).read(), re.M).group(1))
@@ -41,14 +44,18 @@ def boxes_in_order():
         for line in open(f):
             if line.startswith('> [!PAPER]'):
                 in_box = line.startswith('> [!PAPER] ·')        # an unnamed box shows this paper
+                if in_box:
+                    out.append((slug, []))
             elif not line.startswith('>'):
                 in_box = False
             elif in_box:
-                m = re.search(r'/img/papers/sam/([\w-]+)\.png', line)
-                if m:
-                    out.append((slug, m.group(1)))
-                    in_box = False
-    return out
+                m = re.search(r'/img/papers/sam/([\w-]+)\.png', line)   # a linked image names its file twice
+                if m and m.group(1) not in out[-1][1]:
+                    out[-1][1].append(m.group(1))
+    for slug, names in out:
+        if not names:
+            print(f'{slug}: a box of this paper has no screenshot')
+    return [(slug, names) for slug, names in out if names]
 
 
 def mark(pg, clip, n):
@@ -60,7 +67,7 @@ def mark(pg, clip, n):
     sh = pg.new_shape()
     sh.draw_line((x, clip.y0 + 2), (x, clip.y1 - 2))
     sh.finish(color=TEAL, width=1.6, lineCap=1)
-    cx = x - 9 if left else x + 9
+    cx = min(max(x - 9 if left else x + 9, 9), W - 9)   # keep the dot inside the page (the title spans the full width)
     cy = clip.y0 + 7
     sh.draw_circle((cx, cy), 7.5)
     sh.finish(color=TEAL, fill=TEAL)
@@ -75,16 +82,17 @@ def main():
     J = jobs()
     doc = pdf(SAM)
     boxes, missing = [], []
-    for slug, name in boxes_in_order():
-        regions = []
-        for part in STITCHED.get(name, [name]):
+    for slug, names in boxes_in_order():
+        name, regions = names[0], []
+        for part in (p for n in names for p in STITCHED.get(n, [n])):
             j = J.get(part)
             if not j or j.get('arxiv_id', SAM) != SAM:
+                missing += [] if j else [part]
                 continue
             r = shot(**j, dry=True)
             regions.append({'page': r['page'], 'clip': r['clip'], 'hl': r['hl']})
         if not regions:
-            missing.append(name)
+            missing += [] if name in missing else [name]
             continue
         boxes.append({'n': len(boxes) + 1, 'id': name, 'part': slug, 'regions': regions})
 
