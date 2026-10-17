@@ -1,0 +1,27 @@
+== 0. data: Imagenette, 9469 training and 3925 validation pictures, 10 classes; device mps ==
+  loaded google/vit-base-patch16-224-in21k into a 10-class classifier
+  the pre-logits layer (768 x 768 + tanh) is dropped: model.vit.pooler is None
+  new head: Linear(in_features=768, out_features=10, bias=True) with every weight and bias set to 0 (7,690 numbers)
+
+== 1. step 0 with the zero head ==
+  logits of the first picture: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]  -> softmax gives 0.1 to each of the 10 classes
+  loss = -ln(0.1) = ln 10 = 2.302585;  measured 2.302585
+  gradient of the head weight by hand, (softmax - one_hot)^T y / batch: norm 1.2152; autograd: 1.2152; max |difference| 0.0e+00
+  gradient reaching the body (all 85.8M other numbers): norm 0.0  (W_head^T (softmax - one_hot) = 0 because W_head = 0)
+  for comparison, a random head (normal, std 0.02): loss 2.3175, gradient reaching the body: norm 0.561, logits of picture 1 range -0.13 to 0.13
+
+== 2. fine-tuning: 300 steps, batch 32, SGD momentum 0.9, no weight decay, base LR 0.003, linear warm-up 30 steps, cosine decay to 0, clip at global norm 1.0, weight average factor 0.99, random horizontal flips ==
+  step   0: validation accuracy (1,000 pictures, 100 per class) 10.0%  (zero head: every class ties, the first wins)
+  step   5: lr 0.00040  loss 2.3014  gradient norm before clipping   1.151  validation  98.3%   [39 s]
+  step  10: lr 0.00090  loss 2.2914  gradient norm before clipping   1.197  validation  99.0%   [76 s]
+  step  25: lr 0.00240  loss 2.1605  gradient norm before clipping   1.123  validation  99.0%   [137 s]
+  step  50: lr 0.00296  loss 1.6761  gradient norm before clipping   1.280  validation  99.1%   [220 s]
+  step 100: lr 0.00254  loss 0.9975  gradient norm before clipping   1.655  validation  99.4%   [359 s]
+  step 150: lr 0.00178  loss 0.6214  gradient norm before clipping   1.523  validation  99.6%   [494 s]
+  step 200: lr 0.00092  loss 0.4379  gradient norm before clipping   1.217  validation  99.7%   [599 s]
+  step 250: lr 0.00026  loss 0.4833  gradient norm before clipping   1.825  validation  99.7%   [718 s]
+  step 300: lr 0.00000  loss 0.3019  gradient norm before clipping   1.104  validation  99.7%   [850 s]
+  clipping was active in 292 of 300 steps; median gradient norm: first 50 steps 1.197, last 50 steps 1.393
+  mean training loss: steps 1 to 10 2.299, steps 291 to 300 0.350; pictures seen 9,600 = 1.01 passes over the training set
+  final, all 3925 validation pictures: last weights 99.57%   averaged weights (factor 0.99) 99.52%
+saved results/part3_finetune.json

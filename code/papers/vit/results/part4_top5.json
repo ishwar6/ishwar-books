@@ -1,0 +1,70 @@
+{
+ "ViT-B/16": {
+  "top1": 83.13,
+  "top5": 96.66,
+  "n_top1_wrong": 662,
+  "n_saved_by_top5": 531
+ },
+ "ViT-L/16": {
+  "top1": 84.92,
+  "top5": 97.63,
+  "n_top1_wrong": 592,
+  "n_saved_by_top5": 499
+ },
+ "ResNet-50": {
+  "top1": 79.36,
+  "top5": 95.95,
+  "n_top1_wrong": 810,
+  "n_saved_by_top5": 651
+ },
+ "misses": [
+  {
+   "file": "n02102040_2700.JPEG",
+   "label": "English springer",
+   "top1": "Boston bull",
+   "rank": 3
+  },
+  {
+   "file": "n02102040_8260.JPEG",
+   "label": "English springer",
+   "top1": "German short-haired pointer",
+   "rank": 3
+  },
+  {
+   "file": "n02102040_880.JPEG",
+   "label": "English springer",
+   "top1": "Sussex spaniel",
+   "rank": 2
+  },
+  {
+   "file": "n02979186_15511.JPEG",
+   "label": "cassette player",
+   "top1": "cassette",
+   "rank": 2
+  },
+  {
+   "file": "n03028079_26940.JPEG",
+   "label": "church",
+   "top1": "bell cote",
+   "rank": 2
+  },
+  {
+   "file": "n03028079_9481.JPEG",
+   "label": "church",
+   "top1": "monastery",
+   "rank": 2
+  },
+  {
+   "file": "n03028079_9560.JPEG",
+   "label": "church",
+   "top1": "vault",
+   "rank": 3
+  },
+  {
+   "file": "n03394916_38702.JPEG",
+   "label": "French horn",
+   "top1": "cornet",
+   "rank": 2
+  }
+ ]
+}

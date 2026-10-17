@@ -1,0 +1,28 @@
+== 1. resize a 2x2 grid to 3x3 the way the official code does (scipy.ndimage.zoom, order=1 = linear) ==
+  grid 2x2: [[0.0, 1.0], [2.0, 3.0]]
+    0.00  0.50  1.00
+    1.00  1.50  2.00
+    2.00  2.50  3.00
+  corners stay, the new middle row and column are averages of their neighbours: (0+1)/2 = 0.5, (0+2)/2 = 1, (0+1+2+3)/4 = 1.5
+
+== 2. the position table of google/vit-base-patch16-224 ==
+  E_pos (197, 768) = 1 row for [class] + 196 rows = a 14x14 grid of 768 numbers
+  at 384 pixels: 384/16 = 24 patches per side, N = 576, so 577 rows are needed: 380 rows do not exist
+  our bilinear 14x14 -> 24x24: (24, 24, 768); max |difference| vs scipy.ndimage.zoom(order=1): 2.3e-15
+  new row 5 sits at old position 5 x 13/23 = 2.8261: 0.1739 of old row 2 + 0.8261 of old row 3
+  library interpolate_pos_encoding: bicubic, align_corners=False; our bicubic call matches it: max |difference| 0.0e+00
+  bilinear (official) vs bicubic (library) position rows: mean |difference| 0.0131, mean |value| 0.0784
+  corner row (0,0) kept by bilinear: max |difference| 0.0e+00
+
+== 3. cosine similarity of one position row with all the others ==
+  14x14: row (3, 10) vs all 196: max 1.000 (itself), mean 0.018; nearest neighbours: (3, 9) 0.790, (3, 11) 0.787, (2, 10) 0.800, (4, 10) 0.811; far corner (13, 0) -0.286
+  24x24: row (5, 18) (the same place) vs all 576: neighbours 0.946, 0.924; far corner (23, 0) -0.304
+
+== 4. accuracy on the Imagenette validation set: 3925 pictures (160 px on the short side), device mps ==
+  the ImageNet head of the checkpoint is read at the 10 Imagenette classes; no training; "of 1000" = the top class of all 1000 must be right
+  224, the training resolution (196 patches)     accuracy 99.54% (of 10)   83.13% (of 1000)   [65 s]
+  384, 2D bilinear (the official code)           accuracy 99.69% (of 10)   84.76% (of 1000)   [196 s]
+  384, 2D bicubic (the library)                  accuracy 99.69% (of 10)   84.97% (of 1000)   [1582 s]
+  384, 1D: the 196 rows stretched as one list    accuracy 92.00% (of 10)   48.38% (of 1000)   [1583 s]
+  384, no position rows at all (zeros)           accuracy 52.64% (of 10)   13.99% (of 1000)   [297 s]
+saved results/part3_posemb.json

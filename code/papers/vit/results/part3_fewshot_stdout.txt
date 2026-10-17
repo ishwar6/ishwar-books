@@ -1,0 +1,24 @@
+== 1. the closed form by hand: 4 pictures, 2 features, K = 2 classes, lambda = 1 ==
+  X (rows = pictures A1, A2, B1, B2) = [[2.0, 1.0], [1.0, 0.0], [0.0, 2.0], [1.0, 3.0]]
+  Y (targets in {-1, 1}: class A = [1, -1], class B = [-1, 1]) = [[1.0, -1.0], [1.0, -1.0], [-1.0, 1.0], [-1.0, 1.0]]
+  X^T X = [[6.0, 5.0], [5.0, 14.0]]   + lambda I = [[7.0, 5.0], [5.0, 15.0]]   det = 80
+  (X^T X + I)^-1 = [[0.1875, -0.0625], [-0.0625, 0.0875]]
+  X^T Y = [[2.0, -2.0], [-4.0, 4.0]]
+  W = (X^T X + I)^-1 X^T Y = [[0.625, -0.625], [-0.475, 0.475]]
+  new picture x = [1.5, 0.5]: scores x W = [0.7, -0.7] -> class A
+  training scores X W = [[0.775, -0.775], [0.625, -0.625], [-0.95, 0.95], [-0.8, 0.8]] (all on the right side of 0)
+
+== 2. frozen ViT-B/16 (ImageNet-21k weights), device mps: features of 500 training pictures (a pool of 50 per class) and 3925 validation pictures ==
+  representation "pre-logits": the tanh layer on the [class] token, 768 numbers;  "class token": the final LayerNorm output (Eq. 4)
+  accuracy on the 3,925 validation pictures, mean +- std over 5 random draws of the training pictures
+  pre-logits  lambda   0.01:  1-shot  98.0 +-  0.6%   5-shot  99.0 +-  0.2%   10-shot  99.0 +-  0.1%
+  pre-logits  lambda      1:  1-shot  98.0 +-  0.6%   5-shot  99.1 +-  0.1%   10-shot  99.0 +-  0.1%
+  pre-logits  lambda    100:  1-shot  98.2 +-  0.5%   5-shot  99.1 +-  0.2%   10-shot  99.2 +-  0.1%
+  class token lambda   0.01:  1-shot  98.1 +-  0.5%   5-shot  99.0 +-  0.1%   10-shot  99.0 +-  0.0%
+  class token lambda      1:  1-shot  98.1 +-  0.5%   5-shot  99.1 +-  0.1%   10-shot  99.0 +-  0.1%
+  class token lambda    100:  1-shot  98.3 +-  0.3%   5-shot  99.2 +-  0.1%   10-shot  99.2 +-  0.1%
+  chance is 10%; 1-shot means 10 training pictures in total, one per class
+  5-shot, draw 0, pre-logits, lambda 1: X is (50, 769) (50 pictures x 768 features + bias), Y is (50, 10), W is (769, 10); one solve of a 769x769 system
+  per-class accuracy (5-shot, draw 0): tench 100%, springer 100%, cassette player 99%, chain saw 96%, church 99%, French horn 99%, garbage truck 99%, gas pump 99%, golf ball 99%, parachute 99%
+  scores of the first validation picture (a tench): +0.92 -0.96 -1.01 -1.04 -1.02 -0.97 -0.97 -0.94 -0.95 -1.02  -> class tench
+saved results/part3_fewshot.json

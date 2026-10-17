@@ -1,0 +1,73 @@
+== 1. Table 1 and the patch-size notation: ViT-<size>/<patch> ==
+  N = (resolution / patch)^2 patches, plus 1 [class] token; attention compares every pair: (N+1)^2 pairs per head
+  ViT-B/32 at 224: grid  7x7  N =   49  sequence   50  pairs per head     2,500  forward compute about    8.6 GFLOPs
+  ViT-B/32 at 384: grid 12x12 N =  144  sequence  145  pairs per head    21,025  forward compute about   25.4 GFLOPs
+  ViT-B/16 at 224: grid 14x14 N =  196  sequence  197  pairs per head    38,809  forward compute about   34.9 GFLOPs
+  ViT-B/16 at 384: grid 24x24 N =  576  sequence  577  pairs per head   332,929  forward compute about  110.3 GFLOPs
+  ViT-L/32 at 224: grid  7x7  N =   49  sequence   50  pairs per head     2,500  forward compute about   30.4 GFLOPs
+  ViT-L/32 at 384: grid 12x12 N =  144  sequence  145  pairs per head    21,025  forward compute about   89.6 GFLOPs
+  ViT-L/16 at 224: grid 14x14 N =  196  sequence  197  pairs per head    38,809  forward compute about  122.8 GFLOPs
+  ViT-L/16 at 384: grid 24x24 N =  576  sequence  577  pairs per head   332,929  forward compute about  381.2 GFLOPs
+  ViT-H/14 at 224: grid 16x16 N =  256  sequence  257  pairs per head    66,049  forward compute about  334.2 GFLOPs
+  ViT-H/14 at 384: grid 27x27 N =  729  sequence  730  pairs per head   532,900  forward compute about 1005.9 GFLOPs
+  ViT-B/16 vs ViT-B/32 at 224: 196 vs 49 patches = x4 (patch side halved, so (1/2)^-2 = 4); compute x4.06
+  Table 2 fine-tuning resolution: ViT-L/16 at 512: grid 32x32, N = 1024, sequence 1025
+  Table 2 fine-tuning resolution: ViT-H/14 at 518: grid 37x37, N = 1369, sequence 1370
+
+-- parameters of the released checkpoints, read from the weight files (no head, no pre-logits layer) --
+  ViT-B/32 (vit-base-patch32-224-in21k, weight file): backbone  87,455,232  =   87.5M   pre-logits layer   590,592   Table 1: 86M
+  ViT-B/16 (vit-base-patch16-224-in21k, weight file): backbone  85,798,656  =   85.8M   pre-logits layer   590,592   Table 1: 86M
+  ViT-L/32 (vit-large-patch32-224-in21k, weight file): backbone 305,510,400  =  305.5M   pre-logits layer 1,049,600   Table 1: 307M
+  ViT-L/16 (vit-large-patch16-224, weight file): backbone 303,301,632  =  303.3M   pre-logits layer         0   Table 1: 307M
+  ViT-H/14 (vit-huge-patch14-224-in21k, weight file): backbone 630,764,800  =  630.8M   pre-logits layer 1,639,680   Table 1: 632M
+  ViT-B/32 minus ViT-B/16: 1,656,576 parameters (1.9% more), because E grows from 768x768 to 3072x768 (+1,769,472) and the position table shrinks from 197 to 50 rows (-112,896)
+  ViT-L/32 with its pre-logits layer: 306.6M; ViT-L/16 has 303.3M without one
+
+== 2. the hybrid: which ResNet-50 stage feeds ViT ==
+  stage 1 output:  256 channels x 56 x 56 -> as 1x1 patches:  3136 tokens of 256 numbers
+  stage 2 output:  512 channels x 28 x 28 -> as 1x1 patches:   784 tokens of 512 numbers
+  stage 3 output: 1024 channels x 14 x 14 -> as 1x1 patches:   196 tokens of 1024 numbers
+  stage 4 output: 2048 channels x  7 x 7  -> as 1x1 patches:    49 tokens of 2048 numbers
+  option (i), stage 4: 49 tokens; option (ii), extended stage 3: 196 tokens = x4 (the "4x longer sequence")
+  microsoft/resnet-50 is a standard ResNet: it has 53 BatchNorm2d layers (BiT replaces each with Group Norm)
+
+== 3. Batch Norm vs Group Norm on a tiny batch (4 channels, 2 pixels per channel, 2 groups) ==
+  picture A, channel 1 = [1.0, 3.0]
+  Batch Norm, A batched with partner 1: A channel 1 -> [-1.260, -0.700]
+  Batch Norm, A batched with partner 2: A channel 1 -> [ 0.632,  1.265]   (same picture, different output)
+  Group Norm, group 1 = channels 1 and 2 of A = [1.0, 3.0, 2.0, 2.0]: mean 2.000, std 0.707
+  Group Norm: A channel 1 -> [-1.414,  1.414] with any partner (it never looks at the batch); torch GroupNorm agrees: True
+  Weight Standardization: filter 2 = [1.0, 2.0, 3.0, 2.0]: mean 2.00, std 0.7071 -> [-1.414,  0.000,  1.414,  0.000]
+  filter 1 = [0.2, -0.1, 0.5, 0.0] -> [ 0.218, -1.091,  1.528, -0.655]   (every filter now has mean 0 and std 1 before the convolution uses it)
+
+== 4. Tables 3 and 4 as steps and epochs ==
+  pre-training ViT-B/16 on JFT-300M      :   7 epochs x 303.00M images / batch 4096 =   517,822 steps; warm-up 10,000 =  1.9% of them; base LR 0.0008, linear decay
+  pre-training ViT-H/14 on JFT-300M      :  14 epochs x 303.00M images / batch 4096 = 1,035,645 steps; warm-up 10,000 =  1.0% of them; base LR 0.0003, linear decay
+  pre-training ViT-B/16 on ImageNet-21k  :  90 epochs x  14.00M images / batch 4096 =   307,617 steps; warm-up 10,000 =  3.3% of them; base LR 0.001, linear decay
+  pre-training ViT on ImageNet           : 300 epochs x   1.28M images / batch 4096 =    93,750 steps; warm-up 10,000 = 10.7% of them; base LR 0.003, cosine decay
+  fine-tuning ImageNet           : 20,000 steps x batch 512 =  10.24M pictures seen =     8.0 passes over 1,280,000 training pictures
+  fine-tuning CIFAR-100          : 10,000 steps x batch 512 =   5.12M pictures seen =   102.4 passes over 50,000 training pictures
+  fine-tuning CIFAR-10           : 10,000 steps x batch 512 =   5.12M pictures seen =   102.4 passes over 50,000 training pictures
+  fine-tuning Oxford-IIIT Pets   :    500 steps x batch 512 =   0.26M pictures seen =    69.6 passes over 3,680 training pictures
+  fine-tuning Oxford Flowers-102 :    500 steps x batch 512 =   0.26M pictures seen =   125.5 passes over 2,040 training pictures
+  fine-tuning VTAB task          :  2,500 steps x batch 512 =   1.28M pictures seen =  1280.0 passes over 1,000 training pictures
+  ImageNet         1.3M pictures =       137 times the 9,469 training pictures of Imagenette
+  ImageNet-21k    14.0M pictures =     1,479 times the 9,469 training pictures of Imagenette
+  JFT-300M       303.0M pictures =    31,999 times the 9,469 training pictures of Imagenette
+  ViT-B/16 on JFT: LR at step 5,000 = 4.0e-04 (half way up the warm-up), at 10,000 = 8.0e-04, at the middle of the decay = 4.0e-04
+  ImageNet fine-tuning at base LR 0.03, cosine: step 0 -> 0.03, step 10,000 -> 0.015, step 15,000 -> 0.0044, step 20,000 -> 0
+
+== 5. one weight, three gradients: Adam, SGD with momentum, clipping, Polyak averaging ==
+  Adam t=1: g= 0.50  m=0.0500  v=0.000250  m_hat=0.5000  v_hat=0.2500  step = lr*m_hat/sqrt(v_hat) = 0.001000  w=0.999000
+  Adam t=2: g=-0.10  m=0.0350  v=0.000260  m_hat=0.1842  v_hat=0.1299  step = lr*m_hat/sqrt(v_hat) = 0.000511  w=0.998489
+  Adam t=3: g= 0.30  m=0.0615  v=0.000349  m_hat=0.2269  v_hat=0.1166  step = lr*m_hat/sqrt(v_hat) = 0.000665  w=0.997824
+  torch.optim.Adam after the same three gradients: w=0.997824  (ours 0.997824)
+  SGD momentum 0.9, lr 0.01, t=1: g= 0.50  velocity = 0.9*velocity + g = 0.5000  w = w - lr*velocity = 0.99500
+  SGD momentum 0.9, lr 0.01, t=2: g=-0.10  velocity = 0.9*velocity + g = 0.3500  w = w - lr*velocity = 0.99150
+  SGD momentum 0.9, lr 0.01, t=3: g= 0.30  velocity = 0.9*velocity + g = 0.6150  w = w - lr*velocity = 0.98535
+  torch.optim.SGD(momentum=0.9) after the same gradients: w=0.98535  (ours 0.98535)
+  clipping at global norm 1: gradients of two tensors [3, 0] and [4]; global norm sqrt(9 + 0 + 16) = 5.0 > 1, so every gradient is multiplied by 1/5: [0.6, 0.0] and [0.8]; direction kept, length 1
+  torch.nn.utils.clip_grad_norm_: [0.6, 0.0] and [0.8]
+  Polyak (exponential) averaging, factor 0.9: weights [1.0, 1.2, 0.9, 1.1, 1.05] -> averages [1.0, 1.02, 1.008, 1.0172, 1.0205]
+  a factor of 0.9999 averages over roughly the last 1/(1 - 0.9999) = 10,000 steps
+saved results/part3_setup.json

@@ -1,0 +1,74 @@
+== 1. TPUv3-core-days: cores x days ==
+  one TPUv3 chip has 2 cores; "core-days" = (number of cores) x (days of training)
+  the paper: ViT-L/16 on ImageNet-21k "could be trained using a standard cloud TPUv3 with 8 cores in approximately 30 days"
+  8 cores x 30 days = 240 core-days = 0.24k   (Table 2 says 0.23k for ViT-L/16, I21k)
+  ViT-H/14 (JFT)               2.50k core-days =  1,250 chip-days =   312 days on one 8-core TPUv3
+  ViT-L/16 (JFT)               0.68k core-days =    340 chip-days =    85 days on one 8-core TPUv3
+  ViT-L/16 (I21k)              0.23k core-days =    115 chip-days =    29 days on one 8-core TPUv3
+  BiT-L (R152x4)               9.90k core-days =  4,950 chip-days = 1,238 days on one 8-core TPUv3
+  Noisy Student (EffNet-L2)   12.30k core-days =  6,150 chip-days = 1,538 days on one 8-core TPUv3
+  BiT-L / ViT-L/16 (JFT) = 9.9k / 0.68k = 14.6x more pre-training compute for BiT-L
+  BiT-L / ViT-H/14       = 9.9k / 2.5k  = 4.0x
+  Noisy Student / ViT-H/14 = 12.3k / 2.5k = 4.9x
+  ViT-H/14 / ViT-L/16 (JFT) = 2.5k / 0.68k = 3.7x
+
+== 2. Table 2 as error rates (100 - accuracy) ==
+  dataset                    ViT-H/14        ViT-L/16        ViT-L/16           BiT-L   H/14 vs BiT-L: error cut
+  ImageNet                      11.45           12.24           14.70           12.46   12.46 -> 11.45: 8% fewer errors
+  ImageNet ReaL                  9.28            9.46           11.38            9.46   9.46 -> 9.28: 2% fewer errors
+  CIFAR-10                       0.50            0.58            0.85            0.63   0.63 -> 0.50: 21% fewer errors
+  CIFAR-100                      5.45            6.10            6.75            6.49   6.49 -> 5.45: 16% fewer errors
+  Oxford-IIIT Pets               2.44            2.68            5.33            3.38   3.38 -> 2.44: 28% fewer errors
+  Oxford Flowers-102             0.32            0.26            0.39            0.37   0.37 -> 0.32: 14% fewer errors
+  VTAB (19 tasks)               22.37           23.72           27.28           23.71   23.71 -> 22.37: 6% fewer errors
+
+== 3. ViT-L/16 (JFT) against BiT-L, row by row (gap in points, and in units of the larger std) ==
+  ImageNet             87.76 -  87.54 = +0.22   (larger std 0.03, gap = 7.3 std)   ViT-L/16 higher
+  ImageNet ReaL        90.54 -  90.54 = +0.00   (larger std 0.03, gap = 0.0 std)   equal
+  CIFAR-10             99.42 -  99.37 = +0.05   (larger std 0.06, gap = 0.8 std)   ViT-L/16 higher
+  CIFAR-100            93.90 -  93.51 = +0.39   (larger std 0.08, gap = 4.9 std)   ViT-L/16 higher
+  Oxford-IIIT Pets     97.32 -  96.62 = +0.70   (larger std 0.23, gap = 3.0 std)   ViT-L/16 higher
+  Oxford Flowers-102   99.74 -  99.63 = +0.11   (larger std 0.03, gap = 3.7 std)   ViT-L/16 higher
+  VTAB (19 tasks)      76.28 -  76.29 = -0.01   (larger std 1.70, gap = -0.0 std)   BiT-L higher
+  ViT-L/16 (JFT) is strictly higher on 5 of 7 rows; ImageNet ReaL is a tie and VTAB is 0.01 lower, inside BiT-L's std of 1.70
+  ViT-H/14 minus ViT-L/16 (both JFT), row by row: ImageNet +0.79, ImageNet ReaL +0.18, CIFAR-10 +0.08, CIFAR-100 +0.65, Oxford-IIIT Pets +0.24, Oxford Flowers-102 -0.06, VTAB (19 tasks) +1.35
+  ViT-L/16 (I21k) against BiT-L on ImageNet: -2.24 points, for 0.23k against 9.9k core-days
+
+== 4. Table 2 versus Table 5: ImageNet with and without Polyak averaging and 512/518 px fine-tuning ==
+  ViT-H/14 (JFT)   Table 2: 88.55   Table 5 (384 px, no averaging): 88.04   difference +0.51
+  ViT-L/16 (JFT)   Table 2: 87.76   Table 5 (384 px, no averaging): 87.12   difference +0.64
+  ViT-L/16 (I21k)  Table 2: 85.30   Table 5 (384 px, no averaging): 85.15   difference +0.15
+
+== 5. Table 5: ImageNet top-1 after fine-tuning, by pre-training dataset (the numbers behind Figure 3) ==
+  pre-trained on ImageNet      ViT-B/16 77.91  ViT-B/32 73.38  ViT-L/16 76.53  ViT-L/32 71.16
+      best to worst: ViT-B/16 > ViT-L/16 > ViT-B/32 > ViT-L/32;   ViT-L/16 - ViT-B/16 = -1.38
+  pre-trained on ImageNet-21k  ViT-B/16 83.97  ViT-B/32 81.28  ViT-L/16 85.15  ViT-L/32 80.99  ViT-H/14 85.13
+      best to worst: ViT-L/16 > ViT-H/14 > ViT-B/16 > ViT-B/32 > ViT-L/32;   ViT-L/16 - ViT-B/16 = +1.18
+  pre-trained on JFT-300M      ViT-B/16 84.15  ViT-B/32 80.73  ViT-L/16 87.12  ViT-L/32 84.37  ViT-H/14 88.04
+      best to worst: ViT-H/14 > ViT-L/16 > ViT-L/32 > ViT-B/16 > ViT-B/32;   ViT-L/16 - ViT-B/16 = +2.97
+  ImageNet -> JFT-300M pre-training: ViT-B/16 gains +6.24 points, ViT-L/16 gains +10.59 points
+
+== 6. Table 9: the 19 VTAB-1k tasks, grouped as in Figure 2 ==
+  ViT-H/14 (JFT)   mean of 19 = 77.63 (table: 77.6)   Natural 86.7   Specialized 87.0   Structured 65.0   lowest task: sNORB-Azim 33.2
+  ViT-L/16 (JFT)   mean of 19 = 76.29 (table: 76.3)   Natural 85.6   Specialized 86.7   Structured 63.0   lowest task: sNORB-Azim 36.2
+  ViT-L/16 (I21k)  mean of 19 = 72.71 (table: 72.7)   Natural 83.3   Specialized 84.7   Structured 57.5   lowest task: sNORB-Azim 30.5
+  ViT-H/14 (JFT) minus ViT-L/16 (I21k), largest gaps: Clevr-Count +21.4, DMLab +11.2, sNORB-Elev +9.5, SVHN +8.0
+  ... smallest: Camelyon +0.8, Flowers102 +0.4, dSpr-Ori -1.6
+
+== 7. Table 7 (Appendix D.1): ResNets pre-trained on JFT with Adam or SGD, then fine-tuned ==
+                       R50 Adam   R50 SGD  Adam-SGD  R152x2 Adam  R152x2 SGD  Adam-SGD
+  ImageNet                77.54     78.24     -0.70        84.97       84.37     +0.60
+  CIFAR10                 97.67     97.46     +0.21        99.06       99.07     -0.01
+  CIFAR100                86.07     85.17     +0.90        92.05       91.06     +0.99
+  Oxford-IIIT Pets        91.11     91.00     +0.11        95.37       94.79     +0.58
+  Oxford Flowers-102      94.26     92.06     +2.20        98.62       99.32     -0.70
+  average (ours)          89.33     88.79     +0.54        94.01       93.72     +0.29
+  average (table)         89.33     88.79                  94.01       93.72
+  Adam is higher in 7 of 10 dataset-model pairs
+
+== 8. ObjectNet (Appendix D.9) ==
+  ViT-H/14: ObjectNet top-1 61.7%, top-5 82.1%;  ImageNet top-1 (Table 2) 88.55%
+  drop from ImageNet to ObjectNet, top-1: 26.85 points
+  BiT-L (R152x4, JFT), the BiT paper, Table 6, resize and crop: ObjectNet top-1 58.7%, top-5 80.0%
+  ViT-H/14 minus BiT-L on ObjectNet: top-1 +3.0, top-5 +2.1 points
+  BiT paper, Table 6, top-1, BiT-S -> BiT-L: R50x1 30.8 -> 37.6 (+6.8), R152x4 36.0 -> 58.7 (+22.7)

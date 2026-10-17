@@ -1,0 +1,10 @@
+== Section 4.3 in miniature: CIFAR-10 from scratch, same recipe for both models and every data size ==
+  ViT    (4x4 patches -> 64 tokens + [class], D 128, 6 layers, 4 heads, MLP 512): 1.21M parameters, 77M multiply-adds per image
+  ResNet (ResNet-18 layout, widths 24-48-96-192, BatchNorm):                     1.58M parameters, 79M multiply-adds per image
+  recipe: AdamW lr 0.001, warm-up 250 steps then cosine, weight decay 0.05, batch 128, 2500 steps, crop + flip;
+          validation on 5,000 CIFAR-10 test images every 250 steps, best value kept (early stopping)
+    images  per class  epochs   ViT best  ResNet best  ResNet - ViT
+     1,000        100     320      39.0%        54.6%        +15.5
+     5,000        500      64      57.4%        76.5%        +19.1
+    50,000      5,000       6      63.8%        84.2%        +20.5
+  going from 1,000 to 50,000 images: ViT 39.0% -> 63.8% (+24.7), ResNet 54.6% -> 84.2% (+29.7)
