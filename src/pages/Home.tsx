@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { projects, site } from '../data/site'
 import { books, papers, videos, writings } from '../lib/content'
-import { PaperCard } from '../components/PaperBits'
+import { PaperCard, ReaderPromo } from '../components/PaperBits'
 import topicGraph from '../data/graph.json'
 import { useTitle } from '../lib/hooks'
 import { BookCard, ProjectCard, VideoCard, WritingCard } from '../components/Cards'
@@ -68,6 +68,7 @@ export default function Home() {
             <h2>Research papers</h2>
             <Link to="/papers" className="more-link">All papers →</Link>
           </div>
+          {papers.find((p) => p.reader) && <ReaderPromo paper={papers.find((p) => p.reader)!} />}
           <div className="paper-list">{papers.slice(0, 2).map((p) => <PaperCard key={p.slug} paper={p} />)}</div>
         </section>
       )}

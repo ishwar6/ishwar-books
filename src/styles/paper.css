@@ -182,3 +182,53 @@
 .paper-theme .prose > h2:first-child { border-top: 0; padding-top: 0; }
 .paper-links a.paper-read { background: var(--paper); border-color: var(--paper); color: #0d1512; }
 .paper-links a.paper-read:hover { filter: brightness(1.08); }
+
+/* ---------- side-by-side reader: badge, buttons and the banner (home, papers list, paper overview) ---------- */
+.btn.reader-btn { background: var(--paper); border-color: var(--paper); color: #0d1512; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; }
+.btn.reader-btn:hover { filter: brightness(1.08); border-color: var(--paper); }
+.btn.reader-btn.big { padding: 12px 20px; font-size: 15.5px; }
+.paper-card-actions { display: inline-flex; flex-wrap: wrap; gap: 10px; }
+.reader-badge {
+  display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; width: fit-content;
+  padding: 3px 10px; border-radius: 999px; font-size: 12.5px; font-weight: 700; letter-spacing: 0.02em;
+  color: var(--paper-ink); background: var(--paper-soft); border: 1px solid var(--paper-line);
+}
+.reader-badge svg { width: 14px; height: 14px; }
+
+.reader-promo {
+  display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 32px; align-items: center;
+  margin: 0 0 26px; padding: 26px 30px; border-radius: 18px; border: 1px solid var(--paper-line);
+  background: radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--paper) 16%, transparent), transparent 60%), var(--bg-soft);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--paper) 10%, transparent), 0 18px 50px -28px color-mix(in srgb, var(--paper) 55%, transparent);
+}
+.reader-promo.compact { margin: 22px 0 0; padding: 20px 24px; grid-template-columns: minmax(0, 220px) minmax(0, 1fr); gap: 24px; }
+.rp-kicker { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--paper-ink); }
+.rp-text h2 { margin: 8px 0 8px; font-family: var(--serif); font-size: clamp(22px, 2.6vw, 30px); line-height: 1.2; color: var(--text-strong); }
+.reader-promo.compact .rp-text h2 { font-size: 22px; }
+.rp-text p { margin: 0 0 16px; color: var(--muted); font-size: 16px; line-height: 1.6; max-width: 640px; }
+
+/* the small moving picture: a page with two highlighted passages, and two notes; the active pair changes */
+.rp-art { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; aspect-ratio: 4 / 3; }
+.rp-sheet { position: relative; background: #f7f7f4; border-radius: 6px; padding: 14% 12% 10% 16%; display: flex; flex-direction: column; gap: 7%; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35); }
+.rp-sheet i { display: block; height: 5%; min-height: 4px; border-radius: 2px; background: #c9cbd1; }
+.rp-sheet i:nth-child(4n) { width: 70%; }
+.rp-sheet i.hl { background: #f4c84a; }
+.rp-dot { position: absolute; left: 3%; width: 14px; height: 14px; border-radius: 50%; display: grid; place-items: center; font-size: 9px; font-style: normal; color: #fff; background: #33998a; }
+.rp-dot.a { top: 22%; } .rp-dot.b { top: 56%; }
+.rp-notes { display: flex; flex-direction: column; gap: 8%; justify-content: center; }
+.rp-card { position: relative; border-radius: 8px; padding: 12% 10% 10% 10%; background: var(--surface); border: 1.5px solid var(--border); display: flex; flex-direction: column; gap: 9px; }
+.rp-card span { position: absolute; top: -8px; left: 8px; width: 16px; height: 16px; border-radius: 50%; font-size: 10px; font-weight: 800; display: grid; place-items: center; background: var(--paper); color: #0d1512; }
+.rp-card i { display: block; height: 4px; border-radius: 2px; background: var(--border); }
+.rp-card i:last-child { width: 60%; }
+.rp-sheet i.hl, .rp-card { transition: box-shadow 0.4s, border-color 0.4s; }
+.reader-promo .a { animation: rp-on 6s infinite; }
+.reader-promo .b { animation: rp-on 6s infinite 3s; }
+@keyframes rp-on {
+  0%, 45% { box-shadow: 0 0 0 2px var(--paper); border-color: var(--paper); }
+  55%, 100% { box-shadow: none; }
+}
+@media (prefers-reduced-motion: reduce) { .reader-promo .a, .reader-promo .b { animation: none; } .reader-promo .a { box-shadow: 0 0 0 2px var(--paper); } }
+@media (max-width: 720px) {
+  .reader-promo, .reader-promo.compact { grid-template-columns: minmax(0, 1fr); padding: 20px; gap: 18px; }
+  .rp-art { max-width: 260px; }
+}

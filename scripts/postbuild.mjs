@@ -109,7 +109,7 @@ for (const w of manifest.writings) {
 
 pages.push({
   route: 'papers', title: `Research papers · ${site.name}`,
-  description: 'Landmark research papers read slowly, section by section: highlighted excerpts of the paper, plain-English explanations, definitions, figures and code you can run.',
+  description: 'Landmark research papers read slowly, section by section: highlighted excerpts of the paper, clear explanations, definitions, figures, code you can run, and a reader that shows the paper and its explanation side by side.',
   image: ogImage('papers'), type: 'website',
   ld: [{ '@type': 'CollectionPage', name: 'Research papers', url: url('papers'), isPartOf: { '@id': website['@id'] } }, crumbs([['Home', ''], ['Research papers', 'papers']])],
   body: `<h1>Research papers</h1>${list(papers.map((p) => [`${BASE}${p.route}/`, `${p.short}, explained`, p.description]))}`,

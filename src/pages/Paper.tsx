@@ -2,7 +2,7 @@ import { Link, useParams } from 'react-router-dom'
 import { papers } from '../lib/content'
 import { useTitle } from '../lib/hooks'
 import Article from '../components/Article'
-import { PaperSheet, PartNav, accentStyle } from '../components/PaperBits'
+import { PaperSheet, PartNav, ReaderPromo, accentStyle } from '../components/PaperBits'
 import { Chevron } from '../components/icons'
 import NotFound from './NotFound'
 
@@ -25,6 +25,7 @@ export default function Paper() {
             <h1>{paper.short}, explained</h1>
             <p className="lede">{paper.description}</p>
             <PaperSheet paper={paper} />
+            {paper.reader && <ReaderPromo paper={paper} compact />}
           </header>
         }
         footer={
