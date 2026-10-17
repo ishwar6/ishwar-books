@@ -1,0 +1,66 @@
+[
+ {
+  "slug": "cats",
+  "name": "Two cats",
+  "coco": 39769,
+  "licence": "CC BY-SA 2.0",
+  "licence_url": "https://creativecommons.org/licenses/by-sa/2.0/",
+  "flickr": "https://www.flickr.com/photo.gne?id=210383891"
+ },
+ {
+  "slug": "zebra",
+  "name": "Zebra",
+  "coco": 552902,
+  "licence": "CC BY 2.0",
+  "licence_url": "https://creativecommons.org/licenses/by/2.0/",
+  "flickr": "https://www.flickr.com/photo.gne?id=8603855827"
+ },
+ {
+  "slug": "dog",
+  "name": "Small dog",
+  "coco": 309938,
+  "licence": "CC BY-SA 2.0",
+  "licence_url": "https://creativecommons.org/licenses/by-sa/2.0/",
+  "flickr": "https://www.flickr.com/photo.gne?id=3742502573"
+ },
+ {
+  "slug": "bird",
+  "name": "Bird on a branch",
+  "coco": 56545,
+  "licence": "CC BY 2.0",
+  "licence_url": "https://creativecommons.org/licenses/by/2.0/",
+  "flickr": "https://www.flickr.com/photo.gne?id=9470927378"
+ },
+ {
+  "slug": "polar-bear",
+  "name": "Polar bear and heron",
+  "coco": 572517,
+  "licence": "CC BY 2.0",
+  "licence_url": "https://creativecommons.org/licenses/by/2.0/",
+  "flickr": "https://www.flickr.com/photo.gne?id=8754578923"
+ },
+ {
+  "slug": "teddy",
+  "name": "Two teddy bears",
+  "coco": 73118,
+  "licence": "CC BY 2.0",
+  "licence_url": "https://creativecommons.org/licenses/by/2.0/",
+  "flickr": "https://www.flickr.com/photo.gne?id=8017027419"
+ },
+ {
+  "slug": "bananas",
+  "name": "Bananas",
+  "coco": 28809,
+  "licence": "CC BY-SA 2.0",
+  "licence_url": "https://creativecommons.org/licenses/by-sa/2.0/",
+  "flickr": "https://www.flickr.com/photo.gne?id=4444464874"
+ },
+ {
+  "slug": "giraffes",
+  "name": "Giraffes",
+  "coco": 205282,
+  "licence": "CC BY-SA 2.0",
+  "licence_url": "https://creativecommons.org/licenses/by-sa/2.0/",
+  "flickr": "https://www.flickr.com/photo.gne?id=8892272617"
+ }
+]

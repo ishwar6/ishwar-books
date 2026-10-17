@@ -1,0 +1,4 @@
+{
+  "title": "Vision Transformer, step by step",
+  "description": "Pick a picture or use your own photo, and follow a real ViT from pixels to a class: the patches, the embeddings, the position embeddings, every attention map and the answer."
+}

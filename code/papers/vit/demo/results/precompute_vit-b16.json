@@ -1,0 +1,890 @@
+{
+ "cats": {
+  "top5": [
+   [
+    285,
+    "Egyptian cat",
+    0.9374
+   ],
+   [
+    281,
+    "tabby, tabby cat",
+    0.0384
+   ],
+   [
+    282,
+    "tiger cat",
+    0.0144
+   ],
+   [
+    287,
+    "lynx, catamount",
+    0.0033
+   ],
+   [
+    284,
+    "Siamese cat, Siamese",
+    0.0007
+   ]
+  ],
+  "shuffled": [
+   [
+    692,
+    "packet",
+    0.2225
+   ],
+   [
+    285,
+    "Egyptian cat",
+    0.0977
+   ],
+   [
+    611,
+    "jigsaw puzzle",
+    0.0814
+   ],
+   [
+    549,
+    "envelope",
+    0.0493
+   ],
+   [
+    568,
+    "fur coat",
+    0.0436
+   ]
+  ],
+  "nopos": [
+   [
+    929,
+    "ice lolly, lolly, lollipop, popsicle",
+    0.158
+   ],
+   [
+    285,
+    "Egyptian cat",
+    0.1021
+   ],
+   [
+    281,
+    "tabby, tabby cat",
+    0.0985
+   ],
+   [
+    910,
+    "wooden spoon",
+    0.0571
+   ],
+   [
+    813,
+    "spatula",
+    0.0517
+   ]
+  ],
+  "nopos_shuffled": [
+   [
+    929,
+    "ice lolly, lolly, lollipop, popsicle",
+    0.158
+   ],
+   [
+    285,
+    "Egyptian cat",
+    0.1021
+   ],
+   [
+    281,
+    "tabby, tabby cat",
+    0.0985
+   ],
+   [
+    910,
+    "wooden spoon",
+    0.0571
+   ],
+   [
+    813,
+    "spatula",
+    0.0517
+   ]
+  ],
+  "nopos_shuffle_max_abs_diff": 8.106231689453125e-06
+ },
+ "zebra": {
+  "top5": [
+   [
+    340,
+    "zebra",
+    0.9976
+   ],
+   [
+    353,
+    "gazelle",
+    0.0004
+   ],
+   [
+    9,
+    "ostrich, Struthio camelus",
+    0.0003
+   ],
+   [
+    352,
+    "impala, Aepyceros melampus",
+    0.0002
+   ],
+   [
+    386,
+    "African elephant, Loxodonta africana",
+    0.0002
+   ]
+  ],
+  "shuffled": [
+   [
+    340,
+    "zebra",
+    0.9937
+   ],
+   [
+    353,
+    "gazelle",
+    0.0014
+   ],
+   [
+    386,
+    "African elephant, Loxodonta africana",
+    0.0007
+   ],
+   [
+    9,
+    "ostrich, Struthio camelus",
+    0.0007
+   ],
+   [
+    352,
+    "impala, Aepyceros melampus",
+    0.0005
+   ]
+  ],
+  "nopos": [
+   [
+    340,
+    "zebra",
+    0.9885
+   ],
+   [
+    353,
+    "gazelle",
+    0.0019
+   ],
+   [
+    386,
+    "African elephant, Loxodonta africana",
+    0.0011
+   ],
+   [
+    646,
+    "maze, labyrinth",
+    0.0009
+   ],
+   [
+    352,
+    "impala, Aepyceros melampus",
+    0.0008
+   ]
+  ],
+  "nopos_shuffled": [
+   [
+    340,
+    "zebra",
+    0.9885
+   ],
+   [
+    353,
+    "gazelle",
+    0.0019
+   ],
+   [
+    386,
+    "African elephant, Loxodonta africana",
+    0.0011
+   ],
+   [
+    646,
+    "maze, labyrinth",
+    0.0009
+   ],
+   [
+    352,
+    "impala, Aepyceros melampus",
+    0.0008
+   ]
+  ],
+  "nopos_shuffle_max_abs_diff": 3.0994415283203125e-06
+ },
+ "dog": {
+  "top5": [
+   [
+    259,
+    "Pomeranian",
+    0.9949
+   ],
+   [
+    151,
+    "Chihuahua",
+    0.0011
+   ],
+   [
+    154,
+    "Pekinese, Pekingese, Peke",
+    0.0008
+   ],
+   [
+    368,
+    "gibbon, Hylobates lar",
+    0.0003
+   ],
+   [
+    260,
+    "chow, chow chow",
+    0.0003
+   ]
+  ],
+  "shuffled": [
+   [
+    259,
+    "Pomeranian",
+    0.5011
+   ],
+   [
+    400,
+    "academic gown, academic robe, judge's robe",
+    0.2192
+   ],
+   [
+    667,
+    "mortarboard",
+    0.1577
+   ],
+   [
+    151,
+    "Chihuahua",
+    0.0086
+   ],
+   [
+    260,
+    "chow, chow chow",
+    0.0079
+   ]
+  ],
+  "nopos": [
+   [
+    696,
+    "paintbrush",
+    0.5319
+   ],
+   [
+    794,
+    "shower curtain",
+    0.0514
+   ],
+   [
+    750,
+    "quilt, comforter, comfort, puff",
+    0.0216
+   ],
+   [
+    854,
+    "theater curtain, theatre curtain",
+    0.0205
+   ],
+   [
+    611,
+    "jigsaw puzzle",
+    0.0186
+   ]
+  ],
+  "nopos_shuffled": [
+   [
+    696,
+    "paintbrush",
+    0.5319
+   ],
+   [
+    794,
+    "shower curtain",
+    0.0514
+   ],
+   [
+    750,
+    "quilt, comforter, comfort, puff",
+    0.0216
+   ],
+   [
+    854,
+    "theater curtain, theatre curtain",
+    0.0205
+   ],
+   [
+    611,
+    "jigsaw puzzle",
+    0.0186
+   ]
+  ],
+  "nopos_shuffle_max_abs_diff": 7.62939453125e-06
+ },
+ "bird": {
+  "top5": [
+   [
+    16,
+    "bulbul",
+    0.992
+   ],
+   [
+    85,
+    "quail",
+    0.0012
+   ],
+   [
+    10,
+    "brambling, Fringilla montifringilla",
+    0.0006
+   ],
+   [
+    20,
+    "water ouzel, dipper",
+    0.0006
+   ],
+   [
+    18,
+    "magpie",
+    0.0005
+   ]
+  ],
+  "shuffled": [
+   [
+    94,
+    "hummingbird",
+    0.3062
+   ],
+   [
+    12,
+    "house finch, linnet, Carpodacus mexicanus",
+    0.039
+   ],
+   [
+    16,
+    "bulbul",
+    0.0303
+   ],
+   [
+    19,
+    "chickadee",
+    0.0203
+   ],
+   [
+    489,
+    "chainlink fence",
+    0.0186
+   ]
+  ],
+  "nopos": [
+   [
+    611,
+    "jigsaw puzzle",
+    0.1043
+   ],
+   [
+    902,
+    "whistle",
+    0.0801
+   ],
+   [
+    772,
+    "safety pin",
+    0.0706
+   ],
+   [
+    398,
+    "abacus",
+    0.0508
+   ],
+   [
+    506,
+    "coil, spiral, volute, whorl, helix",
+    0.0508
+   ]
+  ],
+  "nopos_shuffled": [
+   [
+    611,
+    "jigsaw puzzle",
+    0.1043
+   ],
+   [
+    902,
+    "whistle",
+    0.0801
+   ],
+   [
+    772,
+    "safety pin",
+    0.0706
+   ],
+   [
+    398,
+    "abacus",
+    0.0508
+   ],
+   [
+    506,
+    "coil, spiral, volute, whorl, helix",
+    0.0508
+   ]
+  ],
+  "nopos_shuffle_max_abs_diff": 1.0013580322265625e-05
+ },
+ "polar-bear": {
+  "top5": [
+   [
+    296,
+    "ice bear, polar bear, Ursus Maritimus, Thalarctos maritimus",
+    0.9976
+   ],
+   [
+    270,
+    "white wolf, Arctic wolf, Canis lupus tundrarum",
+    0.0005
+   ],
+   [
+    294,
+    "brown bear, bruin, Ursus arctos",
+    0.0003
+   ],
+   [
+    279,
+    "Arctic fox, white fox, Alopex lagopus",
+    0.0002
+   ],
+   [
+    295,
+    "American black bear, black bear, Ursus americanus, Euarctos americanus",
+    0.0002
+   ]
+  ],
+  "shuffled": [
+   [
+    296,
+    "ice bear, polar bear, Ursus Maritimus, Thalarctos maritimus",
+    0.9822
+   ],
+   [
+    279,
+    "Arctic fox, white fox, Alopex lagopus",
+    0.0045
+   ],
+   [
+    270,
+    "white wolf, Arctic wolf, Canis lupus tundrarum",
+    0.0022
+   ],
+   [
+    294,
+    "brown bear, bruin, Ursus arctos",
+    0.0017
+   ],
+   [
+    222,
+    "kuvasz",
+    0.0013
+   ]
+  ],
+  "nopos": [
+   [
+    134,
+    "crane",
+    0.7589
+   ],
+   [
+    132,
+    "American egret, great white heron, Egretta albus",
+    0.1774
+   ],
+   [
+    129,
+    "spoonbill",
+    0.0217
+   ],
+   [
+    131,
+    "little blue heron, Egretta caerulea",
+    0.005
+   ],
+   [
+    130,
+    "flamingo",
+    0.0036
+   ]
+  ],
+  "nopos_shuffled": [
+   [
+    134,
+    "crane",
+    0.7589
+   ],
+   [
+    132,
+    "American egret, great white heron, Egretta albus",
+    0.1774
+   ],
+   [
+    129,
+    "spoonbill",
+    0.0217
+   ],
+   [
+    131,
+    "little blue heron, Egretta caerulea",
+    0.005
+   ],
+   [
+    130,
+    "flamingo",
+    0.0036
+   ]
+  ],
+  "nopos_shuffle_max_abs_diff": 1.33514404296875e-05
+ },
+ "teddy": {
+  "top5": [
+   [
+    850,
+    "teddy, teddy bear",
+    0.9802
+   ],
+   [
+    865,
+    "toyshop",
+    0.0053
+   ],
+   [
+    999,
+    "toilet tissue, toilet paper, bathroom tissue",
+    0.0038
+   ],
+   [
+    719,
+    "piggy bank, penny bank",
+    0.0006
+   ],
+   [
+    861,
+    "toilet seat",
+    0.0006
+   ]
+  ],
+  "shuffled": [
+   [
+    961,
+    "dough",
+    0.4052
+   ],
+   [
+    415,
+    "bakery, bakeshop, bakehouse",
+    0.0959
+   ],
+   [
+    932,
+    "pretzel",
+    0.0432
+   ],
+   [
+    509,
+    "confectionery, confectionary, candy store",
+    0.0321
+   ],
+   [
+    929,
+    "ice lolly, lolly, lollipop, popsicle",
+    0.0256
+   ]
+  ],
+  "nopos": [
+   [
+    619,
+    "lampshade, lamp shade",
+    0.2562
+   ],
+   [
+    470,
+    "candle, taper, wax light",
+    0.1285
+   ],
+   [
+    611,
+    "jigsaw puzzle",
+    0.0394
+   ],
+   [
+    599,
+    "honeycomb",
+    0.0303
+   ],
+   [
+    794,
+    "shower curtain",
+    0.0259
+   ]
+  ],
+  "nopos_shuffled": [
+   [
+    619,
+    "lampshade, lamp shade",
+    0.2562
+   ],
+   [
+    470,
+    "candle, taper, wax light",
+    0.1285
+   ],
+   [
+    611,
+    "jigsaw puzzle",
+    0.0394
+   ],
+   [
+    599,
+    "honeycomb",
+    0.0303
+   ],
+   [
+    794,
+    "shower curtain",
+    0.0259
+   ]
+  ],
+  "nopos_shuffle_max_abs_diff": 8.106231689453125e-06
+ },
+ "bananas": {
+  "top5": [
+   [
+    954,
+    "banana",
+    0.9796
+   ],
+   [
+    950,
+    "orange",
+    0.0036
+   ],
+   [
+    953,
+    "pineapple, ananas",
+    0.0029
+   ],
+   [
+    951,
+    "lemon",
+    0.0018
+   ],
+   [
+    114,
+    "slug",
+    0.0017
+   ]
+  ],
+  "shuffled": [
+   [
+    599,
+    "honeycomb",
+    0.7114
+   ],
+   [
+    506,
+    "coil, spiral, volute, whorl, helix",
+    0.1334
+   ],
+   [
+    490,
+    "chain mail, ring mail, mail, chain armor, chain armour, ring armor, ring armour",
+    0.0095
+   ],
+   [
+    616,
+    "knot",
+    0.0094
+   ],
+   [
+    644,
+    "matchstick",
+    0.0078
+   ]
+  ],
+  "nopos": [
+   [
+    502,
+    "clog, geta, patten, sabot",
+    0.4371
+   ],
+   [
+    788,
+    "shoe shop, shoe-shop, shoe store",
+    0.2413
+   ],
+   [
+    666,
+    "mortar",
+    0.0304
+   ],
+   [
+    514,
+    "cowboy boot",
+    0.0216
+   ],
+   [
+    883,
+    "vase",
+    0.0187
+   ]
+  ],
+  "nopos_shuffled": [
+   [
+    502,
+    "clog, geta, patten, sabot",
+    0.4371
+   ],
+   [
+    788,
+    "shoe shop, shoe-shop, shoe store",
+    0.2413
+   ],
+   [
+    666,
+    "mortar",
+    0.0304
+   ],
+   [
+    514,
+    "cowboy boot",
+    0.0216
+   ],
+   [
+    883,
+    "vase",
+    0.0187
+   ]
+  ],
+  "nopos_shuffle_max_abs_diff": 6.4373016357421875e-06
+ },
+ "giraffes": {
+  "top5": [
+   [
+    340,
+    "zebra",
+    0.4456
+   ],
+   [
+    352,
+    "impala, Aepyceros melampus",
+    0.0962
+   ],
+   [
+    353,
+    "gazelle",
+    0.0765
+   ],
+   [
+    293,
+    "cheetah, chetah, Acinonyx jubatus",
+    0.0568
+   ],
+   [
+    288,
+    "leopard, Panthera pardus",
+    0.0485
+   ]
+  ],
+  "shuffled": [
+   [
+    340,
+    "zebra",
+    0.3799
+   ],
+   [
+    353,
+    "gazelle",
+    0.196
+   ],
+   [
+    352,
+    "impala, Aepyceros melampus",
+    0.1072
+   ],
+   [
+    293,
+    "cheetah, chetah, Acinonyx jubatus",
+    0.0614
+   ],
+   [
+    288,
+    "leopard, Panthera pardus",
+    0.0317
+   ]
+  ],
+  "nopos": [
+   [
+    340,
+    "zebra",
+    0.4736
+   ],
+   [
+    352,
+    "impala, Aepyceros melampus",
+    0.1748
+   ],
+   [
+    353,
+    "gazelle",
+    0.0962
+   ],
+   [
+    288,
+    "leopard, Panthera pardus",
+    0.0726
+   ],
+   [
+    293,
+    "cheetah, chetah, Acinonyx jubatus",
+    0.0503
+   ]
+  ],
+  "nopos_shuffled": [
+   [
+    340,
+    "zebra",
+    0.4736
+   ],
+   [
+    352,
+    "impala, Aepyceros melampus",
+    0.1748
+   ],
+   [
+    353,
+    "gazelle",
+    0.0962
+   ],
+   [
+    288,
+    "leopard, Panthera pardus",
+    0.0726
+   ],
+   [
+    293,
+    "cheetah, chetah, Acinonyx jubatus",
+    0.0503
+   ]
+  ],
+  "nopos_shuffle_max_abs_diff": 2.384185791015625e-06
+ }
+}

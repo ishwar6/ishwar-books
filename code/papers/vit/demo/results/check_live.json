@@ -1,0 +1,113 @@
+{
+ "pictures": [
+  {
+   "picture": "cats",
+   "logit_max_abs_diff": 0.0028503909707069397,
+   "same_top1": true,
+   "same_top5": true,
+   "top1": "Egyptian cat",
+   "top1_prob": 0.2573840320110321,
+   "rollout_max_abs_diff": 2.594386055113085e-06,
+   "rollout_max": 0.007852886177603645,
+   "rollout_corr": 0.9999994012859756,
+   "distance_max_abs_diff_px": 0.009128466365723398
+  },
+  {
+   "picture": "zebra",
+   "logit_max_abs_diff": 0.0029900074005126953,
+   "same_top1": true,
+   "same_top5": true,
+   "top1": "zebra",
+   "top1_prob": 0.505987286567688,
+   "rollout_max_abs_diff": 4.061465239669354e-06,
+   "rollout_max": 0.008846810415723477,
+   "rollout_corr": 0.9999994254705081,
+   "distance_max_abs_diff_px": 0.010222847963149206
+  },
+  {
+   "picture": "dog",
+   "logit_max_abs_diff": 0.005001425743103027,
+   "same_top1": true,
+   "same_top5": true,
+   "top1": "Pomeranian",
+   "top1_prob": 0.28075480461120605,
+   "rollout_max_abs_diff": 5.149236258925917e-06,
+   "rollout_max": 0.007835135309350745,
+   "rollout_corr": 0.9999995853079925,
+   "distance_max_abs_diff_px": 0.009542381539731082
+  },
+  {
+   "picture": "bird",
+   "logit_max_abs_diff": 0.0035381317138671875,
+   "same_top1": true,
+   "same_top5": true,
+   "top1": "bulbul",
+   "top1_prob": 0.19949564337730408,
+   "rollout_max_abs_diff": 4.393133294056453e-06,
+   "rollout_max": 0.008918488413294779,
+   "rollout_corr": 0.9999995333639969,
+   "distance_max_abs_diff_px": 0.005947446944134072
+  },
+  {
+   "picture": "polar-bear",
+   "logit_max_abs_diff": 0.005464136600494385,
+   "same_top1": true,
+   "same_top5": true,
+   "top1": "ice bear",
+   "top1_prob": 0.21415960788726807,
+   "rollout_max_abs_diff": 3.6352284197641027e-06,
+   "rollout_max": 0.008490318775758779,
+   "rollout_corr": 0.9999994590817357,
+   "distance_max_abs_diff_px": 0.03539361831236931
+  },
+  {
+   "picture": "teddy",
+   "logit_max_abs_diff": 0.0028142929077148438,
+   "same_top1": true,
+   "same_top5": true,
+   "top1": "teddy",
+   "top1_prob": 0.20729154348373413,
+   "rollout_max_abs_diff": 3.182005959294701e-06,
+   "rollout_max": 0.007830916478278535,
+   "rollout_corr": 0.9999989184139798,
+   "distance_max_abs_diff_px": 0.02180532835488691
+  },
+  {
+   "picture": "bananas",
+   "logit_max_abs_diff": 0.0030312538146972656,
+   "same_top1": true,
+   "same_top5": true,
+   "top1": "banana",
+   "top1_prob": 0.23403911292552948,
+   "rollout_max_abs_diff": 2.7292283321361105e-06,
+   "rollout_max": 0.009355936275488714,
+   "rollout_corr": 0.9999996406222528,
+   "distance_max_abs_diff_px": 0.007988972668329097
+  },
+  {
+   "picture": "giraffes",
+   "logit_max_abs_diff": 0.002190232276916504,
+   "same_top1": true,
+   "same_top5": true,
+   "top1": "leopard",
+   "top1_prob": 0.15200847387313843,
+   "rollout_max_abs_diff": 3.647606789488299e-06,
+   "rollout_max": 0.009285910596207625,
+   "rollout_corr": 0.9999994938405617,
+   "distance_max_abs_diff_px": 0.028632405335301314
+  }
+ ],
+ "timing": {
+  "download": 1889.2999999523163,
+  "session": 2453.399999976158,
+  "bytes": 11572760,
+  "openedToReady": 5770
+ },
+ "click_to_first_live_ms": 6032,
+ "max_logit_diff": 0.005464136600494385,
+ "top1": 8,
+ "top5": 8,
+ "n": 8,
+ "max_rollout_diff": 5.149236258925917e-06,
+ "max_distance_diff": 0.03539361831236931
+}

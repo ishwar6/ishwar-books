@@ -13,6 +13,9 @@ This series reads the paper slowly, in the paper's own order. Each piece shows t
 
 The small `Paper §1` tag above each heading tells you which section of the paper you are reading. The screenshots come from the paper's second arXiv version (3 June 2021), the one most people read today. We run every experiment on the model weights Google released, through the Hugging Face `transformers` library, on one ordinary computer, an Apple M5 Pro (64 GB).
 
+> [!TIP] Try it
+> [Vision Transformer, step by step](/papers/vit/demo): pick a picture or your own photo, and watch a real ViT turn it into a class, one step at a time.
+
 > [!DEFINITION] Definition boxes
 > A yellow box like this explains one technical word, the first time it appears. If you already know the word, skip the box.
 
