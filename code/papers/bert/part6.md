@@ -13,14 +13,16 @@ After that, this part steps outside the paper. It answers three questions: what 
 
 ## The conclusion {§6}
 
-> [!PAPER] · Section 6 (Conclusion) · page 9
+> [!PAPER] · §6
 > [![The conclusion of the BERT paper: rich, unsupervised pre-training is an integral part of many language understanding systems; these results enable even low-resource tasks to benefit from deep unidirectional architectures; our major contribution is further generalizing these findings to deep bidirectional architectures, allowing the same pre-trained model to successfully tackle a broad set of NLP tasks](/img/papers/bert/p6-conclusion.png)](/img/papers/bert/p6-conclusion.png)
->
-> **Context:** Section 6, the whole conclusion. It is one paragraph of three sentences, right after the ablation studies of Section 5.
 >
 > **What it says:** earlier work showed that "rich, unsupervised pre-training is an integral part of many language understanding systems", and that it lets "even low-resource tasks" benefit from "deep unidirectional architectures". BERT's "major contribution is further generalizing these findings to deep *bidirectional* architectures", so "the same pre-trained model" can handle "a broad set of NLP tasks".
 >
-> **Why it matters:** the authors describe their own contribution modestly. They did not invent pre-training or fine-tuning. They made it work with a model that looks both ways.
+> **What it means:**
+>
+> The authors describe their own contribution modestly. They did not invent pre-training or fine-tuning; GPT and others had already shown that both work. Their claim is narrower: they made the recipe work with a model that looks both ways, in every layer.
+>
+> Think of a recipe that cooks already knew was good, and one cook who changed a single ingredient. The conclusion names that ingredient: bidirectionality.
 
 Three phrases need unpacking.
 
@@ -64,11 +66,13 @@ The follow-up models changed BERT in four different directions.
 > [!PAPER] Liu et al. (2019), RoBERTa · Abstract
 > [![The RoBERTa abstract: a replication study of BERT pretraining that measures the impact of key hyperparameters and training data size; we find that BERT was significantly undertrained, and can match or exceed the performance of every model published after it](/img/papers/bert/p6-roberta.png)](/img/papers/bert/p6-roberta.png)
 >
-> **Context:** the first big follow-up from another lab (Facebook AI), nine months after BERT.
->
 > **What it says:** "We find that BERT was significantly undertrained, and can match or exceed the performance of every model published after it."
 >
-> **Why it matters:** the architecture was fine; the training recipe had room to grow. This is why later "BERT-style" models usually mean RoBERTa-style training.
+> **What it means:**
+>
+> "Undertrained" means the model could have learned more, but training stopped too early. It is like judging a runner after only half of the training plan. The architecture was fine; the training recipe had room to grow.
+>
+> RoBERTa came from another lab (Facebook AI), nine months after BERT. With the same architecture and better training, it matched or beat every model published after BERT. This is why later "BERT-style" models usually mean RoBERTa-style training.
 
 > [!DEFINITION] Dynamic masking
 > Choosing new positions to mask every time a sentence is shown to the model. The original BERT pipeline chose the masked positions once, when the training data was prepared (RoBERTa calls this "static" masking). RoBERTa notes that BERT's data was duplicated 10 times "so that each sequence is masked in 10 different ways over the 40 epochs of training", so each fixed mask was still seen several times.
@@ -84,11 +88,13 @@ The NSP result is interesting, because it seems to contradict BERT's own Table 5
 > [!PAPER] Lan et al. (2019), ALBERT · Abstract
 > [![The ALBERT abstract: two parameter-reduction techniques to lower memory consumption and increase the training speed of BERT, and a self-supervised loss that focuses on modeling inter-sentence coherence](/img/papers/bert/p6-albert.png)](/img/papers/bert/p6-albert.png)
 >
-> **Context:** a Google follow-up aimed at size.
->
 > **What it says:** "two parameter-reduction techniques to lower memory consumption and increase the training speed of BERT", plus "a self-supervised loss that focuses on modeling inter-sentence coherence".
 >
-> **Why it matters:** the second half replaces NSP, the part of BERT that later work found weakest.
+> **What it means:**
+>
+> ALBERT is a Google follow-up aimed at size. The first half of the sentence is about memory and speed: the two techniques, listed below, make the model much smaller.
+>
+> The second half is about a pre-training task. The new loss on "inter-sentence coherence" replaces NSP, the part of BERT that later work found weakest.
 
 - **factorized embedding parameterization**: the big vocabulary table is split into two small matrices, so its size no longer grows with the hidden size;
 - **cross-layer parameter sharing**: all layers share the same weights, so the size no longer grows with the depth.
@@ -103,11 +109,13 @@ ALBERT also replaces NSP with **sentence-order prediction (SOP)**, a task about 
 > [!PAPER] Sanh et al. (2019), DistilBERT · Abstract
 > [![The DistilBERT abstract: knowledge distillation during the pre-training phase reduces the size of a BERT model by 40 percent while retaining 97 percent of its language understanding capabilities and being 60 percent faster](/img/papers/bert/p6-distilbert.png)](/img/papers/bert/p6-distilbert.png)
 >
-> **Context:** a Hugging Face follow-up aimed at speed.
->
 > **What it says:** "knowledge distillation during the pre-training phase" makes it possible "to reduce the size of a BERT model by 40%, while retaining 97% of its language understanding capabilities and being 60% faster".
 >
-> **Why it matters:** a much cheaper model to run, for a small loss in quality. Below we check the size claim and show what distillation trains on.
+> **What it means:**
+>
+> DistilBERT is a Hugging Face follow-up aimed at speed. Think of a student who learns from a teacher's full notes, not only from the answer key. The small model learns to copy the big one during pre-training.
+>
+> The result is a much cheaper model to run, for a small loss in quality: 40% smaller, 60% faster, and 97% of the language understanding. Below we check the size claim and show what distillation trains on.
 
 The distillation loss, for one masked position, compares the student's probabilities $$s$$ with the teacher's $$t$$ over the vocabulary:
 
@@ -141,22 +149,26 @@ The masked LM has two weak spots, and two papers named them directly. We measure
 > [!PAPER] Yang et al. (2019), XLNet · Abstract
 > [![The XLNet abstract: relying on corrupting the input with masks, BERT neglects dependency between the masked positions and suffers from a pretrain-finetune discrepancy; XLNet is a generalized autoregressive pretraining method that maximizes the expected likelihood over all permutations of the factorization order](/img/papers/bert/p6-xlnet.png)](/img/papers/bert/p6-xlnet.png)
 >
-> **Context:** a CMU and Google follow-up that names two of BERT's weaknesses.
->
 > **What it says:** BERT "neglects dependency between the masked positions and suffers from a pretrain-finetune discrepancy". XLNet instead maximises the likelihood "over all permutations of the factorization order".
 >
-> **Why it matters:** these are Limits 2 and 4 below, measured on the real model.
+> **What it means:**
+>
+> XLNet, from CMU and Google, names two of BERT's weaknesses in one sentence. "Neglects dependency between the masked positions" means that BERT fills two blanks without knowing what it put in the other. "Pretrain-finetune discrepancy" means that `[MASK]` appears in training but never in real use.
+>
+> These are Limits 2 and 4 below, measured on the real model. XLNet's own fix is to predict the words in many random orders, so it never needs `[MASK]`.
 
 **ELECTRA** (Clark et al., March 2020) points at a different cost: BERT only learns from the masked tokens. ELECTRA replaces some tokens with "plausible alternatives sampled from a small generator network", then trains the main model to say, for every token, whether it was replaced. This is "more efficient than MLM because the task is defined over all input tokens rather than just the small subset that was masked out". Its abstract gives an example: "we train a model on one GPU for 4 days that outperforms GPT (trained using 30x more compute) on the GLUE natural language understanding benchmark".
 
 > [!PAPER] Clark et al. (2020), ELECTRA · Abstract
 > [![The ELECTRA abstract: replaced token detection; instead of masking, corrupt the input by replacing some tokens with plausible alternatives from a small generator network, then train a discriminator that predicts whether each token was replaced; more efficient than MLM because the task is defined over all input tokens rather than just the small subset that was masked out](/img/papers/bert/p6-electra.png)](/img/papers/bert/p6-electra.png)
 >
-> **Context:** a Stanford and Google follow-up aimed at training efficiency.
->
 > **What it says:** "replaced token detection": a small generator fills some positions with plausible words, and the main model judges every token, original or replaced. This is efficient "because the task is defined over all input tokens rather than just the small subset that was masked out".
 >
-> **Why it matters:** it attacks Limit 3 head on: every position gives a training signal.
+> **What it means:**
+>
+> Think of two kinds of reading test. In BERT's test, a few words of a page are blacked out, and the model must guess them. In ELECTRA's test, a few words were quietly swapped, and the main model must check every word.
+>
+> So every position gives a training signal, not only the 15% that were masked. ELECTRA, from Stanford and Google, attacks Limit 3 head on.
 
 {{FIG:p6_electra|ELECTRA in three steps. Mask a few tokens; a small generator fills them ("chef" guessed right, "soup" plausible but wrong); the main model labels every token as original or replaced. BERT learns from 2 of these 5 positions, ELECTRA's main model from all 5.}}
 
@@ -169,11 +181,13 @@ The masked LM has two weak spots, and two papers named them directly. We measure
 > [!PAPER] Reimers and Gurevych (2019), Sentence-BERT · Abstract
 > [![The Sentence-BERT abstract: finding the most similar pair in 10,000 sentences requires about 50 million inference computations, about 65 hours, with BERT; SBERT uses siamese and triplet networks to derive semantically meaningful sentence embeddings that can be compared using cosine-similarity, reducing this to about 5 seconds](/img/papers/bert/p6-sbert.png)](/img/papers/bert/p6-sbert.png)
 >
-> **Context:** the paper that made BERT useful for search and similarity.
->
 > **What it says:** with BERT reading every pair together, finding the most similar pair among 10,000 sentences "requires about 50 million inference computations (~65 hours)". SBERT produces "semantically meaningful sentence embeddings that can be compared using cosine-similarity", which cuts this "to about 5 seconds".
 >
-> **Why it matters:** 50 million is the number of pairs: $$10{,}000 \times 9{,}999 / 2 \approx 5 \times 10^7$$. One vector per sentence turns that into 10,000 BERT runs plus cheap cosine comparisons.
+> **What it means:**
+>
+> Where does 50 million come from? It is the number of pairs: $$10{,}000 \times 9{,}999 / 2 \approx 5 \times 10^7$$. If BERT must read each pair together, that is 50 million BERT runs.
+>
+> Sentence-BERT gives each sentence its own vector instead. That turns the job into 10,000 BERT runs plus cheap cosine comparisons. This is what made BERT useful for search and similarity.
 
 {{FIG:p6_crossbi|Two ways to compare texts. Cross-encoder (BERT as in the paper): read the query and the passage together, one score per pair; accurate, but one BERT run for every pair. Bi-encoder (Sentence-BERT): one vector per text, compared by cosine; passage vectors can be computed once, ahead of time.}}
 
@@ -182,11 +196,13 @@ The masked LM has two weak spots, and two papers named them directly. We measure
 > [!PAPER] Warner et al. (2024), ModernBERT · Abstract
 > [![The ModernBERT abstract: encoder-only transformer models such as BERT are the workhorse of numerous production pipelines; ModernBERT is trained on 2 trillion tokens with a native 8192 sequence length](/img/papers/bert/p6-modernbert.png)](/img/papers/bert/p6-modernbert.png)
 >
-> **Context:** a 2024 encoder from Answer.AI, LightOn and others.
->
 > **What it says:** encoders like BERT are "the workhorse of numerous production pipelines". ModernBERT is "Trained on 2 trillion tokens with a native 8192 sequence length".
 >
-> **Why it matters:** six years later, the BERT design is still in production use, now with modern training and 16 times the context.
+> **What it means:**
+>
+> ModernBERT is a 2024 encoder from Answer.AI, LightOn and others. Six years after BERT, the same design is still in production use, now with modern training.
+>
+> The context length is the clearest change: 8,192 tokens against BERT's 512, which is 16 times more. Limit 1 below shows why that wall mattered.
 
 {{FIG:p6_family|Which follow-up attacks which weakness. 512-token wall: ModernBERT (8,192 tokens). [MASK] mismatch: XLNet, ELECTRA. Only 15% of tokens teach: ELECTRA. Blanks filled independently: XLNet. No sentence vector: Sentence-BERT. Too big or slow: ALBERT, DistilBERT. Undertrained recipe: RoBERTa, SpanBERT.}}
 
@@ -196,14 +212,16 @@ Every model has limits. Here are BERT's main ones. Where the paper itself mentio
 
 ### Limit 1: at most 512 tokens
 
-> [!PAPER] · Appendix A.2 · page 13
+> [!PAPER] · §A.2
 > [![Appendix A.2: longer sequences are disproportionately expensive because attention is quadratic to the sequence length. BERT is pre-trained with sequence length 128 for 90 percent of the steps, then 512 for the last 10 percent to learn the positional embeddings](/img/papers/bert/p6-length.png)](/img/papers/bert/p6-length.png)
->
-> **Context:** Appendix A.2, the pre-training procedure (covered in Part 3).
 >
 > **What it says:** "attention is quadratic to the sequence length", so long inputs are expensive. BERT trains on 128-token sequences for 90% of the steps and on 512-token sequences for the last 10%, "to learn the positional embeddings".
 >
-> **Why it matters:** BERT has learned position vectors for positions 0 to 511, and no more. 512 is a hard wall.
+> **What it means:**
+>
+> The position table is like a ruler with marks only up to 511. BERT learned one position vector for each mark, and none beyond it. So 512 tokens is a hard wall, not a soft limit.
+>
+> Why not train on long sequences all the time? Because attention is "quadratic", as the yellow box below explains. The authors saved compute with short sequences for 90% of the steps and long ones only at the end.
 
 > [!DEFINITION] Quadratic
 > Growing with the square. If attention compares every token with every token, then 2 times more tokens means 2 × 2 = 4 times more comparisons, and 4 times more tokens means 16 times more.
@@ -252,27 +270,31 @@ The price: a token in window 1 never sees a token in window 2. Facts that are fa
 
 ### Limit 2: `[MASK]` never appears after pre-training
 
-> [!PAPER] · Section 3.1 · page 4
+> [!PAPER] · §3.1
 > [![Section 3.1: a downside is that we are creating a mismatch between pre-training and fine-tuning, since the MASK token does not appear during fine-tuning](/img/papers/bert/p6-mismatch.png)](/img/papers/bert/p6-mismatch.png)
->
-> **Context:** Section 3.1, right after the masked LM is introduced (Part 3).
 >
 > **What it says:** "a downside is that we are creating a mismatch between pre-training and fine-tuning, since the [MASK] token does not appear during fine-tuning."
 >
-> **Why it matters:** the authors saw this limit themselves. Their fix, the 80/10/10 rule, softens it but does not remove it.
+> **What it means:**
+>
+> The authors saw this limit themselves. Think of a pilot who trained in a simulator with a warning light that the real plane does not have. Any habit tied to that light is useless in real flight.
+>
+> Their fix, the 80/10/10 rule of Part 3, softens the problem but does not remove it.
 
 During pre-training, BERT sees `[MASK]` in about 12% of positions (80% of the 15% chosen). In real use it never sees `[MASK]` at all. Part 3 explained the 80% / 10% / 10% trick that reduces the gap, and Part 5 (Table 8) measured how much it matters. XLNet named this the "pretrain-finetune discrepancy".
 
 ### Limit 3: only 15% of tokens teach the model
 
-> [!PAPER] · Appendix A.1 · page 12
+> [!PAPER] · §A.1
 > [![Appendix A.1: compared to standard language model training, the masked LM only makes predictions on 15 percent of tokens in each batch, which suggests that more pre-training steps may be required for the model to converge](/img/papers/bert/p6-fifteen.png)](/img/papers/bert/p6-fifteen.png)
->
-> **Context:** Appendix A.1, after the masking examples. The sentence continues on page 13 with "to converge".
 >
 > **What it says:** the masked LM "only make[s] predictions on 15% of tokens in each batch", so "more pre-training steps may be required".
 >
-> **Why it matters:** in a left-to-right model, every token is a prediction target. In BERT, 85% of the tokens give no training signal of their own.
+> **What it means:**
+>
+> In a left-to-right model, every token is a prediction target. In BERT, only the 15% chosen tokens are, so 85% of the tokens give no training signal of their own.
+>
+> Think of a quiz with 100 questions where only 15 are marked. You still learn, but you need more quizzes to learn the same amount. That is the "more pre-training steps" of the sentence.
 
 {{FIG:p6_signal|Where the learning signal comes from. In BERT's masked LM only the masked positions get a loss. In ELECTRA every position is checked as real or replaced (shown here as "fake"), so every token teaches the model something.}}
 
@@ -319,14 +341,16 @@ best pair by the chain rule:                                  "new york" 0.04154
 
 ### Limit 5: no ready-made sentence vector
 
-> [!PAPER] · Section 3.1, footnote 6 · page 4
+> [!PAPER] · §3.1, footnote 6
 > [![Footnote 6: the vector C is not a meaningful sentence representation without fine-tuning, since it was trained with NSP](/img/papers/bert/p6-footnote6.png)](/img/papers/bert/p6-footnote6.png)
->
-> **Context:** a footnote to the next sentence prediction task in Section 3.1.
 >
 > **What it says:** "The vector C is not a meaningful sentence representation without fine-tuning, since it was trained with NSP."
 >
-> **Why it matters:** many people still take BERT's `[CLS]` vector as "the meaning of the sentence". The paper warns against exactly that.
+> **What it means:**
+>
+> The `[CLS]` vector was trained for one job: to say whether sentence B follows sentence A. Nobody trained it to put similar sentences close together. So, without fine-tuning, it is not a summary of meaning.
+>
+> Many people still take BERT's `[CLS]` vector as "the meaning of the sentence". The paper warns against exactly that, and the measurement below shows why.
 
 > [!DEFINITION] Cosine similarity
 > A score for how much two vectors point the same way: 1 means the same direction, 0 means unrelated (at a right angle), and negative means opposite. It is the standard way to compare sentence vectors.
@@ -374,41 +398,47 @@ This is only six pairs, so treat it as an illustration, not a benchmark. Sentenc
 
 ### Limit 6: it does not write text
 
-BERT is an encoder. It reads a whole input and gives back one vector per token; it has no natural way to write a long answer one word at a time. As footnote 4 of the paper puts it (Part 2), the left-context-only Transformer is called a "Transformer decoder" "since it can be used for text generation". Chatbots are built on decoders, in the line of GPT, not on BERT.
+BERT is an encoder, and footnote 4 of the paper (Part 2) says what that means for writing text.
 
-> [!PAPER] · Section 3, footnote 4 · page 4
+> [!PAPER] · §3, footnote 4
 > [![Footnote 4 of the BERT paper: the bidirectional Transformer is often referred to as a Transformer encoder while the left-context-only version is referred to as a Transformer decoder since it can be used for text generation](/img/papers/bert/p6-footnote4.png)](/img/papers/bert/p6-footnote4.png)
->
-> **Context:** a footnote to the model description in Section 3.
 >
 > **What it says:** the bidirectional version "is often referred to as a 'Transformer encoder'", while the left-context-only version is a "'Transformer decoder' since it can be used for text generation".
 >
-> **Why it matters:** the paper itself draws the line: generation needs left-only context. BERT is on the other side of that line by design.
+> **What it means:**
+>
+> The paper itself draws the line. An encoder reads the whole input at once and gives back one vector per token. A decoder sees only the words to its left, so it can write text one word at a time.
+>
+> BERT is on the encoder side of that line by design. It has no natural way to write a long answer word by word. Chatbots are built on decoders, in the line of GPT, not on BERT.
 
 ### Limit 7: pre-training is expensive
 
-> [!PAPER] · Appendix A.2 · page 13
+> [!PAPER] · §A.2
 > [![Appendix A.2: training of BERT-base was performed on 4 Cloud TPUs in Pod configuration, 16 TPU chips total; BERT-large on 16 Cloud TPUs, 64 TPU chips total; each pre-training took 4 days to complete](/img/papers/bert/p6-compute.png)](/img/papers/bert/p6-compute.png)
->
-> **Context:** Appendix A.2, the pre-training procedure.
 >
 > **What it says:** BERT-base was trained on "4 Cloud TPUs in Pod configuration (16 TPU chips total)", BERT-large on "16 Cloud TPUs (64 TPU chips total)", and "each pre-training took 4 days to complete".
 >
-> **Why it matters:** in 2018, few people outside large labs could pre-train BERT themselves. That is why the public release of the weights mattered so much.
+> **What it means:**
+>
+> 16 chips for 4 days is 64 chip-days for BERT-base; 64 chips for 4 days is 256 chip-days for BERT-large. In 2018, few people outside large labs had that much compute.
+>
+> That is why the public release of the weights mattered so much. Most people could never pre-train BERT, but anyone could download it and fine-tune it.
 
 > [!DEFINITION] TPU
 > Tensor Processing Unit: a chip designed by Google for neural network maths, similar in role to a GPU.
 
 The good news is the paper's own: fine-tuning is cheap. Section 3.2 says every result in the paper "can be replicated in at most 1 hour on a single Cloud TPU, or a few hours on a GPU, starting from the exact same pre-trained model" (Part 4).
 
-> [!PAPER] · Section 3.2 · page 5
+> [!PAPER] · §3.2
 > [![From Section 3.2: compared to pre-training, fine-tuning is relatively inexpensive; all of the results in the paper can be replicated in at most 1 hour on a single Cloud TPU, or a few hours on a GPU, starting from the exact same pre-trained model](/img/papers/bert/p6-finetune-cost.png)](/img/papers/bert/p6-finetune-cost.png)
->
-> **Context:** the end of Section 3.2.
 >
 > **What it says:** "All of the results in the paper can be replicated in at most 1 hour on a single Cloud TPU, or a few hours on a GPU, starting from the exact same pre-trained model."
 >
-> **Why it matters:** the expensive step is done once, by someone else; everyone downstream pays only the cheap step.
+> **What it means:**
+>
+> Think of a bridge. One company pays to build it, and then everyone crosses it for a small toll. Pre-training is the bridge; fine-tuning is the toll.
+>
+> The expensive step is done once, by someone else. Everyone downstream pays only the cheap step: at most an hour on one Cloud TPU.
 
 How big was the pre-training budget, in tokens? From the numbers in Appendix A.2:
 

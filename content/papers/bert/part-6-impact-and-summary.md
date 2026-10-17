@@ -13,14 +13,16 @@ After that, this part steps outside the paper. It answers three questions: what 
 
 ## The conclusion {§6}
 
-> [!PAPER] · Section 6 (Conclusion) · page 9
+> [!PAPER] · §6
 > [![The conclusion of the BERT paper: rich, unsupervised pre-training is an integral part of many language understanding systems; these results enable even low-resource tasks to benefit from deep unidirectional architectures; our major contribution is further generalizing these findings to deep bidirectional architectures, allowing the same pre-trained model to successfully tackle a broad set of NLP tasks](/img/papers/bert/p6-conclusion.png)](/img/papers/bert/p6-conclusion.png)
->
-> **Context:** Section 6, the whole conclusion. It is one paragraph of three sentences, right after the ablation studies of Section 5.
 >
 > **What it says:** earlier work showed that "rich, unsupervised pre-training is an integral part of many language understanding systems", and that it lets "even low-resource tasks" benefit from "deep unidirectional architectures". BERT's "major contribution is further generalizing these findings to deep *bidirectional* architectures", so "the same pre-trained model" can handle "a broad set of NLP tasks".
 >
-> **Why it matters:** the authors describe their own contribution modestly. They did not invent pre-training or fine-tuning. They made it work with a model that looks both ways.
+> **What it means:**
+>
+> The authors describe their own contribution modestly. They did not invent pre-training or fine-tuning; GPT and others had already shown that both work. Their claim is narrower: they made the recipe work with a model that looks both ways, in every layer.
+>
+> Think of a recipe that cooks already knew was good, and one cook who changed a single ingredient. The conclusion names that ingredient: bidirectionality.
 
 Three phrases need unpacking.
 
@@ -64,11 +66,13 @@ The follow-up models changed BERT in four different directions.
 > [!PAPER] Liu et al. (2019), RoBERTa · Abstract
 > [![The RoBERTa abstract: a replication study of BERT pretraining that measures the impact of key hyperparameters and training data size; we find that BERT was significantly undertrained, and can match or exceed the performance of every model published after it](/img/papers/bert/p6-roberta.png)](/img/papers/bert/p6-roberta.png)
 >
-> **Context:** the first big follow-up from another lab (Facebook AI), nine months after BERT.
->
 > **What it says:** "We find that BERT was significantly undertrained, and can match or exceed the performance of every model published after it."
 >
-> **Why it matters:** the architecture was fine; the training recipe had room to grow. This is why later "BERT-style" models usually mean RoBERTa-style training.
+> **What it means:**
+>
+> "Undertrained" means the model could have learned more, but training stopped too early. It is like judging a runner after only half of the training plan. The architecture was fine; the training recipe had room to grow.
+>
+> RoBERTa came from another lab (Facebook AI), nine months after BERT. With the same architecture and better training, it matched or beat every model published after BERT. This is why later "BERT-style" models usually mean RoBERTa-style training.
 
 > [!DEFINITION] Dynamic masking
 > Choosing new positions to mask every time a sentence is shown to the model. The original BERT pipeline chose the masked positions once, when the training data was prepared (RoBERTa calls this "static" masking). RoBERTa notes that BERT's data was duplicated 10 times "so that each sequence is masked in 10 different ways over the 40 epochs of training", so each fixed mask was still seen several times.
@@ -84,11 +88,13 @@ The NSP result is interesting, because it seems to contradict BERT's own Table 5
 > [!PAPER] Lan et al. (2019), ALBERT · Abstract
 > [![The ALBERT abstract: two parameter-reduction techniques to lower memory consumption and increase the training speed of BERT, and a self-supervised loss that focuses on modeling inter-sentence coherence](/img/papers/bert/p6-albert.png)](/img/papers/bert/p6-albert.png)
 >
-> **Context:** a Google follow-up aimed at size.
->
 > **What it says:** "two parameter-reduction techniques to lower memory consumption and increase the training speed of BERT", plus "a self-supervised loss that focuses on modeling inter-sentence coherence".
 >
-> **Why it matters:** the second half replaces NSP, the part of BERT that later work found weakest.
+> **What it means:**
+>
+> ALBERT is a Google follow-up aimed at size. The first half of the sentence is about memory and speed: the two techniques, listed below, make the model much smaller.
+>
+> The second half is about a pre-training task. The new loss on "inter-sentence coherence" replaces NSP, the part of BERT that later work found weakest.
 
 - **factorized embedding parameterization**: the big vocabulary table is split into two small matrices, so its size no longer grows with the hidden size;
 - **cross-layer parameter sharing**: all layers share the same weights, so the size no longer grows with the depth.
@@ -103,11 +109,13 @@ ALBERT also replaces NSP with **sentence-order prediction (SOP)**, a task about 
 > [!PAPER] Sanh et al. (2019), DistilBERT · Abstract
 > [![The DistilBERT abstract: knowledge distillation during the pre-training phase reduces the size of a BERT model by 40 percent while retaining 97 percent of its language understanding capabilities and being 60 percent faster](/img/papers/bert/p6-distilbert.png)](/img/papers/bert/p6-distilbert.png)
 >
-> **Context:** a Hugging Face follow-up aimed at speed.
->
 > **What it says:** "knowledge distillation during the pre-training phase" makes it possible "to reduce the size of a BERT model by 40%, while retaining 97% of its language understanding capabilities and being 60% faster".
 >
-> **Why it matters:** a much cheaper model to run, for a small loss in quality. Below we check the size claim and show what distillation trains on.
+> **What it means:**
+>
+> DistilBERT is a Hugging Face follow-up aimed at speed. Think of a student who learns from a teacher's full notes, not only from the answer key. The small model learns to copy the big one during pre-training.
+>
+> The result is a much cheaper model to run, for a small loss in quality: 40% smaller, 60% faster, and 97% of the language understanding. Below we check the size claim and show what distillation trains on.
 
 The distillation loss, for one masked position, compares the student's probabilities $$s$$ with the teacher's $$t$$ over the vocabulary:
 
@@ -141,22 +149,26 @@ The masked LM has two weak spots, and two papers named them directly. We measure
 > [!PAPER] Yang et al. (2019), XLNet · Abstract
 > [![The XLNet abstract: relying on corrupting the input with masks, BERT neglects dependency between the masked positions and suffers from a pretrain-finetune discrepancy; XLNet is a generalized autoregressive pretraining method that maximizes the expected likelihood over all permutations of the factorization order](/img/papers/bert/p6-xlnet.png)](/img/papers/bert/p6-xlnet.png)
 >
-> **Context:** a CMU and Google follow-up that names two of BERT's weaknesses.
->
 > **What it says:** BERT "neglects dependency between the masked positions and suffers from a pretrain-finetune discrepancy". XLNet instead maximises the likelihood "over all permutations of the factorization order".
 >
-> **Why it matters:** these are Limits 2 and 4 below, measured on the real model.
+> **What it means:**
+>
+> XLNet, from CMU and Google, names two of BERT's weaknesses in one sentence. "Neglects dependency between the masked positions" means that BERT fills two blanks without knowing what it put in the other. "Pretrain-finetune discrepancy" means that `[MASK]` appears in training but never in real use.
+>
+> These are Limits 2 and 4 below, measured on the real model. XLNet's own fix is to predict the words in many random orders, so it never needs `[MASK]`.
 
 **ELECTRA** (Clark et al., March 2020) points at a different cost: BERT only learns from the masked tokens. ELECTRA replaces some tokens with "plausible alternatives sampled from a small generator network", then trains the main model to say, for every token, whether it was replaced. This is "more efficient than MLM because the task is defined over all input tokens rather than just the small subset that was masked out". Its abstract gives an example: "we train a model on one GPU for 4 days that outperforms GPT (trained using 30x more compute) on the GLUE natural language understanding benchmark".
 
 > [!PAPER] Clark et al. (2020), ELECTRA · Abstract
 > [![The ELECTRA abstract: replaced token detection; instead of masking, corrupt the input by replacing some tokens with plausible alternatives from a small generator network, then train a discriminator that predicts whether each token was replaced; more efficient than MLM because the task is defined over all input tokens rather than just the small subset that was masked out](/img/papers/bert/p6-electra.png)](/img/papers/bert/p6-electra.png)
 >
-> **Context:** a Stanford and Google follow-up aimed at training efficiency.
->
 > **What it says:** "replaced token detection": a small generator fills some positions with plausible words, and the main model judges every token, original or replaced. This is efficient "because the task is defined over all input tokens rather than just the small subset that was masked out".
 >
-> **Why it matters:** it attacks Limit 3 head on: every position gives a training signal.
+> **What it means:**
+>
+> Think of two kinds of reading test. In BERT's test, a few words of a page are blacked out, and the model must guess them. In ELECTRA's test, a few words were quietly swapped, and the main model must check every word.
+>
+> So every position gives a training signal, not only the 15% that were masked. ELECTRA, from Stanford and Google, attacks Limit 3 head on.
 
 <figure class="fig"><svg viewBox="0 0 760 360" role="img" aria-label="ELECTRA in three steps: mask a few tokens, let a small generator fill them with plausible words, then train the main model to label every token as original or replaced."><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0,0L10,5L0,10z"/></marker><marker id="ah-on" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-on" d="M0,0L10,5L0,10z"/></marker><marker id="ah-2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-2" d="M0,0L10,5L0,10z"/></marker></defs><text class="t-title" x="20.0" y="22.0" text-anchor="start">ELECTRA: replaced token detection, in three steps</text><rect class="box" x="10.0" y="36.0" width="740.0" height="76.0" rx="12"/><circle class="node on" cx="28.0" cy="54.0" r="11"/><text class="t-note" x="28.0" y="58.5" text-anchor="middle">1</text><text class="t-title" x="46.0" y="59.0" text-anchor="start">mask a few tokens (like BERT)</text><rect class="box" x="250.0" y="64.0" width="70.0" height="30.0" rx="6"/><text class="t-muted" x="285.0" y="83.5" text-anchor="middle">the</text><rect class="box-mask" x="328.0" y="64.0" width="70.0" height="30.0" rx="6"/><text class="t-muted" x="363.0" y="83.5" text-anchor="middle">[MASK]</text><rect class="box" x="406.0" y="64.0" width="70.0" height="30.0" rx="6"/><text class="t-muted" x="441.0" y="83.5" text-anchor="middle">cooked</text><rect class="box" x="484.0" y="64.0" width="70.0" height="30.0" rx="6"/><text class="t-muted" x="519.0" y="83.5" text-anchor="middle">the</text><rect class="box-mask" x="562.0" y="64.0" width="70.0" height="30.0" rx="6"/><text class="t-muted" x="597.0" y="83.5" text-anchor="middle">[MASK]</text><rect class="box" x="10.0" y="122.0" width="740.0" height="76.0" rx="12"/><circle class="node on" cx="28.0" cy="140.0" r="11"/><text class="t-note" x="28.0" y="144.5" text-anchor="middle">2</text><text class="t-title" x="46.0" y="145.0" text-anchor="start">a small generator (a small masked LM) fills them</text><rect class="box" x="250.0" y="150.0" width="70.0" height="30.0" rx="6"/><text class="t-tick" x="285.0" y="169.5" text-anchor="middle">the</text><rect class="box-3" x="328.0" y="150.0" width="70.0" height="30.0" rx="6"/><text class="t-tick" x="363.0" y="169.5" text-anchor="middle">chef</text><rect class="box" x="406.0" y="150.0" width="70.0" height="30.0" rx="6"/><text class="t-tick" x="441.0" y="169.5" text-anchor="middle">cooked</text><rect class="box" x="484.0" y="150.0" width="70.0" height="30.0" rx="6"/><text class="t-tick" x="519.0" y="169.5" text-anchor="middle">the</text><rect class="box-2" x="562.0" y="150.0" width="70.0" height="30.0" rx="6"/><text class="t-tick" x="597.0" y="169.5" text-anchor="middle">soup</text><text class="t-muted" x="363.0" y="196.0" text-anchor="middle">guessed right</text><text class="t-muted" x="597.0" y="196.0" text-anchor="middle">plausible but wrong</text><rect class="box" x="10.0" y="208.0" width="740.0" height="100.0" rx="12"/><circle class="node on" cx="28.0" cy="226.0" r="11"/><text class="t-note" x="28.0" y="230.5" text-anchor="middle">3</text><text class="t-title" x="46.0" y="231.0" text-anchor="start">the main model labels EVERY token: original or replaced?</text><rect class="box" x="250.0" y="236.0" width="70.0" height="30.0" rx="6"/><text class="t-tick" x="285.0" y="255.5" text-anchor="middle">the</text><rect class="box" x="328.0" y="236.0" width="70.0" height="30.0" rx="6"/><text class="t-tick" x="363.0" y="255.5" text-anchor="middle">chef</text><rect class="box" x="406.0" y="236.0" width="70.0" height="30.0" rx="6"/><text class="t-tick" x="441.0" y="255.5" text-anchor="middle">cooked</text><rect class="box" x="484.0" y="236.0" width="70.0" height="30.0" rx="6"/><text class="t-tick" x="519.0" y="255.5" text-anchor="middle">the</text><rect class="box" x="562.0" y="236.0" width="70.0" height="30.0" rx="6"/><text class="t-tick" x="597.0" y="255.5" text-anchor="middle">soup</text><line class="edge" x1="285.0" y1="268.0" x2="285.0" y2="280.0" marker-end="url(#ah)"/><text class="t-s3" x="285.0" y="296.0" text-anchor="middle">original</text><line class="edge" x1="363.0" y1="268.0" x2="363.0" y2="280.0" marker-end="url(#ah)"/><text class="t-s3" x="363.0" y="296.0" text-anchor="middle">original</text><line class="edge" x1="441.0" y1="268.0" x2="441.0" y2="280.0" marker-end="url(#ah)"/><text class="t-s3" x="441.0" y="296.0" text-anchor="middle">original</text><line class="edge" x1="519.0" y1="268.0" x2="519.0" y2="280.0" marker-end="url(#ah)"/><text class="t-s3" x="519.0" y="296.0" text-anchor="middle">original</text><line class="edge" x1="597.0" y1="268.0" x2="597.0" y2="280.0" marker-end="url(#ah)"/><text class="t-bad" x="597.0" y="296.0" text-anchor="middle">replaced</text><text class="t-muted" x="20.0" y="330.0" text-anchor="start">BERT learns from 2 of these 5 positions; ELECTRA's main model gets a loss at all 5.</text><text class="t-muted" x="20.0" y="348.0" text-anchor="start">"chef" counts as original, because the generator happened to produce the real word.</text></svg><figcaption>ELECTRA in three steps. Mask a few tokens; a small generator fills them ("chef" guessed right, "soup" plausible but wrong); the main model labels every token as original or replaced. BERT learns from 2 of these 5 positions, ELECTRA's main model from all 5.</figcaption></figure>
 
@@ -169,11 +181,13 @@ The masked LM has two weak spots, and two papers named them directly. We measure
 > [!PAPER] Reimers and Gurevych (2019), Sentence-BERT · Abstract
 > [![The Sentence-BERT abstract: finding the most similar pair in 10,000 sentences requires about 50 million inference computations, about 65 hours, with BERT; SBERT uses siamese and triplet networks to derive semantically meaningful sentence embeddings that can be compared using cosine-similarity, reducing this to about 5 seconds](/img/papers/bert/p6-sbert.png)](/img/papers/bert/p6-sbert.png)
 >
-> **Context:** the paper that made BERT useful for search and similarity.
->
 > **What it says:** with BERT reading every pair together, finding the most similar pair among 10,000 sentences "requires about 50 million inference computations (~65 hours)". SBERT produces "semantically meaningful sentence embeddings that can be compared using cosine-similarity", which cuts this "to about 5 seconds".
 >
-> **Why it matters:** 50 million is the number of pairs: $$10{,}000 \times 9{,}999 / 2 \approx 5 \times 10^7$$. One vector per sentence turns that into 10,000 BERT runs plus cheap cosine comparisons.
+> **What it means:**
+>
+> Where does 50 million come from? It is the number of pairs: $$10{,}000 \times 9{,}999 / 2 \approx 5 \times 10^7$$. If BERT must read each pair together, that is 50 million BERT runs.
+>
+> Sentence-BERT gives each sentence its own vector instead. That turns the job into 10,000 BERT runs plus cheap cosine comparisons. This is what made BERT useful for search and similarity.
 
 <figure class="fig"><svg viewBox="0 0 760 270" role="img" aria-label="Two ways to compare a query with a passage. A cross-encoder reads both in one input and outputs one score. A bi-encoder turns each into its own vector with the same BERT, then compares the vectors with cosine similarity."><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0,0L10,5L0,10z"/></marker><marker id="ah-on" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-on" d="M0,0L10,5L0,10z"/></marker><marker id="ah-2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-2" d="M0,0L10,5L0,10z"/></marker></defs><text class="t-title" x="190.0" y="22.0" text-anchor="middle">Cross-encoder (BERT as in the paper)</text><text class="t-title" x="570.0" y="22.0" text-anchor="middle">Bi-encoder (Sentence-BERT)</text><rect class="box-1" x="40.0" y="200.0" width="140.0" height="30.0" rx="6"/><text class="t-tick" x="110.0" y="219.5" text-anchor="middle">query</text><rect class="box-2" x="200.0" y="200.0" width="140.0" height="30.0" rx="6"/><text class="t-tick" x="270.0" y="219.5" text-anchor="middle">passage</text><line class="edge" x1="190.0" y1="198.0" x2="190.0" y2="172.0" marker-end="url(#ah)"/><rect class="box-on" x="40.0" y="110.0" width="300.0" height="60.0" rx="10"/><text class="t-note" x="190.0" y="136.0" text-anchor="middle">one BERT reads both together</text><text class="t-muted" x="190.0" y="154.0" text-anchor="middle">every query token attends to every passage token</text><line class="edge" x1="190.0" y1="108.0" x2="190.0" y2="84.0" marker-end="url(#ah)"/><rect class="box-3" x="130.0" y="52.0" width="120.0" height="30.0" rx="8"/><text class="t-tick" x="190.0" y="72.0" text-anchor="middle">one score</text><text class="t-muted" x="190.0" y="252.0" text-anchor="middle">accurate; must run once per (query, passage) pair</text><rect class="box-1" x="430.0" y="200.0" width="130.0" height="30.0" rx="6"/><text class="t-tick" x="495.0" y="219.5" text-anchor="middle">query</text><line class="edge" x1="495.0" y1="198.0" x2="495.0" y2="172.0" marker-end="url(#ah)"/><rect class="box-on" x="430.0" y="116.0" width="130.0" height="54.0" rx="10"/><text class="t-note" x="495.0" y="140.0" text-anchor="middle">BERT</text><text class="t-muted" x="495.0" y="158.0" text-anchor="middle">(same weights)</text><line class="edge" x1="495.0" y1="114.0" x2="495.0" y2="98.0" marker-end="url(#ah)"/><rect class="box-ghost" x="447.0" y="81.0" width="88.0" height="18.0" rx="4"/><g class="mark"><rect class="s1" x="450.0" y="84.0" width="12" height="12" rx="2" style="fill-opacity:0.52"/></g><g class="mark"><rect class="s1" x="464.0" y="84.0" width="12" height="12" rx="2" style="fill-opacity:0.95"/></g><g class="mark"><rect class="s1" x="478.0" y="84.0" width="12" height="12" rx="2" style="fill-opacity:0.44"/></g><g class="mark"><rect class="s1" x="492.0" y="84.0" width="12" height="12" rx="2" style="fill-opacity:0.78"/></g><g class="mark"><rect class="s1" x="506.0" y="84.0" width="12" height="12" rx="2" style="fill-opacity:0.61"/></g><g class="mark"><rect class="s1" x="520.0" y="84.0" width="12" height="12" rx="2" style="fill-opacity:0.86"/></g><rect class="box-2" x="600.0" y="200.0" width="130.0" height="30.0" rx="6"/><text class="t-tick" x="665.0" y="219.5" text-anchor="middle">passage</text><line class="edge" x1="665.0" y1="198.0" x2="665.0" y2="172.0" marker-end="url(#ah)"/><rect class="box-on" x="600.0" y="116.0" width="130.0" height="54.0" rx="10"/><text class="t-note" x="665.0" y="140.0" text-anchor="middle">BERT</text><text class="t-muted" x="665.0" y="158.0" text-anchor="middle">(same weights)</text><line class="edge" x1="665.0" y1="114.0" x2="665.0" y2="98.0" marker-end="url(#ah)"/><rect class="box-ghost" x="617.0" y="81.0" width="88.0" height="18.0" rx="4"/><g class="mark"><rect class="s2" x="620.0" y="84.0" width="12" height="12" rx="2" style="fill-opacity:0.52"/></g><g class="mark"><rect class="s2" x="634.0" y="84.0" width="12" height="12" rx="2" style="fill-opacity:0.95"/></g><g class="mark"><rect class="s2" x="648.0" y="84.0" width="12" height="12" rx="2" style="fill-opacity:0.44"/></g><g class="mark"><rect class="s2" x="662.0" y="84.0" width="12" height="12" rx="2" style="fill-opacity:0.78"/></g><g class="mark"><rect class="s2" x="676.0" y="84.0" width="12" height="12" rx="2" style="fill-opacity:0.61"/></g><g class="mark"><rect class="s2" x="690.0" y="84.0" width="12" height="12" rx="2" style="fill-opacity:0.86"/></g><line class="edge-on" x1="544.0" y1="90.0" x2="616.0" y2="90.0"/><text class="t-on" x="580.0" y="74.0" text-anchor="middle">cosine</text><text class="t-muted" x="570.0" y="252.0" text-anchor="middle">fast; passage vectors are computed once, ahead of time</text><line class="edge-dim" x1="380.0" y1="40.0" x2="380.0" y2="262.0"/></svg><figcaption>Two ways to compare texts. Cross-encoder (BERT as in the paper): read the query and the passage together, one score per pair; accurate, but one BERT run for every pair. Bi-encoder (Sentence-BERT): one vector per text, compared by cosine; passage vectors can be computed once, ahead of time.</figcaption></figure>
 
@@ -182,11 +196,13 @@ The masked LM has two weak spots, and two papers named them directly. We measure
 > [!PAPER] Warner et al. (2024), ModernBERT · Abstract
 > [![The ModernBERT abstract: encoder-only transformer models such as BERT are the workhorse of numerous production pipelines; ModernBERT is trained on 2 trillion tokens with a native 8192 sequence length](/img/papers/bert/p6-modernbert.png)](/img/papers/bert/p6-modernbert.png)
 >
-> **Context:** a 2024 encoder from Answer.AI, LightOn and others.
->
 > **What it says:** encoders like BERT are "the workhorse of numerous production pipelines". ModernBERT is "Trained on 2 trillion tokens with a native 8192 sequence length".
 >
-> **Why it matters:** six years later, the BERT design is still in production use, now with modern training and 16 times the context.
+> **What it means:**
+>
+> ModernBERT is a 2024 encoder from Answer.AI, LightOn and others. Six years after BERT, the same design is still in production use, now with modern training.
+>
+> The context length is the clearest change: 8,192 tokens against BERT's 512, which is 16 times more. Limit 1 below shows why that wall mattered.
 
 <figure class="fig"><svg viewBox="0 0 760 432" role="img" aria-label="Each weakness of BERT on the left, and the follow-up model that attacks it on the right: ModernBERT for length, XLNet and ELECTRA for the mask, ELECTRA for the 15% signal, Sentence-BERT for sentence vectors, ALBERT and DistilBERT for size, RoBERTa and SpanBERT for the training recipe."><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0,0L10,5L0,10z"/></marker><marker id="ah-on" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-on" d="M0,0L10,5L0,10z"/></marker><marker id="ah-2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-2" d="M0,0L10,5L0,10z"/></marker></defs><text class="t-title" x="20.0" y="22.0" text-anchor="start">Which follow-up attacks which weakness</text><rect class="box-mask" x="20.0" y="40.0" width="250.0" height="34.0" rx="8"/><text class="t-note" x="32.0" y="61.0" text-anchor="start">512-token wall (Limit 1)</text><rect class="box-1" x="330.0" y="44.0" width="410.0" height="22.0" rx="6"/><text class="t-tick" x="342.0" y="59.0" text-anchor="start">ModernBERT: 8192 tokens</text><line class="edge" x1="272.0" y1="57.0" x2="326.0" y2="57.0" marker-end="url(#ah)"/><rect class="box-mask" x="20.0" y="84.0" width="250.0" height="60.0" rx="8"/><text class="t-note" x="32.0" y="118.0" text-anchor="start">[MASK] mismatch (Limit 2)</text><rect class="box-1" x="330.0" y="88.0" width="410.0" height="22.0" rx="6"/><text class="t-tick" x="342.0" y="103.0" text-anchor="start">XLNet: no [MASK], permuted order</text><rect class="box-1" x="330.0" y="114.0" width="410.0" height="22.0" rx="6"/><text class="t-tick" x="342.0" y="129.0" text-anchor="start">ELECTRA: real tokens in, real/replaced out</text><line class="edge" x1="272.0" y1="114.0" x2="326.0" y2="114.0" marker-end="url(#ah)"/><rect class="box-mask" x="20.0" y="154.0" width="250.0" height="34.0" rx="8"/><text class="t-note" x="32.0" y="175.0" text-anchor="start">only 15% teach (Limit 3)</text><rect class="box-1" x="330.0" y="158.0" width="410.0" height="22.0" rx="6"/><text class="t-tick" x="342.0" y="173.0" text-anchor="start">ELECTRA: a loss at every token</text><line class="edge" x1="272.0" y1="171.0" x2="326.0" y2="171.0" marker-end="url(#ah)"/><rect class="box-mask" x="20.0" y="198.0" width="250.0" height="34.0" rx="8"/><text class="t-note" x="32.0" y="219.0" text-anchor="start">blanks independent (Limit 4)</text><rect class="box-1" x="330.0" y="202.0" width="410.0" height="22.0" rx="6"/><text class="t-tick" x="342.0" y="217.0" text-anchor="start">XLNet: one at a time, later guesses see earlier</text><line class="edge" x1="272.0" y1="215.0" x2="326.0" y2="215.0" marker-end="url(#ah)"/><rect class="box-mask" x="20.0" y="242.0" width="250.0" height="34.0" rx="8"/><text class="t-note" x="32.0" y="263.0" text-anchor="start">no sentence vector (Limit 5)</text><rect class="box-1" x="330.0" y="246.0" width="410.0" height="22.0" rx="6"/><text class="t-tick" x="342.0" y="261.0" text-anchor="start">Sentence-BERT: fine-tuned for cosine</text><line class="edge" x1="272.0" y1="259.0" x2="326.0" y2="259.0" marker-end="url(#ah)"/><rect class="box-mask" x="20.0" y="286.0" width="250.0" height="60.0" rx="8"/><text class="t-note" x="32.0" y="320.0" text-anchor="start">too big, too slow (Limit 7)</text><rect class="box-1" x="330.0" y="290.0" width="410.0" height="22.0" rx="6"/><text class="t-tick" x="342.0" y="305.0" text-anchor="start">ALBERT: shared layers</text><rect class="box-1" x="330.0" y="316.0" width="410.0" height="22.0" rx="6"/><text class="t-tick" x="342.0" y="331.0" text-anchor="start">DistilBERT: 6 layers, distilled</text><line class="edge" x1="272.0" y1="316.0" x2="326.0" y2="316.0" marker-end="url(#ah)"/><rect class="box-mask" x="20.0" y="356.0" width="250.0" height="60.0" rx="8"/><text class="t-note" x="32.0" y="390.0" text-anchor="start">undertrained recipe</text><rect class="box-1" x="330.0" y="360.0" width="410.0" height="22.0" rx="6"/><text class="t-tick" x="342.0" y="375.0" text-anchor="start">RoBERTa: more data, no NSP, dynamic masks</text><rect class="box-1" x="330.0" y="386.0" width="410.0" height="22.0" rx="6"/><text class="t-tick" x="342.0" y="401.0" text-anchor="start">SpanBERT: mask whole spans</text><line class="edge" x1="272.0" y1="386.0" x2="326.0" y2="386.0" marker-end="url(#ah)"/></svg><figcaption>Which follow-up attacks which weakness. 512-token wall: ModernBERT (8,192 tokens). [MASK] mismatch: XLNet, ELECTRA. Only 15% of tokens teach: ELECTRA. Blanks filled independently: XLNet. No sentence vector: Sentence-BERT. Too big or slow: ALBERT, DistilBERT. Undertrained recipe: RoBERTa, SpanBERT.</figcaption></figure>
 
@@ -196,14 +212,16 @@ Every model has limits. Here are BERT's main ones. Where the paper itself mentio
 
 ### Limit 1: at most 512 tokens
 
-> [!PAPER] · Appendix A.2 · page 13
+> [!PAPER] · §A.2
 > [![Appendix A.2: longer sequences are disproportionately expensive because attention is quadratic to the sequence length. BERT is pre-trained with sequence length 128 for 90 percent of the steps, then 512 for the last 10 percent to learn the positional embeddings](/img/papers/bert/p6-length.png)](/img/papers/bert/p6-length.png)
->
-> **Context:** Appendix A.2, the pre-training procedure (covered in Part 3).
 >
 > **What it says:** "attention is quadratic to the sequence length", so long inputs are expensive. BERT trains on 128-token sequences for 90% of the steps and on 512-token sequences for the last 10%, "to learn the positional embeddings".
 >
-> **Why it matters:** BERT has learned position vectors for positions 0 to 511, and no more. 512 is a hard wall.
+> **What it means:**
+>
+> The position table is like a ruler with marks only up to 511. BERT learned one position vector for each mark, and none beyond it. So 512 tokens is a hard wall, not a soft limit.
+>
+> Why not train on long sequences all the time? Because attention is "quadratic", as the yellow box below explains. The authors saved compute with short sequences for 90% of the steps and long ones only at the end.
 
 > [!DEFINITION] Quadratic
 > Growing with the square. If attention compares every token with every token, then 2 times more tokens means 2 × 2 = 4 times more comparisons, and 4 times more tokens means 16 times more.
@@ -252,27 +270,31 @@ The price: a token in window 1 never sees a token in window 2. Facts that are fa
 
 ### Limit 2: `[MASK]` never appears after pre-training
 
-> [!PAPER] · Section 3.1 · page 4
+> [!PAPER] · §3.1
 > [![Section 3.1: a downside is that we are creating a mismatch between pre-training and fine-tuning, since the MASK token does not appear during fine-tuning](/img/papers/bert/p6-mismatch.png)](/img/papers/bert/p6-mismatch.png)
->
-> **Context:** Section 3.1, right after the masked LM is introduced (Part 3).
 >
 > **What it says:** "a downside is that we are creating a mismatch between pre-training and fine-tuning, since the [MASK] token does not appear during fine-tuning."
 >
-> **Why it matters:** the authors saw this limit themselves. Their fix, the 80/10/10 rule, softens it but does not remove it.
+> **What it means:**
+>
+> The authors saw this limit themselves. Think of a pilot who trained in a simulator with a warning light that the real plane does not have. Any habit tied to that light is useless in real flight.
+>
+> Their fix, the 80/10/10 rule of Part 3, softens the problem but does not remove it.
 
 During pre-training, BERT sees `[MASK]` in about 12% of positions (80% of the 15% chosen). In real use it never sees `[MASK]` at all. Part 3 explained the 80% / 10% / 10% trick that reduces the gap, and Part 5 (Table 8) measured how much it matters. XLNet named this the "pretrain-finetune discrepancy".
 
 ### Limit 3: only 15% of tokens teach the model
 
-> [!PAPER] · Appendix A.1 · page 12
+> [!PAPER] · §A.1
 > [![Appendix A.1: compared to standard language model training, the masked LM only makes predictions on 15 percent of tokens in each batch, which suggests that more pre-training steps may be required for the model to converge](/img/papers/bert/p6-fifteen.png)](/img/papers/bert/p6-fifteen.png)
->
-> **Context:** Appendix A.1, after the masking examples. The sentence continues on page 13 with "to converge".
 >
 > **What it says:** the masked LM "only make[s] predictions on 15% of tokens in each batch", so "more pre-training steps may be required".
 >
-> **Why it matters:** in a left-to-right model, every token is a prediction target. In BERT, 85% of the tokens give no training signal of their own.
+> **What it means:**
+>
+> In a left-to-right model, every token is a prediction target. In BERT, only the 15% chosen tokens are, so 85% of the tokens give no training signal of their own.
+>
+> Think of a quiz with 100 questions where only 15 are marked. You still learn, but you need more quizzes to learn the same amount. That is the "more pre-training steps" of the sentence.
 
 <figure class="fig"><svg viewBox="0 0 760 252" role="img" aria-label="Where the training signal comes from. In BERT only the masked positions are scored. In ELECTRA every position is scored as real or replaced."><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0,0L10,5L0,10z"/></marker><marker id="ah-on" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-on" d="M0,0L10,5L0,10z"/></marker><marker id="ah-2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-2" d="M0,0L10,5L0,10z"/></marker></defs><text class="t-title" x="20.0" y="24.0" text-anchor="start">BERT (masked LM): only the hidden tokens give a training signal</text><text class="t-title" x="20.0" y="134.0" text-anchor="start">ELECTRA (replaced token detection): every token gives a signal</text><rect class="box" x="20.0" y="40.0" width="42.0" height="30.0" rx="6"/><text class="t-muted" x="41.0" y="59.5" text-anchor="middle">the</text><rect class="box" x="67.0" y="40.0" width="42.0" height="30.0" rx="6"/><text class="t-muted" x="88.0" y="59.5" text-anchor="middle">cat</text><rect class="box-mask" x="114.0" y="40.0" width="42.0" height="30.0" rx="6"/><text class="t-muted" x="135.0" y="59.5" text-anchor="middle">[M]</text><rect class="box" x="161.0" y="40.0" width="42.0" height="30.0" rx="6"/><text class="t-muted" x="182.0" y="59.5" text-anchor="middle">on</text><rect class="box" x="208.0" y="40.0" width="42.0" height="30.0" rx="6"/><text class="t-muted" x="229.0" y="59.5" text-anchor="middle">the</text><rect class="box" x="255.0" y="40.0" width="42.0" height="30.0" rx="6"/><text class="t-muted" x="276.0" y="59.5" text-anchor="middle">mat</text><rect class="box" x="302.0" y="40.0" width="42.0" height="30.0" rx="6"/><text class="t-muted" x="323.0" y="59.5" text-anchor="middle">and</text><rect class="box" x="349.0" y="40.0" width="42.0" height="30.0" rx="6"/><text class="t-muted" x="370.0" y="59.5" text-anchor="middle">looked</text><rect class="box" x="396.0" y="40.0" width="42.0" height="30.0" rx="6"/><text class="t-muted" x="417.0" y="59.5" text-anchor="middle">out</text><rect class="box-mask" x="443.0" y="40.0" width="42.0" height="30.0" rx="6"/><text class="t-muted" x="464.0" y="59.5" text-anchor="middle">[M]</text><rect class="box" x="490.0" y="40.0" width="42.0" height="30.0" rx="6"/><text class="t-muted" x="511.0" y="59.5" text-anchor="middle">the</text><rect class="box" x="537.0" y="40.0" width="42.0" height="30.0" rx="6"/><text class="t-muted" x="558.0" y="59.5" text-anchor="middle">window</text><rect class="box" x="584.0" y="40.0" width="42.0" height="30.0" rx="6"/><text class="t-muted" x="605.0" y="59.5" text-anchor="middle">at</text><rect class="box" x="631.0" y="40.0" width="42.0" height="30.0" rx="6"/><text class="t-muted" x="652.0" y="59.5" text-anchor="middle">the</text><rect class="box" x="678.0" y="40.0" width="42.0" height="30.0" rx="6"/><text class="t-muted" x="699.0" y="59.5" text-anchor="middle">birds</text><line class="edge" x1="135.0" y1="72.0" x2="135.0" y2="90.0" marker-end="url(#ah)"/><text class="t-on" x="135.0" y="106.0" text-anchor="middle">loss</text><line class="edge" x1="464.0" y1="72.0" x2="464.0" y2="90.0" marker-end="url(#ah)"/><text class="t-on" x="464.0" y="106.0" text-anchor="middle">loss</text><rect class="box" x="20.0" y="150.0" width="42.0" height="30.0" rx="6"/><text class="t-muted" x="41.0" y="169.5" text-anchor="middle">the</text><rect class="box" x="67.0" y="150.0" width="42.0" height="30.0" rx="6"/><text class="t-muted" x="88.0" y="169.5" text-anchor="middle">cat</text><rect class="box" x="114.0" y="150.0" width="42.0" height="30.0" rx="6"/><text class="t-muted" x="135.0" y="169.5" text-anchor="middle">sat</text><rect class="box" x="161.0" y="150.0" width="42.0" height="30.0" rx="6"/><text class="t-muted" x="182.0" y="169.5" text-anchor="middle">on</text><rect class="box" x="208.0" y="150.0" width="42.0" height="30.0" rx="6"/><text class="t-muted" x="229.0" y="169.5" text-anchor="middle">the</text><rect class="box-2" x="255.0" y="150.0" width="42.0" height="30.0" rx="6"/><text class="t-muted" x="276.0" y="169.5" text-anchor="middle">rug</text><rect class="box" x="302.0" y="150.0" width="42.0" height="30.0" rx="6"/><text class="t-muted" x="323.0" y="169.5" text-anchor="middle">and</text><rect class="box" x="349.0" y="150.0" width="42.0" height="30.0" rx="6"/><text class="t-muted" x="370.0" y="169.5" text-anchor="middle">looked</text><rect class="box" x="396.0" y="150.0" width="42.0" height="30.0" rx="6"/><text class="t-muted" x="417.0" y="169.5" text-anchor="middle">out</text><rect class="box" x="443.0" y="150.0" width="42.0" height="30.0" rx="6"/><text class="t-muted" x="464.0" y="169.5" text-anchor="middle">of</text><rect class="box" x="490.0" y="150.0" width="42.0" height="30.0" rx="6"/><text class="t-muted" x="511.0" y="169.5" text-anchor="middle">the</text><rect class="box" x="537.0" y="150.0" width="42.0" height="30.0" rx="6"/><text class="t-muted" x="558.0" y="169.5" text-anchor="middle">window</text><rect class="box" x="584.0" y="150.0" width="42.0" height="30.0" rx="6"/><text class="t-muted" x="605.0" y="169.5" text-anchor="middle">at</text><rect class="box" x="631.0" y="150.0" width="42.0" height="30.0" rx="6"/><text class="t-muted" x="652.0" y="169.5" text-anchor="middle">the</text><rect class="box" x="678.0" y="150.0" width="42.0" height="30.0" rx="6"/><text class="t-muted" x="699.0" y="169.5" text-anchor="middle">birds</text><line class="edge" x1="41.0" y1="182.0" x2="41.0" y2="198.0" marker-end="url(#ah)"/><text class="t-s3" x="41.0" y="214.0" text-anchor="middle">real</text><line class="edge" x1="88.0" y1="182.0" x2="88.0" y2="198.0" marker-end="url(#ah)"/><text class="t-s3" x="88.0" y="214.0" text-anchor="middle">real</text><line class="edge" x1="135.0" y1="182.0" x2="135.0" y2="198.0" marker-end="url(#ah)"/><text class="t-s3" x="135.0" y="214.0" text-anchor="middle">real</text><line class="edge" x1="182.0" y1="182.0" x2="182.0" y2="198.0" marker-end="url(#ah)"/><text class="t-s3" x="182.0" y="214.0" text-anchor="middle">real</text><line class="edge" x1="229.0" y1="182.0" x2="229.0" y2="198.0" marker-end="url(#ah)"/><text class="t-s3" x="229.0" y="214.0" text-anchor="middle">real</text><line class="edge" x1="276.0" y1="182.0" x2="276.0" y2="198.0" marker-end="url(#ah)"/><text class="t-bad" x="276.0" y="214.0" text-anchor="middle">fake</text><line class="edge" x1="323.0" y1="182.0" x2="323.0" y2="198.0" marker-end="url(#ah)"/><text class="t-s3" x="323.0" y="214.0" text-anchor="middle">real</text><line class="edge" x1="370.0" y1="182.0" x2="370.0" y2="198.0" marker-end="url(#ah)"/><text class="t-s3" x="370.0" y="214.0" text-anchor="middle">real</text><line class="edge" x1="417.0" y1="182.0" x2="417.0" y2="198.0" marker-end="url(#ah)"/><text class="t-s3" x="417.0" y="214.0" text-anchor="middle">real</text><line class="edge" x1="464.0" y1="182.0" x2="464.0" y2="198.0" marker-end="url(#ah)"/><text class="t-s3" x="464.0" y="214.0" text-anchor="middle">real</text><line class="edge" x1="511.0" y1="182.0" x2="511.0" y2="198.0" marker-end="url(#ah)"/><text class="t-s3" x="511.0" y="214.0" text-anchor="middle">real</text><line class="edge" x1="558.0" y1="182.0" x2="558.0" y2="198.0" marker-end="url(#ah)"/><text class="t-s3" x="558.0" y="214.0" text-anchor="middle">real</text><line class="edge" x1="605.0" y1="182.0" x2="605.0" y2="198.0" marker-end="url(#ah)"/><text class="t-s3" x="605.0" y="214.0" text-anchor="middle">real</text><line class="edge" x1="652.0" y1="182.0" x2="652.0" y2="198.0" marker-end="url(#ah)"/><text class="t-s3" x="652.0" y="214.0" text-anchor="middle">real</text><line class="edge" x1="699.0" y1="182.0" x2="699.0" y2="198.0" marker-end="url(#ah)"/><text class="t-s3" x="699.0" y="214.0" text-anchor="middle">real</text><text class="t-muted" x="20.0" y="240.0" text-anchor="start">The paper masks 15% of tokens (about 2 of these 15). ELECTRA asks "real or replaced?" at every position.</text></svg><figcaption>Where the learning signal comes from. In BERT's masked LM only the masked positions get a loss. In ELECTRA every position is checked as real or replaced (shown here as "fake"), so every token teaches the model something.</figcaption></figure>
 
@@ -319,14 +341,16 @@ best pair by the chain rule:                                  "new york" 0.04154
 
 ### Limit 5: no ready-made sentence vector
 
-> [!PAPER] · Section 3.1, footnote 6 · page 4
+> [!PAPER] · §3.1, footnote 6
 > [![Footnote 6: the vector C is not a meaningful sentence representation without fine-tuning, since it was trained with NSP](/img/papers/bert/p6-footnote6.png)](/img/papers/bert/p6-footnote6.png)
->
-> **Context:** a footnote to the next sentence prediction task in Section 3.1.
 >
 > **What it says:** "The vector C is not a meaningful sentence representation without fine-tuning, since it was trained with NSP."
 >
-> **Why it matters:** many people still take BERT's `[CLS]` vector as "the meaning of the sentence". The paper warns against exactly that.
+> **What it means:**
+>
+> The `[CLS]` vector was trained for one job: to say whether sentence B follows sentence A. Nobody trained it to put similar sentences close together. So, without fine-tuning, it is not a summary of meaning.
+>
+> Many people still take BERT's `[CLS]` vector as "the meaning of the sentence". The paper warns against exactly that, and the measurement below shows why.
 
 > [!DEFINITION] Cosine similarity
 > A score for how much two vectors point the same way: 1 means the same direction, 0 means unrelated (at a right angle), and negative means opposite. It is the standard way to compare sentence vectors.
@@ -374,41 +398,47 @@ This is only six pairs, so treat it as an illustration, not a benchmark. Sentenc
 
 ### Limit 6: it does not write text
 
-BERT is an encoder. It reads a whole input and gives back one vector per token; it has no natural way to write a long answer one word at a time. As footnote 4 of the paper puts it (Part 2), the left-context-only Transformer is called a "Transformer decoder" "since it can be used for text generation". Chatbots are built on decoders, in the line of GPT, not on BERT.
+BERT is an encoder, and footnote 4 of the paper (Part 2) says what that means for writing text.
 
-> [!PAPER] · Section 3, footnote 4 · page 4
+> [!PAPER] · §3, footnote 4
 > [![Footnote 4 of the BERT paper: the bidirectional Transformer is often referred to as a Transformer encoder while the left-context-only version is referred to as a Transformer decoder since it can be used for text generation](/img/papers/bert/p6-footnote4.png)](/img/papers/bert/p6-footnote4.png)
->
-> **Context:** a footnote to the model description in Section 3.
 >
 > **What it says:** the bidirectional version "is often referred to as a 'Transformer encoder'", while the left-context-only version is a "'Transformer decoder' since it can be used for text generation".
 >
-> **Why it matters:** the paper itself draws the line: generation needs left-only context. BERT is on the other side of that line by design.
+> **What it means:**
+>
+> The paper itself draws the line. An encoder reads the whole input at once and gives back one vector per token. A decoder sees only the words to its left, so it can write text one word at a time.
+>
+> BERT is on the encoder side of that line by design. It has no natural way to write a long answer word by word. Chatbots are built on decoders, in the line of GPT, not on BERT.
 
 ### Limit 7: pre-training is expensive
 
-> [!PAPER] · Appendix A.2 · page 13
+> [!PAPER] · §A.2
 > [![Appendix A.2: training of BERT-base was performed on 4 Cloud TPUs in Pod configuration, 16 TPU chips total; BERT-large on 16 Cloud TPUs, 64 TPU chips total; each pre-training took 4 days to complete](/img/papers/bert/p6-compute.png)](/img/papers/bert/p6-compute.png)
->
-> **Context:** Appendix A.2, the pre-training procedure.
 >
 > **What it says:** BERT-base was trained on "4 Cloud TPUs in Pod configuration (16 TPU chips total)", BERT-large on "16 Cloud TPUs (64 TPU chips total)", and "each pre-training took 4 days to complete".
 >
-> **Why it matters:** in 2018, few people outside large labs could pre-train BERT themselves. That is why the public release of the weights mattered so much.
+> **What it means:**
+>
+> 16 chips for 4 days is 64 chip-days for BERT-base; 64 chips for 4 days is 256 chip-days for BERT-large. In 2018, few people outside large labs had that much compute.
+>
+> That is why the public release of the weights mattered so much. Most people could never pre-train BERT, but anyone could download it and fine-tune it.
 
 > [!DEFINITION] TPU
 > Tensor Processing Unit: a chip designed by Google for neural network maths, similar in role to a GPU.
 
 The good news is the paper's own: fine-tuning is cheap. Section 3.2 says every result in the paper "can be replicated in at most 1 hour on a single Cloud TPU, or a few hours on a GPU, starting from the exact same pre-trained model" (Part 4).
 
-> [!PAPER] · Section 3.2 · page 5
+> [!PAPER] · §3.2
 > [![From Section 3.2: compared to pre-training, fine-tuning is relatively inexpensive; all of the results in the paper can be replicated in at most 1 hour on a single Cloud TPU, or a few hours on a GPU, starting from the exact same pre-trained model](/img/papers/bert/p6-finetune-cost.png)](/img/papers/bert/p6-finetune-cost.png)
->
-> **Context:** the end of Section 3.2.
 >
 > **What it says:** "All of the results in the paper can be replicated in at most 1 hour on a single Cloud TPU, or a few hours on a GPU, starting from the exact same pre-trained model."
 >
-> **Why it matters:** the expensive step is done once, by someone else; everyone downstream pays only the cheap step.
+> **What it means:**
+>
+> Think of a bridge. One company pays to build it, and then everyone crosses it for a small toll. Pre-training is the bridge; fine-tuning is the toll.
+>
+> The expensive step is done once, by someone else. Everyone downstream pays only the cheap step: at most an hour on one Cloud TPU.
 
 How big was the pre-training budget, in tokens? From the numbers in Appendix A.2:
 
