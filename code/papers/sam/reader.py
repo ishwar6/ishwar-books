@@ -17,7 +17,7 @@ ROOT = os.path.join(HERE, '..', '..', '..')
 OUT = os.path.join(ROOT, 'public', 'papers', 'pdf')
 YELLOW = (1.0, 0.86, 0.2)
 TEAL = (0.2, 0.6, 0.53)
-STITCHED = {'p2-resolving': ['p2-resolving-a', 'p2-resolving-b']}   # one screenshot made of two crops
+STITCHED = {'p2-resolving': ['p2-resolving-a', 'p2-resolving-b'], 'p4-b-post': ['p4-b-post-a', 'p4-b-post-b']}   # one screenshot made of two crops
 
 
 def jobs():

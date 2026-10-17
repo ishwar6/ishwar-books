@@ -1,0 +1,88 @@
+model: facebook/sam-vit-huge (the released SAM ViT-H) on mps; photos: cats 640 x 480, car 2646 x 1764 resized to 1500 x 1000
+
+== 1. the stability score, by hand ==
+one row of 10 mask logits: -4.0, -1.5, -0.6, +0.3, +1.8, +3.2, +2.5, +0.9, -0.4, -2.0
+  cut at +1: 3 pixels;  cut at 0 (the mask): 5 pixels;  cut at -1: 7 pixels;  stability = 3 / 7 = 0.429
+  logit +1 = probability 0.731;  logit -1 = probability 0.269  -> in the words of Section 4: 0.5 - delta and 0.5 + delta with delta = 0.231
+
+== 2. the fully automatic stage on the cat photo: 32 x 32 points, full picture only ==
+grid: 32 x 32 = 1024 points; first point at (10.0, 7.5) px, spacing 20.0 px across and 15.0 px down
+candidates: 1024 points x 3 masks = 3072
+  predicted IoU > 0.88:                     2507  (removed 565)
+  and stability >= 0.95:                   2127  (removed 380)
+  and covers < 95% of the picture:           2127  (removed 0)
+  box NMS at 0.7 (duplicates):                 30  (removed 2097)
+  pieces and holes under 100 px: 7 masks changed, 3 removed; NMS again: 23 final masks
+stability only (ignoring the IoU filter): 2135 of 3072 pass;  both fail: 557
+candidates with a stability of exactly 0.95 (where > and >= differ): 0
+final masks by output slot (mask 1, 2, 3 of the point): 14, 8, 1
+
+the three masks of grid point 205 at (270, 98):
+  mask 1: 11,045 px  predicted IoU 0.612  pixels > +1:  7,441  pixels > -1: 13,022  stability 7,441 / 13,022 = 0.571  ->  rejected
+  mask 2: 48,135 px  predicted IoU 1.011  pixels > +1: 47,736  pixels > -1: 48,458  stability 47,736 / 48,458 = 0.985  ->  kept
+  mask 3: 50,501 px  predicted IoU 1.004  pixels > +1: 50,127  pixels > -1: 50,880  stability 50,127 / 50,880 = 0.985  ->  kept
+
+duplicates: candidates (after the filters) whose box overlaps a final mask by more than 0.7
+  final mask of 137,171 px: 1193 candidates from 563 grid points
+  final mask of 57,277 px: 319 candidates from 193 grid points
+  final mask of 48,240 px: 303 candidates from 164 grid points
+
+== 3. the same run with transformers pipeline("mask-generation") ==
+pipeline: 30 masks;  ours before the clean-up: 30 masks (after it: 23)
+each of our masks against its best match in the pipeline output: IoU >= 0.99 for 30 of 30, lowest 1.000;  pipeline masks with a match >= 0.99 in ours: 30 of 30
+
+== 4. the car photo (1500 x 1000): full picture only, then with the 20 zoomed-in crops ==
+full picture only: 3072 candidates -> IoU 2607 -> stability 1641 -> < 95% 1641 -> NMS 76 -> final 70
+crops: 21 = 1 full picture + 4 (2 x 2) + 16 (4 x 4); sizes 921 x 671 and 503 x 378 px; points 32 x 32, 16 x 16 and 8 x 8
+with crops: 3072 points, 9216 candidates -> IoU 7969 -> stability 5197 -> < 95% 5197 -> not at an inner crop edge 2098 -> NMS in each crop 218 -> NMS across crops 110 -> final 101
+final masks by source: full picture 23, 2 x 2 crops 33, 4 x 4 crops 45
+the same with crops on the cat photo:
+  9216 candidates -> final 29 (full picture 9, 2 x 2 9, 4 x 4 11)
+
+== 5. Section 5 style statistics on our two photos (a tiny sample, not SA-1B) ==
+tiny example: a 4 x 4 square with a 2 x 2 bite: area 12, convex hull area 14, concavity 1 - 12/14 = 0.143
+cats: 29 masks;  relative size sqrt(area / picture): median 0.057, under 0.1: 20 (69%), 0.1 to 0.3: 6, 0.3 and above: 3
+      concavity: median 0.101, mean 0.157, max 0.591;  under 0.1: 14
+car: 101 masks;  relative size sqrt(area / picture): median 0.039, under 0.1: 83 (82%), 0.1 to 0.3: 14, 0.3 and above: 4
+      concavity: median 0.049, mean 0.074, max 0.591;  under 0.1: 74
+both photos: 130 masks, 65.0 per photo (SA-1B: 1.1B / 11M = 100 per image); relative size bins 0-0.05-0.1-0.2-0.3-0.5-0.75-1: [72, 31, 17, 3, 4, 3, 0]
+
+== 6. the numbers of the paper, worked out ==
+stage 1: 4.3M masks / 120k images = 35.8 masks per image (it grew from 20 to 44 during the stage)
+stage 2: 5.9M new masks / 180k images = 32.8 new masks per image (72 per image with the automatic ones)
+stages 1 + 2: 10.2M masks; retrains: 6 + 5 = 11
+stage 3: 1.1B masks / 11M images = 100 masks per image; share made fully automatically: (1129M - 10.2M) / 1129M = 99.1%
+time per mask: 14 s x 6.5 = 91 s for a COCO mask; 14 s / 2 = 7 s for a box with extreme points
+1.1B masks by hand at 14 s each: 4.28 million hours = 488 years of work without a pause
+SA-1B pictures: 3300 x 4950 = 16.3M pixels = 53x a COCO picture (480 x 640); released at 1500 x 2250 = 3.38M pixels = 11x COCO
+grid spacing on an average SA-1B picture: 103 x 155 px; in the 1024 frame that SAM reads: 32 px
+scale that SAM applies: full car photo 1024 / 1500 = 0.68; a 4 x 4 crop 1024 / 503 = 2.04 -> an object looks 3.0x larger in the crop
+mask quality study: 500 images, ~50k masks -> ~100 masks per image; 94% of ~50k = ~47,000 pairs above 0.90 IoU
+dataset sizes (Figure 6 legend): masks per image: SA-1B 103, Open Images 2.7, ADE20K 25, COCO 7.3, LVIS 12.5
+  SA-1B / Open Images: images 11x, masks 418x, masks per image 38x; SA-1B / ADE20K masks per image 4.1x (the paper: 3.5x, from exact counts)
+Table 1: masks per image in each group = #masks / #images
+  Africa                      28M /  0.3M =   93.3;  share of SA-1B images  2.8%  COCO  3.0%  Open Images  1.7%
+  Asia & Oceania             423M /  3.9M =  108.5;  share of SA-1B images 36.2%  COCO 11.4%  Open Images 14.3%
+  Europe                     540M /  5.4M =  100.0;  share of SA-1B images 49.8%  COCO 34.2%  Open Images 36.2%
+  Latin America & Carib.      36M / 0.38M =   94.7;  share of SA-1B images  3.5%  COCO  3.1%  Open Images  5.0%
+  North America               80M / 0.83M =   96.4;  share of SA-1B images  7.7%  COCO 48.3%  Open Images 42.8%
+  high income                598M /  5.8M =  103.1;  share of SA-1B images 54.0%  COCO 89.1%  Open Images 87.5%
+  middle income              499M /  4.9M =  101.8;  share of SA-1B images 45.0%  COCO 10.5%  Open Images 12.0%
+  low income                 9.4M /  0.1M =   94.0;  share of SA-1B images  0.9%  COCO  0.4%  Open Images  0.5%
+  regions add up to 100.0% (SA-1B), 100.0% (COCO), 100.0% (Open Images); countries 217 by region, 217 by income
+  Africa in SA-1B: 28M masks = 10x all the masks of Open Images (2.7M)
+Tables 2 and 6: 95% confidence intervals (mean +- half-width), 1 point
+  people   older     [56.2, 69.6]  middle    [53.2, 55.8]  -> disjoint
+  people   feminine  [52.7, 56.1]  masculine [54.0, 57.4]  -> overlap
+  clothing feminine  [75.2, 77.4]  masculine [79.8, 82.2]  -> disjoint
+  clothing older     [78.1, 85.7]  middle    [77.4, 79.0]  -> overlap
+  clothing, gender: gap 81.0 - 76.3 = 4.7 points at 1 point; 92.3 - 90.7 = 1.6 at 3 points; 3-point intervals [90.2, 91.2] and [91.9, 92.7]
+unstable example: stability 1,438 / 59,737 = 0.024, predicted IoU 0.916, 58,299 pixels between -1 and +1
+unstable example: stability 150,707 / 187,803 = 0.802, predicted IoU 0.898, 37,096 pixels between -1 and +1
+unstable example: stability 137,460 / 146,938 = 0.935, predicted IoU 0.999, 9,478 pixels between -1 and +1
+low-confidence example: predicted IoU 0.831, stability 0.951, 182,786 px
+low-confidence example: predicted IoU 0.841, stability 0.961, 7,590 px
+low-confidence example: predicted IoU 0.868, stability 0.983, 7,912 px
+NMS example: duplicate with box IoU 0.889, predicted IoU 1.015 (kept mask: 1.017), mask IoU 0.997
+NMS example: duplicate with box IoU 0.755, predicted IoU 1.001 (kept mask: 1.017), mask IoU 0.740
+the kept mask had 1192 duplicates among the filtered candidates

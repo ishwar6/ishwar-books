@@ -1,0 +1,84 @@
+bike photo: COCO val2017 174482, 640 x 388 pixels; cats photo: 640 x 480 pixels
+device: mps
+
+== the two models ==
+ViT-H: 641,090,864 weights, of which image encoder 637,026,048, prompt encoder + mask decoder 4,064,816
+ViT-B: 93,735,728 weights, of which image encoder 89,670,912, prompt encoder + mask decoder 4,064,816
+ViT-H has 7.1 x the encoder weights of ViT-B
+
+== 1. fine structures: the bicycle photo ==
+ViT-H: box [195, 8, 497, 388] -> 1 mask, predicted IoU 0.972, 61,124 pixels
+ViT-H: point (482, 270) on the rear tyre -> mask 2 (the wheel), predicted IoU 1.003, 34,976 pixels; holes inside it: 6 (77 pixels)
+ViT-B: box [195, 8, 497, 388] -> 1 mask, predicted IoU 0.957, 57,916 pixels
+ViT-B: point (482, 270) on the rear tyre -> mask 2 (the wheel), predicted IoU 0.903, 35,190 pixels; holes inside it: 27 (684 pixels)
+
+== 2. a drawn wheel: 24 spokes of known width, box prompt, 1024 x 1024 pixels ==
+the image is 1024 x 1024, so the 256 x 256 low-resolution mask has one cell for each 4 x 4 pixels
+model   spoke width  spoke px   score  spoke recall  gap fill    IoU  best of 3 IoU
+ViT-H          1 px     7,907   0.917         0.000     0.000  0.835          0.839
+ViT-H          2 px    16,188   0.733         0.208     0.014  0.745          0.771
+ViT-H          3 px    26,062   0.756         0.620     0.534  0.263          0.709
+ViT-H          4 px    34,234   0.893         0.988     0.991  0.193          0.656
+ViT-H          6 px    52,289   0.989         1.000     1.000  0.222          0.569
+ViT-H          8 px    69,115   0.994         1.000     1.000  0.249          0.586
+ViT-H         12 px   103,939   0.996         1.000     1.000  0.306          0.878
+ViT-H         16 px   140,145   0.995         1.000     1.000  0.366          0.865
+ViT-B          1 px     7,907   0.917         0.045     0.001  0.841          0.846
+ViT-B          2 px    16,188   0.873         0.119     0.004  0.773          0.776
+ViT-B          3 px    26,062   0.871         0.506     0.046  0.681          0.708
+ViT-B          4 px    34,234   0.915         0.888     0.402  0.358          0.681
+ViT-B          6 px    52,289   0.986         1.000     0.945  0.233          0.782
+ViT-B          8 px    69,115   1.002         1.000     0.994  0.252          0.856
+ViT-B         12 px   103,939   1.009         1.000     0.998  0.309          0.871
+ViT-B         16 px   140,145   1.004         1.000     0.995  0.369          0.901
+ViT-H: widths with spoke recall > 0.9 and gap fill < 0.1 (the correct shape): none
+ViT-B: widths with spoke recall > 0.9 and gap fill < 0.1 (the correct shape): none
+
+== 3. small disconnected components: 16 x 16 grid of single-point prompts ==
+bike ViT-H: 256 prompts, 152 masks with more than one piece (59%), 145 with stray pieces under 100 pixels (57%), 1051 such pieces in total, median size 5 pixels
+   only masks with predicted IoU > 0.88: 231 masks, 125 with stray pieces under 100 pixels (54%)
+   and also stable (IoU of the masks at logit +1 and -1 >= 0.95): 153 masks, 57 with stray pieces under 100 pixels (37%)
+bike ViT-B: 256 prompts, 133 masks with more than one piece (52%), 125 with stray pieces under 100 pixels (49%), 1122 such pieces in total, median size 5 pixels
+   only masks with predicted IoU > 0.88: 179 masks, 74 with stray pieces under 100 pixels (41%)
+   and also stable (IoU of the masks at logit +1 and -1 >= 0.95): 95 masks, 14 with stray pieces under 100 pixels (15%)
+cats ViT-H: 256 prompts, 154 masks with more than one piece (60%), 87 with stray pieces under 100 pixels (34%), 1195 such pieces in total, median size 4 pixels
+   only masks with predicted IoU > 0.88: 255 masks, 86 with stray pieces under 100 pixels (34%)
+   and also stable (IoU of the masks at logit +1 and -1 >= 0.95): 239 masks, 71 with stray pieces under 100 pixels (30%)
+cats ViT-B: 256 prompts, 210 masks with more than one piece (82%), 209 with stray pieces under 100 pixels (82%), 9212 such pieces in total, median size 4 pixels
+   only masks with predicted IoU > 0.88: 224 masks, 182 with stray pieces under 100 pixels (81%)
+   and also stable (IoU of the masks at logit +1 and -1 >= 0.95): 37 masks, 3 with stray pieces under 100 pixels (8%)
+example cats: click (20, 135), predicted IoU 0.959, main piece 127,706 px, 395 stray pieces under 100 px: sizes [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 8, 8, 8, 8, 9, 9, 10, 10, 10, 10, 10, 10, 11, 12, 12, 12, 13, 13, 13, 13, 14, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 18, 18, 18, 19, 19, 19, 19, 19, 21, 21, 21, 22, 23, 23, 24, 25, 28, 30, 33, 49, 58, 58, 60, 65, 69, 71, 71, 77, 90]
+example bike: click (100, 158), predicted IoU 0.924, main piece 40,080 px, 57 stray pieces under 100 px: sizes [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 4, 4, 4, 4, 5, 6, 6, 6, 7, 7, 7, 7, 7, 7, 8, 8, 9, 9, 9, 12, 13, 14, 16, 16, 17, 17, 18, 18, 20, 24, 26, 40, 47, 47, 50, 72, 76, 82]
+
+== 4. boundary crispness: the low-resolution logits and the soft band ==
+ViT-H: low-resolution logits (256, 256); one cell covers 2.50 x 2.50 photo pixels
+ViT-H: wheel mask edge 1,060 pixels long; pixels with probability between 0.1 and 0.9: 3,768; mean width of the soft band 3.55 pixels
+ViT-H: the final mask and the 256 x 256 cell mask (blown up without interpolation) differ in 648 pixels, 1.9% of the mask area
+ViT-B: low-resolution logits (256, 256); one cell covers 2.50 x 2.50 photo pixels
+ViT-B: wheel mask edge 1,618 pixels long; pixels with probability between 0.1 and 0.9: 13,819; mean width of the soft band 8.54 pixels
+
+== 4b. a drawn edge with teeth of known width (1024 x 1024, box prompt): how fine can the edge be? ==
+teeth 16 pixels high on the top edge of a dark block; tooth width = gap width = t
+model       t  tooth recall  gap fill   edge error (no teeth)
+ViT-H    none                                         2.27 px
+ViT-H     1 px         0.968     0.968
+ViT-H     2 px         0.986     0.989
+ViT-H     4 px         0.993     0.985
+ViT-H     8 px         0.916     0.469
+ViT-H    16 px         0.384     0.011
+ViT-H    32 px         0.807     0.004
+ViT-B    none                                         1.67 px
+ViT-B     1 px         0.722     0.720
+ViT-B     2 px         0.876     0.876
+ViT-B     4 px         0.895     0.874
+ViT-B     8 px         0.827     0.424
+ViT-B    16 px         0.288     0.029
+ViT-B    32 px         0.823     0.005
+
+== 5. ViT-B against ViT-H on the same prompts (masks of ViT-H taken as the reference) ==
+bike, ViT-B top mask: 256 prompts, mean IoU with the ViT-H top mask 0.753, median 0.915, 54% above 0.9, 18% below 0.5
+bike, closest of 3 ViT-B masks: 256 prompts, mean IoU with the ViT-H top mask 0.884, median 0.944, 69% above 0.9, 5% below 0.5
+cats, ViT-B top mask: 256 prompts, mean IoU with the ViT-H top mask 0.810, median 0.936, 58% above 0.9, 11% below 0.5
+cats, closest of 3 ViT-B masks: 256 prompts, mean IoU with the ViT-H top mask 0.902, median 0.951, 70% above 0.9, 0% below 0.5
+
+saved results/part6.json
