@@ -13,14 +13,16 @@ Everything that can be checked, we check on the real released model, `bert-base-
 
 ## Related work: a long history of pre-training {§2}
 
-> [!PAPER] · Section 2 · page 2
+> [!PAPER] · §2
 > [![The opening of Section 2, Related Work: there is a long history of pre-training general language representations, and we briefly review the most widely-used approaches in this section](/img/papers/bert/p2-related-intro.png)](/img/papers/bert/p2-related-intro.png)
->
-> **Context:** right after the introduction. Before describing BERT, the authors place it in the history of the field.
 >
 > **What it says:** "There is a long history of pre-training general language representations." The section reviews the most used approaches, in three groups.
 >
-> **Why it matters:** BERT is not one sudden invention. It combines ideas that already worked: learned word vectors, contextual vectors, fine-tuning, and transfer learning. Knowing them makes clear what is actually new.
+> **What it means:**
+>
+> No invention starts from zero. A new car still has wheels, seats and an engine, and often only one part is really new. So before the authors describe BERT, they place it in the history of the field.
+>
+> BERT is not one sudden invention. It combines ideas that already worked: learned word vectors, contextual vectors, fine-tuning, and transfer learning. Knowing them makes clear what is actually new.
 
 The three groups are: **feature-based** approaches (§2.1), **fine-tuning** approaches (§2.2), and **transfer from labelled data** (§2.3). We take them one at a time.
 
@@ -28,14 +30,16 @@ The three groups are: **feature-based** approaches (§2.1), **fine-tuning** appr
 
 ### Word embeddings {§2.1}
 
-> [!PAPER] · Section 2.1 · page 2
+> [!PAPER] · §2.1
 > [![Section 2.1, Unsupervised Feature-based Approaches: learning widely applicable representations of words has been an active area of research for decades. Pre-trained word embeddings are an integral part of modern NLP systems, offering significant improvements over embeddings learned from scratch](/img/papers/bert/p2-feature-words.png)](/img/papers/bert/p2-feature-words.png)
->
-> **Context:** the first paragraph of Section 2.1.
 >
 > **What it says:** people have learned vectors for words for decades, first without neural networks and then with them (Mikolov et al., 2013, known as word2vec; Pennington et al., 2014, known as GloVe). "Pre-trained word embeddings" give "significant improvements over embeddings learned from scratch".
 >
-> **Why it matters:** this is the oldest form of pre-training: learn one vector per word from a lot of text, then reuse those vectors in other models.
+> **What it means:**
+>
+> Think of a dictionary in which every word has a fixed entry. Someone wrote the entry once, after a lot of reading, and every later reader can look it up. A pre-trained word embedding is such an entry, written as a list of numbers.
+>
+> This is the oldest form of pre-training: learn one vector per word from a lot of text, then reuse those vectors in other models. "Significant improvements over embeddings learned from scratch" means that the reuse pays. A small task no longer has to learn what words mean from its own few examples.
 
 > [!DEFINITION] Word embedding
 > A fixed list of numbers for each word in a vocabulary, learned from a large amount of text so that words used in similar ways get similar lists. word2vec (2013) and GloVe (2014) are the two most famous methods.
@@ -49,23 +53,27 @@ A word embedding is a **lookup table**: one row per word. The word "bank" always
 
 The paragraph says word vectors were trained with left-to-right language models and with objectives that "discriminate correct from incorrect words in left and right context". The second phrase is word2vec. Here is its picture and its training objective, from its own papers:
 
-> [!PAPER] Mikolov et al. (2013a), Efficient Estimation of Word Representations in Vector Space · Section 3.2, Figure 1
+> [!PAPER] Mikolov et al. (2013a), Efficient Estimation of Word Representations in Vector Space · §3.2, Figure 1
 > [![Figure 1 of the skip-gram paper: the input word w(t) is projected to a vector, which is used to predict the surrounding words w(t-2), w(t-1), w(t+1), w(t+2); the training objective is to learn word vectors that are good at predicting the nearby words](/img/papers/bert/p2-ext-skipgram-fig1.png)](/img/papers/bert/p2-ext-skipgram-fig1.png)
 >
-> **Context:** the skip-gram model, one of the two word2vec models.
+> **What it says:** in the skip-gram model, one of the two word2vec models, one word goes in, becomes a vector, and that vector is used to predict the words around it, two on each side here. The training objective is "to learn word vector representations that are good at predicting the nearby words".
 >
-> **What it says:** one word goes in, becomes a vector, and that vector is used to predict the words around it, two on each side here. The training objective is "to learn word vector representations that are good at predicting the nearby words".
+> **What it means:**
 >
-> **Why it matters:** this is "left and right context" in 2013: a small window on both sides of the word. The window is the context; there are no layers that mix it.
+> You can guess a lot about a person from the friends they keep. Skip-gram applies the same idea to words: a word's vector must be good at predicting the words that stand near it.
+>
+> This is "left and right context" in 2013: a small window on both sides of the word. The window is the context; there are no layers that mix it. So each word ends up with one vector, the same in every sentence.
 
-> [!PAPER] Mikolov et al. (2013b), Distributed Representations of Words and Phrases · Section 2.2, Equation (4)
+> [!PAPER] Mikolov et al. (2013b), Distributed Representations of Words and Phrases · §2.2, Equation (4)
 > [![Equation 4 of the word2vec negative sampling paper: the objective log sigma of v prime w O dot v w I plus the sum over k samples from a noise distribution of log sigma of minus v prime w i dot v w I, called negative sampling](/img/papers/bert/p2-ext-skipgram-neg.png)](/img/papers/bert/p2-ext-skipgram-neg.png)
 >
-> **Context:** the trick that made skip-gram fast, from the paper BERT cites as Mikolov et al. (2013).
+> **What it says:** this is the trick that made skip-gram fast. instead of a softmax over the whole vocabulary, the model learns to tell the real neighbour $$w_O$$ apart from $$k$$ random "noise" words. They "define Negative sampling (NEG)" by this objective.
 >
-> **What it says:** instead of a softmax over the whole vocabulary, the model learns to tell the real neighbour $$w_O$$ apart from $$k$$ random "noise" words. They "define Negative sampling (NEG)" by this objective.
+> **What it means:**
 >
-> **Why it matters:** this is exactly "discriminate correct from incorrect words in left and right context", the phrase in BERT's related work.
+> Think of a quiz that asks "which word really stood next to *sat*?" Checking every word in the dictionary is slow. So the quiz shows one real neighbour and a few random words, and the model only has to tell them apart.
+>
+> This is exactly "discriminate correct from incorrect words in left and right context", the phrase in BERT's related work. It is also the paper that BERT cites as Mikolov et al. (2013). The objective below scores that yes-or-no choice.
 
 The objective, symbol by symbol:
 
@@ -88,14 +96,16 @@ where:
 
 ### Sentence and paragraph embeddings {§2.1}
 
-> [!PAPER] · Section 2.1 · page 2
+> [!PAPER] · §2.1
 > [![These approaches have been generalized to coarser granularities, such as sentence embeddings or paragraph embeddings. Prior work trained sentence representations by ranking candidate next sentences, generating the next sentence, or with denoising auto-encoder objectives](/img/papers/bert/p2-feature-sentences.png)](/img/papers/bert/p2-feature-sentences.png)
->
-> **Context:** the second paragraph of Section 2.1.
 >
 > **What it says:** the same idea was "generalized to coarser granularities": one vector for a whole **sentence** or **paragraph**. To learn them, earlier work ranked candidate next sentences, generated the next sentence's words, or used "denoising auto-encoder" objectives.
 >
-> **Why it matters:** two of these ideas come back in BERT. Guessing **which sentence comes next** returns as next sentence prediction (Part 3), and **repairing a damaged input** is close to masked language modelling.
+> **What it means:**
+>
+> Word vectors give one entry per word. The next step was one entry per sentence or paragraph, so that one whole thought could be compared with another. "Coarser granularities" simply means bigger pieces of text.
+>
+> Two of these ideas come back in BERT. Guessing **which sentence comes next** returns as next sentence prediction (Part 3), and **repairing a damaged input** is close to masked language modelling.
 
 > [!DEFINITION] Denoising auto-encoder
 > A model that is given a damaged input (some words deleted or swapped) and is trained to rebuild the clean original. BERT's masked language model is similar, but it only has to rebuild the hidden words, not the whole input.
@@ -104,36 +114,44 @@ The paragraph packs three earlier sentence objectives into one sentence. Each on
 
 **1. Generate the neighbouring sentences (skip-thought).** Kiros et al. (2015) encode a sentence into one vector, then train two decoders to write the sentence before it and the sentence after it.
 
-> [!PAPER] Kiros et al. (2015), Skip-Thought Vectors · Section 2, Figure 1
+> [!PAPER] Kiros et al. (2015), Skip-Thought Vectors · §2, Figure 1
 > [![Figure 1 of the skip-thought paper: given a triplet of contiguous sentences, the middle sentence I could see the cat on the steps is encoded and the model tries to reconstruct the previous sentence I got back home and the next sentence This was strange](/img/papers/bert/p2-ext-skipthought-fig1.png)](/img/papers/bert/p2-ext-skipthought-fig1.png)
 >
-> **Context:** the model BERT's related work describes as "left-to-right generation of next sentence words given a representation of the previous sentence".
+> **What it says:** this is the model that BERT describes as "left-to-right generation of next sentence words given a representation of the previous sentence". given three sentences in a row, "the sentence $$s_i$$ is encoded and tries to reconstruct the previous sentence $$s_{i-1}$$ and next sentence $$s_{i+1}$$".
 >
-> **What it says:** given three sentences in a row, "the sentence $$s_i$$ is encoded and tries to reconstruct the previous sentence $$s_{i-1}$$ and next sentence $$s_{i+1}$$".
+> **What it means:**
 >
-> **Why it matters:** the idea that a sentence's meaning shows in what comes around it. BERT keeps this idea but turns it into a much cheaper yes/no question (next sentence prediction, Part 3).
+> Think of a friend who tells you the middle of a story. If you understand that part, you can guess what happened just before and just after it. Skip-thought trains a sentence vector to do that guessing.
+>
+> The idea is that a sentence's meaning shows in what comes around it. BERT keeps this idea but turns it into a much cheaper yes/no question (next sentence prediction, Part 3). Writing out a whole sentence word by word is slow; one yes or no is fast.
 
 **2. Rank candidate next sentences.** Jernite et al. (2017) and Logeswaran and Lee (2018) skip the writing. They give the model a sentence and a few candidates, and train it to pick the one that really came next.
 
-> [!PAPER] Logeswaran and Lee (2018), An efficient framework for learning sentence representations · Section 3, Figure 1
+> [!PAPER] Logeswaran and Lee (2018), An efficient framework for learning sentence representations · §3, Figure 1
 > [![Figure 1 of the quick-thought paper: the conventional approach encodes Spring had come and decodes the next sentence; the proposed approach encodes the sentence and several candidates and a classifier chooses the target sentence from the set of candidate sentences](/img/papers/bert/p2-ext-quickthought-fig1.png)](/img/papers/bert/p2-ext-quickthought-fig1.png)
 >
-> **Context:** the "quick-thought" model, one of the two papers BERT cites for ranking next sentences.
+> **What it says:** this is the "quick-thought" model, one of the two papers BERT cites for ranking next sentences. (a) the conventional approach decodes the next sentence word by word. (b) The proposed approach "replaces the decoder with a classifier which chooses the target sentence from a set of candidate sentences".
 >
-> **What it says:** (a) the conventional approach decodes the next sentence word by word. (b) The proposed approach "replaces the decoder with a classifier which chooses the target sentence from a set of candidate sentences".
+> **What it means:**
 >
-> **Why it matters:** choosing beats generating: it is faster and trains the same skill. BERT's next sentence prediction is the simplest version: two candidates (the real next sentence or a random one), one yes/no answer.
+> A multiple-choice test is faster to mark than an essay, and it can still test the same knowledge. Quick-thought makes that trade: the model picks the true next sentence instead of writing it.
+>
+> Choosing beats generating: it is faster and trains the same skill. BERT's next sentence prediction is the simplest version: two candidates (the real next sentence or a random one), one yes/no answer.
 
 **3. Repair a damaged sentence (denoising auto-encoders).** Hill et al. (2016) corrupt a sentence and train an encoder-decoder to rebuild the original.
 
-> [!PAPER] Hill, Cho, Korhonen (2016), Learning Distributed Representations of Sentences from Unlabelled Data · Section 2
+> [!PAPER] Hill, Cho, Korhonen (2016), Learning Distributed Representations of Sentences from Unlabelled Data · §2
 > [![The sequential denoising autoencoder paragraph of Hill et al.: each word is deleted with probability p0 and each non-overlapping bigram is swapped with probability px, and an LSTM encoder-decoder is trained to predict the original sentence from the corrupted version](/img/papers/bert/p2-ext-hill-sdae.png)](/img/papers/bert/p2-ext-hill-sdae.png)
 >
-> **Context:** the "sequential denoising autoencoder" (SDAE), the model behind the phrase "denoising auto-encoder derived objectives".
+> **What it says:** the "sequential denoising autoencoder" (SDAE) is the model behind the phrase "denoising auto-encoder derived objectives". each word is deleted "with (independent) probability $$p_o$$", neighbouring pairs are swapped with probability $$p_x$$, and an LSTM encoder-decoder learns to "predict (as target) the original source sentence" from the damaged one.
 >
-> **What it says:** each word is deleted "with (independent) probability $$p_o$$", neighbouring pairs are swapped with probability $$p_x$$, and an LSTM encoder-decoder learns to "predict (as target) the original source sentence" from the damaged one.
+> **What it means:**
 >
-> **Why it matters:** this is the closest ancestor of the masked language model. BERT damages the input too, but only asks for the damaged words back, not the whole sentence (Section 3.1 says so explicitly).
+> Think of a page with coffee stains: some words are gone, and two words have changed places. A good reader can still say what the page said. The SDAE is trained to be that reader.
+>
+> This is the closest ancestor of the masked language model. BERT damages the input too, but only asks for the damaged words back, not the whole sentence (Section 3.1 says so explicitly).
+>
+> The difference looks small, but it changes the model. An SDAE needs a decoder that writes the whole sentence again. BERT needs only an encoder that reads.
 
 {{FIG:p2_sentence_objectives|Learning sentence vectors from neighbouring sentences. Skip-thought writes the previous and next sentence from one sentence vector. Ranking methods score candidate sentences and pick the true next one (scores here are an illustration).}}
 
@@ -141,14 +159,16 @@ The paragraph packs three earlier sentence objectives into one sentence. Each on
 
 ### ELMo: a word's vector depends on its sentence {§2.1}
 
-> [!PAPER] · Section 2.1 · page 2
+> [!PAPER] · §2.1
 > [![The ELMo paragraph: ELMo extracts context-sensitive features from a left-to-right and a right-to-left language model. The contextual representation of each token is the concatenation of the left-to-right and right-to-left representations. Melamud et al. 2016 predicted a word from both sides with LSTMs, but their model is feature-based and not deeply bidirectional](/img/papers/bert/p2-elmo.png)](/img/papers/bert/p2-elmo.png)
->
-> **Context:** the third paragraph of Section 2.1, about the strongest feature-based model of 2018.
 >
 > **What it says:** ELMo extracts "context-sensitive features" from a left-to-right and a right-to-left language model. Each token's vector "is the concatenation of the left-to-right and right-to-left representations". Plugged into existing task models, ELMo set new records in question answering, sentiment analysis and named entity recognition. Melamud et al. (2016, called context2vec) predicted a word from both sides with LSTMs, but, like ELMo, it is "not deeply bidirectional". Fedus et al. (2018) used the Cloze task to improve text generation.
 >
-> **Why it matters:** ELMo fixed the "bank" problem: the vector of a word now depends on its sentence. BERT keeps that, and makes the two directions mix in every layer instead of only at the end.
+> **What it means:**
+>
+> Remember the word "bank" in "river bank" and in "bank account". A word embedding gives both the same vector. ELMo, the strongest feature-based model of 2018, fixed this "bank" problem: the vector of a word now depends on its sentence.
+>
+> The fix has a limit, and the paragraph names it: "not deeply bidirectional". ELMo's two readers each go one way, and their results are only glued together at the end. BERT keeps contextual vectors, and makes the two directions mix in every layer instead of only at the end.
 
 > [!DEFINITION] Contextual embedding
 > A word vector that is computed fresh for each sentence, from the words around it. The same word in two sentences gets two different vectors. ELMo and BERT both produce contextual embeddings.
@@ -209,15 +229,17 @@ The static row of the table cannot tell the two banks apart: it is literally the
 
 ### Fine-tuning approaches {§2.2}
 
-> [!PAPER] · Section 2.2 · pages 2 and 3
+> [!PAPER] · §2.2
 > [![Section 2.2, Unsupervised Fine-tuning Approaches: the first works only pre-trained word embedding parameters. More recently, sentence or document encoders have been pre-trained from unlabeled text and fine-tuned for a supervised downstream task. The advantage is that few parameters need to be learned from scratch. OpenAI GPT achieved previously state-of-the-art results on many sentence-level tasks from the GLUE benchmark](/img/papers/bert/p2-finetune.png)](/img/papers/bert/p2-finetune.png)
 > [![The paragraph continues on page 3: left-to-right language modeling and auto-encoder objectives have been used for pre-training such models](/img/papers/bert/p2-finetune2.png)](/img/papers/bert/p2-finetune2.png)
 >
-> **Context:** Section 2.2, the family BERT belongs to. It runs from page 2 onto page 3.
->
 > **What it says:** the first works (Collobert and Weston, 2008) "only pre-trained word embedding parameters". Later, whole encoders were pre-trained on unlabeled text and "fine-tuned for a supervised downstream task" (Dai and Le, 2015; Howard and Ruder, 2018; Radford et al., 2018). The advantage: "few parameters need to be learned from scratch". This is partly why OpenAI GPT held the previous best results on many GLUE tasks. They were pre-trained with left-to-right language modelling and auto-encoder objectives.
 >
-> **Why it matters:** BERT takes this recipe unchanged (pre-train everything, fine-tune everything) and only changes what happens during pre-training.
+> **What it means:**
+>
+> Think of buying a house instead of building one. The first buyers bought only bricks: early work pre-trained just the word vectors. Later work bought whole houses: the entire encoder was pre-trained, then fine-tuned for each task.
+>
+> This is the family BERT belongs to. BERT takes this recipe unchanged (pre-train everything, fine-tune everything) and only changes what happens during pre-training.
 
 > [!DEFINITION] Supervised learning
 > Learning from labelled examples: inputs paired with the right answers. Fine-tuning on a task is supervised. Pre-training on plain text is called **unsupervised** (or self-supervised), because the "answers" come from the text itself.
@@ -226,14 +248,16 @@ The key phrase is "**few parameters need to be learned from scratch**". With the
 
 ### Transfer learning from labelled data {§2.3}
 
-> [!PAPER] · Section 2.3 · page 3
+> [!PAPER] · §2.3
 > [![Section 2.3, Transfer Learning from Supervised Data: effective transfer from supervised tasks with large datasets, such as natural language inference and machine translation. Computer vision has shown the importance of transfer learning from large pre-trained models, where an effective recipe is to fine-tune models pre-trained with ImageNet](/img/papers/bert/p2-supervised.png)](/img/papers/bert/p2-supervised.png)
->
-> **Context:** the last part of Related Work.
 >
 > **What it says:** models can also be pre-trained on a big **labelled** task and transferred: natural language inference (Conneau et al., 2017) and machine translation (McCann et al., 2017). In computer vision, "an effective recipe is to fine-tune models pre-trained with ImageNet".
 >
-> **Why it matters:** the ImageNet recipe was the model to copy. In vision, nobody trained an image classifier from zero anymore; everyone started from a network pre-trained on ImageNet. BERT brought that habit to language, but with **unlabeled** text, which is far more plentiful than any labelled dataset.
+> **What it means:**
+>
+> In vision, the ImageNet recipe was the model to copy. Nobody trained an image classifier from zero anymore; everyone started from a network pre-trained on ImageNet. A small task, such as finding cracks in photos of roads, then needed far fewer labelled photos.
+>
+> Language had tried the same with labelled tasks, such as natural language inference and translation. The catch is that labels cost money, so such datasets stay small. BERT brought the ImageNet habit to language, but with **unlabeled** text, which is far more plentiful than any labelled dataset.
 
 > [!DEFINITION] Transfer learning
 > Reusing what a model learned on one task to do better on another task. Pre-training and fine-tuning is one form of transfer learning.
@@ -250,26 +274,32 @@ The key phrase is "**few parameters need to be learned from scratch**". With the
 
 Now Section 3, the description of BERT itself. It opens with the two steps and with the paper's main picture, Figure 1.
 
-> [!PAPER] · Section 3 · page 3
+> [!PAPER] · §3
 > [![The opening of Section 3: there are two steps in our framework, pre-training and fine-tuning. During pre-training the model is trained on unlabeled data over different pre-training tasks. For fine-tuning, the model is first initialized with the pre-trained parameters, and all of the parameters are fine-tuned using labeled data from the downstream tasks. Each downstream task has separate fine-tuned models](/img/papers/bert/p2-bert-intro.png)](/img/papers/bert/p2-bert-intro.png)
->
-> **Context:** the first paragraph of Section 3.
 >
 > **What it says:** "There are two steps in our framework: pre-training and fine-tuning." For fine-tuning, BERT starts from the pre-trained parameters and "all of the parameters are fine-tuned using labeled data from the downstream tasks". "Each downstream task has separate fine-tuned models", all starting from the same pre-trained parameters.
 >
-> **Why it matters:** this fixes the vocabulary for the rest of the paper. One pre-training run, then one separate copy per task.
+> **What it means:**
+>
+> Think of a cookery school. Every student first takes the same long general course. Then each one takes a short course for one job: bread, fish or cakes. At the end there are many cooks, each a separate copy of the same training.
+>
+> This fixes the vocabulary for the rest of the paper. One pre-training run, then one separate copy per task. The word "all" matters again: every parameter of the copy moves during fine-tuning, not only the new top layer.
 
 > [!DEFINITION] Initialized with
 > The numbers a model starts from before training. "Initialized with the pre-trained parameters" means the copy starts as an exact clone of pre-trained BERT, not from random numbers.
 
-> [!PAPER] · Section 3, Figure 1 · page 3
+> [!PAPER] · §3, Figure 1
 > [![Figure 1 of the BERT paper. Left, pre-training: an unlabeled sentence A and B pair goes in as [CLS], the tokens of masked sentence A, [SEP], and the tokens of masked sentence B. BERT turns input embeddings E into outputs C and T; C feeds NSP and the T vectors feed Mask LM. Right, fine-tuning: the same BERT is copied for MNLI, NER and SQuAD; for SQuAD a question and a paragraph go in and start and end span outputs come out](/img/papers/bert/p2-figure1.png)](/img/papers/bert/p2-figure1.png)
->
-> **Context:** Figure 1 sits at the top of page 3. The question-answering example in it is the "running example" for Section 3.
 >
 > **What it says:** "Apart from output layers, the same architectures are used in both pre-training and fine-tuning." "During fine-tuning, all parameters are fine-tuned." `[CLS]` is added in front of every input, and `[SEP]` separates two pieces of text, such as a question and its answer.
 >
-> **Why it matters:** this one picture shows the whole system. Learn to read it and the rest of the paper is easy to follow.
+> **What it means:**
+>
+> This one picture shows the whole system. The left side is the long general course; the right side is the short course for each task. The big box in the middle is the same on both sides.
+>
+> The question-answering example on the right is the paper's running example for Section 3. A question and a paragraph go in together, separated by `[SEP]`, and the model points at the answer in the paragraph.
+>
+> Learn to read this figure and the rest of the paper is easy to follow. The list below reads it from bottom to top.
 
 How to read Figure 1, from bottom to top:
 
@@ -284,15 +314,17 @@ How to read Figure 1, from bottom to top:
 > [!DEFINITION] MNLI, NER, SQuAD
 > Three of the downstream tasks in Figure 1. **MNLI** (MultiNLI): natural language inference on sentence pairs. **NER**: named entity recognition, a label for every token. **SQuAD**: question answering, find the answer span in a paragraph. Part 4 covers all of them.
 
-> [!PAPER] · Section 3 · page 3
+> [!PAPER] · §3
 > [![A distinctive feature of BERT is its unified architecture across different tasks](/img/papers/bert/p2-unified.png)](/img/papers/bert/p2-unified.png)
 > [![There is minimal difference between the pre-trained architecture and the final downstream architecture. Then the Model Architecture paragraph: a multi-layer bidirectional Transformer encoder based on the original implementation of Vaswani et al. 2017, almost identical to the original](/img/papers/bert/p2-architecture.png)](/img/papers/bert/p2-architecture.png)
 >
-> **Context:** the second paragraph of Section 3 (it starts at the bottom of the left column and ends at the top of the right column), followed by the "Model Architecture" paragraph.
->
 > **What it says:** "A distinctive feature of BERT is its unified architecture across different tasks." There is "minimal difference between the pre-trained architecture and the final downstream architecture". The model is "a multi-layer bidirectional Transformer encoder" based on Vaswani et al. (2017), released in the `tensor2tensor` library, and "almost identical to the original".
 >
-> **Why it matters:** BERT invents no new kind of layer. The architecture is the standard 2017 Transformer encoder. Everything new is in how it is trained.
+> **What it means:**
+>
+> Think of one engine that goes into a car, a boat and a generator. Only the parts attached to it change. BERT's encoder is that engine, and only the output layer changes from task to task.
+>
+> The "Model Architecture" paragraph then says where the engine comes from. BERT invents no new kind of layer. The architecture is the standard 2017 Transformer encoder. Everything new is in how it is trained.
 
 ## The model: a stack of Transformer encoder layers {§3}
 
@@ -338,27 +370,31 @@ where:
 
 The paper hands the details to Vaswani et al. and to "The Annotated Transformer" in two footnotes:
 
-> [!PAPER] · Section 3, footnotes 1 and 2 · page 3
+> [!PAPER] · §3, footnotes 1 and 2
 > [![Footnotes 1 and 2 of the BERT paper: the tensor2tensor library on GitHub, and The Annotated Transformer at nlp.seas.harvard.edu](/img/papers/bert/p2-footnotes12.png)](/img/papers/bert/p2-footnotes12.png)
 >
-> **Context:** the two links behind "the tensor2tensor library" and "excellent guides such as The Annotated Transformer".
+> **What it says:** these are the two links behind "the tensor2tensor library" and "excellent guides such as The Annotated Transformer". Footnote 1 is Google's [tensor2tensor](https://github.com/tensorflow/tensor2tensor) code; footnote 2 is [The Annotated Transformer](http://nlp.seas.harvard.edu/2018/04/03/attention.html), a line-by-line code walk-through of Vaswani et al. by Harvard NLP.
 >
-> **What it says:** footnote 1 is Google's [tensor2tensor](https://github.com/tensorflow/tensor2tensor) code; footnote 2 is [The Annotated Transformer](http://nlp.seas.harvard.edu/2018/04/03/attention.html), a line-by-line code walk-through of Vaswani et al. by Harvard NLP.
+> **What it means:**
 >
-> **Why it matters:** BERT's code started from that Transformer code, so the layer we describe next is exactly the 2017 one.
+> Footnotes like these tell you where to look instead of repeating the text. The authors skip the Transformer's details on purpose, because the code and a good guide already exist.
+>
+> BERT's code started from that Transformer code, so the layer we describe next is exactly the 2017 one.
 
 ### Inside one layer: attention, with real numbers
 
 The heart of each layer is the attention equation of Vaswani et al.:
 
-> [!PAPER] Vaswani et al. (2017), Attention Is All You Need · Section 3.2.1, Equation (1)
+> [!PAPER] Vaswani et al. (2017), Attention Is All You Need · §3.2.1, Equation (1)
 > [![Section 3.2.1 of Attention Is All You Need: queries are packed together into a matrix Q, keys and values into matrices K and V, and the matrix of outputs is Attention of Q, K, V equals softmax of Q K transpose over square root of d k, times V](/img/papers/bert/p2-ext-vaswani-eq1.png)](/img/papers/bert/p2-ext-vaswani-eq1.png)
 >
-> **Context:** scaled dot-product attention, computed for all tokens at once.
+> **What it says:** this is scaled dot-product attention, computed for all tokens at once: "we compute the attention function on a set of queries simultaneously, packed together into a matrix $$Q$$", and likewise $$K$$ and $$V$$, then $$\text{softmax}(QK^T / \sqrt{d_k})V$$.
 >
-> **What it says:** "we compute the attention function on a set of queries simultaneously, packed together into a matrix $$Q$$", and likewise $$K$$ and $$V$$, then $$\text{softmax}(QK^T / \sqrt{d_k})V$$.
+> **What it means:**
 >
-> **Why it matters:** this one line is most of what BERT computes. BERT uses it with no mask (Part 1).
+> Think of a library search. Each token writes a question (a query), and every token shows a label (a key). The best matching labels decide which contents (values) each token takes home. Packing all the questions into one matrix lets a computer answer them all in one step.
+>
+> This one line is most of what BERT computes. BERT uses it with no mask (Part 1), so every token may match every other token.
 
 Where do $$Q$$, $$K$$ and $$V$$ come from? Each is the layer input $$X$$ (one row of $$H = 768$$ numbers per token) multiplied by a learned matrix:
 
@@ -422,14 +458,16 @@ softmax WITH the division:                    [ 0.208,  0.140,  0.114,  0.199,  
 
 **Many heads.** One head learns one way of looking. BERT-base runs $$A = 12$$ heads side by side, each with its own $$W^Q, W^K, W^V$$ of $$768 \times 64$$, and joins their outputs:
 
-> [!PAPER] Vaswani et al. (2017), Attention Is All You Need · Section 3.2.2
+> [!PAPER] Vaswani et al. (2017), Attention Is All You Need · §3.2.2
 > [![Section 3.2.2 of Attention Is All You Need: multi-head attention allows the model to jointly attend to information from different representation subspaces at different positions; MultiHead of Q, K, V equals Concat of head 1 to head h times W O, where head i is Attention of Q W i Q, K W i K, V W i V](/img/papers/bert/p2-ext-vaswani-mha.png)](/img/papers/bert/p2-ext-vaswani-mha.png)
 >
-> **Context:** multi-head attention, the version every Transformer uses.
+> **What it says:** in multi-head attention, the version every Transformer uses, multiple heads let the model "jointly attend to information from different representation subspaces at different positions". The outputs are concatenated and multiplied by $$W^O$$.
 >
-> **What it says:** multiple heads let the model "jointly attend to information from different representation subspaces at different positions". The outputs are concatenated and multiplied by $$W^O$$.
+> **What it means:**
 >
-> **Why it matters:** with $$A$$ heads of $$H/A$$ numbers each, the joined output is again $$H$$ wide: $$12 \times 64 = 768$$. That is why BERT's $$H$$ is always a multiple of $$A$$.
+> One reader can follow one thread of a story at a time: the plot, or who said what. Twelve readers can follow twelve threads at once. Each head is such a reader, with its own way of looking.
+>
+> With $$A$$ heads of $$H/A$$ numbers each, the joined output is again $$H$$ wide: $$12 \times 64 = 768$$. That is why BERT's $$H$$ is always a multiple of $$A$$.
 
 $$
 \text{MultiHead}(X) = \text{Concat}(\text{head}_1, \dots, \text{head}_A)\, W^O
@@ -459,14 +497,16 @@ head 1 of layer 1, attention weights:
 
 ### Inside one layer: the feed-forward network
 
-> [!PAPER] Vaswani et al. (2017), Attention Is All You Need · Section 3.3, Equation (2)
+> [!PAPER] Vaswani et al. (2017), Attention Is All You Need · §3.3, Equation (2)
 > [![Section 3.3 of Attention Is All You Need: each layer contains a fully connected feed-forward network applied to each position separately and identically, two linear transformations with a ReLU activation in between, FFN of x equals max of 0 and x W1 plus b1, times W2, plus b2](/img/papers/bert/p2-ext-vaswani-ffn.png)](/img/papers/bert/p2-ext-vaswani-ffn.png)
 >
-> **Context:** the second part of every Transformer layer.
+> **What it says:** the second part of every Transformer layer is a feed-forward network "applied to each position separately and identically": "two linear transformations with a ReLU activation in between".
 >
-> **What it says:** a feed-forward network "applied to each position separately and identically": "two linear transformations with a ReLU activation in between".
+> **What it means:**
 >
-> **Why it matters:** BERT uses the same shape, with two changes: the inner size is $$4H$$ (footnote 3, below) and GELU replaces ReLU (Part 3).
+> Attention is a meeting where the tokens share information. The feed-forward network is the time after the meeting, when each token works alone on what it heard. The same weights are used for every position.
+>
+> BERT uses the same shape, with two changes: the inner size is $$4H$$ (footnote 3, below) and GELU replaces ReLU (Part 3).
 
 {{FIG:p2_ffn|The feed-forward network for one token. "kid" (768 numbers after attention) is widened to 3,072 by W₁, passed through GELU, and narrowed back to 768 by W₂. The same weights are used for every position in the layer. In this real example only 5.2% of the 3,072 numbers were positive before GELU.}}
 
@@ -508,14 +548,16 @@ The largest difference from the model's own layer is $$8.34 \times 10^{-7}$$, th
 
 ## Two model sizes: L, H and A {§3}
 
-> [!PAPER] · Section 3 · page 3
+> [!PAPER] · §3
 > [![We denote the number of layers as L, the hidden size as H, and the number of self-attention heads as A. BERT-BASE: L=12, H=768, A=12, Total Parameters=110M. BERT-LARGE: L=24, H=1024, A=16, Total Parameters=340M. BERT-BASE was chosen to have the same model size as OpenAI GPT. BERT uses bidirectional self-attention, while the GPT Transformer uses constrained self-attention where every token can only attend to context to its left](/img/papers/bert/p2-sizes.png)](/img/papers/bert/p2-sizes.png)
->
-> **Context:** the second paragraph of "Model Architecture".
 >
 > **What it says:** **L** is the number of layers, **H** the hidden size, **A** the number of attention heads. Two sizes: **BERT-base** (L=12, H=768, A=12, 110M parameters) and **BERT-large** (L=24, H=1024, A=16, 340M parameters). BERT-base "was chosen to have the same model size as OpenAI GPT for comparison purposes". The one critical difference: "bidirectional self-attention" in BERT versus "constrained self-attention where every token can only attend to context to its left" in GPT.
 >
-> **Why it matters:** because BERT-base and GPT have the same size, a fair comparison is possible. When BERT-base wins, the size is not the reason.
+> **What it means:**
+>
+> To compare two cooks fairly, give them the same kitchen and the same food. BERT-base was made the same size as GPT for this reason. So when BERT-base wins, the size is not the reason.
+>
+> That leaves one difference: the direction of attention. BERT-large then asks a second question: what happens when the same design gets bigger? Part 5 answers it.
 
 | | Layers L | Hidden size H | Heads A | Numbers per head H/A | Feed-forward size 4H | Parameters (paper) |
 |---|---|---|---|---|---|---|
@@ -527,32 +569,34 @@ The largest difference from the model's own layer is $$8.34 \times 10^{-7}$$, th
 
 The feed-forward size comes from a footnote:
 
-> [!PAPER] · Section 3, footnote 3 · page 3
+> [!PAPER] · §3, footnote 3
 > [![Footnote 3: In all cases we set the feed-forward/filter size to be 4H, i.e., 3072 for the H = 768 and 4096 for the H = 1024](/img/papers/bert/p2-footnote3.png)](/img/papers/bert/p2-footnote3.png)
->
-> **Context:** footnote 3, attached to the definition of L, H and A.
 >
 > **What it says:** the feed-forward ("filter") size is always 4H: 3,072 for BERT-base and 4,096 for BERT-large.
 >
-> **Why it matters:** with this number we can compute the exact parameter count ourselves, which we do next.
+> **What it means:**
+>
+> One rule, "always 4H", fixes a whole part of the model. Once you know H, you know the size of the feed-forward network, so the paper needs no extra table for it.
+>
+> With this number we can compute the exact parameter count ourselves, which we do next.
 
 And footnote 4 explains two names you will see everywhere:
 
-> [!PAPER] · Section 3, footnote 4 · pages 3 and 4
+> [!PAPER] · §3, footnote 4
 > [![Footnote 4, first line: We note that in the literature the bidirectional Trans-](/img/papers/bert/p2-footnote4a.png)](/img/papers/bert/p2-footnote4a.png)
 > [![Footnote 4, continued on page 4: former is often referred to as a Transformer encoder while the left-context-only version is referred to as a Transformer decoder since it can be used for text generation](/img/papers/bert/p2-footnote4.png)](/img/papers/bert/p2-footnote4.png)
 >
-> **Context:** footnote 4, attached to the sentence about GPT's "constrained self-attention". It starts on page 3 and ends on page 4.
->
 > **What it says:** the bidirectional Transformer "is often referred to as a **Transformer encoder**", and the left-context-only version "as a **Transformer decoder** since it can be used for text generation".
 >
-> **Why it matters:** this is why BERT is called an *encoder* model and GPT a *decoder* model. The layers are almost the same; the difference is the attention mask.
+> **What it means:**
+>
+> The names come from what each version can do. A model that can only look left can **write** text one token at a time, because it never needs the future. People call it a decoder. A model that looks both ways can **understand** text better, but cannot simply write the next word. People call it an encoder.
+>
+> This is why BERT is called an *encoder* model and GPT a *decoder* model. The layers are almost the same; the difference is the attention mask. The trade-off between writing and understanding is why BERT is used for understanding tasks and GPT-style models for generation.
 
 The mask is easiest to see as a grid. Each row is a token doing the looking; each column a token being looked at.
 
 {{FIG:p2_masks|Attention masks. In BERT (left) every square is allowed: every token can attend to every token. In GPT (right) the upper triangle is blocked, so each token attends only to itself and to the tokens on its left. That one triangle is the difference between an encoder and a decoder.}}
-
-A model that can only look left can **write** text one token at a time, because it never needs the future. A model that looks both ways can **understand** text better, but cannot simply write the next word. That trade-off is why BERT is used for understanding tasks and GPT-style models for generation.
 
 ### Where "110 million" comes from {§3}
 
@@ -612,28 +656,32 @@ Two things stand out in the picture:
 
 ## Input: sentences and sequences {§3}
 
-> [!PAPER] · Section 3, Input/Output Representations · page 4
+> [!PAPER] · §3, Input/Output Representations
 > [![Input/Output Representations: the input representation can unambiguously represent both a single sentence and a pair of sentences in one token sequence. A sentence can be an arbitrary span of contiguous text, rather than an actual linguistic sentence. A sequence refers to the input token sequence to BERT, which may be a single sentence or two sentences packed together](/img/papers/bert/p2-input.png)](/img/papers/bert/p2-input.png)
->
-> **Context:** the first paragraph of "Input/Output Representations", at the top of page 4.
 >
 > **What it says:** one input format must handle both a single sentence and a pair, such as ⟨Question, Answer⟩. In this paper, "a 'sentence' can be an arbitrary span of contiguous text, rather than an actual linguistic sentence". A "sequence" is the whole input: one sentence, or two packed together.
 >
-> **Why it matters:** two words with special meanings for the rest of the paper. A "sentence" may be a whole paragraph. A "sequence" is what BERT actually reads.
+> **What it means:**
+>
+> In everyday speech, a sentence ends with a full stop. In this paper, a "sentence" is any piece of text cut out in one go, and it may be a whole paragraph. A "sequence" is what BERT actually reads: one such piece, or two packed together.
+>
+> The authors need these words because many tasks come in pairs, such as a question and a passage. One input format handles both cases, so no task needs a second design.
 
 > [!DEFINITION] Contiguous
 > Next to each other, without gaps. A contiguous span of text is a piece cut out in one go, from some word to some later word.
 
 ## WordPiece: how text becomes tokens {§3}
 
-> [!PAPER] · Section 3, Input/Output Representations · page 4
+> [!PAPER] · §3, Input/Output Representations
 > [![We use WordPiece embeddings with a 30,000 token vocabulary. The first token of every sequence is always a special classification token [CLS], whose final hidden state is used as the aggregate sequence representation for classification tasks. Sentence pairs are separated with a special token [SEP], and a learned embedding is added to every token indicating whether it belongs to sentence A or sentence B. The input embedding is E, the final hidden vector of [CLS] is C in R to the H, and the final hidden vector of the i-th token is T i in R to the H](/img/papers/bert/p2-wordpiece.png)](/img/papers/bert/p2-wordpiece.png)
->
-> **Context:** the second paragraph of "Input/Output Representations". It is short but dense: five ideas in nine lines.
 >
 > **What it says:** (1) "WordPiece embeddings (Wu et al., 2016) with a 30,000 token vocabulary". (2) Every sequence starts with `[CLS]`, whose final vector is "the aggregate sequence representation for classification tasks". (3) Two sentences are separated by `[SEP]`. (4) A "learned embedding" on every token says whether it belongs to sentence A or B. (5) Names: **E** for input embeddings, $$C \in \mathbb{R}^H$$ for the final vector of `[CLS]`, $$T_i \in \mathbb{R}^H$$ for the final vector of token $$i$$.
 >
-> **Why it matters:** these are the symbols used in every formula from here to the end of the paper.
+> **What it means:**
+>
+> This paragraph is short but dense: five ideas in nine lines. It works like the key on a map. Each symbol is introduced once, and the rest of the paper uses it without explanation.
+>
+> These are the symbols used in every formula from here to the end of the paper. $$C$$ is the one vector that speaks for the whole input, and each $$T_i$$ speaks for one token. Sentence-level tasks read $$C$$, and token-level tasks read the $$T_i$$.
 
 We take the five ideas one at a time, starting with WordPiece.
 
@@ -689,14 +737,16 @@ Two honest notes. First, the pieces are chosen by frequency, not by meaning: "bi
 
 The paper cites Wu et al. (2016) for WordPiece. Their own example shows the idea:
 
-> [!PAPER] Wu et al. (2016), Google's Neural Machine Translation System · Section 4
+> [!PAPER] Wu et al. (2016), Google's Neural Machine Translation System · §4
 > [![The WordPiece example from the Google neural machine translation paper: Jet makers feud over seat width with big orders at stake becomes _J et _makers _fe ud _over _seat _width _with _big _orders _at _stake, where the underscore is a special character added to mark the beginning of a word](/img/papers/bert/p2-ext-wu-wordpiece.png)](/img/papers/bert/p2-ext-wu-wordpiece.png)
 >
-> **Context:** the WordPiece model, built for Google's translation system.
+> **What it says:** in the WordPiece model, built for Google's translation system, "Jet" becomes two pieces, `_J` and `et`, and "feud" becomes `_fe` and `ud`; the other words stay whole. "_" "is a special character added to mark the beginning of a word".
 >
-> **What it says:** "Jet" becomes two pieces, `_J` and `et`, and "feud" becomes `_fe` and `ud`; the other words stay whole. "_" "is a special character added to mark the beginning of a word".
+> **What it means:**
 >
-> **Why it matters:** BERT uses the same idea with the opposite marker: it marks the pieces that *continue* a word (`##`) instead of the ones that start one.
+> Think of a box of toy bricks. A few thousand standard bricks can build any shape. WordPiece keeps common words as single bricks and builds rare words from smaller ones.
+>
+> BERT uses the same idea with the opposite marker: it marks the pieces that *continue* a word (`##`) instead of the ones that start one.
 
 Here is the greedy rule above, run on "embeddings", with every lookup it makes:
 
@@ -767,23 +817,27 @@ Two ways tell the sentences apart, exactly as the paper says: the `[SEP]` token 
 
 ## Three embeddings, added together {§3}
 
-> [!PAPER] · Section 3, Input/Output Representations · page 4
+> [!PAPER] · §3, Input/Output Representations
 > [![For a given token, its input representation is constructed by summing the corresponding token, segment, and position embeddings. A visualization of this construction can be seen in Figure 2](/img/papers/bert/p2-sum.png)](/img/papers/bert/p2-sum.png)
->
-> **Context:** the last paragraph of "Input/Output Representations".
 >
 > **What it says:** a token's input representation is made "by summing the corresponding token, segment, and position embeddings".
 >
-> **Why it matters:** this is the very first computation BERT does. Everything else builds on these vectors.
-
-> [!PAPER] · Section 3, Figure 2 · page 5
-> [![Figure 2 of the BERT paper: the input [CLS] my dog is cute [SEP] he likes play ##ing [SEP]. Below each token: its token embedding E with the token as subscript, plus a segment embedding E A for the first six tokens and E B for the rest, plus a position embedding E 0 to E 10](/img/papers/bert/p2-figure2.png)](/img/papers/bert/p2-figure2.png)
+> **What it means:**
 >
-> **Context:** Figure 2, at the top of page 5, the picture for the paragraph above.
+> Think of the label on a parcel: what is inside, which order it belongs to, and its place in the queue. BERT gives every token the same three facts as three vectors, and adds them into one.
+>
+> This is the very first computation BERT does. Everything else builds on these vectors.
+
+> [!PAPER] · §3, Figure 2
+> [![Figure 2 of the BERT paper: the input [CLS] my dog is cute [SEP] he likes play ##ing [SEP]. Below each token: its token embedding E with the token as subscript, plus a segment embedding E A for the first six tokens and E B for the rest, plus a position embedding E 0 to E 10](/img/papers/bert/p2-figure2.png)](/img/papers/bert/p2-figure2.png)
 >
 > **What it says:** "The input embeddings are the sum of the token embeddings, the segmentation embeddings and the position embeddings." Each column is one token; each row is one kind of embedding.
 >
-> **Why it matters:** three tables, one lookup in each, one addition. That is the whole input layer.
+> **What it means:**
+>
+> Read each column from top to bottom. The token "dog" gets three rows: its own row of the token table, $$E_A$$ for sentence A, and the row for position 2. The three are added into one vector.
+>
+> Three tables, one lookup in each, one addition. That is the whole input layer. Adding, instead of joining the vectors side by side, keeps the result at $$H$$ numbers.
 
 > [!DEFINITION] Position embedding
 > A learned vector for each position in the sequence: one for position 0, one for position 1, and so on. Attention by itself does not know word order ("dog bites man" and "man bites dog" would look the same), so the position vector is added to tell the model where each token sits. BERT learns a table of 512 of them, which is why its inputs are at most 512 tokens long.

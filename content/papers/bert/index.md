@@ -37,7 +37,7 @@ Each part follows the paper's own sections:
 
 ## How to read the boxes
 
-- A **teal "From the paper" box** shows the exact lines of the paper as a highlighted screenshot (click it to open it full size), followed by its **context**, **what it says** in plain English, and **why it matters**.
+- A **teal "From the paper" box** shows the exact lines of the paper as a highlighted screenshot. Click the screenshot to see it at full size. Under it, **What it says** gives the main words of the paper. **What it means** then explains those lines, and what the authors mean but do not write. When the box shows a different paper, the box gives the name of that paper.
 - A **yellow definition box** explains a technical word the first time it appears. If you already know the word, skip the box.
 - The small **Paper §3.1** tag above a heading tells you which section of the paper you are reading, so you can follow along in the PDF.
 - A **green "Key takeaways" box** ends every part with what to remember.

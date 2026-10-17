@@ -13,28 +13,34 @@ This part is about how BERT learns language from plain text, before any real tas
 
 ## Not a normal language model {§3.1}
 
-> [!PAPER] · Section 3.1 · page 4
+> [!PAPER] · §3.1
 > [![The opening of Section 3.1, Pre-training BERT: unlike Peters et al. and Radford et al., we do not use traditional left-to-right or right-to-left language models to pre-train BERT. Instead, we pre-train BERT using two unsupervised tasks, presented in the left part of Figure 1](/img/papers/bert/p3-intro.png)](/img/papers/bert/p3-intro.png)
->
-> **Context:** the start of Section 3.1. Section 3 has just described the model and its input (Part 2).
 >
 > **What it says:** ELMo (Peters et al.) and OpenAI GPT (Radford et al.) were pre-trained as normal language models, reading left to right or right to left. BERT is not. It uses "two unsupervised tasks" instead.
 >
-> **Why it matters:** this is where BERT breaks from the usual recipe. The rest of the section explains the two tasks.
+> **What it means:**
+>
+> Until BERT, pre-training a language model meant one game: predict the next word. ELMo and GPT both played it, in one direction or the other. BERT steps out of that game and plays two new ones.
+>
+> This is where BERT breaks from the usual recipe. The model and its input follow known designs (Part 2), so everything new in BERT is in what follows. The rest of the section explains the two tasks.
 
 > [!DEFINITION] Unsupervised task
 > A training task whose answers come from the text itself, so no person has to label anything. "Predict the hidden word" is unsupervised: the hidden word is the answer. (Some people call this **self-supervised**.)
 
 ## Why not just look both ways? {§3.1}
 
-> [!PAPER] · Section 3.1, Task #1 · page 4
+> [!PAPER] · §3.1, Task #1
 > [![Task 1, Masked LM: a deep bidirectional model is strictly more powerful than a left-to-right model or a shallow concatenation. Unfortunately, standard conditional language models can only be trained left-to-right or right-to-left, since bidirectional conditioning would allow each word to indirectly see itself, and the model could trivially predict the target word in a multi-layered context](/img/papers/bert/p3-mlm-why.png)](/img/papers/bert/p3-mlm-why.png)
->
-> **Context:** the first paragraph of Task #1. Part 1 showed why both directions help. Now the paper explains why you cannot simply switch them on.
 >
 > **What it says:** a deep bidirectional model is "strictly more powerful". But a standard language model cannot be trained that way, because "bidirectional conditioning would allow each word to indirectly 'see itself'", and then the model "could trivially predict the target word in a multi-layered context".
 >
-> **Why it matters:** this one sentence is the reason the masked language model exists. It is worth understanding exactly.
+> **What it means:**
+>
+> Part 1 showed why both directions help. So why not simply switch both on? Think of a game in which each player must guess their own secret word, but may ask the neighbours. If a neighbour already saw the word, the player only has to ask.
+>
+> That is what "indirectly see itself" means: the answer leaks back through a neighbour. A model that can read its own answer learns to copy, not to understand.
+>
+> This one sentence is the reason the masked language model exists. It is worth understanding exactly, so below we show the leak in a drawing and in a real experiment.
 
 > [!DEFINITION] Conditional language model
 > A model that predicts a word **given** (conditioned on) some other words. A left-to-right model conditions on the words to the left. "Bidirectional conditioning" would mean predicting each word from the words on both sides.
@@ -87,14 +93,16 @@ Three things to notice:
 
 ## The fix: hide the words you predict {§3.1}
 
-> [!PAPER] · Section 3.1, Task #1 · page 4
+> [!PAPER] · §3.1, Task #1
 > [![To train a deep bidirectional representation, we simply mask some percentage of the input tokens at random, and then predict those masked tokens: a masked LM, also called a Cloze task. The final hidden vectors of the mask tokens are fed into an output softmax over the vocabulary. We mask 15 percent of all WordPiece tokens in each sequence at random. Unlike denoising auto-encoders, we only predict the masked words rather than reconstructing the entire input](/img/papers/bert/p3-mlm-how.png)](/img/papers/bert/p3-mlm-how.png)
->
-> **Context:** the second paragraph of Task #1: the solution to the problem above.
 >
 > **What it says:** "we simply mask some percentage of the input tokens at random, and then predict those masked tokens." The final vectors at the masked positions go into "an output softmax over the vocabulary". They mask "15% of all WordPiece tokens in each sequence at random", and "only predict the masked words rather than reconstructing the entire input".
 >
-> **Why it matters:** if a word is replaced by `[MASK]` in the input, it is not in the input at all, so no path through any number of layers can bring it back. Now every layer can look both ways safely.
+> **What it means:**
+>
+> The fix is to take the answer out of the input. If a word is replaced by `[MASK]` in the input, it is not in the input at all. Then no path through any number of layers can bring it back.
+>
+> Now every layer can look both ways safely. The price is that only the hidden positions give a lesson. The other 85% of tokens are only context, and they add nothing to the loss.
 
 > [!DEFINITION] Softmax over the vocabulary
 > For a masked position, the model outputs one score for every token in its vocabulary (30,522 scores for `bert-base-uncased`). **Softmax** turns these scores into probabilities that add up to 1. The highest probability is the model's guess.
@@ -186,37 +194,49 @@ The paper's contrast with denoising auto-encoders (Vincent et al., 2008) is abou
 
 ## The [MASK] problem and the 80/10/10 rule {§3.1}
 
-> [!PAPER] · Section 3.1, Task #1 · page 4
+> [!PAPER] · §3.1, Task #1
 > [![A downside is a mismatch between pre-training and fine-tuning, since the MASK token does not appear during fine-tuning. The training data generator chooses 15 percent of the token positions at random for prediction. If the i-th token is chosen, it is replaced by the MASK token 80 percent of the time, a random token 10 percent of the time, and the unchanged i-th token 10 percent of the time. Then T_i is used to predict the original token with cross entropy loss](/img/papers/bert/p3-mlm-8010.png)](/img/papers/bert/p3-mlm-8010.png)
->
-> **Context:** the last paragraph of Task #1. Masking works, but it creates a new problem.
 >
 > **What it says:** "the [MASK] token does not appear during fine-tuning", so there is "a mismatch between pre-training and fine-tuning". To soften it, the chosen 15% of positions are not always masked: "(1) the [MASK] token 80% of the time (2) a random token 10% of the time (3) the unchanged i-th token 10% of the time". In every case, $$T_i$$ must predict the original token.
 >
-> **Why it matters:** this small rule is one of the most copied details in the paper. Part 5 shows the paper's own test of other ratios (Table 8).
+> **What it means:**
+>
+> Think of a pilot who trains only in a simulator with a red warning light. On a real flight there is no red light, and the habits may not fit. `[MASK]` is that red light: it appears in pre-training but never in fine-tuning.
+>
+> So the authors do not always show the `[MASK]`. Sometimes the chosen word is swapped for a random word, and sometimes it stays as it is. The model must give the original word in every case, so it cannot rely on the `[MASK]` sign.
+>
+> This small rule is one of the most copied details in the paper. Part 5 shows the paper's own test of other ratios (Table 8).
 
 > [!DEFINITION] Pre-train/fine-tune mismatch
 > When the input during pre-training looks different from the input during real use. BERT pre-trains with `[MASK]` tokens everywhere, but a sentiment classifier never sees `[MASK]`. A model that only learned "work hard at [MASK] positions" might put less effort into normal words.
 
 Appendix A.1 walks through the rule on one sentence, and explains the reasons.
 
-> [!PAPER] · Appendix A.1 · page 12
+> [!PAPER] · Appendix A.1
 > [![Appendix A.1, Masked LM and the Masking Procedure: assuming the sentence is my dog is hairy and the 4th token is chosen: 80 percent of the time replace it with MASK, giving my dog is MASK; 10 percent of the time replace it with a random word, giving my dog is apple; 10 percent of the time keep it unchanged, my dog is hairy. The purpose of this is to bias the representation towards the actual observed word](/img/papers/bert/p3-a1-mlm.png)](/img/papers/bert/p3-a1-mlm.png)
->
-> **Context:** Appendix A.1 gives examples of both pre-training tasks. This is the masked LM example.
 >
 > **What it says:** with "my dog is hairy" and the 4th token chosen: 80% of the time "my dog is [MASK]", 10% "my dog is apple", 10% "my dog is hairy". Keeping the word unchanged is meant "to bias the representation towards the actual observed word".
 >
-> **Why it matters:** each of the three cases teaches the model something different. The next paragraph of the appendix says what.
-
-> [!PAPER] · Appendix A.1 · page 12
-> [![The advantage of this procedure is that the Transformer encoder does not know which words it will be asked to predict or which have been replaced by random words, so it is forced to keep a distributional contextual representation of every input token. Because random replacement only occurs for 1.5 percent of all tokens, 10 percent of 15 percent, this does not seem to harm the model's language understanding capability](/img/papers/bert/p3-a1-why.png)](/img/papers/bert/p3-a1-why.png)
+> **What it means:**
 >
-> **Context:** right after the example.
+> One sentence, three versions. The model sees one of them, and it must always answer "hairy". From the inside, it cannot tell which version it got.
+>
+> Each case does its own job. The `[MASK]` version (80%) is the main exercise: fill in a blank from both sides. The random word (10%) teaches that a visible word might be wrong, so the model must check every word against its context. The unchanged word (10%) teaches that a visible word is usually right. So the model's vector for a normal word should stay close to that word.
+>
+> The last case keeps the model useful when there are no `[MASK]` tokens at all, as in fine-tuning.
+
+> [!PAPER] · Appendix A.1
+> [![The advantage of this procedure is that the Transformer encoder does not know which words it will be asked to predict or which have been replaced by random words, so it is forced to keep a distributional contextual representation of every input token. Because random replacement only occurs for 1.5 percent of all tokens, 10 percent of 15 percent, this does not seem to harm the model's language understanding capability](/img/papers/bert/p3-a1-why.png)](/img/papers/bert/p3-a1-why.png)
 >
 > **What it says:** the encoder "does not know which words it will be asked to predict or which have been replaced by random words", so it must keep "a distributional contextual representation of every input token". And random replacement happens to only "1.5% of all tokens (i.e., 10% of 15%)", too rarely to hurt.
 >
-> **Why it matters:** this is the real reason for the rule: the model can never relax about any token, because any token might be a test.
+> **What it means:**
+>
+> Think of a teacher who might test any student at any moment, with no warning. No student can relax. The encoder is in the same place: it does not know which tokens will be tested, or which ones are false.
+>
+> So it must keep a good vector for every token, not only for the `[MASK]` ones. This is the real reason for the rule: any token might be a test.
+>
+> The cost is small. Random words make up only 1.5% of all tokens, so the text the model reads stays almost clean.
 
 {{FIG:p3_8010|The 80/10/10 rule. Each chosen token becomes [MASK] 80% of the time, a random word 10% of the time, and stays itself 10% of the time. The target is always the original word.}}
 
@@ -231,12 +251,6 @@ and the other $$1 - 0.15 = 0.85$$ are untouched and not predicted. So in a typic
 {{FIG:p3_budget|Every 200 tokens of training text, on average. 170 untouched (no loss), 24 [MASK], 3 random words and 3 unchanged-but-predicted. A loss on 12 + 1.5 + 1.5 = 15%; 85 + 1.5 = 86.5% look like the original text.}}
 
 {{FIG:p3_pipeline|The procedure on two real sentences, step by step. Choose 15% of positions (here "store", "milk" and "bag"). Of the chosen ones, one becomes [MASK], one becomes a random word ("piano"), and one stays the same. The model must predict all three originals; the other 17 tokens carry no loss.}}
-
-In plain words, the three cases do three jobs:
-
-- **[MASK] (80%)** is the main exercise: fill in a blank from both sides.
-- **A random word (10%)** teaches the model that a visible word might be wrong, so it must check every word against its context.
-- **Unchanged (10%)** teaches the model that a visible word is usually right, so its vector for a normal word should stay close to that word. This is the case that keeps the model useful when there are no `[MASK]` tokens at all, as in fine-tuning.
 
 ### The procedure in code, measured on real text
 
@@ -315,29 +329,33 @@ With a whole paragraph of context, BERT finds the hidden word 58.3% of the time,
 
 ### The cost: only 15% of tokens teach anything
 
-> [!PAPER] · Appendix A.1 · pages 12 and 13
+> [!PAPER] · Appendix A.1
 > [![Compared to standard language model training, the masked LM only makes predictions on 15 percent of tokens in each batch, which suggests that more pre-training steps may be required for the model to converge](/img/papers/bert/p3-a1-cost.png)](/img/papers/bert/p3-a1-cost.png)
 > [![In Section C.1 we demonstrate that MLM does converge marginally slower than a left-to-right model, which predicts every token, but the empirical improvements of the MLM model far outweigh the increased training cost](/img/papers/bert/p3-a1-cost2.png)](/img/papers/bert/p3-a1-cost2.png)
 >
-> **Context:** the end of the masked LM part of Appendix A.1, running onto page 13.
->
 > **What it says:** a normal language model learns from every token; the masked LM "only make[s] predictions on 15% of tokens in each batch", so it may need more training. It does "converge marginally slower", but "the empirical improvements of the MLM model far outweigh the increased training cost".
 >
-> **Why it matters:** this is the price of bidirectionality. Part 5 shows the measurement (Figure 5), and Part 6 shows that later work (ELECTRA) attacked exactly this waste.
+> **What it means:**
+>
+> A left-to-right model gets a lesson at every token. The masked LM gets a lesson at only 15% of them, like a student who checks only about one answer in seven. So it may need more practice to reach the same level.
+>
+> The authors say the extra cost is small and worth paying. This is the price of bidirectionality. Part 5 shows the measurement (Figure 5), and Part 6 shows that later work (ELECTRA) attacked exactly this waste.
 
 > [!DEFINITION] Converge
 > A model has converged when more training stops improving it much. "Converges slower" means it needs more steps to reach the same quality.
 
 ## Task 2: next sentence prediction {§3.1}
 
-> [!PAPER] · Section 3.1, Task #2 · page 4
+> [!PAPER] · §3.1, Task #2
 > [![Task 2, Next Sentence Prediction: question answering and natural language inference are based on understanding the relationship between two sentences, which is not directly captured by language modeling. When choosing sentences A and B, 50 percent of the time B is the actual next sentence that follows A, labeled IsNext, and 50 percent of the time it is a random sentence from the corpus, labeled NotNext. C is used for next sentence prediction](/img/papers/bert/p3-nsp.png)](/img/papers/bert/p3-nsp.png)
->
-> **Context:** the second pre-training task, right after the masked LM.
 >
 > **What it says:** many tasks, like question answering and natural language inference, depend on "the relationship between two sentences", which language modelling does not teach. So BERT also learns a yes/no task: "50% of the time B is the actual next sentence that follows A (labeled as IsNext), and 50% of the time it is a random sentence from the corpus (labeled as NotNext)". The vector $$C$$ makes the decision.
 >
-> **Why it matters:** it gives the `[CLS]` position a job during pre-training, and it practises the "two pieces of text" format that many tasks use.
+> **What it means:**
+>
+> Fill-in-the-blank teaches the words inside one text. It does not teach how two texts relate: does this passage answer that question? So the authors add a second game: is B really the sentence after A?
+>
+> The game has two side effects. It gives the `[CLS]` position a job during pre-training, because its vector $$C$$ makes the decision. And it practises the "two pieces of text" format that many tasks use.
 
 > [!DEFINITION] Binary classification
 > Picking one of two answers. The paper calls NSP "binarized": IsNext or NotNext.
@@ -349,14 +367,16 @@ With a whole paragraph of context, BERT finds the hidden word 58.3% of the time,
 
 Here is where NSP lives in the paper's Figure 1: the left-most output, $$C$$, feeds the box marked NSP.
 
-> [!PAPER] · Section 3, Figure 1 · page 3
+> [!PAPER] · §3, Figure 1
 > [![Figure 1 of the BERT paper: in pre-training, the output C of the [CLS] token feeds the NSP head and the output vectors at masked positions feed the Mask LM heads; the caption says the same architectures are used in both pre-training and fine-tuning](/img/papers/bert/p3-figure1.png)](/img/papers/bert/p3-figure1.png)
->
-> **Context:** the paper's main figure, seen again from the point of view of the two pre-training heads.
 >
 > **What it says:** on the left (pre-training), two kinds of red arrow leave BERT: "NSP" from $$C$$, and "Mask LM" from the output vectors of the masked positions. "The same architectures are used in both pre-training and fine-tuning."
 >
-> **Why it matters:** both tasks share one encoder and one forward pass. Only the tiny heads on top differ, and both heads are thrown away at fine-tuning time.
+> **What it means:**
+>
+> Think of one camera with two small lenses that clip on top. The camera does almost all the work, and each lens only shapes the result for one job.
+>
+> Both tasks share one encoder and one forward pass. Only the tiny heads on top differ, and both heads are thrown away at fine-tuning time. What the encoder learned for them stays.
 
 The NSP loss is cross-entropy over two classes:
 
@@ -374,14 +394,16 @@ where:
 
 Appendix A.1 shows two examples:
 
-> [!PAPER] · Appendix A.1 · page 13
+> [!PAPER] · Appendix A.1
 > [![Two next sentence prediction examples. Input: CLS the man went to MASK store SEP he bought a gallon MASK milk SEP, Label IsNext. Input: CLS the man MASK to the store SEP penguin MASK are flight less birds SEP, Label NotNext](/img/papers/bert/p3-a1-nsp.png)](/img/papers/bert/p3-a1-nsp.png)
->
-> **Context:** the second half of Appendix A.1.
 >
 > **What it says:** "the man went to [MASK] store" followed by "he bought a gallon [MASK] milk" is IsNext. "the man [MASK] to the store" followed by "penguin [MASK] are flight ##less birds" is NotNext.
 >
-> **Why it matters:** notice that both tasks run on the same input at the same time: the sentences are already masked. `##less` is a WordPiece fragment (Part 2): "flightless" was split into "flight" and "##less".
+> **What it means:**
+>
+> The first pair tells a small story: a man goes to the store and buys milk. The second pair jumps from a man at the store to penguins. A reader sees at once which pair belongs together.
+>
+> Notice that both tasks run on the same input at the same time: the sentences are already masked. `##less` is a WordPiece fragment (Part 2): "flightless" was split into "flight" and "##less".
 
 ### The real NSP head
 
@@ -399,14 +421,16 @@ The released `bert-base-uncased` still contains its trained NSP layer, so we can
 
 All six are right, and very confident. The paper reports how good the final model is in a footnote:
 
-> [!PAPER] · Section 3.1, footnotes 5 and 6 · page 4
+> [!PAPER] · §3.1, footnotes 5 and 6
 > [![Footnote 5: the final model achieves 97 to 98 percent accuracy on NSP. Footnote 6: the vector C is not a meaningful sentence representation without fine-tuning, since it was trained with NSP](/img/papers/bert/p3-footnotes.png)](/img/papers/bert/p3-footnotes.png)
->
-> **Context:** two footnotes attached to the NSP paragraph.
 >
 > **What it says:** footnote 5: "The final model achieves 97%-98% accuracy on NSP." Footnote 6: "The vector C is not a meaningful sentence representation without fine-tuning, since it was trained with NSP."
 >
-> **Why it matters:** footnote 5 says the task is easy for the model. Footnote 6 is a warning that many people later ignored: do not use raw $$C$$ as a sentence embedding.
+> **What it means:**
+>
+> Footnote 5 says the task is easy for the model: 97% to 98% right. An easy game may teach less than it seems, and Part 5 tests how much NSP really helps.
+>
+> Footnote 6 is a warning that many people later ignored: do not use raw $$C$$ as a sentence embedding. $$C$$ was trained to answer one yes/no question, not to describe meaning. The checks below test both footnotes on the real model.
 
 **The NSP head, worked by hand.** In the released model, $$C$$ first passes through the **pooler** (Part 2), then a two-way linear classifier:
 
@@ -465,45 +489,55 @@ Every pair scores above 0.76, and the two sentences with **opposite** meanings s
 
 ### NSP and earlier work {§3.1}
 
-> [!PAPER] · Section 3.1 · page 5
+> [!PAPER] · §3.1
 > [![The NSP task is closely related to representation-learning objectives used in Jernite et al. 2017 and Logeswaran and Lee 2018. However, in prior work, only sentence embeddings are transferred to down-stream tasks, where BERT transfers all parameters to initialize end-task model parameters](/img/papers/bert/p3-nsp-prior.png)](/img/papers/bert/p3-nsp-prior.png)
->
-> **Context:** the paragraph after Task #2, at the top of page 5.
 >
 > **What it says:** the idea of learning from "which sentence comes next" is not new (Jernite et al., 2017; Logeswaran and Lee, 2018). The difference: earlier work transferred "only sentence embeddings" to new tasks, while "BERT transfers all parameters".
 >
-> **Why it matters:** this is the fine-tuning idea from Part 1 again. The whole network is reused, not just one vector per sentence.
+> **What it means:**
+>
+> Think of two schools that teach the same skill. One sends out a single certificate for each student. The other sends out the whole student. Earlier work kept only one vector per sentence; BERT keeps the whole network.
+>
+> This is the fine-tuning idea from Part 1 again. The whole network is reused, not just one vector per sentence.
 
 The two cited papers, in their own words:
 
-> [!PAPER] Jernite, Bowman, Sontag (2017), Discourse-Based Objectives · Section 3
+> [!PAPER] Jernite, Bowman, Sontag (2017), Discourse-Based Objectives · §3
 > [![The NEXT task of Jernite et al.: two adjacent sentences will generally be more coherent than two more distant ones, so given the first three sentences of a paragraph and five candidates from later in the paragraph, the model must decide which candidate immediately follows the initial three](/img/papers/bert/p3-jernite.png)](/img/papers/bert/p3-jernite.png)
 >
-> **Context:** one of three "discourse" training tasks in that paper.
+> **What it says:** this is one of three "discourse" training tasks in that paper. Its idea: "two adjacent sentences will generally be more coherent than two more distant ones". So the model must "decide which candidate immediately follows the initial three" sentences, out of five.
 >
-> **What it says:** "two adjacent sentences will generally be more coherent than two more distant ones", so the model must "decide which candidate immediately follows the initial three" sentences, out of five.
+> **What it means:**
 >
-> **Why it matters:** the same intuition as NSP, with harder negatives: the wrong candidates come from the same paragraph, not from a random document.
+> The same intuition as NSP, with harder negatives: the wrong candidates come from the same paragraph, not from a random document.
+>
+> That makes the test harder in a useful way. A wrong sentence from the same paragraph is on the same topic, so the model cannot win by spotting a change of topic. BERT's random sentences are easier to reject, a point Part 6 comes back to.
 
 > [!PAPER] Logeswaran and Lee (2018), An efficient framework for learning sentence representations · Abstract
 > [![The quick-thought abstract: reformulate the problem of predicting the context in which a sentence appears as a classification problem; given a sentence and its context, a classifier distinguishes context sentences from other contrastive sentences based on their vector representations](/img/papers/bert/p3-logeswaran.png)](/img/papers/bert/p3-logeswaran.png)
 >
-> **Context:** the quick-thought paper we met in Part 2.
+> **What it says:** this is the quick-thought paper from Part 2. They "reformulate the problem of predicting the context in which a sentence appears as a classification problem": a classifier "distinguishes context sentences from other contrastive sentences".
 >
-> **What it says:** they "reformulate the problem of predicting the context in which a sentence appears as a classification problem": a classifier "distinguishes context sentences from other contrastive sentences".
+> **What it means:**
 >
-> **Why it matters:** NSP is this classification in its simplest form. The difference, as the BERT paragraph says, is what gets reused afterwards: one sentence vector there, the whole network here.
+> NSP is this classification in its simplest form. Quick-thought picks the true neighbour out of many sentences; NSP only asks yes or no about one.
+>
+> The difference, as the BERT paragraph says, is what gets reused afterwards: one sentence vector there, the whole network here.
 
 ## The pre-training data {§3.1}
 
-> [!PAPER] · Section 3.1 · page 5
+> [!PAPER] · §3.1
 > [![Pre-training data: the BooksCorpus, 800 million words, and English Wikipedia, 2,500 million words. For Wikipedia only the text passages are extracted, ignoring lists, tables and headers. It is critical to use a document-level corpus rather than a shuffled sentence-level corpus such as the Billion Word Benchmark in order to extract long contiguous sequences](/img/papers/bert/p3-data.png)](/img/papers/bert/p3-data.png)
->
-> **Context:** the last paragraph of Section 3.1.
 >
 > **What it says:** two sources: "the BooksCorpus (800M words)" and "English Wikipedia (2,500M words)". From Wikipedia, "only the text passages", without "lists, tables, and headers". And "it is critical to use a document-level corpus rather than a shuffled sentence-level corpus such as the Billion Word Benchmark".
 >
-> **Why it matters:** 800 million plus 2,500 million is the 3.3 billion words in the training arithmetic below. And the last sentence explains why the *kind* of text matters, not just the amount.
+> **What it means:**
+>
+> 800 million plus 2,500 million is the 3.3 billion words in the training arithmetic below.
+>
+> The last sentence explains why the *kind* of text matters, not just the amount. Think of a novel whose pages are shuffled and mixed with pages of other books. You can still learn words from it, but not how one page leads to the next.
+>
+> Both pre-training tasks need that order. Next sentence prediction needs a true next sentence, and long input sequences need text that stays on one topic.
 
 > [!DEFINITION] Corpus
 > A large collection of text used for training. Plural: corpora.
@@ -513,27 +547,31 @@ The two cited papers, in their own words:
 
 What is in the BooksCorpus? Its paper (Zhu et al., 2015) describes it:
 
-> [!PAPER] Zhu et al. (2015), Aligning Books and Movies · Section 3 and Table 2
+> [!PAPER] Zhu et al. (2015), Aligning Books and Movies · §3 and Table 2
 > [![The BookCorpus paragraph: the learning signal of the model depends on having contiguous text, where sentences follow one another in sequence, so a natural corpus is a large collection of books](/img/papers/bert/p3-bookcorpus.png)](/img/papers/bert/p3-bookcorpus.png)
 > [![Table 2 of the BookCorpus paper: 11,038 books, 74,004,228 sentences, 984,846,357 words, 1,316,420 unique words, mean 13 and median 11 words per sentence](/img/papers/bert/p3-bookcorpus-table.png)](/img/papers/bert/p3-bookcorpus-table.png)
 >
-> **Context:** the dataset section of the paper that built the BooksCorpus, originally to train skip-thought vectors.
+> **What it says:** the BooksCorpus was first built to train skip-thought vectors. That model "depends on having contiguous text, where sentences follow one another in sequence", so "a natural corpus is thus a large collection of books". Table 2: 11,038 books, 74 million sentences, about 985 million words.
 >
-> **What it says:** their model "depends on having contiguous text, where sentences follow one another in sequence", so "a natural corpus is thus a large collection of books". Table 2: 11,038 books, 74 million sentences, about 985 million words.
+> **What it means:**
 >
-> **Why it matters:** the same reason BERT needs it: books are long, ordered text. The table counts about 985 million words; the BERT paper reports 800 million for the version it used (the counts depend on how text is split into words), so the two numbers are not a contradiction.
+> The same reason BERT needs it: books are long, ordered text. A chapter of a novel stays on one story for thousands of words.
+>
+> The table counts about 985 million words; the BERT paper reports 800 million for the version it used. The counts depend on how text is split into words, so the two numbers are not a contradiction.
 
 And the Billion Word Benchmark, which the paper rules out, says this about itself:
 
-> [!PAPER] Chelba et al. (2013), One Billion Word Benchmark · Sections 2 and 4
+> [!PAPER] Chelba et al. (2013), One Billion Word Benchmark · §2 and §4
 > [![From the One Billion Word Benchmark data description: sentence order was randomized, and the data was split into 100 disjoint partitions](/img/papers/bert/p3-billion-steps.png)](/img/papers/bert/p3-billion-steps.png)
 > [![From the One Billion Word Benchmark: because the original data had already randomized sentence order, the benchmark is not useful for experiments with models that capture long context dependencies across sentence boundaries](/img/papers/bert/p3-billion.png)](/img/papers/bert/p3-billion.png)
 >
-> **Context:** the benchmark BERT names as the wrong kind of corpus.
->
 > **What it says:** "Sentence order was randomized", so the benchmark is "not useful for experiments with models that capture long context dependencies across sentence boundaries".
 >
-> **Why it matters:** the benchmark's own authors give the reason BERT avoids it. With shuffled sentences there is no true next sentence to learn from, and no 512-token span stays on one topic.
+> **What it means:**
+>
+> This is the benchmark BERT names as the wrong kind of corpus, and its own authors give the reason. Think of a deck of cards with one sentence on each card, shuffled. Every card is real text, but the order is gone.
+>
+> With shuffled sentences there is no true next sentence to learn from, and no 512-token span stays on one topic.
 
 {{FIG:p3_doc_vs_shuffled|Document-level text versus shuffled sentences. In a document-level corpus, the sentence after sentence 1 really is sentence 2, so IsNext pairs and long coherent spans exist. In a shuffled corpus, the "next" sentence comes from another document.}}
 Why must the text be **document-level**? The Billion Word Benchmark is a big set of single sentences in **shuffled** order. In it, the sentence after "She opened the fridge." is some unrelated sentence from somewhere else. That makes next sentence prediction impossible to learn, and it stops the model from ever seeing long stretches of connected text. BERT needs sequences of up to 512 tokens that really belong together, so it needs whole documents.
@@ -542,31 +580,35 @@ Why must the text be **document-level**? The Billion Word Benchmark is a big set
 
 Appendix A.2 gives the exact recipe. First, how one training example is built.
 
-> [!PAPER] · Appendix A.2 · page 13
+> [!PAPER] · Appendix A.2
 > [![A.2 Pre-training Procedure: to generate each training input sequence, sample two spans of text from the corpus, called sentences even though they are typically much longer. The first receives the A embedding, the second the B embedding. 50 percent of the time B is the actual next sentence. The combined length is at most 512 tokens. The LM masking is applied after WordPiece tokenization with a uniform masking rate of 15 percent, and no special consideration given to partial word pieces](/img/papers/bert/p3-a2-data.png)](/img/papers/bert/p3-a2-data.png)
->
-> **Context:** the start of Appendix A.2.
 >
 > **What it says:** each example has two "sentences" that are really spans of text, "typically much longer than single sentences". Together they are at most 512 tokens. Masking is done "after WordPiece tokenization", at 15%, with "no special consideration given to partial word pieces".
 >
-> **Why it matters:** the last detail means a word like "flightless" can be half-masked ("flight [MASK]"). Then predicting "##less" from "flight" is easy, which is a weaker exercise.
+> **What it means:**
+>
+> A "sentence" here is a span of text, often several real sentences long. The pair is cut so that together it fills up to 512 tokens. This is the meaning of "sentence" that Part 2 set for this paper.
+>
+> The last detail means a word like "flightless" can be half-masked ("flight [MASK]"). Then predicting "##less" from "flight" is easy, which is a weaker exercise. It is like a crossword answer with half its letters already filled in.
 
 Google noticed this too. In May 2019 the BERT repository added **Whole Word Masking** models (its README: "New May 31st, 2019: Whole Word Masking Models"), which always mask every piece of a word together. The released masking code has a switch for it, and its comment notes that the training itself does not change: each piece is still predicted on its own.
 
 > [!DEFINITION] Span
 > A stretch of consecutive text: a few words, a sentence or several sentences.
 
-Next, the training run itself. The sentence starts at the bottom of the left column:
+Next, the training run itself:
 
-> [!PAPER] · Appendix A.2 · page 13
+> [!PAPER] · Appendix A.2
 > [![We train with batch size of 256 sequences, 256 sequences times 512 tokens equals 128,000 tokens per batch, for 1,000,000 steps, which is approximately 40](/img/papers/bert/p3-a2-train0.png)](/img/papers/bert/p3-a2-train0.png)
 > [![epochs over the 3.3 billion word corpus. Adam with learning rate 1e-4, beta1 0.9, beta2 0.999, L2 weight decay of 0.01, learning rate warmup over the first 10,000 steps, and linear decay of the learning rate. Dropout probability of 0.1 on all layers. A gelu activation rather than the standard relu, following OpenAI GPT. The training loss is the sum of the mean masked LM likelihood and the mean next sentence prediction likelihood](/img/papers/bert/p3-a2-train.png)](/img/papers/bert/p3-a2-train.png)
 >
-> **Context:** the second paragraph of Appendix A.2, which continues at the top of the right column.
->
 > **What it says:** 256 sequences of 512 tokens per batch ("128,000 tokens/batch"), 1,000,000 steps, "approximately 40 epochs over the 3.3 billion word corpus". Adam with learning rate 1e-4, β₁ = 0.9, β₂ = 0.999, "L2 weight decay of 0.01", warmup over 10,000 steps then linear decay, dropout 0.1, GELU. The loss is "the sum of the mean masked LM likelihood and the mean next sentence prediction likelihood".
 >
-> **Why it matters:** this is the whole training recipe in a few lines. Let us go through it one item at a time.
+> **What it means:**
+>
+> This is the whole training recipe in a few lines. It is like the settings on an oven: how much goes in, for how long, and how hot. Each number was a choice, and the sections below take them one at a time.
+>
+> Two numbers set the scale. 1,000,000 steps of about 128,000 tokens each is about 40 passes over the 3.3 billion words. The other numbers control how each step changes the weights.
 
 > [!DEFINITION] Batch, step and epoch
 > A **batch** is the group of examples the model looks at before one update of its weights. One update is a **step**. An **epoch** is one full pass over the whole training data.
@@ -633,11 +675,13 @@ So GELU keeps $$x$$ in proportion to how large $$x$$ is. Big positive inputs pas
 > [!PAPER] Hendrycks and Gimpel (2016), Gaussian Error Linear Units (GELUs) · Abstract
 > [![The GELU abstract: the GELU activation function is x times Phi of x, where Phi of x is the standard Gaussian cumulative distribution function; the GELU nonlinearity weights inputs by their value, rather than gates inputs by their sign as in ReLUs](/img/papers/bert/p3-gelu-paper.png)](/img/papers/bert/p3-gelu-paper.png)
 >
-> **Context:** the paper the BERT appendix cites for "gelu".
+> **What it says:** this is the paper the BERT appendix cites for "gelu". "The GELU activation function is $$x\Phi(x)$$, where $$\Phi(x)$$ the standard Gaussian cumulative distribution function." It "weights inputs by their value, rather than gates inputs by their sign as in ReLUs".
 >
-> **What it says:** "The GELU activation function is $$x\Phi(x)$$, where $$\Phi(x)$$ the standard Gaussian cumulative distribution function." It "weights inputs by their value, rather than gates inputs by their sign as in ReLUs".
+> **What it means:**
 >
-> **Why it matters:** "weights by value, not by sign" is the one-line difference from ReLU, and it is easy to see in the numbers below.
+> ReLU is a gate: a number passes if it is positive and stops if it is negative. GELU is more like a dimmer: it lets each number through in part, more for large numbers and less for small ones.
+>
+> "Weights by value, not by sign" is the one-line difference from ReLU, and it is easy to see in the numbers below.
 
 $$\Phi$$ has no simple closed form, so the released code uses a fast approximation based on tanh:
 
@@ -715,14 +759,18 @@ $$
 
 ### Hardware and the two sequence lengths
 
-> [!PAPER] · Appendix A.2 · page 13
+> [!PAPER] · Appendix A.2
 > [![Training of BERT-base was performed on 4 Cloud TPUs in Pod configuration, 16 TPU chips total; BERT-large on 16 Cloud TPUs, 64 TPU chips total. Each pre-training took 4 days. Longer sequences are disproportionately expensive because attention is quadratic to the sequence length. We pre-train with sequence length of 128 for 90 percent of the steps, then the rest 10 percent of the steps with sequence of 512 to learn the positional embeddings](/img/papers/bert/p3-a2-tpu.png)](/img/papers/bert/p3-a2-tpu.png)
->
-> **Context:** the last two paragraphs of Appendix A.2.
 >
 > **What it says:** BERT-base trained on "16 TPU chips total", BERT-large on "64 TPU chips total", and "each pre-training took 4 days". Because "attention is quadratic to the sequence length", they used "sequence length of 128 for 90% of the steps", and length 512 only for the last 10%, "to learn the positional embeddings".
 >
-> **Why it matters:** a practical trick that most later models copied: train short first, long at the end.
+> **What it means:**
+>
+> Think of a driving school. Learners practise first on short, quiet roads, and take the long motorway trip only near the end. BERT trains on sequences of 128 tokens for 90% of the steps, and on 512 tokens only at the end.
+>
+> The reason is cost: attention compares every token with every other token, so a sequence 4 times longer needs 16 times as many attention scores. The last 10% of steps is still needed, "to learn the positional embeddings" of the far positions.
+>
+> This is a practical trick that most later models copied: train short first, long at the end.
 
 > [!DEFINITION] TPU
 > Tensor Processing Unit: a chip designed by Google to run neural-network maths fast, similar in purpose to a GPU. A "pod" links many of them together.

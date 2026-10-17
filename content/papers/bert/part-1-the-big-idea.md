@@ -9,28 +9,27 @@ tags: [bert, nlp, transformers]
 
 In October 2018, four researchers at Google posted a paper called **BERT**. It reported new best results on eleven language tasks at once. A year later, in October 2019, Google wrote that BERT would help its search engine understand about one in ten English searches in the US. BERT-style models are still used today inside search engines, spam filters, support-ticket routers and retrieval systems.
 
-This series reads the paper slowly, in the paper's own order. Each piece follows the same pattern:
-
-1. **The exact lines from the paper**, as a highlighted screenshot in a teal box like the one below.
-2. **A plain-English explanation**, with a yellow box for every new word.
-3. **A picture**, and **real code** when it helps, with its real output.
-4. **Why it matters**, and only then the next piece.
+This series reads the paper slowly, in the paper's own order. Each piece shows the exact lines of the paper as a highlighted screenshot in a teal box, with what they say and what they mean. A yellow box explains every new word, and a picture or real code with its real output follows when it helps.
 
 The small `Paper §1` tag above each heading tells you which section of the paper you are reading. The screenshots come from the paper's second arXiv version (May 2019), the one most people read today.
 
 > [!DEFINITION] Definition boxes
-> A yellow box like this explains one technical word in plain language, the first time it appears. If you already know the word, skip the box.
+> A yellow box like this explains one technical word, the first time it appears. If you already know the word, skip the box.
 
 ## The title {§Title}
 
-> [!PAPER] · Title · page 1
+> [!PAPER] · Title
 > [![The title of the BERT paper: BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding, by Jacob Devlin, Ming-Wei Chang, Kenton Lee and Kristina Toutanova, Google AI Language](/img/papers/bert/p1-title.png)](/img/papers/bert/p1-title.png)
->
-> **Context:** the first thing on page 1. The paper was posted to arXiv in October 2018 and published at NAACL 2019, a major conference on language technology.
 >
 > **What it says:** "BERT: Pre-training of Deep **Bidirectional Transformers** for Language Understanding."
 >
-> **Why it matters:** every word of the title is one idea of the paper. If you understand the title, you understand the paper.
+> **What it means:**
+>
+> A good title works like the label on a tin: it lists what is inside. Here every word of the title is one idea of the paper. If you understand the title, you understand the paper.
+>
+> The words also follow the order of the work, though the authors do not say so. First comes a long training on ordinary text. The model is a deep stack that reads both ways. The goal is to read and decide, not to write.
+>
+> The paper was posted to arXiv in October 2018. It was published at NAACL 2019, a major conference on language technology.
 
 Let us take the title apart, one word at a time.
 
@@ -51,14 +50,18 @@ Let us take the title apart, one word at a time.
 
 ## What BERT is {§Abstract}
 
-> [!PAPER] · Abstract · page 1
+> [!PAPER] · Abstract
 > [![The first half of the BERT abstract, with three highlights: Bidirectional Encoder Representations from Transformers; jointly conditioning on both left and right context in all layers; one additional output layer](/img/papers/bert/p1-abstract-what.png)](/img/papers/bert/p1-abstract-what.png)
->
-> **Context:** the abstract, the paper's summary of itself in two paragraphs. This is the first paragraph.
 >
 > **What it says:** BERT stands for **B**idirectional **E**ncoder **R**epresentations from **T**ransformers. It is pre-trained on "unlabeled text by jointly conditioning on both left and right context in all layers". Afterwards it can be fine-tuned "with just one additional output layer" for many tasks, such as question answering.
 >
-> **Why it matters:** these three sentences are the whole recipe. Learn from plain text, look both ways, then add one small layer per task.
+> **What it means:**
+>
+> Think of a medical student. First come years of general study, then a short training in one field. BERT works the same way: one long general training on ordinary text, then a short training for each task.
+>
+> Each phrase carries one part of the plan. "Unlabeled text" means nobody has to write answers, so the supply of training text is almost unlimited. "Both left and right context in all layers" means each word takes its meaning from both sides, at every level. "Just one additional output layer" means the same model serves many tasks, with almost nothing new on top.
+>
+> So these three sentences are the whole recipe. Learn from plain text, look both ways, then add one small layer per task.
 
 The name has four parts. You already know **bidirectional** and **transformers** from the title. The two new words are **encoder** and **representations**.
 
@@ -72,15 +75,19 @@ The name has four parts. You already know **bidirectional** and **transformers**
 
 "Encoder" is a precise word here. It points at one half of the Transformer from *Attention Is All You Need* (Vaswani et al., 2017), the paper BERT is built on.
 
-> [!PAPER] Vaswani et al. (2017), Attention Is All You Need · Section 3 · page 3, Figure 1
+> [!PAPER] Vaswani et al. (2017), Attention Is All You Need · §3, Figure 1
 > [![Figure 1 of Attention Is All You Need: the Transformer, an encoder stack on the left with multi-head attention and feed-forward blocks, and a decoder stack on the right with masked multi-head attention, cross-attention and feed-forward blocks, ending in a linear layer and softmax](/img/papers/bert/p1-transformer-fig1.png)](/img/papers/bert/p1-transformer-fig1.png)
 > [![Section 3.1 of Attention Is All You Need: the encoder and decoder are the left and right halves of Figure 1; the decoder's self-attention is modified to prevent positions from attending to subsequent positions, so predictions for position i depend only on outputs at positions before i](/img/papers/bert/p1-transformer-halves.png)](/img/papers/bert/p1-transformer-halves.png)
 >
-> **Context:** the Transformer was built for translation. The left half (the **encoder**) reads the source sentence. The right half (the **decoder**) writes the translation, one word at a time.
->
 > **What it says:** both halves are stacks of $$N$$ identical layers. The decoder's self-attention is "modified to prevent positions from attending to subsequent positions", so "the predictions for position $$i$$ can depend only on the known outputs at positions less than $$i$$". The encoder has no such rule.
 >
-> **Why it matters:** BERT is the left half. OpenAI GPT is (almost) the right half, without the cross-attention block. The single difference between them is that rule about "subsequent positions".
+> **What it means:**
+>
+> The Transformer was built for translation. Think of a human interpreter with two jobs: first read the whole French sentence, then say the English one, word by word. The left half (the **encoder**) does the reading. The right half (the **decoder**) does the writing, one word at a time.
+>
+> A writer must not see words that it has not written yet. That is why the decoder has a rule against "subsequent positions". A reader has no such need, so the encoder sees the whole sentence at once.
+>
+> BERT is the left half. OpenAI GPT is (almost) the right half, without the cross-attention block. The single difference between them is that rule about "subsequent positions".
 
 <figure class="fig"><svg viewBox="0 0 760 336" role="img" aria-label="The original Transformer has two halves. The encoder (left) uses self-attention where every word sees every word. The decoder (right) uses masked self-attention where a word sees only the words on its left, plus cross-attention to the encoder. BERT keeps only the encoder half; GPT keeps only the decoder half, without the cross-attention."><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0,0L10,5L0,10z"/></marker><marker id="ah-on" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-on" d="M0,0L10,5L0,10z"/></marker><marker id="ah-2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="arrow-2" d="M0,0L10,5L0,10z"/></marker></defs><text class="t-title" x="190.0" y="22.0" text-anchor="middle">Left half: the encoder</text><text class="t-title" x="570.0" y="22.0" text-anchor="middle">Right half: the decoder</text><rect class="box-ghost" x="80.0" y="50.0" width="220.0" height="122.0" rx="14"/><rect class="box-1" x="96.0" y="112.0" width="188.0" height="34.0" rx="8"/><text class="t-note" x="190.0" y="127.0" text-anchor="middle">self-attention</text><text class="t-muted" x="190.0" y="141.0" text-anchor="middle">every word sees every word</text><rect class="box" x="96.0" y="66.0" width="188.0" height="34.0" rx="8"/><text class="t-note" x="190.0" y="81.0" text-anchor="middle">feed-forward</text><text class="t-muted" x="190.0" y="95.0" text-anchor="middle">each word on its own</text><text class="t-tick" x="308.0" y="70.0" text-anchor="start">× N</text><rect class="box-ghost" x="450.0" y="50.0" width="240.0" height="168.0" rx="14"/><rect class="box-2" x="466.0" y="158.0" width="208.0" height="34.0" rx="8"/><text class="t-note" x="570.0" y="173.0" text-anchor="middle">masked self-attention</text><text class="t-muted" x="570.0" y="187.0" text-anchor="middle">a word sees only its left</text><rect class="box-ghost" x="466.0" y="112.0" width="208.0" height="34.0" rx="8"/><text class="t-note" x="570.0" y="127.0" text-anchor="middle">cross-attention</text><text class="t-muted" x="570.0" y="141.0" text-anchor="middle">looks at the encoder output</text><rect class="box" x="466.0" y="66.0" width="208.0" height="34.0" rx="8"/><text class="t-note" x="570.0" y="81.0" text-anchor="middle">feed-forward</text><text class="t-muted" x="570.0" y="95.0" text-anchor="middle">each word on its own</text><text class="t-tick" x="698.0" y="70.0" text-anchor="start">× N</text><line class="edge" x1="190.0" y1="192.0" x2="190.0" y2="172.0" marker-end="url(#ah)"/><text class="t-tick" x="190.0" y="208.0" text-anchor="middle">input words</text><line class="edge" x1="570.0" y1="238.0" x2="570.0" y2="218.0" marker-end="url(#ah)"/><text class="t-tick" x="570.0" y="254.0" text-anchor="middle">words written so far</text><line class="edge-dim" x1="300.0" y1="120.0" x2="450.0" y2="120.0" marker-end="url(#ah)"/><rect class="box-1" x="60.0" y="270.0" width="260.0" height="52.0" rx="12"/><text class="t-note" x="190.0" y="292.0" text-anchor="middle">BERT keeps only this half</text><text class="t-muted" x="190.0" y="310.0" text-anchor="middle">no mask: both directions</text><rect class="box-2" x="430.0" y="270.0" width="280.0" height="52.0" rx="12"/><text class="t-note" x="570.0" y="292.0" text-anchor="middle">GPT keeps only this half</text><text class="t-muted" x="570.0" y="310.0" text-anchor="middle">without the cross-attention; mask stays</text></svg><figcaption>The two halves of the original Transformer. BERT keeps only the encoder (every word sees every word). GPT keeps a decoder-style stack without the cross-attention, so a word sees only itself and the words before it.</figcaption></figure>
 
@@ -201,14 +208,18 @@ The idea itself came from computer vision, which the paper mentions in its relat
 
 ## The results in the abstract {§Abstract}
 
-> [!PAPER] · Abstract · page 1
+> [!PAPER] · Abstract
 > [![The second paragraph of the BERT abstract: new state-of-the-art results on eleven tasks, GLUE score 80.5 percent, MultiNLI accuracy 86.7 percent, SQuAD v1.1 Test F1 93.2 and SQuAD v2.0 Test F1 83.1](/img/papers/bert/p1-abstract-results.png)](/img/papers/bert/p1-abstract-results.png)
->
-> **Context:** the second paragraph of the abstract, right after the description of BERT.
 >
 > **What it says:** BERT is "conceptually simple and empirically powerful". It sets new best results on eleven tasks, and the abstract lists four of them with how much it improved.
 >
-> **Why it matters:** these were large jumps. Benchmarks usually move by fractions of a point at a time.
+> **What it means:**
+>
+> Think of the world record in the 100 metres. It usually falls by a few hundredths of a second. A runner who takes off half a second at once changes the sport, not only the record.
+>
+> These were jumps of that kind. Benchmarks usually move by fractions of a point at a time, and here the GLUE score moved by 7.7 points.
+>
+> The two adjectives make two separate claims. "Conceptually simple" means no new kind of layer: the gains come from how the model is trained. "Empirically powerful" means the measured results, and eleven tasks show that one recipe works on very different jobs.
 
 > [!DEFINITION] State of the art (SOTA)
 > The best result anyone has published so far on a task. "New state of the art" means "better than every earlier system".
@@ -216,7 +227,7 @@ The idea itself came from computer vision, which the paper mentions in its relat
 > [!DEFINITION] Benchmark
 > A fixed, public test that everyone uses, so results can be compared fairly. A model is given the test questions, and its answers are scored.
 
-Here are the four results from the abstract, in plain words:
+Here are the four results from the abstract:
 
 | Benchmark | What it tests | BERT's score | Improvement |
 |---|---|---|---|
@@ -234,14 +245,18 @@ A note on the wording "7.7% point absolute improvement": it means the score went
 
 Now the introduction. Its first paragraph sets the scene.
 
-> [!PAPER] · Section 1 · page 1
+> [!PAPER] · §1
 > [![The first paragraph of the introduction: language model pre-training has been shown to be effective for sentence-level tasks such as natural language inference and paraphrasing, and token-level tasks such as named entity recognition and question answering](/img/papers/bert/p1-intro-tasks.png)](/img/papers/bert/p1-intro-tasks.png)
->
-> **Context:** the opening paragraph of Section 1 (Introduction).
 >
 > **What it says:** "Language model pre-training" already helps many tasks. These come in two kinds: **sentence-level tasks**, which look at whole sentences ("analyzing them holistically"), and **token-level tasks**, which need an answer for every single word ("fine-grained output at the token level").
 >
-> **Why it matters:** BERT wants to be good at **both** kinds with the same model. Keep the two kinds in mind; the argument of the next paragraphs depends on them.
+> **What it means:**
+>
+> Think of a teacher who marks an essay. Sometimes the teacher gives one grade for the whole essay. Sometimes the teacher marks each wrong word, one by one. Sentence-level tasks are the first kind, and token-level tasks are the second kind.
+>
+> The two kinds need different things from a model. One grade needs a good summary of the whole text. A mark per word needs a good vector at every position, and each of those vectors must know its neighbours.
+>
+> BERT wants to be good at **both** kinds with the same model. Keep the two kinds in mind; the argument of the next paragraphs depends on them.
 
 > [!DEFINITION] Token
 > A small piece of text: usually a word, sometimes part of a word or a punctuation mark. Models read tokens, not letters. Part 2 shows exactly how BERT cuts text into tokens.
@@ -271,14 +286,18 @@ The two token-level examples in that paragraph deserve a closer look, because bo
 
 ## Two ways to reuse a pre-trained model {§1}
 
-> [!PAPER] · Section 1 · page 1
+> [!PAPER] · §1
 > [![The second paragraph of the introduction: there are two existing strategies, feature-based and fine-tuning. ELMo uses task-specific architectures that include the pre-trained representations as additional features. OpenAI GPT is trained by simply fine-tuning all pre-trained parameters. Both use unidirectional language models](/img/papers/bert/p1-intro-strategies.png)](/img/papers/bert/p1-intro-strategies.png)
 >
-> **Context:** the second paragraph of the introduction. It describes the two ways people used pre-trained models in 2018.
+> **What it says:** in 2018 there were two ways to use a pre-trained model. The **feature-based** approach (ELMo) feeds the pre-trained representations as extra inputs into a model built specially for each task. The **fine-tuning** approach (OpenAI GPT) adds very few new weights and fine-tunes "all pre-trained parameters". Both learn during pre-training with "unidirectional language models".
 >
-> **What it says:** the **feature-based** approach (ELMo) feeds the pre-trained representations as extra inputs into a model built specially for each task. The **fine-tuning** approach (OpenAI GPT) adds very few new weights and fine-tunes "all pre-trained parameters". Both learn during pre-training with "unidirectional language models".
+> **What it means:**
 >
-> **Why it matters:** BERT picks the fine-tuning side. And the last sentence names the weakness BERT attacks: both approaches pre-train in only one direction.
+> Think of a hired expert. In the feature-based approach, the expert writes a report and leaves. Your own team, built for the task, uses that report as one more input. In the fine-tuning approach, the expert joins your team and keeps learning on the job.
+>
+> BERT picks the fine-tuning side. The reason is in the word "all": every pre-trained weight can adapt to the task, and almost nothing must be built new for each task.
+>
+> The last sentence names the weakness BERT attacks: both approaches pre-train in only one direction. The next paragraphs explain why that is a real limit.
 
 > [!DEFINITION] Downstream task
 > The real task you care about in the end (sentiment, question answering, and so on), as opposed to the pre-training task. It sits "downstream" of pre-training.
@@ -351,14 +370,18 @@ $$
 
 ## The problem: reading in only one direction {§1}
 
-> [!PAPER] · Section 1 · page 1
+> [!PAPER] · §1
 > [![The third paragraph of the introduction: the major limitation is that standard language models are unidirectional. In OpenAI GPT every token can only attend to previous tokens. This is sub-optimal for sentence-level tasks and could be very harmful for token-level tasks such as question answering, where it is crucial to incorporate context from both directions](/img/papers/bert/p1-intro-limitation.png)](/img/papers/bert/p1-intro-limitation.png)
->
-> **Context:** the third paragraph of the introduction: the problem statement of the whole paper.
 >
 > **What it says:** "The major limitation is that standard language models are unidirectional." In OpenAI GPT, "every token can only attend to previous tokens". This is "sub-optimal" for sentence-level tasks and "could be very harmful" for token-level tasks like question answering, "where it is crucial to incorporate context from both directions".
 >
-> **Why it matters:** this is the problem BERT solves. Everything else in the paper is the solution and the evidence.
+> **What it means:**
+>
+> Read a mystery novel and stop halfway through. You can guess the killer, but the real clue often comes later in the book. A left-to-right model is in that place at every word: it builds each word before it sees the words after it.
+>
+> The authors grade the damage with care. For a whole-sentence task it is only "sub-optimal", because the last token has seen the whole sentence. For a per-word task it "could be very harmful", because the answer at each position depends on both sides.
+>
+> This paragraph is the problem statement of the whole paper. Everything else in the paper is the solution and the evidence.
 
 > [!DEFINITION] Attend to
 > In a Transformer, "token A attends to token B" means A looks at B and takes information from it. In GPT, a token may attend only to itself and the tokens before it. A **mask** blocks every token to the right.
@@ -443,17 +466,21 @@ What this shows, and what it does not:
 
 ## BERT's fix: fill in the blanks {§1}
 
-If language models are one-directional by nature, how do you pre-train a two-directional model? The paper's answer is in the next paragraph.
+If language models are one-directional by nature, how do you pre-train a two-directional model? Here is the paper's answer.
 
-> [!PAPER] · Section 1 · pages 1 and 2
+> [!PAPER] · §1
 > [![The fourth paragraph of the introduction: BERT alleviates the unidirectionality constraint by using a masked language model pre-training objective, inspired by the Cloze task. The masked language model randomly masks some of the tokens from the input, and the objective is to predict the original vocabulary id of the masked word](/img/papers/bert/p1-intro-mlm.png)](/img/papers/bert/p1-intro-mlm.png)
 > [![The paragraph continues on page 2: based only on its context. The MLM objective enables the representation to fuse the left and the right context. In addition, a next sentence prediction task jointly pre-trains text-pair representations](/img/papers/bert/p1-intro-mlm2.png)](/img/papers/bert/p1-intro-mlm2.png)
 >
-> **Context:** the fourth paragraph of the introduction, which runs from the bottom of page 1 onto page 2. After the problem, the solution.
->
 > **What it says:** BERT uses a **"masked language model" (MLM)**, "inspired by the Cloze task". It "randomly masks some of the tokens from the input", and the model must "predict the original vocabulary id of the masked word based only on its context". This lets the representation "fuse the left and the right context". A second task, **"next sentence prediction"**, teaches the model about pairs of sentences.
 >
-> **Why it matters:** this is the trick that makes deep bidirectional pre-training possible. Instead of predicting the *next* word, predict a *hidden* word, using everything around it.
+> **What it means:**
+>
+> Think of a school worksheet with blanks: "The cat sat on the ____." To fill a blank, you read the words before it and after it. You cannot cheat, because the answer is not on the page.
+>
+> That is the reason the trick works, though the paragraph does not spell it out. A normal language model must hide the future, or the next word would give away its own answer. With masking, the answer is hidden in place, so the model may look both ways safely.
+>
+> So the task changes from predicting the *next* word to predicting a *hidden* word, using everything around it. This one change makes deep bidirectional pre-training possible.
 
 > [!DEFINITION] Cloze task
 > A fill-in-the-blank test. Wilson Taylor described it in 1953 as a way to measure how readable a text is. "The cat sat on the ____." Readers fill in the missing word from the context.
@@ -466,18 +493,22 @@ If language models are one-directional by nature, how do you pre-train a two-dir
 
 You already saw masked language modelling in action: the `[MASK]` sentences above are exactly this pre-training task. The trick works because a hidden word cannot leak its own answer, so the model is free to look in both directions. In Part 3 we will see *why* an ordinary language model cannot simply look both ways (each word would "see itself"), and we will run the exact masking recipe, which has a few surprising details.
 
-The paragraph ends with a second task, **next sentence prediction**: given two pieces of text, guess whether the second really came right after the first. Many tasks are about *pairs* of sentences (does this answer this question? does this sentence follow from that one?), and plain language modelling never practises that. Part 3 covers it too.
+The paragraph ends with a second task, **next sentence prediction**: given two pieces of text, guess whether the second really came right after the first. Many tasks are about *pairs* of sentences (does this answer this question? does this sentence follow from that one?), and ordinary language modelling never practises that. Part 3 covers it too.
 
 ## The three contributions {§1}
 
-> [!PAPER] · Section 1 · page 2
+> [!PAPER] · §1
 > [![The contributions of the paper as three bullet points: the importance of bidirectional pre-training; pre-trained representations reduce the need for heavily-engineered task-specific architectures; BERT advances the state of the art for eleven NLP tasks. The code and models are released on GitHub](/img/papers/bert/p1-contributions.png)](/img/papers/bert/p1-contributions.png)
 >
-> **Context:** the end of the introduction, where the authors list what is new in their paper.
+> **What it says:** the authors list what is new in their paper as three contributions. (1) Bidirectional pre-training matters, and BERT is deeply bidirectional, unlike GPT (one direction) and unlike ELMo's "shallow concatenation of independently trained left-to-right and right-to-left LMs". (2) Pre-trained representations "reduce the need for many heavily-engineered task-specific architectures". (3) BERT "advances the state of the art for eleven NLP tasks", and the code and models are public.
 >
-> **What it says:** three contributions. (1) Bidirectional pre-training matters, and BERT is deeply bidirectional, unlike GPT (one direction) and unlike ELMo's "shallow concatenation of independently trained left-to-right and right-to-left LMs". (2) Pre-trained representations "reduce the need for many heavily-engineered task-specific architectures". (3) BERT "advances the state of the art for eleven NLP tasks", and the code and models are public.
+> **What it means:**
 >
-> **Why it matters:** each claim is tested later. Claim 1 by the ablation studies in Part 5, claims 2 and 3 by the experiments in Part 4.
+> A list of contributions works like a contract. The authors state their promises here, and the rest of the paper must pay each one with evidence.
+>
+> The first claim attacks both rivals at once: GPT for its single direction, ELMo for joining its two directions only at the end. The second claim is about cost, because before BERT each task had its own network, designed by hand. The third claim is the proof that the recipe works.
+>
+> Each claim is tested later. Claim 1 by the ablation studies in Part 5, claims 2 and 3 by the experiments in Part 4.
 
 Let us unpack each contribution.
 
@@ -488,14 +519,16 @@ Let us unpack each contribution.
 
 To see what "shallow" means exactly, look at how ELMo is trained, in its own paper:
 
-> [!PAPER] Peters et al. (2018a), Deep contextualized word representations (ELMo) · Section 3.1 · page 2
+> [!PAPER] Peters et al. (2018a), Deep contextualized word representations (ELMo) · §3.1
 > [![Section 3.1 of the ELMo paper: a forward language model predicts each token from the tokens before it, a backward language model predicts each token from the tokens after it, and the biLM maximizes the sum of both log likelihoods, with separate parameters for the LSTMs in each direction](/img/papers/bert/p1-elmo-bilm.png)](/img/papers/bert/p1-elmo-bilm.png)
 >
-> **Context:** ELMo's training objective, the paper BERT calls "Peters et al. (2018a)".
+> **What it says:** ELMo's training objective has two parts. A **forward** language model predicts each token from the tokens before it; a **backward** one predicts "the previous token given the future context". ELMo "jointly maximizes the log likelihood of the forward and backward directions", sharing only the input layer and the final softmax, while keeping "separate parameters for the LSTMs in each direction".
 >
-> **What it says:** a **forward** language model predicts each token from the tokens before it; a **backward** one predicts "the previous token given the future context". ELMo "jointly maximizes the log likelihood of the forward and backward directions", sharing only the input layer and the final softmax, while keeping "separate parameters for the LSTMs in each direction".
+> **What it means:**
 >
-> **Why it matters:** "separate parameters for the LSTMs in each direction" is the shallow part. Each reader is still one-directional. They meet only when their outputs are glued together at the end.
+> Picture two people who read the same sentence. One reads from the start to the end. The other reads from the end back to the start. They never talk while they read, and at the end their notes are stapled together.
+>
+> That is what "separate parameters for the LSTMs in each direction" means, and it is the shallow part. Each reader is still one-directional. They meet only when their outputs are glued together at the end, so no layer ever mixes both sides.
 
 ELMo's objective, in the notation we used for GPT:
 
@@ -540,26 +573,29 @@ GPT-2 (Radford et al., 2019, [*Language Models are Unsupervised Multitask Learne
 
 The paper puts its clearest picture of this argument in the appendix (Appendix A.4), so we read it now, where it belongs in the story.
 
-> [!PAPER] · Appendix A.4, Figure 3 · page 13
+> [!PAPER] · Appendix A.4, Figure 3
 > [![Figure 3 of the BERT paper: three diagrams. BERT, a stack of Transformer blocks where every block connects to every position below. OpenAI GPT, a stack of Transformer blocks where each block connects only to positions on its left. ELMo, a left-to-right LSTM and a right-to-left LSTM whose outputs are combined. The caption says only BERT representations are jointly conditioned on both left and right context in all layers](/img/papers/bert/p1-figure3.png)](/img/papers/bert/p1-figure3.png)
->
-> **Context:** Appendix A.4 compares BERT, OpenAI GPT and ELMo. Figure 3 draws the three of them.
 >
 > **What it says:** BERT uses a bidirectional Transformer; GPT a left-to-right Transformer; ELMo two separately trained LSTMs, one per direction. "Among the three, only BERT representations are jointly conditioned on both left and right context in all layers." Also, BERT and GPT are fine-tuning approaches, while ELMo is feature-based.
 >
-> **Why it matters:** the whole paper in one picture. Look at the arrows.
+> **What it means:**
+>
+> The whole paper is in this one picture, and the arrows tell the story. An arrow means "this output can use that input".
+>
+> In the BERT panel, every block connects to *every* position in the layer below, so each output knows both sides at every layer. In the GPT panel, each block connects only to positions on its own left. In the ELMo panel, the arrows inside each LSTM chain all point one way; the two directions only meet at the top.
+>
+> BERT and GPT also have the **same** shape: a stack of Transformer blocks. This is deliberate. The authors made BERT's smaller version the same size as GPT, so a gain of BERT comes from the arrows, not from size.
 
-How to read the figure:
+The symbols in the figure:
 
 - **E₁, E₂, …, E_N** (yellow, bottom) are the input embeddings: one vector per input token.
 - **Trm** is one Transformer block (a layer). **Lstm** is one step of an LSTM, an older kind of network that reads one token at a time.
 - **T₁, T₂, …, T_N** (green, top) are the output vectors, one per token.
-- **The arrows** show who can see whom. In the BERT panel, every Trm connects to *every* position in the layer below. In the GPT panel, each Trm connects only to positions on its own left. In the ELMo panel, the arrows inside each LSTM chain all point one way; the two directions only meet at the top.
 
 > [!DEFINITION] LSTM
 > Long short-term memory: a kind of recurrent neural network, the standard way to read text before Transformers. It reads tokens one at a time, carrying a running memory from each token to the next.
 
-Notice also that BERT and GPT have the **same** shape: a stack of Transformer blocks. The only difference is the arrows, that is, which positions each token may look at. This is deliberate. The authors made BERT's smaller version the same size as GPT so the two could be compared fairly. Part 2 opens up that stack.
+Part 2 opens up that stack of blocks.
 
 > [!TAKEAWAYS] Key takeaways
 > - **BERT = Bidirectional Encoder Representations from Transformers**: a Transformer encoder, pre-trained on unlabeled text, that builds every word's representation from both its left and its right, in every layer.
