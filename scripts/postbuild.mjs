@@ -114,6 +114,13 @@ pages.push({
   ld: [{ '@type': 'CollectionPage', name: 'Research papers', url: url('papers'), isPartOf: { '@id': website['@id'] } }, crumbs([['Home', ''], ['Research papers', 'papers']])],
   body: `<h1>Research papers</h1>${list(papers.map((p) => [`${BASE}${p.route}/`, `${p.short}, explained`, p.description]))}`,
 })
+pages.push({
+  route: 'demos', title: `Interactive demos · ${site.name}`,
+  description: 'Run the models of the papers in your browser: click a photo and SAM cuts out the object, or follow a picture through a Vision Transformer step by step.',
+  image: ogImage('papers'), type: 'website',
+  ld: [{ '@type': 'CollectionPage', name: 'Interactive demos', url: url('demos'), isPartOf: { '@id': website['@id'] } }, crumbs([['Home', ''], ['Interactive demos', 'demos']])],
+  body: `<h1>Interactive demos</h1>${list(papers.filter((p) => p.demo).map((p) => [`${BASE}${p.route}/demo/`, p.demo.title, p.demo.description]))}`,
+})
 for (const p of papers) {
   const scholarly = {
     '@type': 'ScholarlyArticle', name: p.title, headline: p.title, datePublished: p.year ? String(p.year) : undefined,

@@ -1,16 +1,44 @@
-/* The shell of a paper's interactive demo page (/papers/<paper>/demo) and its link on the series page.
+/* The shell of a paper's interactive demo page (/papers/<paper>/demo), the /demos page, and the demo links
+   (cards, promo, button) used on the home page, the papers pages and the parts.
    Each demo styles its own insides in src/demos/<paper>/; colours come from the theme tokens. */
 .demo-page { max-width: 1180px; margin: 0 auto; padding: 24px 16px 64px; }
 .demo-head { max-width: 760px; margin-bottom: 28px; }
 .demo-head h1 { margin: 10px 0 8px; }
 .demo-loading { padding: 48px 0; color: var(--muted); }
 
-.demo-promo {
-  display: grid; gap: 4px; margin: 18px 0 0; padding: 16px 18px; border-radius: 12px; text-decoration: none;
-  border: 1px solid color-mix(in srgb, var(--paper) 45%, transparent);
-  background: color-mix(in srgb, var(--paper) 8%, transparent); color: inherit;
-}
-.demo-promo:hover { background: color-mix(in srgb, var(--paper) 14%, transparent); }
-.dp-kicker { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--paper); }
-.dp-title { font-size: 18px; font-weight: 700; }
-.dp-text { color: var(--muted); font-size: 15px; }
+.dp-kicker { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--paper); }
+.dp-title { font-size: 19px; font-weight: 700; color: var(--text-strong); }
+.dp-text { color: var(--muted); font-size: 15px; line-height: 1.5; }
+
+/* the button: the paper's accent, like the reader button */
+.btn.demo-btn { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; color: var(--paper);
+  border-color: color-mix(in srgb, var(--paper) 60%, transparent); background: color-mix(in srgb, var(--paper) 10%, transparent); }
+.btn.demo-btn:hover { border-color: var(--paper); background: color-mix(in srgb, var(--paper) 18%, transparent); }
+
+/* a card with a picture */
+.demo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 20px; }
+.demo-card { display: flex; flex-direction: column; border-radius: 14px; overflow: hidden; text-decoration: none; color: inherit;
+  border: 1px solid var(--border); background: var(--surface, transparent); transition: transform .15s, border-color .15s; }
+.demo-card:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--paper) 60%, transparent); }
+.demo-card img { width: 100%; height: auto; aspect-ratio: 800 / 420; object-fit: cover; display: block; border-bottom: 1px solid var(--border); }
+.dc-body { display: grid; gap: 6px; padding: 16px 18px 18px; }
+.dc-go { margin-top: 4px; font-weight: 700; color: var(--paper); font-size: 14.5px; }
+
+/* the big link on a paper's series page: picture beside the text */
+.demo-promo { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 0; margin: 18px 0 0; border-radius: 14px;
+  overflow: hidden; text-decoration: none; color: inherit; border: 1px solid color-mix(in srgb, var(--paper) 45%, transparent);
+  background: color-mix(in srgb, var(--paper) 7%, transparent); }
+.demo-promo:hover { border-color: var(--paper); }
+.demo-promo img { width: 100%; height: 100%; object-fit: cover; display: block; min-height: 180px; }
+.demo-promo .dc-body { align-content: center; padding: 20px 22px; }
+.demo-promo .demo-btn { justify-self: start; margin-top: 6px; }
+@media (max-width: 720px) { .demo-promo { grid-template-columns: 1fr; } .demo-promo img { min-height: 0; aspect-ratio: 800 / 420; } }
+
+/* a part's header: the demo button under the part list */
+.part-demo { margin: 14px 0 18px; }
+.paper-card-actions .demo-btn svg, .part-demo .demo-btn svg { width: 16px; height: 16px; }
+
+/* the /papers page and the /demos page */
+.papers-demos { margin: 8px 0 28px; }
+.papers-demos h2 { font-size: 20px; margin: 0 0 14px; }
+.demos-more { margin-top: 28px; color: var(--muted); }

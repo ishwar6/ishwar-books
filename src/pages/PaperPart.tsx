@@ -4,6 +4,7 @@ import { useTitle } from '../lib/hooks'
 import Article from '../components/Article'
 import { PaperSheet, PartNav, accentStyle } from '../components/PaperBits'
 import { Chevron } from '../components/icons'
+import { DemoButton } from '../components/DemoPromo'
 import NotFound from './NotFound'
 
 export default function PaperPart() {
@@ -31,6 +32,7 @@ export default function PaperPart() {
             <div className="part-label">{meta.partOf}{meta.covers ? <span className="covers"> · Covers {meta.covers}</span> : null}</div>
             <h1>{meta.title}</h1>
             {meta.description && <p className="lede">{meta.description}</p>}
+            {paper.demo && <div className="part-demo"><DemoButton paper={paper} label={`Try ${paper.short} in your browser`} /></div>}
             <div className="meta"><span>{meta.minutes} min read</span>{meta.tags.map((t) => <span key={t} className="tag">{t}</span>)}</div>
             <PartNav paper={paper} current={meta.slug} />
           </header>

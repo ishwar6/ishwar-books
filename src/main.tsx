@@ -22,6 +22,7 @@ import Papers from './pages/Papers'
 import Paper from './pages/Paper'
 import PaperPart from './pages/PaperPart'
 import NotFound from './pages/NotFound'
+import Demos from './pages/Demos'
 
 const PaperRead = lazy(() => import('./pages/PaperRead'))   // pdf.js is large: load it only on this page
 const PaperDemo = lazy(() => import('./pages/PaperDemo'))   // each demo loads its models on its own page
@@ -38,6 +39,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="books/:book" element={<Book />} />
           <Route path="books/:book/:chapter" element={<Chapter />} />
           <Route path="papers" element={<Papers />} />
+          <Route path="demos" element={<Demos />} />
           <Route path="papers/:paper" element={<Paper />} />
           <Route path="papers/:paper/read" element={<Suspense fallback={null}><PaperRead /></Suspense>} />
           <Route path="papers/:paper/demo" element={<Suspense fallback={null}><PaperDemo /></Suspense>} />

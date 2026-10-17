@@ -1,7 +1,7 @@
 ---
 title: "Segment Anything"
 short: SAM
-description: "The 2023 paper that made one model cut out any object in any picture from a click, a box or a rough mask. It shows a new task, the model SAM and a dataset of 1.1 billion masks. Six parts, with the paper's own text, simple pictures, worked equations and real code on the released models."
+description: "The 2023 paper that made one model cut out any object in any picture from a click, a box or a rough mask. It shows a new task, the model SAM and a dataset of 1.1 billion masks. Six parts, with the paper's own text, pictures, worked equations and real code on the released models."
 authors: [Alexander Kirillov, Eric Mintun, Nikhila Ravi, Hanzi Mao, Chloe Rolland, Laura Gustafson, Tete Xiao, Spencer Whitehead, Alexander C. Berg, Wan-Yen Lo, Piotr Dollár, Ross Girshick]
 org: Meta AI Research, FAIR
 year: 2023

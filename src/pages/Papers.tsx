@@ -1,6 +1,7 @@
 import { papers } from '../lib/content'
 import { useTitle } from '../lib/hooks'
 import { PaperCard, ReaderPromo } from '../components/PaperBits'
+import { DemoGrid, demos } from '../components/DemoPromo'
 
 export default function Papers() {
   useTitle('Research Papers', 'Landmark research papers read slowly, section by section: highlighted excerpts, clear explanations, figures, definitions and code you can run.')
@@ -14,6 +15,7 @@ export default function Papers() {
           explains them, defines every new word, draws a picture, and runs real code to check the claims.
         </p>
       </header>
+      {demos.length > 0 && <section className="papers-demos"><h2>Try a paper in your browser</h2><DemoGrid /></section>}
       {papers.find((p) => p.reader) && <ReaderPromo paper={papers.find((p) => p.reader)!} />}
       {papers.length ? (
         <div className="paper-list">{papers.map((p) => <PaperCard key={p.slug} paper={p} />)}</div>

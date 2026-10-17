@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { projects, site } from '../data/site'
 import { books, papers, videos, writings } from '../lib/content'
 import { PaperCard, ReaderPromo } from '../components/PaperBits'
+import { DemoGrid, demos } from '../components/DemoPromo'
 import topicGraph from '../data/graph.json'
 import { useTitle } from '../lib/hooks'
 import { BookCard, ProjectCard, VideoCard, WritingCard } from '../components/Cards'
@@ -14,6 +15,7 @@ export default function Home() {
     { to: '/writings', count: writings.length, label: 'Writings', desc: 'Long-form essays and deep dives, written from first principles.' },
     { to: '/books', count: books.length, label: 'Books', desc: `${chapters}+ chapters on GPUs, LLMs, RAG and agents.` },
     { to: '/papers', count: papers.length, label: 'Research papers', desc: 'Landmark papers explained section by section, with code.' },
+    { to: '/demos', count: demos.length, label: 'Interactive demos', desc: 'Run the models of the papers in your browser, step by step.' },
     { to: '/projects', count: projects.length, label: 'Projects', desc: 'Tools and pipelines I build, like an explainer-video studio.' },
     { to: '/videos', count: videos.length, label: 'Videos', desc: 'Animated explainers, each with a written companion.' },
     { to: '/map', count: topicGraph.nodes.length, label: 'Topic map', desc: 'Every important idea on the site, as one clickable graph.' },
@@ -51,6 +53,16 @@ export default function Home() {
           })}
         </div>
       </section>
+
+      {demos.length > 0 && (
+        <section className="section paper-theme">
+          <div className="section-head">
+            <h2>Interactive demos</h2>
+            <Link to="/demos" className="more-link">All demos →</Link>
+          </div>
+          <DemoGrid />
+        </section>
+      )}
 
       {videos.length > 0 && (
         <section className="section">

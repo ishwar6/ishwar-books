@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import type { CSSProperties } from 'react'
 import type { PageMeta, Paper } from '../lib/content'
 import { Arrow } from './icons'
+import { DemoButton, Play } from './DemoPromo'
 
 const arxivAbs = (id: string) => `https://arxiv.org/abs/${id}`
 const arxivPdf = (id: string) => `https://arxiv.org/pdf/${id}`
@@ -85,11 +86,13 @@ export function PaperCard({ paper }: { paper: Paper }) {
         <div className="paper-cite">{[paper.venue, paper.arxiv && `arXiv:${paper.arxiv}`].filter(Boolean).join(' · ')}</div>
         <h3><Link to={`/${paper.route}`}>{paper.title}</Link></h3>
         {paper.reader && <span className="reader-badge"><SideBySide /> Side-by-side reader</span>}
+        {paper.demo && <span className="reader-badge"><Play /> Interactive demo</span>}
         <div className="paper-authors">{authorLine(paper.authors)}</div>
         <p>{paper.description}</p>
         <div className="paper-card-foot">
           <span>{paper.parts.length} {paper.parts.length === 1 ? 'part' : 'parts'} · {paper.minutes} min of reading</span>
           <span className="paper-card-actions">
+            {paper.demo && <DemoButton paper={paper} />}
             {paper.reader && <Link to={`/${paper.route}/read`} className="btn reader-btn"><SideBySide /> Read side by side</Link>}
             {first && <Link to={`/${first.route}`} className="btn primary">Start with Part 1</Link>}
           </span>
