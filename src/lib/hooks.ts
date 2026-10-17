@@ -1,24 +1,41 @@
 import { useEffect, useState } from 'react'
 import { site } from '../data/site'
+import { useLocation } from 'react-router-dom'
+import { books, papers, videos, writings } from './content'
+import { applyHead, loadHead, type HeadNode } from './seo-head'
 
-function setMeta(selector: string, attr: string, value: string) {
-  const el = document.head.querySelector(selector)
-  if (el) el.setAttribute(attr, value)
-}
+const routes = new Set(['', 'writings', 'books', 'papers', 'videos', 'demos', 'map', 'projects', 'about',
+  ...writings.map((p) => p.route), ...videos.map((p) => p.route),
+  ...books.flatMap((b) => [`books/${b.slug}`, ...b.chapters.map((c) => c.route)]),
+  ...papers.flatMap((p) => [p.route, ...p.parts.map((x) => x.route), ...(p.demo ? [`${p.route}/demo`] : []), ...(p.reader ? [`${p.route}/read`] : [])]),
+])
 
 /** Keeps the document title, description and canonical URL in sync with in-app navigation. */
 export function useTitle(title?: string, description?: string) {
+  const { pathname } = useLocation()
   useEffect(() => {
-    const full = title ? `${title} · ${site.name}` : `${site.name}: LLM inference, RAG and GPU programming, from first principles`
-    document.title = full
+    const route = pathname.replace(/^\/+|\/+$/g, '')
+    const known = routes.has(route)
+    // Keep server-rendered metadata intact on the initial load.
+    if (known && document.getElementById('page-structured-data')?.getAttribute('data-seo-route') === route) return
+    const full = !known ? `Page not found · ${site.name}` : title ? `${title} · ${site.name}` : `${site.name}: LLM inference, RAG and GPUs, from first principles`
     const desc = description ?? site.description
-    setMeta('meta[name="description"]', 'content', desc)
-    setMeta('meta[property="og:title"]', 'content', full)
-    setMeta('meta[property="og:description"]', 'content', desc)
-    const canonical = site.url.replace(/\/$/, '') + location.pathname.replace(/\/?$/, '/')
-    setMeta('link[rel="canonical"]', 'href', canonical)
-    setMeta('meta[property="og:url"]', 'content', canonical)
-  }, [title, description])
+    const canonical = `${site.url.replace(/\/$/, '')}${import.meta.env.BASE_URL}${route ? route + '/' : ''}`
+    const fallback: HeadNode[] = [
+      { tag: 'title', text: full },
+      { tag: 'meta', attrs: { name: 'description', content: desc } },
+      { tag: 'meta', attrs: { name: 'robots', content: known ? 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' : 'noindex, follow' } },
+      { tag: 'meta', attrs: { property: 'og:title', content: full } },
+      { tag: 'meta', attrs: { property: 'og:description', content: desc } },
+      { tag: 'meta', attrs: { property: 'og:type', content: 'website' } },
+      { tag: 'meta', attrs: { property: 'og:image', content: `${site.url}${import.meta.env.BASE_URL}og/site.png` } },
+    ]
+    if (known) fallback.push({ tag: 'link', attrs: { rel: 'canonical', href: canonical } }, { tag: 'meta', attrs: { property: 'og:url', content: canonical } })
+    applyHead(fallback)
+    let active = true
+    if (known && import.meta.env.PROD) loadHead(route).then((nodes) => { if (active) applyHead(nodes) }).catch(() => { /* Keep the current route's fallback metadata on network failure. */ })
+    return () => { active = false }
+  }, [title, description, pathname])
 }
 
 export const THEMES = ['dark', 'dim', 'light'] as const

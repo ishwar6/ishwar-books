@@ -27,7 +27,7 @@ A model that only works on its own training pictures is a good student of one te
 > Why does "five tasks, four of which differ" matter? The first task is the training task itself, on new pictures. The other four are new jobs. For them, the team must invent a prompt that turns the new job into "give me a mask".
 
 > [!DEFINITION] Zero-shot transfer
-> Use a trained model on a new dataset or a new task with no more training and no examples of the new task. For SAM, the only tool is the prompt: [Part 2](part-2-the-task.md#zero-shot-transfer-the-prompt-is-the-connection-2) explains why the prompt is the connection.
+> Use a trained model on a new dataset or a new task with no more training and no examples of the new task. For SAM, the only tool is the prompt: [Part 2](part-2-the-task.md#zero-shot-transfer-the-prompt-is-the-connection) explains why the prompt is the connection.
 
 > [!DEFINITION] Benchmark
 > A fixed test set plus a fixed way to score it. Everybody runs their model on the same pictures with the same rules, so the scores can be compared. A **baseline** is an earlier method that the new model is compared with.

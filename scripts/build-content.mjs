@@ -24,12 +24,16 @@ import rehypeShiki from '@shikijs/rehype'
 import rehypeStringify from 'rehype-stringify'
 import { visit, SKIP } from 'unist-util-visit'
 import { toString } from 'hast-util-to-string'
+import { contentDates, latestDate } from './lib/content-dates.mjs'
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..')
 const CONTENT = path.join(ROOT, 'content')
 const OUT_PUBLIC = path.join(ROOT, 'public', '_content')
 const OUT_MANIFEST = path.join(ROOT, 'src', 'generated', 'manifest.json')
 const BASE = (process.env.BASE_PATH ?? '/').replace(/\/?$/, '/')
+const sourceDates = contentDates(ROOT)
+const production = process.env.NODE_ENV === 'production' || process.argv.includes('--production')
+const { site } = JSON.parse(fs.readFileSync(path.join(ROOT, 'src/data/site.json'), 'utf8'))
 
 const CALLOUTS = {
   note: 'Note', info: 'Info', tip: 'Tip', important: 'Important', warning: 'Warning',
@@ -72,7 +76,7 @@ const pages = [] // { file, route, collection, meta, body }
 
 for (const file of walk(path.join(CONTENT, 'writings')).filter((f) => f.endsWith('.md'))) {
   const { data, content } = matter(fs.readFileSync(file, 'utf8'))
-  if (data.draft && process.env.NODE_ENV === 'production') continue
+  if (data.draft && production) continue
   const slug = data.slug ?? slugOf(file)
   pages.push({ file, collection: 'writings', slug, route: `writings/${slug}`, data, body: content })
 }
@@ -81,7 +85,7 @@ const videosDir = path.join(CONTENT, 'videos')
 const videoFiles = fs.existsSync(videosDir) ? fs.readdirSync(videosDir).filter((f) => f.endsWith('.md')).map((f) => path.join(videosDir, f)) : []
 for (const file of videoFiles) {
   const { data, content } = matter(fs.readFileSync(file, 'utf8'))
-  if (data.draft && process.env.NODE_ENV === 'production') continue
+  if (data.draft && production) continue
   const slug = data.slug ?? slugOf(file)
   pages.push({ file, collection: 'videos', slug, route: `videos/${slug}`, data, body: content })
 }
@@ -95,7 +99,7 @@ for (const dir of bookDirs) {
   const bookSlug = slugOf(dir.name)
   const indexFile = path.join(bookRoot, 'index.md')
   const index = fs.existsSync(indexFile) ? matter(fs.readFileSync(indexFile, 'utf8')) : { data: {}, content: '' }
-  if (index.data.hidden) continue   // `hidden: true` in a book's index.md keeps it in the repo but off the site
+  if (index.data.hidden || (index.data.draft && production)) continue
   const book = { slug: bookSlug, data: index.data, chapters: [] }
   books.push(book)
   pages.push({ file: indexFile, collection: 'book-index', slug: bookSlug, book: bookSlug, route: `books/${bookSlug}`, data: index.data, body: index.content })
@@ -103,7 +107,7 @@ for (const dir of bookDirs) {
   const used = new Set()
   for (const file of walk(bookRoot).filter((f) => f.endsWith('.md') && f !== indexFile).sort(natural)) {
     const { data, content } = matter(fs.readFileSync(file, 'utf8'))
-    if (data.draft && process.env.NODE_ENV === 'production') continue
+    if (data.draft && production) continue
     const rel = path.relative(bookRoot, file)
     const folder = path.dirname(rel)
     let slug = data.slug ?? slugOf(file)
@@ -130,12 +134,13 @@ for (const dir of paperDirs) {
   const paperSlug = slugOf(dir.name)
   const indexFile = path.join(root, 'index.md')
   const index = fs.existsSync(indexFile) ? matter(fs.readFileSync(indexFile, 'utf8')) : { data: {}, content: '' }
+  if (index.data.hidden || (index.data.draft && production)) continue
   const paper = { slug: paperSlug, data: index.data, parts: [] }
   papers.push(paper)
   pages.push({ file: indexFile, collection: 'paper-index', slug: paperSlug, paper: paperSlug, route: `papers/${paperSlug}`, data: index.data, body: index.content })
   for (const file of fs.readdirSync(root).filter((f) => f.endsWith('.md') && f !== 'index.md').map((f) => path.join(root, f))) {
     const { data, content } = matter(fs.readFileSync(file, 'utf8'))
-    if (data.draft && process.env.NODE_ENV === 'production') continue
+    if (data.draft && production) continue
     const slug = data.slug ?? slugOf(file)
     const page = { file, collection: 'paper-part', slug, paper: paperSlug, route: `papers/${paperSlug}/${slug}`, data, body: content }
     paper.parts.push(page)
@@ -248,7 +253,7 @@ function remarkWikilinks() {
         const target = byName.get(path.basename(m[1].trim()).toLowerCase())
         const label = m[3] ?? path.basename(m[1])
         parts.push(target
-          ? { type: 'link', url: BASE + target.route + (m[2] ?? ''), children: [{ type: 'text', value: label }] }
+          ? { type: 'link', url: BASE + target.route + '/' + (m[2] ?? ''), children: [{ type: 'text', value: label }] }
           : { type: 'text', value: label })
         last = m.index + m[0].length
       }
@@ -276,6 +281,11 @@ function rehypeLinks({ page }) {
     visit(tree, 'element', (node) => {
       if (node.tagName === 'a' && typeof node.properties.href === 'string') {
         const href = node.properties.href
+        if (page.collection === 'videos' && /^#t=\d+$/.test(href)) {
+          node.properties.dataVideoTime = Number(href.slice(3))
+          node.properties.href = `https://www.youtube.com/watch?v=${page.data.youtube}&t=${href.slice(3)}s`
+          return
+        }
         if (/^[a-z]+:/i.test(href)) {
           node.properties.target = '_blank'
           node.properties.rel = 'noopener noreferrer'
@@ -284,7 +294,7 @@ function rehypeLinks({ page }) {
         if (href.startsWith('#') || href.startsWith('/')) return
         const [p, hash = ''] = href.split('#')
         const target = byFile.get(path.resolve(path.dirname(page.file), decodeURIComponent(p)))
-        if (target) node.properties.href = BASE + target.route + (hash ? `#${hash}` : '')
+        if (target) node.properties.href = BASE + target.route + '/' + (hash ? `#${hash}` : '')
         else if (p.endsWith('.md')) { node.tagName = 'span'; node.properties = { className: ['dead-link'], title: 'Not published yet' } }
       }
       if (node.tagName === 'img' && typeof node.properties.src === 'string' && !/^([a-z]+:|\/)/i.test(node.properties.src)) {
@@ -423,12 +433,13 @@ function videoMeta(d) {
 
 const metaOf = (p) => {
   const title = p.data.title ?? firstHeading(p.body) ?? pretty(p.slug)
+  const source = path.relative(ROOT, p.file).split(path.sep).join('/')
   // The page header shows the title, so drop a leading H1 that duplicates it.
   p.body = p.body.replace(/^\s*#\s+.+\n/, (h) => (h.replace(/^\s*#\s+/, '').trim() === title ? '' : h))
   return {
     slug: p.slug, route: p.route, title,
     description: p.data.description ?? clip(firstParagraph(p.body)) ?? '',
-    date: toDate(p.data.date), updated: toDate(p.data.updated),
+    date: toDate(p.data.date), updated: latestDate(toDate(p.data.updated), sourceDates.get(source), toDate(p.data.date)), source,
     tags: p.data.tags ?? [], minutes: readingMinutes(p.body),
     ...coverOf(p),
     ...(p.data.series ? { series: p.data.series, seriesPart: p.data.series_part ?? 1 } : {}),
@@ -449,12 +460,46 @@ const pageLabel = (p) => `${paperShort(p.paper)}, ${partLabelOf(p)}`
 
 let rendered = 0
 const search = [] // one document per section: route, anchor, page title, heading, text, book
+for (const p of pages) p.meta = metaOf(p)
+for (const group of [...books, ...papers]) {
+  const overview = pages.find((p) => p.slug === group.slug && ['book-index', 'paper-index'].includes(p.collection))
+  if (overview) overview.meta.updated = latestDate(overview.meta.updated, (group.chapters ?? group.parts).map((p) => p.meta.updated))
+}
 for (const p of pages) {
-  p.meta = metaOf(p)
   const { html, toc, sections } = await render(p)
   const dest = path.join(OUT_PUBLIC, `${p.route}.json`)
   fs.mkdirSync(path.dirname(dest), { recursive: true })
-  fs.writeFileSync(dest, JSON.stringify({ html, toc }))
+  fs.writeFileSync(dest, JSON.stringify({ html, toc, meta: p.meta }))
+  // A text alternative for readers and tools. Preserve the source; resolve relative links
+  // against the public page or repository so the downloaded Markdown is usable on its own.
+  const canonical = `${site.url.replace(/\/$/, '')}${BASE}${p.route}/`
+  const sourceUrl = `https://github.com/ishwar6/ishwar-books/blob/main/${p.meta.source}`
+  const edits = []
+  visit(unified().use(remarkParse).use(remarkGfm).parse(p.body), (node) => {
+    if (!['link', 'image', 'definition'].includes(node.type) || !node.url || !node.position) return
+    const href = node.url
+    if (/^[a-z]+:/i.test(href)) return
+    const [file, hash] = href.split('#')
+    const local = path.resolve(path.dirname(p.file), decodeURIComponent(file))
+    const target = byFile.get(local)
+    let resolved
+    if (p.collection === 'videos' && /^#t=\d+$/.test(href)) resolved = `https://www.youtube.com/watch?v=${p.data.youtube}&t=${href.slice(3)}s`
+    else if (href.startsWith('#')) resolved = canonical + href
+    else if (href.startsWith('/')) resolved = site.url.replace(/\/$/, '') + href
+    else if (target) resolved = `${site.url.replace(/\/$/, '')}${BASE}${target.route}/${hash ? '#' + hash : ''}`
+    else if (node.type === 'image' && local.startsWith(CONTENT + path.sep) && fs.existsSync(local)) resolved = `${site.url.replace(/\/$/, '')}${BASE}_content/files/${path.relative(CONTENT, local).split(path.sep).map(encodeURIComponent).join('/')}`
+    else resolved = new URL(href, sourceUrl).href
+    const start = node.position.start.offset, end = node.position.end.offset
+    const original = p.body.slice(start, end)
+    // Edit URL tokens only; fenced code and inline examples are untouched.
+    const at = node.type === 'definition' ? original.indexOf(':') + 1 : original.indexOf('](') + 2
+    if (at < 1) return
+    const token = original.indexOf(href, at)
+    if (token !== -1) edits.push({ start: start + token, end: start + token + href.length, value: resolved })
+  })
+  let markdown = p.body
+  for (const edit of edits.sort((a, b) => b.start - a.start)) markdown = markdown.slice(0, edit.start) + edit.value + markdown.slice(edit.end)
+  fs.writeFileSync(dest.replace(/\.json$/, '.md'), `# ${p.meta.title}\n\nAuthor: ${site.name}\nCanonical URL: ${canonical}\n${p.meta.updated ? `Updated: ${p.meta.updated}\n` : ''}Source: ${sourceUrl}\n\n${markdown}\n`)
   for (const sec of sections) {
     const text = sec.text.join(' ').replace(/\s+/g, ' ').trim()
     if (!text && !sec.heading) continue
@@ -477,6 +522,9 @@ const bookList = books.map((b) => ({
   topics: b.data.topics ?? [],
   plannedChapters: b.data.chapters ?? b.chapters.length,
   order: b.data.order ?? 1e9,
+  source: `content/books/${b.slug}/index.md`,
+  date: toDate(b.data.date),
+  updated: latestDate(toDate(b.data.updated), sourceDates.get(`content/books/${b.slug}/index.md`), b.chapters.map((c) => c.meta.updated)),
   chapters: b.chapters.map((c) => c.meta),
 })).sort((a, b) => a.order - b.order || natural(a.slug, b.slug))
 
@@ -487,7 +535,7 @@ const paperList = papers.map((x) => {
     title: d.title ?? pretty(x.slug), short: d.short ?? pretty(x.slug),
     description: d.description ?? '', authors: d.authors ?? [], org: d.org ?? '', year: d.year, venue: d.venue ?? '',
     arxiv: d.arxiv ? String(d.arxiv) : undefined, url: d.url, code: d.code, accent: d.accent ?? '#4fc3d9',
-    learn: d.learn ?? [], tags: d.tags ?? [], date: toDate(d.date), updated: toDate(d.updated), order: d.order ?? 1e9,
+    learn: d.learn ?? [], tags: d.tags ?? [], date: toDate(d.date), updated: latestDate(toDate(d.updated), sourceDates.get(`content/papers/${x.slug}/index.md`), x.parts.map((p) => p.meta.updated)), source: `content/papers/${x.slug}/index.md`, order: d.order ?? 1e9,
     plannedParts: d.parts ?? x.parts.length,
     // the side-by-side reader exists when code/papers/<paper>/reader.py has written its map
     ...(fs.existsSync(path.join(ROOT, 'public', 'papers', 'pdf', `${x.slug}.json`)) ? { reader: `papers/pdf/${x.slug}.json` } : {}),

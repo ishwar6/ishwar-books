@@ -100,6 +100,8 @@ export default function Layout() {
             <div>
               <h4>Connect</h4>
               <Link to="/about">About</Link>
+              <a href={`${import.meta.env.BASE_URL}rss.xml`}>RSS feed</a>
+              <a href={`${import.meta.env.BASE_URL}llms.txt`}>Content index for AI tools</a>
               <a href={`mailto:${site.email}`}>Email</a>
               <a href={site.links.youtube} target="_blank" rel="noreferrer">YouTube</a>
             </div>

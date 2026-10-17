@@ -8,6 +8,7 @@ export type PageMeta = {
   description: string
   date?: string
   updated?: string
+  source?: string
   tags: string[]
   minutes: number
   part?: string
@@ -32,7 +33,7 @@ export type Book = {
   plannedChapters: number
   chapters: PageMeta[]
 }
-export type Rendered = { html: string; toc: TocItem[] }
+export type Rendered = { html: string; toc: TocItem[]; meta?: PageMeta }
 
 export type Chapter = { t: number; stamp: string; label: string }
 export type VideoMeta = PageMeta & { youtube: string; duration?: string; durationSeconds?: number; chapters: Chapter[] }

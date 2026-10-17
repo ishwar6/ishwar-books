@@ -412,3 +412,10 @@
 .pp-lightbox img { max-width: min(1400px, 100%); max-height: 100%; object-fit: contain; background: #fff; padding: 16px; border-radius: 10px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); }
 .pp-lightbox span { position: fixed; top: 16px; right: 20px; color: #fff; font-size: 13px; opacity: 0.8; }
 @keyframes pp-fade { from { opacity: 0; } to { opacity: 1; } }
+
+.article-credit { margin: 2rem 0; padding: 1.1rem 1.25rem; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--muted); font-size: .875rem; line-height: 1.7; overflow-wrap: anywhere; }
+.article-credit p { margin: 0 0 .6rem; }
+.article-credit p:last-child { margin-bottom: 0; }
+.article-credit a { color: var(--link); text-underline-offset: .2em; }
+.article-credit summary { cursor: pointer; color: var(--text); }
+.article-credit details[open] summary { margin-bottom: .75rem; }

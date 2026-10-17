@@ -7,11 +7,12 @@
     "content": "node scripts/build-content.mjs",
     "content:watch": "node --watch-path=content --watch-path=scripts scripts/build-content.mjs",
     "dev": "npm run content && vite",
-    "build": "npm run content && vite build && node scripts/postbuild.mjs",
+    "build": "node scripts/build-content.mjs --production && vite build && node scripts/postbuild.mjs",
     "preview": "vite preview",
     "typecheck": "npm run content && tsc --noEmit",
     "check:map": "npm run content && node scripts/check-topic-map.mjs",
-    "check:demos": "npm run content && node scripts/check-demos.mjs"
+    "check:demos": "npm run content && node scripts/check-demos.mjs",
+    "check:seo": "node scripts/check-seo.mjs"
   },
   "dependencies": {
     "katex": "0.16.47",
@@ -30,6 +31,7 @@
     "@vitejs/plugin-react": "^6.1.1",
     "gray-matter": "^4.0.3",
     "hast-util-to-string": "^3.0.1",
+    "linkedom": "^0.18.13",
     "rehype-autolink-headings": "^7.1.0",
     "rehype-katex": "^7.0.1",
     "rehype-raw": "^7.0.0",

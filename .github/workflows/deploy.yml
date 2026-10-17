@@ -19,6 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Use real source modification dates in sitemaps and articles.
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -28,6 +30,9 @@ jobs:
       - run: npm run build
         env:
           NODE_ENV: production
+          GOOGLE_SITE_VERIFICATION: ${{ vars.GOOGLE_SITE_VERIFICATION }}
+          BING_SITE_VERIFICATION: ${{ vars.BING_SITE_VERIFICATION }}
+      - run: npm run check:seo
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

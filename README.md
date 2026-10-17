@@ -52,7 +52,11 @@ Pushing to `main` builds and deploys via `.github/workflows/deploy.yml`. The sit
 
 ## SEO
 
-Every page is built as real HTML for search engines (`scripts/postbuild.mjs`): its own title, description, canonical URL, Open Graph and X card tags, JSON-LD structured data (Person, WebSite, BlogPosting, Book, TechArticle, BreadcrumbList), and the full article text inside the page. The build also writes `sitemap.xml`, `robots.txt` and `rss.xml`.
+Every published route is built as readable HTML with its own complete title, description, canonical URL, social cards and JSON-LD. Author identities, book membership and original research citations are explicit. The same metadata replaces the previous page's metadata during client navigation; missing pages stay `noindex`.
+
+The build generates `sitemap.xml`, `robots.txt`, an RSS feed covering writings, book chapters, paper explanations and videos, `llms.txt`, and Markdown alternatives to the published content. Sitemap dates come from source history and explicit content dates, never the build clock. CI checks every generated page and internal link before deployment; IndexNow notifies participating search engines after deployment.
+
+Run `npm run build && npm run check:seo` to validate a release. Keep the full Git history when building (`fetch-depth: 0` in CI). See [search discovery and indexing setup](docs/search-discovery.md) for Google/Bing verification, publication conventions and remaining account-level steps. These features support discovery and accurate attribution; they do not guarantee indexing, ranking or AI citations.
 
 Social preview images live in `public/og/<slug>.png`. A new writing falls back to `public/og/site.png` until you generate its own card with `scripts/og.mjs` (instructions at the top of that file).
 
