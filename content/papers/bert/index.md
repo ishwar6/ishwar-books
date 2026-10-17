@@ -1,7 +1,7 @@
 ---
 title: "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding"
 short: BERT
-description: "The 2018 paper that taught one model to read text in both directions at once, then reuse that skill for almost any language task. Explained line by line in six parts, with the paper's own text, simple pictures and real code."
+description: "The 2018 paper that taught one model to read text in both directions at once, then reuse that skill for almost any language task. Explained line by line in six parts, with the paper's own text, pictures and real code."
 authors: [Jacob Devlin, Ming-Wei Chang, Kenton Lee, Kristina Toutanova]
 org: Google AI Language
 year: 2018
