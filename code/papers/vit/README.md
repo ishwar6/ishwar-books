@@ -13,6 +13,7 @@ Every number in the articles that does not come from the paper comes from one of
 | `figlib.py`, `vitfig.py`, `alammar.py`, `figs_partN.py` | draw the SVG figures from the results (theme-aware CSS classes, no hard-coded colours) |
 | `termshot.py` | renders a saved log as a terminal screenshot PNG |
 | `assemble.py` | turns `partN.md` into `content/papers/vit/<slug>.md`, inserting the figures; checks images, em dashes and banned words |
+| `reader.py` | builds the side-by-side reader (/papers/vit/read): our annotated copy of the paper and the map from each box to its place in the PDF, in `public/papers/pdf/` |
 | `check_md.mjs` | renders a page's maths with KaTeX and reports errors (run from the repo root) |
 | `results/` | the JSON and text output every number in the articles comes from |
 
@@ -22,3 +23,13 @@ python vit_part1.py && python vit_part1_math.py      # and the other vit_part*.p
 python shots_part1.py                                 # paper excerpts (needs pymupdf)
 python figs_part1.py && python assemble.py 1
 ```
+
+## The side-by-side reader
+
+`python reader.py` (after `assemble.py`) builds /papers/vit/read. It reads the assembled parts in
+`content/papers/vit/`, takes every box of the ViT paper itself (a box title that starts with `·`; boxes that show a
+different paper are skipped) in article order, and finds each screenshot's job in `shots_partN.py`.
+`paper_shots.shot(dry=True)` then gives the page, the crop and the highlights without rendering a PNG. A box with
+two screenshots (a passage that runs onto the next page) gets two regions. The script draws the highlights, a
+numbered teal dot and a bar beside each passage into the PDF, makes the images smaller, and writes
+`public/papers/pdf/vit.pdf` and `vit.json`. Run it again after every new part, then `npm run content`.

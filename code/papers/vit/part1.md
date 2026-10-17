@@ -9,28 +9,25 @@ tags: [vit, vision-transformer, transformers, computer-vision]
 
 On 22 October 2020, twelve researchers at Google posted a paper with an odd title: *An Image is Worth 16×16 Words*. It took the Transformer, the network design that had taken over language processing, cut photographs into small squares, and fed the squares to the Transformer as if they were words. On the standard photo benchmark, ImageNet, the model matched or beat the best convolutional networks of the day, once it had been trained on enough pictures. The paper was accepted at ICLR 2021, and the model it introduced, the Vision Transformer (ViT), is today the base of most image models and of the image half of models that read both text and pictures.
 
-This series reads the paper slowly, in the paper's own order. Each piece follows the same pattern:
-
-1. **The exact lines from the paper**, as a highlighted screenshot in a teal box like the one below.
-2. **A plain-English explanation**, with a yellow box for every new word.
-3. **A picture**, and **real code** when it helps, with its real output.
-4. **Why it matters**, and only then the next piece.
+This series reads the paper slowly, in the paper's own order. Each piece shows the exact lines of the paper as a highlighted screenshot in a teal box, then explains what they mean. Pictures and real code, with its real output, help where they can.
 
 The small `Paper §1` tag above each heading tells you which section of the paper you are reading. The screenshots come from the paper's second arXiv version (3 June 2021), the one most people read today. We run every experiment on the model weights Google released, through the Hugging Face `transformers` library, on one ordinary computer, an Apple M5 Pro (64 GB).
 
 > [!DEFINITION] Definition boxes
-> A yellow box like this explains one technical word in plain language, the first time it appears. If you already know the word, skip the box.
+> A yellow box like this explains one technical word, the first time it appears. If you already know the word, skip the box.
 
 ## The title {§Title}
 
-> [!PAPER] · Title · page 1
+> [!PAPER] · Title
 > [![The title of the ViT paper: An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale, with 16x16 Words and Image Recognition at Scale highlighted](/img/papers/vit/p1-title.png)](/img/papers/vit/p1-title.png)
->
-> **Context:** the first thing on page 1. Above it, in small print, the page says "Published as a conference paper at ICLR 2021". ICLR is one of the three big machine-learning conferences.
 >
 > **What it says:** "An Image is Worth **16×16 Words**: Transformers for **Image Recognition at Scale**."
 >
-> **Why it matters:** the title is a joke on the proverb "a picture is worth a thousand words", and the joke is exactly the method. A picture is turned into a sequence of words, and each "word" is a 16×16 square of pixels.
+> **What it means:**
+>
+> The title plays on the old saying "a picture is worth a thousand words". The joke is the method. The paper turns a picture into a sequence of words, and each "word" is a square of 16×16 pixels.
+>
+> Every page of the paper carries the line "Published as a conference paper at ICLR 2021". ICLR is one of the three big machine-learning conferences, so the paper passed peer review there.
 
 Let us take the title apart, one piece at a time.
 
@@ -95,51 +92,59 @@ The title's analogy is worth drawing out, because the whole paper rests on it. A
 
 Here is the paper's own drawing of the model, which Part 2 explains block by block. We show it now because it makes the title concrete.
 
-> [!PAPER] · Figure 1 · page 3
+> [!PAPER] · Figure 1
 > [![Figure 1 of the ViT paper: a picture is cut into nine patches, the patches are flattened and passed through a linear projection, a class token and position embeddings are added, the sequence goes through a Transformer encoder, and an MLP head on the class token outputs the class. On the right, the Transformer encoder block with layer norm, multi-head attention, an MLP and residual connections](/img/papers/vit/p1-figure1.png)](/img/papers/vit/p1-figure1.png)
->
-> **Context:** Figure 1, at the top of Section 3 (page 3). It is the only diagram of the model in the paper.
 >
 > **What it says:** "We split an image into fixed-size patches, linearly embed each of them, add position embeddings, and feed the resulting sequence of vectors to a standard Transformer encoder." For classification, an extra learnable "classification token" is added to the sequence, "the standard approach" from BERT.
 >
-> **Why it matters:** look at the bottom row of the left panel: nine small photo squares, numbered 1 to 9, going into a box. That row *is* the title. Everything above the box is a Transformer encoder copied from the language world.
+> **What it means:**
+>
+> Look at the bottom row of the left panel. Nine small photo squares, numbered 1 to 9, go into a box. That row *is* the title: the picture has become a short sentence of patches.
+>
+> Everything above that box is a Transformer encoder, copied from the language world with almost no change. This is the only drawing of the model in the paper. Part 2 takes it apart block by block.
 
 ## The authors and the footnotes {§Title}
 
-> [!PAPER] · Authors · page 1
+> [!PAPER] · Authors
 > [![The author list of the ViT paper: Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov, Dirk Weissenborn, Xiaohua Zhai, Thomas Unterthiner, Mostafa Dehghani, Matthias Minderer, Georg Heigold, Sylvain Gelly, Jakob Uszkoreit, Neil Houlsby, with footnotes for equal technical contribution and equal advising, and the affiliation Google Research, Brain Team](/img/papers/vit/p1-authors.png)](/img/papers/vit/p1-authors.png)
->
-> **Context:** under the title. Twelve authors, one affiliation, two kinds of footnote mark.
 >
 > **What it says:** the asterisk marks "equal technical contribution": five people (Dosovitskiy, Beyer, Kolesnikov, Weissenborn, Zhai) plus Houlsby share the credit for building and running the experiments. The dagger marks "equal advising": Dosovitskiy and Houlsby led the project. The affiliation is "Google Research, Brain Team", and the two contact e-mails belong to the two leads.
 >
-> **Why it matters:** this is a large-team industrial paper. Several of the authors (Kolesnikov, Beyer, Zhai, Houlsby) had just written the Big Transfer paper on scaling up convolutional networks with the same giant datasets, and that paper's models are the main baseline here. One author, Jakob Uszkoreit, is also an author of the original Transformer paper.
-
-The order of the names matters less than usual: six of the twelve are marked as equal contributors. When this series says "the authors" it means the team.
-
-There is one footnote on page 1, attached to the last sentence of the abstract.
-
-> [!PAPER] · Footnote 1 · page 1
-> [![Footnote 1 of the ViT paper: Fine-tuning code and pre-trained models are available at https://github.com/google-research/vision_transformer](/img/papers/vit/p1-footnote.png)](/img/papers/vit/p1-footnote.png)
+> **What it means:**
 >
-> **Context:** footnote 1, at the bottom of page 1.
+> This is the work of a large industrial team: twelve authors with one affiliation. Six of them share the equal-contribution mark, so the order of the names says less than usual.
+>
+> The names also explain the baseline. Kolesnikov, Beyer, Zhai and Houlsby had just written the Big Transfer paper, which scaled up convolutional networks on the same giant datasets. Those Big Transfer models are the main competitors here, so the team tests ViT against its own earlier work. One more author, Jakob Uszkoreit, is also an author of the original Transformer paper.
+
+When this series says "the authors", it means the team.
+
+The last sentence of the abstract carries one footnote.
+
+> [!PAPER] · Footnote 1
+> [![Footnote 1 of the ViT paper: Fine-tuning code and pre-trained models are available at https://github.com/google-research/vision_transformer](/img/papers/vit/p1-footnote.png)](/img/papers/vit/p1-footnote.png)
 >
 > **What it says:** "Fine-tuning code and pre-trained models are available at" the `google-research/vision_transformer` repository on GitHub.
 >
-> **Why it matters:** the released weights are the reason this series can run the real model. The Hugging Face checkpoints we use (`google/vit-base-patch16-224` and its relatives) are conversions of those files. Note the wording: *fine-tuning* code. The pre-training itself ran on Google's private JFT-300M dataset and is not something you can repeat at home.
+> **What it means:**
+>
+> This one line is the reason this series can run the real model. Google released the trained weights. The Hugging Face checkpoints we use (`google/vit-base-patch16-224` and its relatives) are conversions of those files.
+>
+> Read the wording with care: it says *fine-tuning* code. The pre-training itself ran on Google's private JFT-300M dataset. So you can download the finished models and adapt them, but you cannot repeat the most expensive step at home.
 
 ## The abstract, sentence by sentence {§Abstract}
 
 The abstract is one paragraph of four sentences. We read it in two halves.
 
-> [!PAPER] · Abstract · page 1
+> [!PAPER] · Abstract
 > [![The first half of the ViT abstract: while the Transformer architecture has become the de-facto standard for natural language processing tasks, its applications to computer vision remain limited. In vision, attention is either applied in conjunction with convolutional networks, or used to replace certain components of convolutional networks while keeping their overall structure in place](/img/papers/vit/p1-abstract-1.png)](/img/papers/vit/p1-abstract-1.png)
->
-> **Context:** the first two sentences of the abstract: the state of the field in 2020.
 >
 > **What it says:** the Transformer is "the de-facto standard" for language, but "its applications to computer vision remain limited". Where vision does use attention, it is either "in conjunction with convolutional networks" or used to "replace certain components of convolutional networks while keeping their overall structure in place".
 >
-> **Why it matters:** the two sentences set up the gap. Vision had borrowed attention, but always inside a convolutional design. Nobody had thrown the convolutions away and shown that the result works.
+> **What it means:**
+>
+> Think of a workshop that buys a new tool but uses it only inside its old machines. Vision in 2020 was like that. It had borrowed attention from language, but always inside a convolutional design that stayed in charge.
+>
+> The two sentences set up the gap that the paper fills. Nobody had thrown the convolutions away completely and shown that the result works. The last two sentences of the abstract claim to do exactly that.
 
 **Sentence 1** says that in language the question was settled. "De-facto standard" means "the standard in practice, even if nobody voted on it". By 2020 every strong language model was a Transformer. The second half of the sentence says vision had not followed.
 
@@ -161,14 +166,16 @@ The abstract is one paragraph of four sentences. We read it in two halves.
 
 The figure shows the real difference between the two operations. A convolution is **local** (each output looks at a small neighbourhood) and **shares weights** (the same filter is used everywhere). Self-attention is **global** (each token can look at every token) and its weights depend on the content, not on the position. Hold on to those two words, local and global; the introduction will come back to them under the name "inductive bias".
 
-> [!PAPER] · Abstract · page 1
+> [!PAPER] · Abstract
 > [![The second half of the ViT abstract: we show that this reliance on CNNs is not necessary and a pure transformer applied directly to sequences of image patches can perform very well on image classification tasks. When pre-trained on large amounts of data and transferred to multiple mid-sized or small image recognition benchmarks (ImageNet, CIFAR-100, VTAB, etc.), Vision Transformer (ViT) attains excellent results compared to state-of-the-art convolutional networks while requiring substantially fewer computational resources to train](/img/papers/vit/p1-abstract-2.png)](/img/papers/vit/p1-abstract-2.png)
->
-> **Context:** the last two sentences of the abstract: the claim and the result.
 >
 > **What it says:** "this reliance on CNNs is not necessary". A "pure transformer applied directly to sequences of image patches" works well for classification. The recipe: pre-train "on large amounts of data", then transfer to "mid-sized or small image recognition benchmarks (ImageNet, CIFAR-100, VTAB, etc.)". The result: "excellent results compared to state-of-the-art convolutional networks while requiring substantially fewer computational resources to train".
 >
-> **Why it matters:** three claims in two sentences. (1) No convolutions are needed. (2) It works when pre-trained on a lot of data and then transferred. (3) It is cheaper to train than the best CNNs. Parts 4 and 5 test each one.
+> **What it means:**
+>
+> Two sentences hold three separate claims. First, no convolutions are needed. Second, the model works when it is pre-trained on a lot of data and then transferred. Third, it costs less to train than the best convolutional networks.
+>
+> The second claim is the condition on the first. The abstract does not say that a Transformer beats a CNN on any data. It says this happens after pre-training "on large amounts of data". Parts 4 and 5 test each of the three claims against the paper's own tables.
 
 **Sentence 3** is the thesis. "Pure transformer" means no convolution layers inside the network (Part 2 will show that the very first step, the patch embedding, can be written as one convolution, but the authors mean no CNN *body*). "Sequences of image patches" is the title again.
 
@@ -330,52 +337,62 @@ Three things to notice:
 
 Now the introduction. Its first paragraph is about language, not pictures.
 
-> [!PAPER] · Section 1 · page 1
+> [!PAPER] · §1
 > [![The first paragraph of the ViT introduction: self-attention-based architectures, in particular Transformers, have become the model of choice in natural language processing. The dominant approach is to pre-train on a large text corpus and then fine-tune on a smaller task-specific dataset. Thanks to Transformers' computational efficiency and scalability, it has become possible to train models of unprecedented size, with over 100B parameters. With the models and datasets growing, there is still no sign of saturating performance](/img/papers/vit/p1-intro-nlp.png)](/img/papers/vit/p1-intro-nlp.png)
->
-> **Context:** the opening paragraph of Section 1 (Introduction). It cites four language papers: the Transformer (Vaswani et al., 2017), BERT (Devlin et al., 2019), GPT-3 (Brown et al., 2020) and GShard (Lepikhin et al., 2020).
 >
 > **What it says:** Transformers are "the model of choice" in NLP. The standard recipe is to "pre-train on a large text corpus and then fine-tune on a smaller task-specific dataset". Because Transformers are efficient and scale well, models "with over 100B parameters" exist, and "there is still no sign of saturating performance".
 >
-> **Why it matters:** this paragraph is the motivation for everything that follows. In language, bigger Transformers trained on more data kept getting better, with no ceiling in sight. The authors want to know whether pictures behave the same way.
+> **What it means:**
+>
+> In language, the story of 2017 to 2020 was short: make the Transformer bigger, give it more text, and it gets better. Nobody had found the ceiling. Four citations back this up. They are the Transformer (Vaswani et al., 2017), BERT (Devlin et al., 2019), GPT-3 (Brown et al., 2020) and GShard (Lepikhin et al., 2020).
+>
+> The paragraph says nothing about pictures, and that is the point. It is the motivation for everything that follows. If the same design and the same recipe keep getting better with scale in language, do pictures behave the same way?
 
 Each of the four citations stands for one idea, and the paper leans on all four. We screenshot the sentences it points to.
 
-> [!PAPER] Vaswani et al. (2017), Attention Is All You Need · Abstract · page 1
+> [!PAPER] Vaswani et al. (2017), Attention Is All You Need · Abstract
 > [![The first sentences of the Transformer paper's abstract: the dominant sequence transduction models are based on complex recurrent or convolutional neural networks. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely](/img/papers/vit/p1-vaswani-abstract.png)](/img/papers/vit/p1-vaswani-abstract.png)
->
-> **Context:** the 2017 paper that introduced the Transformer, for translation between languages.
 >
 > **What it says:** earlier models used recurrent or convolutional networks. The Transformer is "based solely on attention mechanisms, dispensing with recurrence and convolutions entirely".
 >
-> **Why it matters:** "dispensing with convolutions entirely" was the Transformer's pitch in 2017, for text. ViT makes the same move for pictures, where convolutions were far more entrenched.
-
-> [!PAPER] Devlin et al. (2019), BERT · Abstract · page 1
-> [![The first paragraph of the BERT abstract: BERT is designed to pre-train deep bidirectional representations from unlabeled text, and the pre-trained model can be fine-tuned with just one additional output layer to create state-of-the-art models for a wide range of tasks](/img/papers/vit/p1-bert-abstract.png)](/img/papers/vit/p1-bert-abstract.png)
+> **What it means:**
 >
-> **Context:** the 2018 paper that made pre-train-then-fine-tune the standard recipe in NLP. The [BERT breakdown](/papers/bert/) on this site reads it in full.
+> In 2017 the Transformer was a model for translation between languages. Its pitch was to drop the older building blocks, recurrence and convolution, and keep only attention. "Dispensing with recurrence and convolutions entirely" was a bold claim for text.
+>
+> ViT makes the same move for pictures. There the claim is bolder, because convolutions had been the base of every strong vision model since 2012.
+
+> [!PAPER] Devlin et al. (2019), BERT · Abstract
+> [![The first paragraph of the BERT abstract: BERT is designed to pre-train deep bidirectional representations from unlabeled text, and the pre-trained model can be fine-tuned with just one additional output layer to create state-of-the-art models for a wide range of tasks](/img/papers/vit/p1-bert-abstract.png)](/img/papers/vit/p1-bert-abstract.png)
 >
 > **What it says:** BERT is designed to "pre-train deep bidirectional representations from unlabeled text" and then be "fine-tuned with just one additional output layer".
 >
-> **Why it matters:** this is "the dominant approach" the ViT paragraph describes. ViT copies the shape of the recipe (pre-train once, fine-tune with one new layer) and even copies BERT's model sizes and its `[class]` token.
-
-> [!PAPER] Brown et al. (2020), GPT-3 · Abstract · page 1
-> [![A sentence from the GPT-3 abstract: we train GPT-3, an autoregressive language model with 175 billion parameters, 10x more than any previous non-sparse language model](/img/papers/vit/p1-gpt3-abstract.png)](/img/papers/vit/p1-gpt3-abstract.png)
+> **What it means:**
 >
-> **Context:** GPT-3, published five months before ViT.
+> BERT, from 2018, made "pre-train, then fine-tune" the standard recipe of language processing. It is "the dominant approach" that the ViT paragraph describes. The [BERT breakdown](/papers/bert/) on this site reads it in full.
+>
+> ViT copies the shape of the recipe: pre-train once, then fine-tune with one new output layer. It also copies BERT's model sizes and its `[class]` token. A reader who knows BERT already knows half of ViT.
+
+> [!PAPER] Brown et al. (2020), GPT-3 · Abstract
+> [![A sentence from the GPT-3 abstract: we train GPT-3, an autoregressive language model with 175 billion parameters, 10x more than any previous non-sparse language model](/img/papers/vit/p1-gpt3-abstract.png)](/img/papers/vit/p1-gpt3-abstract.png)
 >
 > **What it says:** a language model "with 175 billion parameters, 10x more than any previous non-sparse language model".
 >
-> **Why it matters:** one of the two "over 100B parameters" examples. The point is not the number itself but that the model got better as it got bigger.
-
-> [!PAPER] Lepikhin et al. (2020), GShard · Abstract · page 1
-> [![A sentence from the GShard abstract: GShard enabled us to scale up a multilingual neural machine translation Transformer model with Sparsely-Gated Mixture-of-Experts beyond 600 billion parameters using automatic sharding](/img/papers/vit/p1-gshard-abstract.png)](/img/papers/vit/p1-gshard-abstract.png)
+> **What it means:**
 >
-> **Context:** GShard, a Google paper on spreading one giant model across many chips.
+> GPT-3 came out five months before ViT. It is one of the two "over 100B parameters" examples of the paragraph.
+>
+> The number itself is not the point. The point is that the model kept getting better as it got bigger, with no sign of a ceiling. ViT asks whether pictures show the same trend.
+
+> [!PAPER] Lepikhin et al. (2020), GShard · Abstract
+> [![A sentence from the GShard abstract: GShard enabled us to scale up a multilingual neural machine translation Transformer model with Sparsely-Gated Mixture-of-Experts beyond 600 billion parameters using automatic sharding](/img/papers/vit/p1-gshard-abstract.png)](/img/papers/vit/p1-gshard-abstract.png)
 >
 > **What it says:** a translation Transformer scaled "beyond 600 billion parameters".
 >
-> **Why it matters:** the other "over 100B" example, and a Google-internal one: the authors had the tools to train very large models, and the question was whether vision would reward them.
+> **What it means:**
+>
+> GShard is a Google paper on how to spread one giant model across many chips. It is the other "over 100B" example of the paragraph.
+>
+> It also tells us something the paper does not write. The authors worked next to the people who trained such giant models, so they had the tools to train very large models. The open question was whether vision would reward those tools.
 
 {{FIG:p1_params|How big the language Transformers in that paragraph are, on a log scale: 213 million parameters for the 2017 Transformer's large version, 340 million for BERT-large, 175 billion for GPT-3 and 600 billion for GShard. The ViT models of this paper (86 million to 632 million) are BERT-sized, not GPT-3-sized.}}
 
@@ -386,27 +403,31 @@ The paragraph's last sentence is the one to remember: "there is still no sign of
 
 ## In vision, convolutions still ruled {§1}
 
-> [!PAPER] · Section 1 · page 1
+> [!PAPER] · §1
 > [![The second paragraph of the ViT introduction: in computer vision, convolutional architectures remain dominant. Inspired by NLP successes, multiple works try combining CNN-like architectures with self-attention, some replacing the convolutions entirely. The latter models, while theoretically efficient, have not yet been scaled effectively on modern hardware accelerators due to the use of specialized attention patterns. Therefore, in large-scale image recognition, classic ResNet-like architectures are still state of the art](/img/papers/vit/p1-intro-cnn.png)](/img/papers/vit/p1-intro-cnn.png)
->
-> **Context:** the second paragraph of the introduction: the state of computer vision in 2020, with nine citations.
 >
 > **What it says:** "convolutional architectures remain dominant" (LeCun 1989, AlexNet 2012, ResNet 2016). Several works tried "combining CNN-like architectures with self-attention" (Non-local networks, DETR), some "replacing the convolutions entirely" (stand-alone self-attention, Axial-DeepLab). The latter are "theoretically efficient" but "have not yet been scaled effectively on modern hardware accelerators due to the use of specialized attention patterns". So "classic ResNet-like architectures are still state of the art" (Mahajan 2018, Noisy Student, Big Transfer).
 >
-> **Why it matters:** this paragraph explains *why nobody had done the obvious thing*. Attention over pixels is too expensive, so people invented clever local attention patterns, and those patterns did not run fast on the chips that matter. The paper's way out is to attend over patches, not pixels, so that plain attention becomes cheap enough.
+> **What it means:**
+>
+> This paragraph explains *why nobody had done the obvious thing*. Plain attention over every pixel is far too expensive. So people invented clever local attention patterns that look only at nearby pixels.
+>
+> Those patterns work on paper ("theoretically efficient"). But the chips that train big models are fast only at plain, dense matrix work, and the custom patterns did not run fast on them. So those models never grew large. The paper's way out is to attend over patches, not pixels, so that plain attention becomes cheap enough.
 
 Let us take the three sentences in turn.
 
 **"Convolutional architectures remain dominant."** The three citations are the history of CNNs in three steps. LeCun et al. (1989) trained a convolutional network to read handwritten postcodes, the first practical CNN. Krizhevsky et al. (2012), the AlexNet paper, won the 2012 ImageNet contest by a large margin with a deep CNN trained on GPUs, which started the deep-learning era in vision. He et al. (2016), the ResNet paper, made CNNs of 100+ layers trainable.
 
-> [!PAPER] He et al. (2015), Deep Residual Learning (ResNet) · Abstract · page 1
+> [!PAPER] He et al. (2015), Deep Residual Learning (ResNet) · Abstract
 > [![A sentence from the ResNet abstract: on the ImageNet dataset we evaluate residual nets with a depth of up to 152 layers, 8 times deeper than VGG nets but still having lower complexity. An ensemble of these residual nets achieves 3.57% error on the ImageNet test set. This result won the 1st place on the ILSVRC 2015 classification task](/img/papers/vit/p1-resnet-abstract.png)](/img/papers/vit/p1-resnet-abstract.png)
->
-> **Context:** the ResNet paper, the CNN design that every vision baseline in the ViT paper is built on.
 >
 > **What it says:** residual networks "with a depth of up to 152 layers" reached "3.57% error on the ImageNet test set" and "won the 1st place on the ILSVRC 2015 classification task".
 >
-> **Why it matters:** "ResNet-like architectures" is what ViT has to beat. The baseline in this paper, Big Transfer (BiT), is a very large ResNet trained on the same giant datasets as ViT.
+> **What it means:**
+>
+> ResNet, from 2015, is the CNN design that every vision baseline in the ViT paper is built on. The "ResNet-like architectures" of the paragraph are its descendants.
+>
+> So this is what ViT has to beat. The strongest baseline in the paper, Big Transfer (BiT), is a very large ResNet trained on the same giant datasets as ViT. Same data, different design: that makes the comparison fair.
 
 > [!DEFINITION] ResNet
 > A family of CNNs from 2015 built from "residual blocks", in which each block adds its output to its input, so that very deep stacks (50, 101, 152 layers) can be trained. ResNet-50 is the everyday workhorse; the ViT paper's baselines are ResNets with 152 layers made several times wider.
@@ -481,14 +502,16 @@ Patches make attention about 65,000 times cheaper than pixels. That single fact 
 
 ## The fewest possible modifications {§1}
 
-> [!PAPER] · Section 1 · page 1
+> [!PAPER] · §1
 > [![The third paragraph of the ViT introduction: inspired by the Transformer scaling successes in NLP, we experiment with applying a standard Transformer directly to images, with the fewest possible modifications. To do so, we split an image into patches and provide the sequence of linear embeddings of these patches as an input to a Transformer. Image patches are treated the same way as tokens (words) in an NLP application. We train the model on image classification in supervised fashion](/img/papers/vit/p1-intro-ours.png)](/img/papers/vit/p1-intro-ours.png)
->
-> **Context:** the third paragraph: what the authors actually do, in four sentences.
 >
 > **What it says:** apply "a standard Transformer directly to images, with the fewest possible modifications". Split the image into patches, feed "the sequence of linear embeddings of these patches" to the Transformer. "Image patches are treated the same way as tokens (words) in an NLP application." Train "on image classification in supervised fashion".
 >
-> **Why it matters:** "fewest possible modifications" is a deliberate scientific choice. By changing nothing but the input, the authors can attribute everything they find to the data and the scale, not to clever new architecture. It also means every tool built for language Transformers (training code, scaling tricks) works out of the box.
+> **What it means:**
+>
+> Imagine a test of whether a new fuel helps a car. You change only the fuel and keep the engine the same, so any change in speed comes from the fuel. "Fewest possible modifications" is the same kind of choice.
+>
+> By changing nothing but the input, the authors can link everything they find to the data and the scale, not to a clever new design. The choice also has a practical side. Every tool built for language Transformers, from training code to scaling tricks, works without change.
 
 The four sentences are the whole method. We illustrate each.
 
@@ -519,17 +542,19 @@ Our code found this layer in the released model. In the implementation it is sto
 
 ## Mid-sized data, and the inductive-bias explanation {§1}
 
-The fourth paragraph starts at the bottom of page 1 and ends at the top of page 2. It reports the first, disappointing result, and explains it.
+The fourth paragraph reports the first, disappointing result, and explains it.
 
-> [!PAPER] · Section 1 · pages 1 to 2
+> [!PAPER] · §1
 > [![The fourth paragraph of the ViT introduction, first part: when trained on mid-sized datasets such as ImageNet without strong regularization, these models yield modest accuracies of a few percentage points below ResNets of comparable size. This seemingly discouraging outcome may be expected: Transformers lack some of the inductive biases](/img/papers/vit/p1-intro-midsize.png)](/img/papers/vit/p1-intro-midsize.png)
 > [![The paragraph continues on page 2: inherent to CNNs, such as translation equivariance and locality, and therefore do not generalize well when trained on insufficient amounts of data](/img/papers/vit/p1-intro-midsize2.png)](/img/papers/vit/p1-intro-midsize2.png)
 >
-> **Context:** the fourth paragraph of the introduction. The first honest result of the paper.
->
 > **What it says:** trained on "mid-sized datasets such as ImageNet without strong regularization", ViT models reach "modest accuracies of a few percentage points below ResNets of comparable size". The authors call this "seemingly discouraging" but expected: "Transformers lack some of the inductive biases inherent to CNNs, such as translation equivariance and locality, and therefore do not generalize well when trained on insufficient amounts of data."
 >
-> **Why it matters:** this is the conceptual centre of the paper. A CNN comes with built-in assumptions about pictures; a Transformer does not. With little data, assumptions help. The next paragraph says what happens with a lot of data.
+> **What it means:**
+>
+> This is the first honest result of the paper, and it is a loss. On ImageNet alone, with no strong tricks against memorising, ViT is a few points worse than a ResNet of the same size.
+>
+> The authors expected it, and their reason is the centre of the paper. A CNN comes with built-in assumptions about pictures; a Transformer does not. Think of two students: one gets a summary sheet before the test, the other must work everything out from examples. With few examples, the summary sheet wins. With many examples, the story changes.
 
 Four technical words appear here, and the rest of the series uses all of them, so we take them slowly.
 
@@ -646,14 +671,16 @@ An honesty note on the ResNet column: its confidence drops to 0.607 at a 12-pixe
 
 ## Large scale training trumps inductive bias {§1}
 
-> [!PAPER] · Section 1 · page 2
+> [!PAPER] · §1
 > [![The fifth paragraph of the ViT introduction: however, the picture changes if the models are trained on larger datasets (14M-300M images). We find that large scale training trumps inductive bias. Our Vision Transformer (ViT) attains excellent results when pre-trained at sufficient scale and transferred to tasks with fewer datapoints. When pre-trained on the public ImageNet-21k dataset or the in-house JFT-300M dataset, ViT approaches or beats state of the art on multiple image recognition benchmarks. In particular, the best model reaches the accuracy of 88.55% on ImageNet, 90.72% on ImageNet-ReaL, 94.55% on CIFAR-100, and 77.63% on the VTAB suite of 19 tasks](/img/papers/vit/p1-intro-scale.png)](/img/papers/vit/p1-intro-scale.png)
->
-> **Context:** the last paragraph of the introduction, at the top of page 2. The turn of the story, and the headline numbers.
 >
 > **What it says:** "the picture changes if the models are trained on larger datasets (14M-300M images). We find that large scale training trumps inductive bias." Pre-trained on "the public ImageNet-21k dataset or the in-house JFT-300M dataset", ViT "approaches or beats state of the art on multiple image recognition benchmarks". The best model reaches "88.55% on ImageNet, 90.72% on ImageNet-ReaL, 94.55% on CIFAR-100, and 77.63% on the VTAB suite of 19 tasks".
 >
-> **Why it matters:** "large scale training trumps inductive bias" is the sentence the paper is remembered for. With enough data, a model with fewer built-in assumptions wins, because it is free to learn better assumptions than the ones a human would build in.
+> **What it means:**
+>
+> This is the turn of the story. "Large scale training trumps inductive bias" is the sentence the paper is remembered for.
+>
+> Go back to the two students. The one with the summary sheet starts faster, but the sheet also limits them: it holds only the rules a teacher thought of. Give the other student millions of examples, and they can learn better rules than the sheet holds. With enough data, the model with fewer built-in assumptions wins.
 
 The two datasets named here are the paper's fuel.
 
@@ -669,26 +696,30 @@ The two datasets named here are the paper's fuel.
 
 The paper proves the sketch in Section 4.3, which Part 4 reads in full. Two sentences from it are worth seeing now, because they are the evidence behind "the picture changes".
 
-> [!PAPER] · Section 4.3 · page 6
+> [!PAPER] · §4.3
 > [![A passage from Section 4.3: first, we pre-train ViT models on datasets of increasing size: ImageNet, ImageNet-21k, and JFT-300M. When pre-trained on the smallest dataset, ImageNet, ViT-Large models underperform compared to ViT-Base models](/img/papers/vit/p1-sec43-small.png)](/img/papers/vit/p1-sec43-small.png)
 > [![A sentence from Section 4.3 on page 7: the BiT CNNs outperform ViT on ImageNet, but with the larger datasets, ViT overtakes](/img/papers/vit/p1-sec43-overtake.png)](/img/papers/vit/p1-sec43-overtake.png)
 >
-> **Context:** Section 4.3, "Pre-training Data Requirements", pages 6 to 7. The experiment that tests the introduction's claim.
->
 > **What it says:** ViT models were pre-trained "on datasets of increasing size: ImageNet, ImageNet-21k, and JFT-300M". On the smallest, "ViT-Large models underperform compared to ViT-Base models". And: "The BiT CNNs outperform ViT on ImageNet, but with the larger datasets, ViT overtakes."
 >
-> **Why it matters:** two crossovers, both in the direction the inductive-bias story predicts. A bigger Transformer is worse than a smaller one on small data (more freedom, more ways to go wrong). A CNN beats the Transformer on small data and loses on large data.
+> **What it means:**
+>
+> These sentences come from Section 4.3, "Pre-training Data Requirements", the experiment that tests the claim of the introduction. They report two crossovers, and both go the way the inductive-bias story predicts.
+>
+> First, a bigger Transformer is worse than a smaller one on small data. More freedom means more ways to learn the wrong thing from too few pictures. Second, a CNN beats the Transformer on small data and loses on large data. Its built-in assumptions help while data is short, and hold it back once there is plenty.
 
 The exact numbers are in the paper's Table 5 (appendix), which Part 4 redraws in full. Here is the table, and the ImageNet rows for the two 16-pixel-patch models as a chart.
 
-> [!PAPER] · Table 5 · page 15
+> [!PAPER] · Table 5
 > [![Table 5 of the ViT paper: top-1 accuracy of ViT-B/16, ViT-B/32, ViT-L/16, ViT-L/32 and ViT-H/14 on CIFAR-10, CIFAR-100, ImageNet, ImageNet ReaL, Oxford Flowers-102 and Oxford-IIIT Pets, after pre-training on ImageNet, ImageNet-21k or JFT-300M. The ImageNet rows are highlighted: 77.91, 73.38, 76.53, 71.16 after ImageNet pre-training; 83.97, 81.28, 85.15, 80.99, 85.13 after ImageNet-21k; 84.15, 80.73, 87.12, 84.37, 88.04 after JFT-300M](/img/papers/vit/p1-table5.png)](/img/papers/vit/p1-table5.png)
->
-> **Context:** Table 5 in Appendix D, the numbers behind Figure 3 of the main text. Models fine-tuned at 384-pixel resolution.
 >
 > **What it says:** every model gets better as the pre-training set grows. Read the highlighted ImageNet rows for ViT-B/16 and ViT-L/16: 77.91 and 76.53 after ImageNet, 83.97 and 85.15 after ImageNet-21k, 84.15 and 87.12 after JFT-300M.
 >
-> **Why it matters:** the larger model (L/16) is *worse* than the smaller (B/16) with 1.3 million pictures, and *better* with 14 million or 303 million. "Large scale training trumps inductive bias" in five numbers.
+> **What it means:**
+>
+> Table 5 sits in Appendix D and holds the numbers behind Figure 3 of the main text. All models here were fine-tuned on pictures of 384 pixels.
+>
+> Compare the two highlighted model rows. With 1.3 million pictures, the larger model (L/16) is *worse* than the smaller one (B/16). With 14 million or 303 million pictures, it is *better*. That is "large scale training trumps inductive bias" in five numbers: a bigger, freer model needs more data before its freedom pays.
 
 {{FIG:p1_table5|The ImageNet rows of Table 5 for ViT-B/16 and ViT-L/16, against the size of the pre-training set on a log scale. With 1.3 million pictures the smaller model wins (77.91 against 76.53). With 14 million the larger model is ahead (85.15 against 83.97), and with 303 million it is far ahead (87.12 against 84.15).}}
 

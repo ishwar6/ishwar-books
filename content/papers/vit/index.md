@@ -1,7 +1,7 @@
 ---
 title: "An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale"
 short: ViT
-description: "The 2020 paper that cut an image into 16×16 patches, fed them to an unchanged Transformer, and beat the best convolutional networks once it was given enough data. Explained line by line in six parts, with the paper's own text, simple pictures, worked equations and real code on the released models."
+description: "The 2020 paper that cut an image into 16×16 patches, fed them to an unchanged Transformer, and beat the best convolutional networks once it was given enough data. Explained line by line in six parts, with the paper's own text, pictures, worked equations and real code on the released models."
 authors: [Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov, Dirk Weissenborn, Xiaohua Zhai, Thomas Unterthiner, Mostafa Dehghani, Matthias Minderer, Georg Heigold, Sylvain Gelly, Jakob Uszkoreit, Neil Houlsby]
 org: Google Research, Brain Team
 year: 2020
@@ -43,7 +43,7 @@ Each part follows the paper's own sections:
 
 ## How to read the boxes
 
-- A **teal "From the paper" box** shows the exact lines of the paper as a highlighted screenshot (click it to open it full size), followed by its **context**, **what it says** in plain English, and **why it matters**.
+- A **teal "From the paper" box** shows the exact lines of the paper as a highlighted screenshot (click it to open it full size). Under it, **What it says** gives the main words of the paper. **What it means** then explains those lines, and what the authors mean but do not write. When the box shows a different paper, the box gives the name of that paper.
 - A **yellow definition box** explains a technical word the first time it appears. If you already know the word, skip the box.
 - The small **Paper §3.1** tag above a heading tells you which section of the paper you are reading, so you can follow along in the PDF.
 - A **green "Key takeaways" box** ends every part with what to remember.

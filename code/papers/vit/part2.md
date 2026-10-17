@@ -13,14 +13,16 @@ Everything that can be checked, we check on a released model, `google/vit-base-p
 
 ## Related work: attention on images before ViT {§2}
 
-> [!PAPER] · Section 2 · page 2
+> [!PAPER] · §2
 > [![The first paragraph of Section 2: Transformers were proposed by Vaswani et al. (2017) for machine translation and have since become the state of the art method in many NLP tasks. Large Transformer-based models are often pre-trained on large corpora and then fine-tuned: BERT uses a denoising self-supervised pre-training task, while the GPT line of work uses language modeling as its pre-training task](/img/papers/vit/p2-related-transformers.png)](/img/papers/vit/p2-related-transformers.png)
->
-> **Context:** the opening of Related Work, right after the headline numbers of the introduction.
 >
 > **What it says:** Transformers "were proposed by Vaswani et al. (2017) for machine translation" and are now the standard in language. Big ones are pre-trained and then fine-tuned: BERT with "a denoising self-supervised pre-training task" (hide words, predict them), the GPT line with "language modeling" (predict the next word).
 >
-> **Why it matters:** this is the recipe ViT wants to copy for images: a plain Transformer, pre-trained on a lot of data, then fine-tuned. The whole paper is about whether the recipe survives the move from words to pixels.
+> **What it means:**
+>
+> Related Work opens with language, not pictures, because language is where the recipe comes from. A plain Transformer is pre-trained on a lot of data, then fine-tuned for each task. BERT and GPT differ only in the pre-training game: fill in hidden words, or guess the next one.
+>
+> This is the recipe ViT wants to copy for images. The whole paper asks one question: does the recipe survive the move from words to pixels?
 
 > [!DEFINITION] Transformer encoder
 > A stack of identical layers that take a sequence of vectors in and give a sequence of vectors of the same size out. Each layer lets every position look at every other position (self-attention) and then processes each position on its own (an MLP). It is the half of the 2017 Transformer that reads; BERT is one, and so is ViT. The [attention series](/writings/attention-1-self-attention/) builds it up from scratch.
@@ -28,14 +30,16 @@ Everything that can be checked, we check on a released model, `google/vit-base-p
 > [!DEFINITION] Self-attention
 > The step in which every token in a sequence compares itself with every other token, decides how much to look at each one, and takes a weighted mix of their information. The weights are computed from the data, not fixed in advance. Appendix A of the paper, covered at the end of this part, writes it out.
 
-> [!PAPER] · Section 2 · page 2
+> [!PAPER] · §2
 > [![The second paragraph of Section 2: naive application of self-attention to images would require that each pixel attends to every other pixel, with quadratic cost in the number of pixels. Parmar et al. applied self-attention only in local neighborhoods for each query pixel; such local blocks can completely replace convolutions (Hu, Ramachandran, Zhao); Sparse Transformers (Child et al.) employ scalable approximations; attention in blocks of varying sizes (Weissenborn) or only along individual axes (Ho, Wang); these require complex engineering to be implemented efficiently on hardware accelerators](/img/papers/vit/p2-related-approx.png)](/img/papers/vit/p2-related-approx.png)
->
-> **Context:** the longest paragraph of Section 2. It lists the ways people made attention cheap enough for pictures.
 >
 > **What it says:** attention over pixels means "each pixel attends to every other pixel", which has "quadratic cost in the number of pixels" and "does not scale to realistic input sizes". So people approximated: attention "only in local neighborhoods for each query pixel" (Parmar et al., 2018), local attention blocks that "can completely replace convolutions" (Hu et al., 2019; Ramachandran et al., 2019; Zhao et al., 2020), "Sparse Transformers" (Child et al., 2019), attention "in blocks of varying sizes" (Weissenborn et al., 2019) or "only along individual axes" (Ho et al., 2019; Wang et al., 2020a). All of them work, but "require complex engineering to be implemented efficiently on hardware accelerators".
 >
-> **Why it matters:** the last sentence is the argument. Every approximation is a custom attention pattern that needs custom code to run fast. ViT avoids the problem a different way: it does not make attention cheaper, it makes the sequence shorter (196 patches instead of 50,176 pixels), so plain attention is affordable.
+> **What it means:**
+>
+> Picture a meeting where every person must talk to every other person. With 10 people that is 100 talks; with 50,176 people (the pixels of a 224×224 picture) it is about 2.5 billion. Every method in this paragraph cuts the talks: neighbours only, rows and columns only, or fixed patterns.
+>
+> The last sentence is the real argument. Each shortcut is a custom attention pattern, and custom patterns need custom code to run fast on GPUs and TPUs. ViT solves the problem another way. It does not make attention cheaper; it makes the sequence shorter (196 patches instead of 50,176 pixels), so plain attention is affordable.
 
 > [!DEFINITION] Quadratic cost
 > If a computation over $$n$$ items has to look at every pair of items, its cost grows with $$n^2$$. Double the items and the work is four times larger. Self-attention over $$n$$ tokens has this cost, because every token compares itself with every token. Part 1 works out the numbers for pixels.
@@ -57,31 +61,37 @@ Two of these ideas are worth seeing in their own papers. Here is Parmar et al. (
 > [!PAPER] Parmar et al. (2018), Image Transformer · Abstract
 > [![The abstract of the Image Transformer: by restricting the self-attention mechanism to attend to local neighborhoods we significantly increase the size of images the model can process in practice, despite maintaining significantly larger receptive fields per layer than typical convolutional neural networks](/img/papers/vit/p2-ext-parmar.png)](/img/papers/vit/p2-ext-parmar.png)
 >
-> **Context:** the paper the ViT authors cite for "self-attention only in local neighborhoods". Its goal was generating images pixel by pixel, not classifying them.
->
 > **What it says:** "By restricting the self-attention mechanism to attend to local neighborhoods we significantly increase the size of images the model can process in practice", while still seeing more than a convolution does.
 >
-> **Why it matters:** this is the trade every method in the paragraph makes: give up global attention to afford larger images. ViT keeps global attention and gives up pixels instead.
+> **What it means:**
+>
+> The Image Transformer is the paper that ViT cites for "self-attention only in local neighborhoods". Its goal was different: it generated images pixel by pixel, and did not classify them.
+>
+> Its abstract shows the trade that every method in the paragraph makes. Give up global attention, and you can afford larger images. ViT makes the opposite trade: it keeps global attention and gives up single pixels as tokens.
 
 And here are the patterns of the Sparse Transformer, which the ViT paper names explicitly:
 
 > [!PAPER] Child et al. (2019), Generating Long Sequences with Sparse Transformers · Figure 3
 > [![Figure 3 of the Sparse Transformer paper: three connectivity patterns for a 6 by 6 image. (a) full attention of a standard Transformer, (b) strided sparse attention where a position attends to its row and to every k-th position, (c) fixed sparse attention where positions attend within blocks and to summary positions; the bottom row shows each pattern as a connectivity matrix](/img/papers/vit/p2-ext-child-fig3.png)](/img/papers/vit/p2-ext-child-fig3.png)
 >
-> **Context:** "two 2d factorized attention schemes" compared with full attention, for a tiny 6×6 image.
->
 > **What it says:** in (a) every output can see every input (the full lower triangle of the matrix). In (b) and (c) only the coloured cells are computed: a row, a column stride, a block. The patterns are chosen so that two heads in sequence still connect everything.
 >
-> **Why it matters:** the pictures make "scalable approximations to global self-attention" concrete: it means deleting most cells of the attention matrix by hand. ViT's attention matrix is the full one, (a), but only 197×197.
-
-> [!PAPER] · Section 2 · page 2
-> [![The third paragraph of Section 2: most related to ours is the model of Cordonnier et al. (2020), which extracts patches of size 2 by 2 from the input image and applies full self-attention on top. This model is very similar to ViT, but our work goes further to demonstrate that large scale pre-training makes vanilla transformers competitive with state-of-the-art CNNs. Cordonnier et al. use a small patch size of 2 by 2 pixels, which makes the model applicable only to small-resolution images](/img/papers/vit/p2-related-cordonnier.png)](/img/papers/vit/p2-related-cordonnier.png)
+> **What it means:**
 >
-> **Context:** the paragraph that names the closest earlier work.
+> The figure compares full attention with "two 2d factorized attention schemes" on a tiny 6×6 image. Each grid in the bottom row is an attention matrix: a coloured cell means "this output may look at this input".
+>
+> These pictures make "scalable approximations to global self-attention" concrete. It means deleting most cells of the attention matrix by hand, with a pattern that a person designs. ViT's attention matrix is the full one, (a), but only 197×197 in size.
+
+> [!PAPER] · §2
+> [![The third paragraph of Section 2: most related to ours is the model of Cordonnier et al. (2020), which extracts patches of size 2 by 2 from the input image and applies full self-attention on top. This model is very similar to ViT, but our work goes further to demonstrate that large scale pre-training makes vanilla transformers competitive with state-of-the-art CNNs. Cordonnier et al. use a small patch size of 2 by 2 pixels, which makes the model applicable only to small-resolution images](/img/papers/vit/p2-related-cordonnier.png)](/img/papers/vit/p2-related-cordonnier.png)
 >
 > **What it says:** Cordonnier et al. (2020) "extracts patches of size 2 × 2 from the input image and applies full self-attention on top". "This model is very similar to ViT." The differences the authors claim: ViT shows that "large scale pre-training makes vanilla transformers competitive with (or even better than) state-of-the-art CNNs", and 2×2 patches make the earlier model "applicable only to small-resolution images", while 16×16 patches handle "medium-resolution images as well".
 >
-> **Why it matters:** this is the honest answer to "was the idea new?". No: patches plus full attention existed. What was new is the scale, both of the patches and of the data, and the result that followed.
+> **What it means:**
+>
+> This is the honest answer to "was the idea new?". No: cutting a picture into patches and running full attention on top already existed.
+>
+> What was new is the scale, of both the patches and the data. Patches of 2×2 pixels keep the sequence long, so the earlier model could only handle small pictures. Patches of 16×16 make medium-sized pictures affordable, and huge pre-training sets make the plain Transformer competitive. The result that followed is the real contribution.
 
 > [!DEFINITION] Patch
 > A small square cut out of the picture, here 16×16 pixels with 3 colour channels. ViT treats each patch as one token, the way BERT treats each word piece. The picture is cut into a grid of patches with no overlap.
@@ -92,32 +102,38 @@ The Cordonnier paper is about something else: it proves that attention *can* do 
 > [![The abstract of Cordonnier et al.: this work provides evidence that attention layers can perform convolution and indeed they often learn to do so in practice. Specifically, we prove that a multi-head self-attention layer with sufficient number of heads is at least as expressive as any convolutional layer](/img/papers/vit/p2-ext-cordonnier-abs.png)](/img/papers/vit/p2-ext-cordonnier-abs.png)
 > [![The experimental setup of Cordonnier et al.: in all experiments, we use a 2 by 2 invertible down-sampling on the input to reduce the size of the image, since the attention coefficient tensors scale quadratically with the size of the input image and full attention cannot be applied to bigger images](/img/papers/vit/p2-ext-cordonnier-2x2.png)](/img/papers/vit/p2-ext-cordonnier-2x2.png)
 >
-> **Context:** the abstract, and the experiments section on CIFAR-10 (32×32 images).
->
 > **What it says:** they "prove that a multi-head self-attention layer with sufficient number of heads is at least as expressive as any convolutional layer". In the experiments "we use a 2 × 2 invertible down-sampling on the input", because the attention tensors "scale quadratically with the size of the input image" and "full attention cannot be applied to bigger images".
 >
-> **Why it matters:** their 2×2 groups are the "patches" the ViT paper refers to. On a 32×32 image that gives 256 tokens; on a 224×224 image it would give 12,544, far too many. ViT's 16×16 patches give 196 at 224×224. Same idea, eight times larger patches, and a different question.
-
-> [!PAPER] · Section 2 · page 2
-> [![The fourth paragraph of Section 2: there has also been a lot of interest in combining convolutional neural networks with forms of self-attention, by augmenting feature maps for image classification (Bello et al.) or by further processing the output of a CNN using self-attention, for object detection (Hu et al., Carion et al.), video processing (Wang et al., Sun et al.), image classification (Wu et al.), unsupervised object discovery (Locatello et al.) or unified text-vision tasks (Chen et al., Lu et al., Li et al.)](/img/papers/vit/p2-related-cnn-attn.png)](/img/papers/vit/p2-related-cnn-attn.png)
+> **What it means:**
 >
-> **Context:** the fourth paragraph: attention as an add-on to a CNN rather than a replacement.
+> The two crops come from the abstract and from the experiments on CIFAR-10, whose pictures are only 32×32 pixels. The 2×2 groups of the experiments are the "patches" that the ViT paper refers to.
+>
+> Count the tokens. A 32×32 picture in 2×2 groups gives 256 tokens. A 224×224 picture would give 12,544, far too many for full attention. ViT's 16×16 patches give 196 at 224×224. It is the same idea with patches eight times larger. It also serves a different question: what attention *can* do, against what it does at scale.
+
+> [!PAPER] · §2
+> [![The fourth paragraph of Section 2: there has also been a lot of interest in combining convolutional neural networks with forms of self-attention, by augmenting feature maps for image classification (Bello et al.) or by further processing the output of a CNN using self-attention, for object detection (Hu et al., Carion et al.), video processing (Wang et al., Sun et al.), image classification (Wu et al.), unsupervised object discovery (Locatello et al.) or unified text-vision tasks (Chen et al., Lu et al., Li et al.)](/img/papers/vit/p2-related-cnn-attn.png)](/img/papers/vit/p2-related-cnn-attn.png)
 >
 > **What it says:** people have combined CNNs "with forms of self-attention", either "by augmenting feature maps" inside the CNN (Bello et al., 2019) or "by further processing the output of a CNN using self-attention". The second kind covers object detection (relation networks; DETR), video (non-local networks; VideoBERT), classification (Visual Transformers), object discovery (slot attention) and joint text-and-image models (UNITER, ViLBERT, VisualBERT).
 >
-> **Why it matters:** in all of these the CNN does the seeing and attention does the reasoning on top. ViT's "hybrid" model, later in Section 3.1, is exactly this kind of design, and the paper tests it against the pure version.
+> **What it means:**
+>
+> In all these models the CNN does the seeing and attention does the reasoning on top. Attention is an add-on to the CNN, not a replacement for it.
+>
+> ViT's "hybrid" model, defined at the end of Section 3.1, is exactly this kind of design. The paper builds it so that it can test the add-on design against the pure Transformer, with everything else the same.
 
 > [!DEFINITION] Feature map
 > The output of a convolutional layer: a grid of positions, each holding a vector of numbers. A ResNet turns a 224×224×3 picture into, for example, a 14×14×1024 feature map: 196 positions, each described by 1,024 numbers. The hybrid ViT reads these positions as tokens.
 
-> [!PAPER] · Section 2 · page 2
+> [!PAPER] · §2
 > [![The fifth paragraph of Section 2: another recent related model is image GPT (iGPT), which applies Transformers to image pixels after reducing image resolution and color space. The model is trained in an unsupervised fashion as a generative model, and the resulting representation can then be fine-tuned or probed linearly for classification performance, achieving a maximal accuracy of 72% on ImageNet](/img/papers/vit/p2-related-igpt.png)](/img/papers/vit/p2-related-igpt.png)
->
-> **Context:** the one earlier model that used a Transformer on raw pixels at scale.
 >
 > **What it says:** iGPT "applies Transformers to image pixels after reducing image resolution and color space". It is trained "as a generative model" (predict the next pixel), and its representation "can then be fine-tuned or probed linearly", reaching "a maximal accuracy of 72% on ImageNet".
 >
-> **Why it matters:** iGPT shows the other way to shorten the sequence: shrink the picture (to 32×32 or 64×64) and squash the colours into 512 values, so a pixel is a token. The price is 72% on ImageNet, far below the 85% to 88% of good CNNs. ViT keeps the resolution and shortens the sequence by patching.
+> **What it means:**
+>
+> iGPT is the one earlier model that ran a Transformer on raw pixels at scale. It shows the other way to shorten the sequence. It shrinks the picture (to 32×32 or 64×64) and squashes the colours into 512 values, so that one pixel is one token.
+>
+> The price is the 72% on ImageNet, far below the 85% to 88% of good CNNs. Too much of the picture is lost before the model sees it. ViT keeps the resolution and shortens the sequence by cutting it into patches.
 
 > [!DEFINITION] Generative model
 > A model trained to produce the data itself, for example to predict the next pixel given the previous ones (iGPT) or the next word given the previous ones (GPT). Nothing is labelled; the data is its own target.
@@ -128,14 +144,16 @@ The Cordonnier paper is about something else: it proves that attention *can* do 
 > [!DEFINITION] Linear probe
 > A test of a representation: freeze the model, take its output vectors, and train only one linear layer on top to predict the classes. If the probe scores well, the frozen vectors already contain the information. Part 4 uses a related "few-shot linear" measure.
 
-> [!PAPER] · Section 2 · page 2
+> [!PAPER] · §2
 > [![The last paragraph of Section 2: our work adds to the increasing collection of papers that explore image recognition at larger scales than the standard ImageNet dataset. Additional data sources allow state-of-the-art results (Mahajan et al., Touvron et al., Xie et al.). Sun et al. (2017) study how CNN performance scales with dataset size, and Kolesnikov et al. (2020) and Djolonga et al. (2020) explore CNN transfer learning from ImageNet-21k and JFT-300M. We focus on these two latter datasets as well, but train Transformers instead of ResNet-based models](/img/papers/vit/p2-related-scale.png)](/img/papers/vit/p2-related-scale.png)
->
-> **Context:** the closing paragraph, which places ViT in the "more data" line of work rather than the "new attention" line.
 >
 > **What it says:** the paper "adds to the increasing collection of papers that explore image recognition at larger scales than the standard ImageNet dataset": Mahajan et al. (2018, Instagram hashtags), Touvron et al. (2019), Xie et al. (2020, Noisy Student). Sun et al. (2017) studied "how CNN performance scales with dataset size"; Kolesnikov et al. (2020, Big Transfer) and Djolonga et al. (2020) studied transfer from "ImageNet-21k and JFT-300M". ViT uses "these two latter datasets as well, but train[s] Transformers instead of ResNet-based models".
 >
-> **Why it matters:** this tells you how to read the results in Part 4. The comparison that matters to the authors is with Big Transfer, the same team's ResNets trained on the same data. Same data, same recipe, different architecture.
+> **What it means:**
+>
+> The closing paragraph places ViT in the "more data" line of work, not in the "new attention" line. Its idea is not a clever new layer. Its idea is a plain design fed with far more pictures.
+>
+> This tells you how to read the results in Part 4. The comparison that matters to the authors is with Big Transfer, the same team's ResNets trained on the same data. Same data, same recipe, different design: any difference comes from the design.
 
 {{FIG:p2_related_map|The related work on one map. Five earlier ways of putting attention on images, each a different answer to the quadratic cost: local attention, sparse and axial patterns, 2×2 patches with full attention, attention bolted on to a CNN, and iGPT on shrunken pixels. ViT, below, keeps full attention and the standard encoder, uses 16×16 patches, and joins the large-data line of work.}}
 
@@ -143,14 +161,16 @@ The Cordonnier paper is about something else: it proves that attention *can* do 
 
 Section 3 is short. It opens with one sentence of design philosophy and one picture, Figure 1. Here is the picture first, because everything else in this part explains one piece of it.
 
-> [!PAPER] · Figure 1 · page 3
+> [!PAPER] · Figure 1
 > [![Figure 1 of the ViT paper. Left: a picture is split into nine patches, each goes through a linear projection of flattened patches, position embeddings 1 to 9 are added along with an extra learnable class embedding at position 0, the sequence enters a Transformer encoder, and an MLP head on the class token outputs Bird, Ball, Car. Right: the Transformer encoder block, repeated L times: Norm, Multi-Head Attention, a residual addition, Norm, MLP, another residual addition. Caption: we split an image into fixed-size patches, linearly embed each of them, add position embeddings, and feed the resulting sequence of vectors to a standard Transformer encoder; to perform classification we use the standard approach of adding an extra learnable classification token](/img/papers/vit/p2-figure1.png)](/img/papers/vit/p2-figure1.png)
->
-> **Context:** the top of page 3, the one figure of the method section.
 >
 > **What it says:** "We split an image into fixed-size patches, linearly embed each of them, add position embeddings, and feed the resulting sequence of vectors to a standard Transformer encoder. In order to perform classification, we use the standard approach of adding an extra learnable 'classification token' to the sequence."
 >
-> **Why it matters:** the caption is the whole method in two sentences. Learn to read the picture and the four equations of Section 3.1 are just its labels.
+> **What it means:**
+>
+> This is the one figure of the method section, and its caption is the whole method in two sentences. Learn to read the picture, and the four equations of Section 3.1 are just its labels.
+>
+> Note the word "standard" twice: a "standard Transformer encoder" and "the standard approach" of a classification token. The authors want you to see that nothing in the picture is new except the bottom row, where the photo becomes patches.
 
 How to read Figure 1, left to right and bottom to top:
 
@@ -163,14 +183,16 @@ How to read Figure 1, left to right and bottom to top:
 
 {{FIG:p2_figure1_frames|Figure 1 redrawn as nine numbered frames with the real sizes. The 224×224×3 picture is cut into 196 patches of 16×16×3; each is flattened to 768 numbers and multiplied by E (768×768); the [class] token is prepended and 197 position rows are added; the 12-layer encoder keeps the shape 197×768; the [class] output is normalised and a single linear layer gives 1000 scores, the largest of which is "Egyptian cat" with probability 0.937 on our picture.}}
 
-> [!PAPER] · Section 3 · page 3
+> [!PAPER] · §3
 > [![The opening of Section 3: in model design we follow the original Transformer (Vaswani et al., 2017) as closely as possible. An advantage of this intentionally simple setup is that scalable NLP Transformer architectures, and their efficient implementations, can be used almost out of the box](/img/papers/vit/p2-method-intro.png)](/img/papers/vit/p2-method-intro.png)
->
-> **Context:** the two sentences between the Figure 1 caption and Section 3.1.
 >
 > **What it says:** "we follow the original Transformer (Vaswani et al., 2017) as closely as possible." The reason: "scalable NLP Transformer architectures, and their efficient implementations, can be used almost out of the box."
 >
-> **Why it matters:** this is a deliberate design choice, not laziness. The paragraph on related work complained that custom attention needs custom engineering. A standard Transformer needs none: the code, the hardware kernels and the scaling know-how from language transfer directly. Later parts show that this is what allowed the authors to train 632-million-parameter models.
+> **What it means:**
+>
+> To follow the original Transformer "as closely as possible" is a deliberate choice, not laziness. Related Work complained that custom attention needs custom engineering. A standard Transformer needs none.
+>
+> The code, the hardware kernels and the scaling know-how from language transfer directly. Think of a new car that fits every existing fuel station: nobody has to build anything before it can drive. Later parts show that this is what let the authors train models of 632 million parameters.
 
 The phrase "out of the box" is also why we can check this paper so thoroughly. ViT-B/16 has the same layer count, hidden size, head count and MLP size as BERT-base ([BERT Part 2](/papers/bert/part-2-architecture-and-input/)), and the released code is a few hundred lines on top of a standard Transformer implementation.
 
@@ -178,14 +200,16 @@ The phrase "out of the box" is also why we can check this paper so thoroughly. V
 
 ## From pixels to a sequence: the reshape {§3.1}
 
-> [!PAPER] · Section 3.1 · page 3
+> [!PAPER] · §3.1
 > [![The first paragraph of Section 3.1: the standard Transformer receives as input a 1D sequence of token embeddings. To handle 2D images, we reshape the image x in R H by W by C into a sequence of flattened 2D patches x p in R N by P squared times C, where (H, W) is the resolution of the original image, C is the number of channels, (P, P) is the resolution of each image patch, and N equals HW over P squared is the resulting number of patches, which also serves as the effective input sequence length. The Transformer uses constant latent vector size D through all of its layers, so we flatten the patches and map to D dimensions with a trainable linear projection (Eq. 1). We refer to the output of this projection as the patch embeddings](/img/papers/vit/p2-vit-reshape.png)](/img/papers/vit/p2-vit-reshape.png)
->
-> **Context:** the first paragraph of Section 3.1, which does the only real translation work in the paper: from a 2D picture to a 1D sequence.
 >
 > **What it says:** a Transformer wants "a 1D sequence of token embeddings". So the picture $$\mathbf{x} \in \mathbb{R}^{H \times W \times C}$$ is reshaped into "a sequence of flattened 2D patches" $$\mathbf{x}_p \in \mathbb{R}^{N \times (P^2 \cdot C)}$$. $$(H, W)$$ is the picture's resolution, $$C$$ its number of channels, $$(P, P)$$ the patch size, and $$N = HW/P^2$$ the number of patches, "which also serves as the effective input sequence length". Because the Transformer "uses constant latent vector size $$D$$ through all of its layers", the flattened patches are mapped "to $$D$$ dimensions with a trainable linear projection". The result is called "the patch embeddings".
 >
-> **Why it matters:** five symbols ($$H, W, C, P, N$$) and one matrix do the whole job. There is no convolution stack, no feature pyramid, nothing learned about pictures before the Transformer sees them. The rest of the paper's "surprising" results rest on how little happens here.
+> **What it means:**
+>
+> This paragraph does the only real translation work in the paper: it turns a 2D picture into a 1D sequence. Think of cutting a photo into stamps and laying them in one row, left to right and top to bottom. Each stamp is then flattened into a list of numbers and multiplied by one matrix.
+>
+> Five symbols ($$H, W, C, P, N$$) and that one matrix do the whole job. There is no convolution stack, no feature pyramid, nothing learned about pictures before the Transformer sees them. The paper's "surprising" results rest on how little happens here.
 
 > [!DEFINITION] Tensor shape
 > The list of sizes of an array of numbers. A colour picture of height 224 and width 224 has shape $$224 \times 224 \times 3$$ (in PyTorch the channels come first: $$3 \times 224 \times 224$$). A sequence of 197 tokens with 768 numbers each has shape $$197 \times 768$$. Following the shapes is the easiest way to follow a model.
@@ -271,14 +295,16 @@ A difference of $$5 \times 10^{-6}$$ is rounding noise in 32-bit arithmetic. So 
 
 ## The [class] token and the head {§3.1}
 
-> [!PAPER] · Section 3.1 · page 3
+> [!PAPER] · §3.1
 > [![The second paragraph of Section 3.1: similar to BERT's class token, we prepend a learnable embedding to the sequence of embedded patches (z 0 0 equals x class), whose state at the output of the Transformer encoder (z L 0) serves as the image representation y (Eq. 4). Both during pre-training and fine-tuning, a classification head is attached to z L 0. The classification head is implemented by a MLP with one hidden layer at pre-training time and by a single linear layer at fine-tuning time](/img/papers/vit/p2-vit-class.png)](/img/papers/vit/p2-vit-class.png)
->
-> **Context:** the second paragraph of Section 3.1, about the one token that is not a patch.
 >
 > **What it says:** "Similar to BERT's [class] token, we prepend a learnable embedding to the sequence of embedded patches ($$\mathbf{z}_0^0 = \mathbf{x}_{\text{class}}$$)". Its state at the encoder output, $$\mathbf{z}_L^0$$, "serves as the image representation $$\mathbf{y}$$ (Eq. 4)". A classification head sits on $$\mathbf{z}_L^0$$ both in pre-training and fine-tuning; it is "a MLP with one hidden layer at pre-training time and ... a single linear layer at fine-tuning time".
 >
-> **Why it matters:** the model does not average the 196 patch outputs. It reads one token, which never saw a pixel directly and has to gather everything through attention. This is copied from BERT, and the paper's Appendix D.3 (Part 5) shows that averaging would have worked too, with a different learning rate.
+> **What it means:**
+>
+> The [class] token is the one token that is not a patch. Think of a reporter at a meeting who has no news of their own. They listen to everyone, and at the end only their notes are read out.
+>
+> So the model does not average the 196 patch outputs. It reads one token, which never saw a pixel directly and must gather everything through attention. This is copied from BERT. Appendix D.3 of the paper (Part 5) shows that averaging the patch outputs would also have worked, with a different learning rate.
 
 > [!DEFINITION] [class] token
 > An extra token at position 0 that belongs to no patch. Its input vector $$\mathbf{x}_{\text{class}}$$ is a learned list of 768 numbers, the same for every picture. Through 12 layers of attention it collects information from all patches, and its output vector is what the classifier reads. BERT calls the same thing `[CLS]`.
@@ -297,14 +323,16 @@ A difference of $$5 \times 10^{-6}$$ is rounding noise in 32-bit arithmetic. So 
 
 Here is the BERT sentence the paper points to:
 
-> [!PAPER] Devlin et al. (2018), BERT · Section 3, Input/Output Representations
+> [!PAPER] Devlin et al. (2018), BERT · §3, Input/Output Representations
 > [![The BERT paper: the first token of every sequence is always a special classification token ([CLS]). The final hidden state corresponding to this token is used as the aggregate sequence representation for classification tasks](/img/papers/vit/p2-ext-bert-cls.png)](/img/papers/vit/p2-ext-bert-cls.png)
->
-> **Context:** the paragraph of the BERT paper that introduces `[CLS]`.
 >
 > **What it says:** "The first token of every sequence is always a special classification token ([CLS]). The final hidden state corresponding to this token is used as the aggregate sequence representation for classification tasks."
 >
-> **Why it matters:** ViT took this sentence as is and renamed the token. "Aggregate sequence representation" becomes "image representation".
+> **What it means:**
+>
+> This is the paragraph of the BERT paper that introduces `[CLS]`. ViT took the sentence almost as it is and renamed the token.
+>
+> "Aggregate sequence representation" becomes "image representation". The idea is the same in both papers: one extra token collects the whole input, and the classifier reads only that token.
 
 The two heads can be seen in the released checkpoints. The fine-tuned model `google/vit-base-patch16-224` ends in exactly one linear layer, and the pre-trained-only model `google/vit-base-patch16-224-in21k` ends in a dense layer with a tanh (a "pooler", the hidden layer of the pre-training MLP head; the 21,843-class output layer on top of it was not released):
 
@@ -322,14 +350,16 @@ So the released files match the sentence: an MLP with one hidden layer for pre-t
 
 ## Position embeddings {§3.1}
 
-> [!PAPER] · Section 3.1 · page 3
+> [!PAPER] · §3.1
 > [![The third paragraph of Section 3.1: position embeddings are added to the patch embeddings to retain positional information. We use standard learnable 1D position embeddings, since we have not observed significant performance gains from using more advanced 2D-aware position embeddings (Appendix D.4). The resulting sequence of embedding vectors serves as input to the encoder](/img/papers/vit/p2-vit-pos.png)](/img/papers/vit/p2-vit-pos.png)
->
-> **Context:** the third paragraph of Section 3.1.
 >
 > **What it says:** position embeddings "are added to the patch embeddings to retain positional information". They are "standard learnable 1D position embeddings", because "more advanced 2D-aware position embeddings (Appendix D.4)" did not help significantly. The sum "serves as input to the encoder".
 >
-> **Why it matters:** "1D" means the model is told "you are token 37", not "you are at row 2, column 9". It has to work out the grid from data. Appendix D.4, covered in [Part 5](part-5-scaling-and-inside-vit.md), shows that it does: the learned position vectors end up arranged in a grid.
+> **What it means:**
+>
+> Think of a pile of stamps cut from a photo, with no note of where each one came from. A position embedding is that note. Each position gets its own learned vector, added to the patch at that place.
+>
+> "1D" means the model is told "you are token 37", not "you are at row 2, column 9". It is like seat numbers in a cinema with no row letters. The model must work out the grid from data. Appendix D.4, covered in [Part 5](part-5-scaling-and-inside-vit.md), shows that it does: the learned position vectors end up arranged in a grid.
 
 > [!DEFINITION] Position embedding
 > A learned vector for each position in the sequence, added to the token at that position. Attention on its own does not know the order of its inputs (we show this below), so without these vectors the model could not tell the top-left patch from the bottom-right one. ViT-B/16 at 224 learns 197 of them, one per patch plus one for the class token.
@@ -355,15 +385,17 @@ Compare with the original-order output in the Appendix A section: the rows for t
 
 ## The encoder: LayerNorm, attention, MLP {§3.1}
 
-> [!PAPER] · Section 3.1 · pages 3 and 4
+> [!PAPER] · §3.1
 > [![The fourth paragraph of Section 3.1: the Transformer encoder (Vaswani et al., 2017) consists of alternating layers of multiheaded self-attention (MSA, see Appendix A) and MLP blocks (Eq. 2, 3). Layernorm (LN) is applied before every block, and residual connections after every block (Wang et al., 2019; Baevski and Auli, 2019)](/img/papers/vit/p2-vit-encoder.png)](/img/papers/vit/p2-vit-encoder.png)
 > [![The paragraph continues at the top of page 4: the MLP contains two layers with a GELU non-linearity, followed by Equations 1 to 4](/img/papers/vit/p2-eq1-4.png)](/img/papers/vit/p2-eq1-4.png)
 >
-> **Context:** the description of the encoder, which runs from the bottom of page 3 to the top of page 4, where the four equations follow.
->
 > **What it says:** the encoder "consists of alternating layers of multiheaded self-attention (MSA, see Appendix A) and MLP blocks (Eq. 2, 3)". "Layernorm (LN) is applied before every block, and residual connections after every block", citing Wang et al. (2019) and Baevski and Auli (2019) for this pre-norm arrangement. "The MLP contains two layers with a GELU non-linearity."
 >
-> **Why it matters:** this is the standard encoder with the one modern change: normalising *before* each block rather than after, which the two cited papers found makes deep Transformers train more stably. BERT normalises after. Everything else is 2017.
+> **What it means:**
+>
+> This is the standard Transformer encoder with one modern change. LayerNorm comes *before* each block, not after it. The two cited papers found that this order makes deep Transformers train more stably. BERT and the 2017 Transformer normalise after.
+>
+> Think of the residual path as a main road and each block as a side road. In pre-norm, each side road cleans its own traffic before it joins, and the main road changes only by addition. Everything else is the 2017 design. The four equations then write the whole model down in symbols.
 
 > [!DEFINITION] Multi-head self-attention (MSA)
 > Several self-attention computations ("heads") run side by side on the same input, each with its own small set of weights, and their outputs joined and mixed by one more matrix. ViT-B runs 12 heads of 64 numbers each. Appendix A, at the end of this part, gives the equations.
@@ -636,14 +668,18 @@ The model says "Egyptian cat" with probability 0.937, and the next four guesses 
 
 ## Inductive bias {§3.1}
 
-> [!PAPER] · Section 3.1, Inductive bias · page 4
+> [!PAPER] · §3.1, Inductive bias
 > [![The Inductive bias paragraph: we note that Vision Transformer has much less image-specific inductive bias than CNNs. In CNNs, locality, two-dimensional neighborhood structure, and translation equivariance are baked into each layer throughout the whole model. In ViT, only MLP layers are local and translationally equivariant, while the self-attention layers are global. The two-dimensional neighborhood structure is used very sparingly: in the beginning of the model by cutting the image into patches and at fine-tuning time for adjusting the position embeddings for images of different resolution. Other than that, the position embeddings at initialization time carry no information about the 2D positions of the patches and all spatial relations between the patches have to be learned from scratch](/img/papers/vit/p2-inductive.png)](/img/papers/vit/p2-inductive.png)
->
-> **Context:** the first of two named paragraphs that close Section 3.1. It restates the thesis of the introduction in the vocabulary of the model.
 >
 > **What it says:** ViT "has much less image-specific inductive bias than CNNs". In a CNN, "locality, two-dimensional neighborhood structure, and translation equivariance are baked into each layer". In ViT "only MLP layers are local and translationally equivariant, while the self-attention layers are global". The 2D grid is used "very sparingly": when "cutting the image into patches" and at fine-tuning time when "adjusting the position embeddings for images of different resolution". The position embeddings "at initialization time carry no information about the 2D positions of the patches", so "all spatial relations between the patches have to be learned from scratch".
 >
-> **Why it matters:** this paragraph is the mechanism behind the paper's main finding. Less built-in knowledge means more must be learned from data, which is why ViT loses on small datasets and wins on huge ones (Part 4). It also tells you exactly where to look for the learned knowledge: in the position embeddings and the attention patterns (Part 5).
+> **What it means:**
+>
+> This paragraph restates the thesis of the introduction in the words of the model. A CNN has its assumptions about pictures built into every layer. ViT has them in only two places: the cut into patches, and the resizing of position embeddings at fine-tuning time.
+>
+> That is the mechanism behind the paper's main finding. Less built-in knowledge means more must be learned from data. So ViT loses on small datasets and wins on huge ones (Part 4).
+>
+> It also tells you where to look for the learned knowledge: in the position embeddings and the attention patterns. Part 5 looks there.
 
 > [!DEFINITION] Inductive bias
 > The assumptions a model has before it sees any data. A CNN assumes that nearby pixels matter most and that a cat is a cat wherever it appears. ViT assumes almost nothing about pictures. Part 1 has the long version.
@@ -657,14 +693,16 @@ The paragraph's two claims about ViT are easy to confirm from what we computed. 
 
 ## Hybrid architecture {§3.1}
 
-> [!PAPER] · Section 3.1, Hybrid Architecture · page 4
+> [!PAPER] · §3.1, Hybrid Architecture
 > [![The Hybrid Architecture paragraph: as an alternative to raw image patches, the input sequence can be formed from feature maps of a CNN (LeCun et al., 1989). In this hybrid model, the patch embedding projection E (Eq. 1) is applied to patches extracted from a CNN feature map. As a special case, the patches can have spatial size 1x1, which means that the input sequence is obtained by simply flattening the spatial dimensions of the feature map and projecting to the Transformer dimension. The classification input embedding and position embeddings are added as described above](/img/papers/vit/p2-hybrid.png)](/img/papers/vit/p2-hybrid.png)
->
-> **Context:** the last paragraph of Section 3.1, which defines the third model family of the paper (ResNet, ViT, hybrid).
 >
 > **What it says:** "the input sequence can be formed from feature maps of a CNN". The projection $$\mathbf{E}$$ "is applied to patches extracted from a CNN feature map". In the special case of "spatial size 1x1" patches, the sequence is "obtained by simply flattening the spatial dimensions of the feature map and projecting to the Transformer dimension". The class embedding and position embeddings "are added as described above".
 >
-> **Why it matters:** this is the "CNN + attention" family of Section 2, built inside ViT's own framework so that the three families can be compared fairly. Part 4 shows the hybrid winning at small compute budgets and the pure ViT catching up and passing it at large ones.
+> **What it means:**
+>
+> This paragraph defines the third model family of the paper, next to the ResNet and the pure ViT. In the hybrid, a CNN does the first steps of seeing, and its output grid becomes the tokens.
+>
+> It is the "CNN + attention" family of Section 2, built inside ViT's own design so that the three families can be compared fairly. Part 4 shows the hybrid winning at small compute budgets. With more compute, the pure ViT catches up and passes it.
 
 > [!DEFINITION] CNN stage
 > A group of convolutional layers that work at one resolution; between stages the grid is halved. A ResNet-50 has four stages after its first layer, with feature maps of 56×56, 28×28, 14×14 and 7×7 for a 224×224 input. The hybrids in the paper take either the 7×7 output of stage 4 or the 14×14 output of a stage 3 that is extended to replace stage 4 (Section 4.1, Part 3).
@@ -680,14 +718,16 @@ In shapes: a ResNet turns the $$224 \times 224 \times 3$$ picture into a $$14 \t
 
 The next part reads the experimental setup in full. We need one table from it now, because every number above (768, 12, 3,072) came from it:
 
-> [!PAPER] · Table 1 · page 5
+> [!PAPER] · Table 1
 > [![Table 1, details of Vision Transformer model variants: ViT-Base has 12 layers, hidden size D 768, MLP size 3072, 12 heads, 86M parameters; ViT-Large has 24 layers, 1024, 4096, 16 heads, 307M; ViT-Huge has 32 layers, 1280, 5120, 16 heads, 632M](/img/papers/vit/p2-table1.png)](/img/papers/vit/p2-table1.png)
->
-> **Context:** Section 4.1, Model Variants. The paper says the Base and Large sizes "are directly adopted from BERT".
 >
 > **What it says:** **ViT-Base**: 12 layers, $$D = 768$$, MLP 3,072, 12 heads, 86M parameters. **ViT-Large**: 24 layers, $$D = 1{,}024$$, MLP 4,096, 16 heads, 307M. **ViT-Huge**: 32 layers, $$D = 1{,}280$$, MLP 5,120, 16 heads, 632M. The MLP size is always $$4D$$ and the head size always $$D/\text{heads} = 64$$ for Base and Large, 80 for Huge.
 >
-> **Why it matters:** with these numbers and the equations above we can count every parameter of every model, which we do next. [Part 3](part-3-fine-tuning-and-setup.md) reads the table together with the patch-size notation and the baselines.
+> **What it means:**
+>
+> Table 1 belongs to Section 4.1, "Model Variants". The paper says the Base and Large sizes "are directly adopted from BERT", so ViT-B has the same shape as BERT-base.
+>
+> Each row is a recipe: how many layers, how wide, how many heads. With these numbers and the equations above, we can count every parameter of every model, which we do next. [Part 3](part-3-fine-tuning-and-setup.md) reads the table together with the patch-size notation and the baselines.
 
 {{FIG:p2_table1_blocks|Table 1 as three stacks of blocks, one block per layer, block width proportional to D. ViT-Base: 12 layers of 768. ViT-Large: 24 of 1,024. ViT-Huge: 32 of 1,280. Under each, the paper's parameter count and ours without a classification head.}}
 
@@ -753,14 +793,16 @@ Two things stand out. The embeddings are tiny: 0.9% of the model, against about 
 
 The paper keeps the attention formulas out of the main text and puts them in Appendix A. They are the inside of the "MSA" box above.
 
-> [!PAPER] · Appendix A · page 13
+> [!PAPER] · Appendix A
 > [![Appendix A, Multihead Self-Attention: standard qkv self-attention is a popular building block. For each element in an input sequence z in R N by D, we compute a weighted sum over all values v in the sequence. The attention weights A i j are based on the pairwise similarity between two elements of the sequence and their respective query q i and key k j representations. Equation 5: q, k, v equals z U qkv, with U qkv in R D by 3 D h. Equation 6: A equals softmax of q k transpose over square root of D h, with A in R N by N. Equation 7: SA of z equals A v](/img/papers/vit/p2-appendix-a.png)](/img/papers/vit/p2-appendix-a.png)
->
-> **Context:** the first half of Appendix A, one attention head.
 >
 > **What it says:** for each element of the input $$\mathbf{z} \in \mathbb{R}^{N \times D}$$, "we compute a weighted sum over all values $$\mathbf{v}$$ in the sequence", with weights $$A_{ij}$$ "based on the pairwise similarity between two elements of the sequence and their respective query $$\mathbf{q}^i$$ and key $$\mathbf{k}^j$$ representations". Then Equations 5, 6 and 7.
 >
-> **Why it matters:** three lines define the one operation that lets tokens interact. Everything else in the model works on one token at a time.
+> **What it means:**
+>
+> Think of a library. Each token writes a question (its query), puts a label on its own shelf (its key), and keeps a book there (its value). A token compares its question with every label, and takes most from the books whose labels match best.
+>
+> Equations 5 to 7 are those steps, for one head. They define the one operation in the whole model that lets tokens interact. Everything else in ViT works on one token at a time.
 
 > [!DEFINITION] Query, key and value
 > Three vectors computed from each token by three linear projections. A token's **query** is what it is looking for; a token's **key** is what it offers to be matched against; its **value** is what it hands over when it is attended to. The weight from token $$i$$ to token $$j$$ is the similarity (dot product) of $$i$$'s query with $$j$$'s key.
@@ -795,14 +837,16 @@ where:
 
 This is Vaswani et al.'s Equation 1 with different letters:
 
-> [!PAPER] Vaswani et al. (2017), Attention Is All You Need · Section 3.2.1, Equation (1)
+> [!PAPER] Vaswani et al. (2017), Attention Is All You Need · §3.2.1, Equation (1)
 > [![Section 3.2.1 of Attention Is All You Need: in practice we compute the attention function on a set of queries simultaneously, packed together into a matrix Q; the keys and values are also packed into matrices K and V; Attention of Q, K, V equals softmax of Q K transpose over square root of d k, times V](/img/papers/vit/p2-ext-vaswani-eq1.png)](/img/papers/vit/p2-ext-vaswani-eq1.png)
->
-> **Context:** scaled dot-product attention in the original Transformer paper.
 >
 > **What it says:** queries are "packed together into a matrix $$Q$$", keys and values into $$K$$ and $$V$$, and $$\text{Attention}(Q, K, V) = \text{softmax}(QK^T/\sqrt{d_k})\,V$$.
 >
-> **Why it matters:** ViT's $$\mathbf{q}, \mathbf{k}, \mathbf{v}, D_h$$ are $$Q, K, V, d_k$$. The paper changed nothing here, as Section 3 promised.
+> **What it means:**
+>
+> This is scaled dot-product attention as the original Transformer paper writes it. Only the letters differ from ViT's Appendix A.
+>
+> ViT's $$\mathbf{q}, \mathbf{k}, \mathbf{v}, D_h$$ are $$Q, K, V, d_k$$. The paper changed nothing here, as Section 3 promised when it said it follows the original Transformer "as closely as possible".
 
 **A worked example small enough to check with a pencil.** Four tokens, $$D = 6$$, two heads, so $$D_h = 3$$, with small whole numbers chosen so the sums stay short ([`vit_part2_attn.py`](https://github.com/ishwar6/ishwar-books/blob/main/code/papers/vit/vit_part2_attn.py)). Head 1:
 
@@ -856,14 +900,16 @@ which the script checks the same way (`A[t0, t0] = 3.173 / 4.803 = 0.661`). And 
 
 ### Equation 8: many heads
 
-> [!PAPER] · Appendix A · page 13
+> [!PAPER] · Appendix A
 > [![The second half of Appendix A: multihead self-attention (MSA) is an extension of SA in which we run k self-attention operations, called heads, in parallel, and project their concatenated outputs. To keep compute and number of parameters constant when changing k, D h (Eq. 5) is typically set to D over k. Equation 8: MSA of z equals the concatenation of SA 1 of z to SA k of z, times U msa, with U msa in R k D h by D](/img/papers/vit/p2-appendix-msa.png)](/img/papers/vit/p2-appendix-msa.png)
->
-> **Context:** the second half of Appendix A.
 >
 > **What it says:** MSA runs "$$k$$ self-attention operations, called 'heads', in parallel", and projects "their concatenated outputs". "To keep compute and number of parameters constant when changing $$k$$, $$D_h$$ (Eq. 5) is typically set to $$D/k$$." Then Equation 8.
 >
-> **Why it matters:** the rule $$D_h = D/k$$ is why ViT-B has 12 heads of 64: $$768/12 = 64$$. It means that the choice of head count does not change the size of the model.
+> **What it means:**
+>
+> One head can learn one way of relating tokens, such as "look at your neighbour". Many heads side by side can learn many ways at once, like a team in which each member watches for something different.
+>
+> The rule $$D_h = D/k$$ keeps the size of the team fixed. That is why ViT-B has 12 heads of 64 numbers each: $$768/12 = 64$$. More heads means smaller heads, so the head count does not change the size of the model.
 
 $$
 \text{MSA}(\mathbf{z}) = [\text{SA}_1(\mathbf{z});\ \text{SA}_2(\mathbf{z});\ \cdots;\ \text{SA}_k(\mathbf{z})]\ \mathbf{U}_{msa}, \qquad \mathbf{U}_{msa} \in \mathbb{R}^{k \cdot D_h \times D}
@@ -881,11 +927,13 @@ Vaswani et al. draw it like this:
 > [!PAPER] Vaswani et al. (2017), Attention Is All You Need · Figure 2
 > [![Figure 2 of Attention Is All You Need. Left: scaled dot-product attention as a flow of MatMul, Scale, optional Mask, SoftMax, MatMul over Q, K, V. Right: multi-head attention, where V, K and Q each pass through h parallel linear layers into h scaled dot-product attention blocks whose outputs are concatenated and passed through a final linear layer](/img/papers/vit/p2-ext-vaswani-fig2.png)](/img/papers/vit/p2-ext-vaswani-fig2.png)
 >
-> **Context:** the original diagram of one head (left) and of multi-head attention (right).
->
 > **What it says:** multi-head attention "consists of several attention layers running in parallel". Each head has its own linear projections of $$V, K, Q$$; the heads are concatenated and go through one more linear layer.
 >
-> **Why it matters:** the right half is Equation 8 as a picture. The "Mask (opt.)" box in the left half is the one piece ViT never uses: every patch may see every patch.
+> **What it means:**
+>
+> This is the original drawing of one head (left) and of multi-head attention (right). The right half is Equation 8 as a picture: parallel heads, then a join, then one more linear layer.
+>
+> The "Mask (opt.)" box in the left half is the one piece ViT never uses. A model that writes text must hide the future words from each word. A picture has no future, so every patch may see every patch.
 
 The tiny example's second head and the join:
 
