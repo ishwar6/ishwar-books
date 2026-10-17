@@ -85,9 +85,15 @@ In Part 1 we wrote a layer as "every head adds its output to the stream". But th
 > [!PAPER] · Attention Heads are Independent and Additive
 > [![The paragraph showing that stacking result vectors and multiplying by W_O^H equals the sum of each head's W_O times its result](/img/papers/circuits/p2-independent.png)](/img/papers/circuits/p2-independent.png)
 >
-> **What it says:** the original transformer paper stacks the result vectors of all heads and multiplies them by one big output matrix $$W_{\mathrm{O}}^H$$. If you split $$W_{\mathrm{O}}^H$$ into one block per head, the big product turns into a sum: each head multiplies its own result by its own block, and the results are added.
+> **What it says:** the original transformer paper stacks the result vectors of all heads and multiplies them by one big output matrix $$W_{\mathrm{O}}^H$$. Split $$W_{\mathrm{O}}^H$$ into one block per head, and the big product turns into a sum. Each head multiplies its own result by its own block, and the results are added.
 >
-> **Why it matters:** the two ways give exactly the same numbers. The stacked way is faster on a GPU, because one big multiplication is cheaper than eight small ones. The sum way is easier to think about, because each head becomes a separate term that we can study alone.
+> **What it means:**
+>
+> Think of eight cooks who each add one ingredient to the same pot. They can hand all eight ingredients to one helper, who tips them in together. Or each cook can tip in their own. The soup is the same.
+>
+> The two ways give exactly the same numbers. The stacked way is faster on a GPU, because one big multiplication is cheaper than eight small ones. The sum way is easier to think about, because each head becomes a separate term that we can study alone.
+>
+> Code uses the first way, and the paper reasons with the second. The derivation below shows why they agree.
 
 ### The derivation
 
@@ -142,9 +148,13 @@ If heads work alone, what does each one do? The paper's answer is short.
 > [!PAPER] · Attention Heads as Information Movement
 > [![The paragraph stating that the fundamental action of attention heads is moving information, and that where to move from is separable from what is moved](/img/papers/circuits/p2-moving.png)](/img/papers/circuits/p2-moving.png)
 >
-> **What it says:** "The fundamental action of attention heads is moving information." A head reads from the stream of one token and writes into the stream of another. The main point of the section is that **which tokens** the information comes from is "completely separable" from **what information** is read and how it is written.
+> **What it says:** "The fundamental action of attention heads is moving information." A head reads from the stream of one token and writes into the stream of another. **Which tokens** the information comes from is "completely separable" from **what information** is read and how it is written.
 >
-> **Why it matters:** this is the idea behind the whole part. A head has a "where" part and a "what" part, and the two can be studied apart. The rest of the section turns this sentence into an equation.
+> **What it means:**
+>
+> Think of a librarian who carries a page from one book to another. Two questions describe each trip: which book did the page come from, and what was written on it? The paper says that inside a head, these two questions have separate answers.
+>
+> This is the idea behind the whole part. A head has a "where" part and a "what" part, and the two can be studied apart. The rest of the section turns this sentence into an equation.
 
 Remember from Part 1 that every position has its own residual stream. Before attention, the stream at position 9 only knows about token 9. A head is the only part of this model that can carry information **across** positions. The paper draws it like this:
 
@@ -153,7 +163,11 @@ Remember from Part 1 that every position has its own residual stream. Before att
 >
 > **What it says:** attention heads copy information from the residual stream of one token to the residual stream of another. "They typically write to a different subspace than they read from."
 >
-> **Why it matters:** the band leaves token A's stream from one lane and enters token B's stream in another lane. So a head does not just copy numbers; it can also move them to a new place in the stream. We will measure this on the real model later.
+> **What it means:**
+>
+> Follow the band in the drawing. It leaves token A's stream from one lane and enters token B's stream in another lane. So a head does not only copy numbers between tokens. It can also move them to a new place in the stream.
+>
+> Token B's stream already holds information about token B. When the copied message goes into a different subspace, it does not get mixed up with what was there. We measure this on the real model later in this part.
 
 ### The three steps
 
@@ -162,9 +176,15 @@ The paper then writes a head as three steps. These are the same equations as in 
 > [!PAPER] · Attention Heads as Information Movement
 > [![The three steps of an attention head: compute value vectors, mix them with the attention pattern, project out with W_O; and the remark that x is multiplied on different sides](/img/papers/circuits/p2-three-steps.png)](/img/papers/circuits/p2-three-steps.png)
 >
-> **What it says:** given an attention pattern, a head (1) computes a value vector for each token, $$v_i=W_{\mathrm{V}} x_i$$, (2) mixes the value vectors with the pattern, $$r_i=\sum_j A_{ij}v_j$$, and (3) computes the output for each token, $$h(x)_i=W_{\mathrm{O}} r_i$$. If we treat $$x$$ as a table with one vector per token, then $$W_{\mathrm{V}}$$ and $$W_{\mathrm{O}}$$ multiply it on one side and $$A$$ multiplies it on the other.
+> **What it says:** given an attention pattern, a head works in three steps. (1) It computes a value vector for each token, $$v_i=W_{\mathrm{V}} x_i$$. (2) It mixes the value vectors with the pattern, $$r_i=\sum_j A_{ij}v_j$$. (3) It computes the output for each token, $$h(x)_i=W_{\mathrm{O}} r_i$$. Treat $$x$$ as a table with one vector per token: $$W_{\mathrm{V}}$$ and $$W_{\mathrm{O}}$$ multiply it on one side, and $$A$$ on the other.
 >
-> **Why it matters:** step 1 and step 3 act on each token separately. Step 2 is the only step that moves anything between tokens. That is the separation the paper promised.
+> **What it means:**
+>
+> Picture three machines in a row in a post office. The first stamps each parcel on its own. The second is the only one that moves parcels between addresses. The third stamps each parcel again, on its own.
+>
+> Step 1 and step 3 act on each token separately. Step 2 is the only step that moves anything between tokens. That is the separation the paper promised: $$A$$ handles "where", and $$W_{\mathrm{V}}$$ and $$W_{\mathrm{O}}$$ handle "what".
+>
+> The last sentence, about multiplying $$x$$ on different sides, is the key to the tensor notation later in this part.
 
 Let us run the three steps by hand on a tiny head. The stream has 3 numbers per token, and there are 3 tokens. The head has $$d_\text{head}=1$$, so every value is a single number. Its matrices are $$W_{\mathrm{V}}=(1,1,0)$$, which adds up dimensions 1 and 2, and $$W_{\mathrm{O}}=(0,0,1)^\top$$, which writes into dimension 3. The attention pattern is given.
 
@@ -205,7 +225,7 @@ Out of 48,262 tokens, the one this head pushes up most is " tea". The head moved
 
 ## The two sides of x, and the tensor product {§Attention Heads as Information Movement}
 
-The paper now asks a natural question. Each of the three steps is a matrix multiplication, so why not collapse them into one step? The answer needs one new piece of notation, the tensor product. This section explains it without any jargon.
+The paper now asks a natural question. Each of the three steps is a matrix multiplication, so why not collapse them into one step? The answer needs one new piece of notation, the tensor product.
 
 ### x is a table, and it has two sides
 
@@ -270,9 +290,15 @@ The appendix of the paper lists the practical rules:
 >
 > **What it says:** $$\text{Id}\otimes W$$ multiplies every position by $$W$$, and $$A\otimes\text{Id}$$ multiplies across positions. $$A\otimes W$$ does both, and "it doesn't matter which order you do this in". Tensor products also obey the mixed-product property.
 >
-> **Why it matters:** these four rules are all the tensor algebra the paper needs. The order rule is the formal version of "the where part and the what part are independent".
+> **What it means:**
+>
+> Think of a spreadsheet with one row per token and one column per dimension. $$\text{Id}\otimes W$$ edits every row in the same way and leaves the rows where they are. $$A\otimes\text{Id}$$ mixes whole rows and leaves the meaning of each column alone.
+>
+> The two act on different sides of the table, so they do not get in each other's way. That is why the order does not matter. The order rule is the formal version of "the where part and the what part are independent".
+>
+> These rules, with the mixed-product property, are all the tensor algebra the paper needs.
 
-Why does the order not matter? Matrix multiplication is associative: $$(A\,x)\,W^\top$$ and $$A\,(x\,W^\top)$$ are the same table. So you can mix first and transform second, or the other way round. Here is a toy with two tokens and two dimensions. $$A$$ lets token 2 take half of each token, and $$W$$ swaps the two numbers of a token.
+In symbols, the order does not matter because matrix multiplication is associative: $$(A\,x)\,W^\top$$ and $$A\,(x\,W^\top)$$ are the same table. So you can mix first and transform second, or the other way round. Here is a toy with two tokens and two dimensions. $$A$$ lets token 2 take half of each token, and $$W$$ swaps the two numbers of a token.
 
 {{FIG:p2_tensor|The tensor product on a two-token toy. Top: first W swaps each token's two numbers, giving (2, 1) and (4, 3), then A lets token 2 take half of each token, giving (2, 1) and (3, 2). Bottom: first A mixes, giving (1, 2) and (2, 3), then W swaps, giving the same (2, 1) and (3, 2).}}
 
@@ -289,11 +315,17 @@ The flat view is correct, but it hides the structure, so the paper (and this ser
 > [!PAPER] · Attention Heads as Information Movement
 > [![The head written as a product of three tensor products, then collapsed by the mixed product property into A ⊗ W_O W_V](/img/papers/circuits/p2-tensor.png)](/img/papers/circuits/p2-tensor.png)
 >
-> **What it says:** a head is three tensor products in a row: compute the values ($$\text{Id}\otimes W_{\mathrm{V}}$$), mix them across tokens ($$A\otimes\text{Id}$$), and project the results out ($$\text{Id}\otimes W_{\mathrm{O}}$$). "Applying the mixed product property and collapsing identities" gives $$h(x)=(A\otimes W_{\mathrm{O}} W_{\mathrm{V}})\,x$$.
+> **What it says:** a head is three tensor products in a row. It computes the values ($$\text{Id}\otimes W_{\mathrm{V}}$$), mixes them across tokens ($$A\otimes\text{Id}$$) and projects the results out ($$\text{Id}\otimes W_{\mathrm{O}}$$). "Applying the mixed product property and collapsing identities" gives $$h(x)=(A\otimes W_{\mathrm{O}} W_{\mathrm{V}})\,x$$.
 >
-> **Why it matters:** the final line shows the whole head as one pair: a pattern $$A$$ and a matrix $$W_{\mathrm{O}} W_{\mathrm{V}}$$. This is the paper's main way of writing a head from now on.
+> **What it means:**
+>
+> Think of two currency changes in a row: dollars to euros, then euros to yen. A bank can replace them with one direct rate from dollars to yen. Here $$W_{\mathrm{V}}$$ and $$W_{\mathrm{O}}$$ are the two changes, and $$W_{\mathrm{O}} W_{\mathrm{V}}$$ is the direct rate.
+>
+> The pattern $$A$$ sits between them, but it works on the other side of the table. So it can step out of the way, and the two per-token matrices meet. The final line shows the whole head as one pair: a pattern $$A$$ and a matrix $$W_{\mathrm{O}} W_{\mathrm{V}}$$.
+>
+> This is the paper's main way of writing a head from now on. The paper skips the algebra, so we fill it in below.
 
-The paper skips the algebra, so let us fill it in. The three steps, read from right to left, are:
+The three steps, read from right to left, are:
 
 $$
 \begin{aligned}
@@ -367,7 +399,13 @@ We have collapsed the "what" part. The paper does the same for the "where" part,
 >
 > **What it says:** normally one computes keys and queries and then their dot products. "But we can do it all in one step without referring to keys and queries": $$A=\text{softmax}(x^\top {W_{\mathrm{Q}}}^{\top} W_{\mathrm{K}}\,x)$$. The paper adds that actually computing a head this way would be "horribly inefficient".
 >
-> **Why it matters:** the pattern depends on $$W_{\mathrm{Q}}$$ and $$W_{\mathrm{K}}$$ only through one product. Queries and keys are a way to compute it, not something the head needs.
+> **What it means:**
+>
+> Think of a matchmaker who scores every pair of people. One way is to give each person a wish list (the query) and a profile (the key), then compare the two. Another way is one big chart that gives the score of every pair directly. Both ways give the same scores.
+>
+> So the pattern depends on $$W_{\mathrm{Q}}$$ and $$W_{\mathrm{K}}$$ only through one product. Queries and keys are a way to compute it, not something the head needs.
+>
+> The big chart is slow to use, which is why the paper calls it "horribly inefficient". But for reading a head, the chart is the natural object. We come back to the cost after the derivation.
 
 ### The derivation
 
@@ -429,11 +467,15 @@ The first observation repeats the main idea: heads move information from one tok
 > [!PAPER] · Observations about Attention Heads
 > [![The observations: an attention head applies two linear operations A and W_O W_V, A governs which tokens, W_O W_V governs which information; A is the only non-linear part](/img/papers/circuits/p2-two-operations.png)](/img/papers/circuits/p2-two-operations.png)
 >
-> **What it says:** a head applies two linear operations, $$A$$ and $$W_{\mathrm{O}} W_{\mathrm{V}}$$, which act on different dimensions. $$A$$ "governs which token's information is moved from and to", and $$W_{\mathrm{O}} W_{\mathrm{V}}$$ "governs which information is read from the source token and how it is written to the destination token". $$A$$ is "the only non-linear part", because it comes from a softmax. So if the pattern is held fixed, the head is linear, and the paper calls heads "half-linear".
+> **What it says:** a head applies two linear operations, $$A$$ and $$W_{\mathrm{O}} W_{\mathrm{V}}$$, which act on different dimensions. $$A$$ "governs which token's information is moved from and to". $$W_{\mathrm{O}} W_{\mathrm{V}}$$ "governs which information is read from the source token and how it is written to the destination token". $$A$$ is "the only non-linear part", because it comes from a softmax. So if the pattern is held fixed, the head is linear, and the paper calls heads "half-linear".
 >
-> **Why it matters:** this gives the two circuits their jobs. It also gives a tool: if you record a head's pattern and then hold it fixed, everything else is plain matrix multiplication. Part 4 uses this "freezing" trick on the one-layer model.
-
-Why is the head non-linear at all? Because the pattern is computed from the input. If you double $$x$$, the scores grow four times (both $$x_i$$ and $$x_j$$ double), and the softmax of the new scores is a different pattern. But once $$A$$ is fixed, $$h(x)=A\,x\,{W_{\mathrm{OV}}}^{\top}$$ is linear in $$x$$: doubling $$x$$ doubles the output.
+> **What it means:**
+>
+> Think of a sound mixer. The sliders decide how loud each channel is, and the channels are added. If someone sets the sliders and walks away, the output is a sum of the inputs, each scaled. The sliders are $$A$$.
+>
+> Why is the head non-linear at all? Because the pattern is computed from the input. If you double $$x$$, the scores grow four times, because both $$x_i$$ and $$x_j$$ double. The softmax of the new scores is a different pattern. But once $$A$$ is fixed, $$h(x)=A\,x\,{W_{\mathrm{OV}}}^{\top}$$ is linear in $$x$$: doubling $$x$$ doubles the output.
+>
+> This gives the two circuits their jobs, and it gives a tool. Record a head's pattern and hold it fixed, and everything else is matrix multiplication. Part 4 uses this "freezing" trick on the one-layer model.
 
 ### W_OV and W_QK are low-rank
 
@@ -480,9 +522,15 @@ Every head scores between 0.120 and 0.176, close to the random 0.125. So the hea
 > [!PAPER] · Observations about Attention Heads
 > [![The observations that W_Q and W_K always operate together, that keys, queries and values are superficial, and the definitions of W_OV and W_QK](/img/papers/circuits/p2-always-together.png)](/img/papers/circuits/p2-always-together.png)
 >
-> **What it says:** $$W_{\mathrm{Q}}$$ and $$W_{\mathrm{K}}$$ "always operate together", and so do $$W_{\mathrm{O}}$$ and $$W_{\mathrm{V}}$$. So "keys, queries and value vectors are, in some sense, superficial". They are by-products of computing two low-rank matrices, and "one could easily reparametrize" the factors to get different vectors that work identically. That is why the paper names the products $$W_{\mathrm{OV}}=W_{\mathrm{O}} W_{\mathrm{V}}$$ and $$W_{\mathrm{QK}}={W_{\mathrm{Q}}}^{\top} W_{\mathrm{K}}$$.
+> **What it says:** $$W_{\mathrm{Q}}$$ and $$W_{\mathrm{K}}$$ "always operate together", and so do $$W_{\mathrm{O}}$$ and $$W_{\mathrm{V}}$$. So "keys, queries and value vectors are, in some sense, superficial", and "one could easily reparametrize" them. The paper names the products $$W_{\mathrm{OV}}=W_{\mathrm{O}} W_{\mathrm{V}}$$ and $$W_{\mathrm{QK}}={W_{\mathrm{Q}}}^{\top} W_{\mathrm{K}}$$.
 >
-> **Why it matters:** the familiar story of queries, keys and values describes one of infinitely many equal ways to split the same two matrices. Only the products are fixed by what the head does, so only the products deserve to be interpreted.
+> **What it means:**
+>
+> Think of the number 12. You can write it as 3 × 4, as 2 × 6 or as 24 × 0.5. The factors are a choice; only the product is fixed. $$W_{\mathrm{O}} W_{\mathrm{V}}$$ works the same way: many pairs of factors give the same product.
+>
+> Queries, keys and values are by-products of one such choice. The familiar story about them describes one of infinitely many equal ways to split the same two low-rank matrices. Swap the factors for another pair with the same product, and you get different vectors that work identically.
+>
+> Only the products are fixed by what the head does, so only the products deserve to be interpreted. Below, "reparametrize" becomes exact, and then we test it on the real head.
 
 What does "reparametrize" mean? Take any invertible 64 × 64 matrix $$M$$. Replace $$W_{\mathrm{V}}$$ by $$M\,W_{\mathrm{V}}$$ and $$W_{\mathrm{O}}$$ by $$W_{\mathrm{O}} M^{-1}$$. The value vectors are now completely different. But their product is unchanged:
 
@@ -524,14 +572,20 @@ The result has the same shape as one head: a pattern $$A^2A^1$$ and an OV matrix
 
 ## From weights to tokens: the QK and OV circuits {§Splitting Attention Head terms into Query-Key and Output-Value Circuits}
 
-So far $$W_{\mathrm{QK}}$$ and $$W_{\mathrm{OV}}$$ act on the 512-number stream. A stream vector is hard to read. A token is easy to read. The paper's last step for a single head is to attach the embedding and the unembedding, so that both matrices go from tokens to tokens.
+The paper's last step for a single head turns both matrices into tables of tokens.
 
 > [!PAPER] · Splitting Attention Head terms into Query-Key and Output-Value Circuits
 > [![The paper's figure of the OV circuit W_U W_O W_V W_E from a source token to the output, and the QK circuit W_E^T W_Q^T W_K W_E from the source and destination tokens to an attention score](/img/papers/circuits/p2-circuits-fig.png)](/img/papers/circuits/p2-circuits-fig.png)
 >
 > **What it says:** the **OV ("output-value") circuit**, $$W_{\mathrm{U}} W_{\mathrm{O}} W_{\mathrm{V}} W_{\mathrm{E}}$$, "determines how attending to a given token affects the logits". The **QK ("query-key") circuit**, $${W_{\mathrm{E}}}^{\top} {W_{\mathrm{Q}}}^{\top} W_{\mathrm{K}} W_{\mathrm{E}}$$, "controls which tokens the head prefers to attend to". Each one is a path through the model that starts and ends at tokens.
 >
-> **Why it matters:** each circuit is a table indexed by tokens, so a person can read it. The paper defines them inside its study of the one-layer model; here we only build them and read one head. Part 4 reads them as skip-trigrams.
+> **What it means:**
+>
+> So far $$W_{\mathrm{QK}}$$ and $$W_{\mathrm{OV}}$$ act on the 512-number stream, and a stream vector is hard to read. A token is easy to read. Attach the embedding at the start and the unembedding at the end, and both matrices become tables with a token on each side.
+>
+> The OV circuit answers one question: "if the head reads this token, which next tokens go up?" The QK circuit answers another: "standing on this token, which earlier tokens does the head want to read?"
+>
+> The paper defines them inside its study of the one-layer model. Here we only build them and read one head. Part 4 reads them as skip-trigrams.
 
 ### The derivation
 

@@ -1,7 +1,7 @@
 ---
 title: "A Mathematical Framework for Transformer Circuits"
 short: Circuits
-description: "The 2021 paper that started reverse-engineering transformers by hand. It writes a small attention-only model as a sum of simple pieces you can read straight from the weights: bigram tables, skip-trigrams and induction heads. Explained in plain English, with every equation derived, the paper's own figures, and real code on small open models."
+description: "The 2021 paper that started reverse-engineering transformers by hand. It writes a small attention-only model as a sum of simple pieces you can read straight from the weights: bigram tables, skip-trigrams and induction heads. Every equation is derived step by step, next to the paper's own figures and real code on small open models."
 authors: [Nelson Elhage, Neel Nanda, Catherine Olsson, Tom Henighan, Nicholas Joseph, Ben Mann, Amanda Askell, Yuntao Bai, Anna Chen, Tom Conerly, Nova DasSarma, Dawn Drain, Deep Ganguli, Zac Hatfield-Dodds, Danny Hernandez, Andy Jones, Jackson Kernion, Liane Lovitt, Kamal Ndousse, Dario Amodei, Tom Brown, Jack Clark, Jared Kaplan, Sam McCandlish, Chris Olah]
 org: Anthropic
 year: 2021
@@ -41,7 +41,7 @@ The paper also gave the field its vocabulary: the **residual stream**, **virtual
 
 ## How to read the boxes
 
-- A **teal "From the paper" box** shows the exact words of the paper as a highlighted screenshot (click it to open it full size), followed by **what it says** in plain English and **why it matters**.
+- A **teal "From the paper" box** shows the exact words of the paper as a highlighted screenshot (click it to open it full size), followed by **what it says**, the main words of the paper, and **what it means**, an explanation of those lines and of what the authors mean but do not write.
 - A **yellow definition box** explains a technical word the first time it appears. If you already know the word, skip the box.
 - The small tag above a heading names the section of the paper you are reading, so you can follow along on the paper's web page.
 - A **green "Key takeaways" box** ends every part with what to remember.

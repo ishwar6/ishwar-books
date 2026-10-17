@@ -13,21 +13,27 @@ In December 2021, a team at Anthropic published a long web article, *A Mathemati
 
 This part covers the paper's setup: what "mechanistic interpretability" means, which parts of a transformer the paper removes, the whole model in four equations, the **residual stream** that every layer reads from and writes to, and why a transformer with zero layers can only learn **bigrams** (word pairs).
 
-Each idea follows the same pattern: the paper's own words as a highlighted screenshot in a teal box; a plain-English explanation, with a yellow box for every new word; the maths, derived one step at a time with a small example you can check by hand; and the same idea on a real model, with real code and its real output. The models are small public ones, run with the TransformerLens library on the CPU of an Apple M5 Pro (64 GB).
+Each idea follows the same pattern: the paper's own words as a highlighted screenshot in a teal box, with what they mean; a yellow box for every new word; the maths, derived one step at a time with a small example you can check by hand; and the same idea on a real model, with real code and its real output. The models are small public ones, run with the TransformerLens library on the CPU of an Apple M5 Pro (64 GB).
 
 > [!DEFINITION] Definition boxes
-> A yellow box like this explains one technical word in plain language, the first time it appears. If you already know the word, skip the box.
+> A yellow box like this explains one technical word, the first time it appears. If you already know the word, skip the box.
 
 ## The paper {§Title}
 
 > [!PAPER] · Title and authors
 > [![The title, authors, affiliation (Anthropic) and date (Dec 22, 2021) of the paper](/img/papers/circuits/p1-title.png)](/img/papers/circuits/p1-title.png)
 >
-> **What it says:** the paper has twenty-five authors from Anthropic and is dated 22 December 2021. The marks after the names flag the core research contributors (Elhage, Nanda, Olsson), the core infrastructure contributors and the contact author (Chris Olah).
+> **What it says:** the key word of the title is "framework". Twenty-five authors from Anthropic wrote it, and it is dated 22 December 2021.
 >
-> **Why it matters:** the title promises a "framework", a way of writing transformers down so they can be read, not a new model. The findings (bigrams, skip-trigrams, induction heads) fall out of that new way of writing. It was also the first article of a long series from the same group: induction heads (2022), superposition (2022), sparse autoencoders (2023 and 2024) and circuit tracing (2025) all build on the vocabulary set out here.
+> **What it means:**
+>
+> A framework is not a new machine. It is a new way to write an old machine down. Think of a map of the city you already live in: the streets stay the same, but now you can find your way.
+>
+> So the paper does not train a new kind of model. It writes the usual transformer in a different but exactly equal form, a set of equations and names that a person can read. The findings (bigrams, skip-trigrams, induction heads) are not added on top. They fall out of that new way of writing.
+>
+> The same vocabulary then carried a long series from the same group. Induction heads (2022), superposition (2022), sparse autoencoders (2023 and 2024) and circuit tracing (2025) all build on the words set out here.
 
-A **circuit** is a small part of a network that does one understandable job, such as "after the word *Barack*, predict *Obama*". The word comes from earlier work on image models, the Distill *Circuits* thread, which found such parts inside an image network. A **framework** is a set of equations and names: the paper does not train a new kind of model, it writes the usual one in a different but equal form.
+A **circuit** is a small part of a network that does one understandable job, such as "after the word *Barack*, predict *Obama*". The word comes from earlier work on image models, the Distill *Circuits* thread, which found such parts inside an image network.
 
 > [!DEFINITION] Token
 > One unit of text that a language model reads. A token is a word, a piece of a word, or a symbol. " Barack" (with its leading space) is one token. "Dursley" might be three: "D", "urs", "ley". The model never sees letters, only token numbers.
@@ -42,9 +48,13 @@ A **circuit** is a small part of a network that does one understandable job, suc
 >
 > **What it says:** large language models keep surprising their own builders: new abilities and harmful behaviours are sometimes found years after training. One answer is **mechanistic interpretability**: reverse-engineering "the detailed computations performed by transformers", the way a programmer turns binaries back into source code.
 >
-> **Why it matters:** it sets the goal. The goal is not a rough story ("the model looks at *Barack*") but the exact computation, in a form a person can read.
-
-A **compiler** turns readable source code into a binary file that a computer runs but a person cannot read. If you only have the binary, you **reverse engineer** it: work back from the bytes to what the program does. A trained transformer is in the same place. Training is the compiler, the weights are the binary, and nobody ever wrote the source code. Mechanistic interpretability tries to recover it.
+> **What it means:**
+>
+> A **compiler** turns readable source code into a binary file that a computer runs but a person cannot read. If you only have the binary, you **reverse engineer** it: you work back from the bytes to what the program does.
+>
+> A trained transformer is in the same place. Training is the compiler, the weights are the binary, and nobody ever wrote the source code. Mechanistic interpretability tries to recover it.
+>
+> This sets a high goal. A rough story, such as "the model looks at *Barack*", is not enough. The goal is the exact computation, in a form a person can read.
 
 {{FIG:p1_reverse|This is the comparison the paper makes. At the top, a compiler turns readable source code into an unreadable binary (the bytes shown are the real first bytes of the Python program), and reverse engineering goes back. At the bottom, training turns an unknown algorithm into weights (the 52 million numbers of the two-layer model we use; the first three are shown), and mechanistic interpretability tries to go back.}}
 
@@ -79,9 +89,15 @@ The paper's summary of results has one finding per model size:
 > [!PAPER] · Model Simplifications
 > [![The Model Simplifications paragraphs: attention-only transformers, no biases, no layer normalization](/img/papers/circuits/p1-simplifications.png)](/img/papers/circuits/p1-simplifications.png)
 >
-> **What it says:** the paper makes one big change: it removes the MLP layers, partly because the authors "had much less success in understanding MLP layers". It also makes two small changes. It removes biases and layer norm, because both fold into the weights.
+> **What it says:** the paper makes one big change: it removes the MLP layers. One reason is that the authors "had much less success in understanding MLP layers". It also makes two small changes. It removes biases and layer norm, because both fold into the weights.
 >
-> **Why it matters:** without MLPs and layer norm, almost every step is a matrix multiplication or an addition. That is what lets the model split into a sum of pieces.
+> **What it means:**
+>
+> Think of a recipe with only two kinds of steps: "multiply by" and "add". You can merge and reorder such steps freely, and the dish stays the same. Without MLPs and layer norm, almost every step in the model is a matrix multiplication or an addition.
+>
+> That is the property the whole paper needs. It lets the model split into a sum of pieces that can each be read alone. A non-linear step in the middle would mix the pieces, and the split would fail.
+>
+> The three changes do not cost the same. The big one is a real loss; the two small ones cost almost nothing. The next three sections take them one at a time.
 
 A normal transformer layer (GPT-2, for example) has layer normalization, attention heads, an MLP, and biases inside each. The paper keeps only the attention heads.
 
@@ -151,7 +167,13 @@ Now the model itself. The paper studies **autoregressive, decoder-only** transfo
 >
 > **What it says:** a transformer "starts with a token embedding, followed by a series of residual blocks, and finally a token unembedding". The drawing writes this as four equations, bottom to top: embed, add every head's output, add the MLP's output, unembed.
 >
-> **Why it matters:** every block takes its input from the vertical line and puts its output back with a "+". That line is the **residual stream**, and the paper is built on it. Attention-only models have no MLP row.
+> **What it means:**
+>
+> Read the drawing from the bottom up. The token enters at the bottom and becomes a vector. One vertical line then carries that vector to the top, where it becomes a score for every possible next token.
+>
+> Every block on the way takes its input from that line and puts its output back with a "+". No block replaces the vector; each one only adds to it. That line is the **residual stream**, and the whole paper is built on it.
+>
+> The drawing has a row for MLPs. Attention-only models do not have that row, so for us only the attention row stays.
 
 We now go through the equations one at a time. The real model we use is `attn-only-2l` from TransformerLens: two layers, eight heads per layer, trained on web text and code in the style of the paper. Here are its sizes:
 
@@ -317,9 +339,15 @@ Here is the whole real model in one picture, with the paper's shapes.
 > [!PAPER] · Virtual Weights and the Residual Stream as a Communication Channel
 > [![The paragraph defining the residual stream as the sum of all previous outputs and a communication channel](/img/papers/circuits/p1-residual-stream.png)](/img/papers/circuits/p1-residual-stream.png)
 >
-> **What it says:** the residual stream "is simply the sum of the output of all the previous layers and the original embedding", and a "communication channel" that does no processing itself.
+> **What it says:** the residual stream "is simply the sum of the output of all the previous layers and the original embedding". It is a "communication channel" that does no processing itself.
 >
-> **Why it matters:** the usual picture is a pipeline, each layer transforming the data in turn. The paper's picture is a shared whiteboard: every layer reads the same board and writes on it, and what is written stays for every later layer.
+> **What it means:**
+>
+> The usual picture of a deep network is a pipeline. Each layer takes the data, changes it and hands it on, like workers on an assembly line.
+>
+> The paper's picture is a shared whiteboard in a meeting room. Every layer reads the same board and writes on it. What one layer writes stays there for every later layer, unless another layer wipes it.
+>
+> So the stream itself does no work. It only carries messages between layers. The derivation below shows that this picture is exact, not only a comparison.
 
 ### Derivation: the stream is a sum
 
@@ -435,9 +463,11 @@ It looks back at the "ley" that followed "urs" the first time, and pushes "ley" 
 >
 > **What it says:** every layer reads with one linear map and writes, by adding, with another. One consequence is that the stream "doesn't have a privileged basis".
 >
-> **Why it matters:** "linear" lets us multiply matrices across layers (virtual weights, next); "additive" lets us split the stream into pieces (what we just did).
-
-What does "no privileged basis" mean? The model never looks at single dimensions of the stream on their own: it only reads through matrices and writes by adding. So we can rotate the whole stream, rotate every matrix that touches it to match, and the output stays the same.
+> **What it means:**
+>
+> "Linear" and "additive" are two different gifts. Linear means each layer reads with a matrix, so we can multiply matrices across layers: the virtual weights of the next section. Additive means each layer writes by adding, so we can split the stream into pieces, as we just did.
+>
+> "No privileged basis" follows from the same two facts. The model never looks at one dimension of the stream on its own. It only reads through matrices and writes by adding. So we can rotate the whole stream, rotate every matrix that touches it to match, and the output stays the same.
 
 > [!DEFINITION] Basis and privileged basis
 > A **basis** is a set of directions used to write a vector as a list of numbers; the usual one is "dimension 1, dimension 2, ...". A basis is **privileged** when the model treats those exact directions specially, for example by applying a function to each number on its own (as an MLP's GeLU does). The residual stream has no such function, so no direction is special: dimension 7 means nothing by itself.
@@ -470,9 +500,15 @@ exactly what it saw before. A writer $$W_{\mathrm{O}}$$ becomes $$R\,W_{\mathrm{
 > [!PAPER] · Virtual Weights
 > [![The paper's figure of layers reading and writing the residual stream, and virtual weights such as W_I^3 W_O^1](/img/papers/circuits/p1-virtual-weights-fig.png)](/img/papers/circuits/p1-virtual-weights-fig.png)
 >
-> **What it says:** each layer reads with $$W_{\mathrm{I}}$$ and writes with $$W_{\mathrm{O}}$$. Because both are linear, you can "multiply through" the stream: the product of one layer's output weights with a later layer's input weights, such as $$W_{\mathrm{I}}^2W_{\mathrm{O}}^1$$, is a **virtual weight** that connects the two layers directly. $$W_{\mathrm{I}}^3W_{\mathrm{O}}^1$$ connects layer 1 to layer 3, even with layer 2 in between.
+> **What it says:** each layer reads with $$W_{\mathrm{I}}$$ and writes with $$W_{\mathrm{O}}$$. Because both are linear, one can "multiply through" the stream. Products such as $$W_{\mathrm{I}}^2W_{\mathrm{O}}^1$$ are **"virtual weights"** that connect two layers directly.
 >
-> **Why it matters:** it finds which layers talk to which by multiplying two weight matrices, without running the model.
+> **What it means:**
+>
+> Think of two people who never meet but share a mailbox. One drops letters in through one slot, and the other reads them through another slot. What the reader gets from the writer depends on the two slots together. The virtual weight is those two slots, multiplied into one matrix.
+>
+> The product acts like a wire from the earlier layer to the later one, though no such wire exists in the code. It also skips layers: $$W_{\mathrm{I}}^3W_{\mathrm{O}}^1$$ connects layer 1 to layer 3, even with layer 2 in between.
+>
+> So we can find which layers talk to which by multiplying two weight matrices, without running the model. The derivation below shows where the product comes from.
 
 ### Reading and writing, as equations
 
@@ -567,9 +603,15 @@ There are three things to see. There is one 64 × 64 virtual weight for each of 
 > [!PAPER] · Subspaces and Residual Stream Bandwidth
 > [![The paper's figure of subspaces of the residual stream: shared, disjoint, and deleting information](/img/papers/circuits/p1-subspaces-fig.png)](/img/papers/circuits/p1-subspaces-fig.png)
 >
-> **What it says:** the stream has hundreds of dimensions in small models and tens of thousands in big ones, so "layers can send different information to different layers by storing it in different subspaces". Layers interact only through shared subspaces; with separate subspaces they do not interact. A layer can also **delete** information by reading a subspace and writing back the negative.
+> **What it says:** the stream has hundreds of dimensions in small models and tens of thousands in big ones. So "layers can send different information to different layers by storing it in different subspaces". Layers interact only through shared subspaces. A layer can also **delete** information by reading a subspace and writing back the negative.
 >
-> **Why it matters:** it generalises the toy above: reader B did not hear the writer because they used different subspaces.
+> **What it means:**
+>
+> Think of the stream as a road with 512 lanes. One layer writes in lanes 1 to 10, and a later layer reads lanes 1 to 10. Another pair of layers uses lanes 300 to 310. Both conversations share the road, but neither hears the other. In a real model the lanes are directions, not single dimensions, but the idea is the same.
+>
+> This is the toy above in general form. Reader B did not hear the writer because they used different subspaces: the writer wrote dimension 3, and reader B read dimension 1. Their virtual weight was 0.
+>
+> Deleting uses the same lanes. A layer reads a subspace and writes back the negative, so the sum there becomes zero and the lane is free again.
 
 > [!DEFINITION] Subspace
 > A subspace is a "flat" part of a vector space that passes through zero: all the vectors you can make by adding and scaling a few chosen directions. In our toy, "dimension 3 only" is a 1-dimensional subspace. A head that writes through a 512 × 64 matrix can only write into a subspace of at most 64 dimensions.
@@ -582,9 +624,15 @@ Once a layer writes something, it stays "unless another layer actively deletes i
 > [!PAPER] · Subspaces and Residual Stream Bandwidth
 > [![The paragraphs on residual stream bandwidth being in high demand, and memory management](/img/papers/circuits/p1-bandwidth.png)](/img/papers/circuits/p1-bandwidth.png)
 >
-> **What it says:** "we should expect residual stream bandwidth to be in very high demand": in the middle of a 50-layer model, about 100 times more neurons write before that point than the stream has dimensions. So some neurons and heads may do **"memory management"**, clearing dimensions by writing the negative of what they read.
+> **What it says:** "we should expect residual stream bandwidth to be in very high demand". In the middle of a 50-layer model, about 100 times more neurons write before that point than the stream has dimensions. So some neurons and heads may do **"memory management"**, clearing dimensions by writing the negative of what they read.
 >
-> **Why it matters:** a crowded stream is hard to read directly, which is why the paper studies virtual weights (the channels between layers) instead.
+> **What it means:**
+>
+> Imagine an office where 100 people share one small whiteboard. Space runs out fast. People write small, write over each other and wipe old notes. The paper expects the same in the middle of a big model.
+>
+> "Memory management" is the wiping. Some heads or neurons may exist only to read a subspace and write its negative, so that a later layer can reuse the space.
+>
+> A crowded board is hard to read by looking at it directly. That is why the paper studies virtual weights, the channels between layers, and not the stream itself. Below we count how crowded our own models are.
 
 We counted the same numbers for our models. "Head outputs" is the number of heads times 64 (each head computes 64 numbers before writing); "MLP neurons" is 3,072 per layer in GPT-2 small.
 
@@ -614,7 +662,13 @@ Now we can read the first real result of the paper. It is short, and everything 
 >
 > **What it says:** a zero-layer model is $$T=W_{\mathrm{U}} W_{\mathrm{E}}$$, and the best it can do is "approximate the bigram log-likelihood". The same term sits inside every transformer as the **direct path**, often storing pairs like "Barack" followed by "Obama".
 >
-> **Why it matters:** it is the simplest circuit: one matrix product, read straight from the weights.
+> **What it means:**
+>
+> A zero-layer model sees only the current token and nothing before it. So the best it can do is a lookup table: "after this token, these tokens are likely". That is a bigram table.
+>
+> The table is one matrix product, $$W_{\mathrm{U}} W_{\mathrm{E}}$$, read straight from the weights. It is the simplest circuit in the paper.
+>
+> The table does not go away when layers are added. It stays inside every transformer as the direct path. The two derivations below show why it must hold log bigram probabilities, and then we read it from a real model.
 
 ### Derivation 1: the model is one matrix
 
