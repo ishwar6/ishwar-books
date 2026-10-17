@@ -574,6 +574,8 @@ And the Billion Word Benchmark, which the paper rules out, says this about itsel
 > With shuffled sentences there is no true next sentence to learn from, and no 512-token span stays on one topic.
 
 {{FIG:p3_doc_vs_shuffled|Document-level text versus shuffled sentences. In a document-level corpus, the sentence after sentence 1 really is sentence 2, so IsNext pairs and long coherent spans exist. In a shuffled corpus, the "next" sentence comes from another document.}}
+
+
 Why must the text be **document-level**? The Billion Word Benchmark is a big set of single sentences in **shuffled** order. In it, the sentence after "She opened the fridge." is some unrelated sentence from somewhere else. That makes next sentence prediction impossible to learn, and it stops the model from ever seeing long stretches of connected text. BERT needs sequences of up to 512 tokens that really belong together, so it needs whole documents.
 
 ## The pre-training procedure {§A.2}

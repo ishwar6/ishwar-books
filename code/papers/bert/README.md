@@ -22,6 +22,7 @@ Every number in the articles that does not come from the paper comes from one of
 | `bert_part6.py` | Part 6: the 512-token limit, raw [CLS] vs a fine-tuned sentence model, two masks at once, NER with a public checkpoint |
 | `common.py` | a log that prints and saves to `results/<name>_stdout.txt`, and JSON results |
 | `paper_shots.py`, `shots_part*.py` | download the paper, highlight phrases and crop excerpts into `public/img/papers/bert/` |
+| `reader.py` | builds the side-by-side reader (/papers/bert/read): our annotated copy of the paper and the map from each box to its place in the PDF, in `public/papers/pdf/` |
 | `figlib.py`, `bertfig.py`, `figs_part*.py` | draw the SVG figures from the results (theme-aware CSS classes, no hard-coded colours) |
 | `assemble.py` | turns `partN.md` into `content/papers/bert/<slug>.md`, inserting the figures; checks for missing images |
 | `check_md.mjs` | renders a page's maths with KaTeX and reports errors (run from the repo root) |
@@ -33,3 +34,20 @@ python bert_part1.py            # and the other bert_part*.py scripts
 python shots_part1.py           # paper excerpts (needs pymupdf)
 python figs_part1.py && python assemble.py 1
 ```
+
+## The side-by-side reader
+
+https://ishwarj.com/papers/bert/read shows the paper on the left and the six parts on the right, and the two panes scroll in step.
+`python reader.py` builds its two files:
+
+- `public/papers/pdf/bert.pdf`: the paper with the yellow highlights of the screenshots drawn in, a teal bar and a numbered dot
+  in the margin beside each passage, and the images made smaller (about 0.6 MB).
+- `public/papers/pdf/bert.json`: the page sizes and, for each box, its number, its first screenshot (the id), its part and
+  one region (page, crop, highlights) per screenshot.
+
+It reads every unnamed box (title starting with "·") of `content/papers/bert/part-*.md` in article order, finds each
+screenshot in the `shots_part*.py` job lists and asks `paper_shots.shot(dry=True)` where it is, without rendering anything.
+A box with two or three screenshots (a passage over a page or column break, or a passage and its footnote) gets one region
+per screenshot. Boxes from other papers (named boxes) are skipped. Run it after `assemble.py`, whenever a box is added or
+moved, then `npm run content`. It prints how many boxes it mapped and any screenshot it could not find (today: 93 boxes,
+116 regions, none missing).
