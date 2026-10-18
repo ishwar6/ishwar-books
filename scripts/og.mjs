@@ -43,7 +43,7 @@ const paperArt = (short, lines) => `<svg viewBox="0 0 1200 630" xmlns="http://ww
   <rect width="1200" height="630" fill="#0d0e16"/>
   <g transform="translate(790 70) rotate(4)"><rect width="330" height="440" rx="14" fill="#16303a" stroke="#4fc3d9" stroke-opacity=".5"/></g>
   <g transform="translate(770 90)"><rect width="330" height="440" rx="14" fill="#f4f6f8"/>
-    <text x="34" y="92" font-family="Georgia, serif" font-size="64" font-weight="700" fill="#111">${esc(short)}</text>
+    <text x="34" y="92" font-family="Georgia, serif" font-size="${Math.min(64, Math.floor(262 / (0.6 * short.length)))}" font-weight="700" fill="#111">${esc(short)}</text>
     ${Array.from({ length: lines }, (_, i) => `<rect x="34" y="${130 + i * 26}" width="${i % 3 === 2 ? 180 : 262}" height="9" rx="4" fill="${i === 3 || i === 4 ? '#ffdc33' : '#c9ced6'}"/>`).join('')}
   </g></svg>`
 const papers = manifest.papers ?? []

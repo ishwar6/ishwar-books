@@ -78,7 +78,7 @@ export function PaperCard({ paper }: { paper: Paper }) {
   return (
     <article className="paper-card" style={accentStyle(paper)}>
       <div className="paper-card-sheet" aria-hidden="true">
-        <span className="ps-short">{paper.short}</span>
+        <span className="ps-short" style={{ ['--ps-size' as string]: `${Math.min(46, Math.floor(172 / (0.58 * paper.short.length)))}px` }}>{paper.short}</span>
         <span className="ps-lines"><i /><i /><i /><i /><i /><i /></span>
         <span className="ps-year">{paper.year}</span>
       </div>

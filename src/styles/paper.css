@@ -38,7 +38,7 @@
     linear-gradient(160deg, var(--paper-soft), transparent 70%), var(--surface);
   border-right: 1px solid var(--border-soft);
 }
-.ps-short { font-family: var(--serif); font-size: 46px; font-weight: 700; color: var(--text-strong); letter-spacing: -0.01em; line-height: 1; }
+.ps-short { font-family: var(--serif); font-size: var(--ps-size, 46px); font-weight: 700; color: var(--text-strong); letter-spacing: -0.01em; line-height: 1; }
 .ps-lines { display: grid; gap: 7px; }
 .ps-lines i { display: block; height: 5px; border-radius: 3px; background: var(--border); }
 .ps-lines i:nth-child(2n) { width: 82%; }
@@ -52,7 +52,7 @@
 @media (max-width: 720px) {
   .paper-card { grid-template-columns: minmax(0, 1fr); }
   .paper-card-sheet { flex-direction: row; align-items: center; border-right: 0; border-bottom: 1px solid var(--border-soft); padding: 18px 20px; }
-  .ps-short { font-size: 34px; }
+  .ps-short { font-size: min(34px, var(--ps-size, 34px)); }
   .ps-lines { display: none; }
   .paper-card-body { padding: 20px; }
   .paper-card h3 { font-size: 21px; }
