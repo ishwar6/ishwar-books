@@ -1,0 +1,133 @@
+{
+ "name": "local-llm-1",
+ "proposer": "local-llm",
+ "iterations": 5,
+ "k": 2,
+ "task_model": "Qwen/Qwen2.5-0.5B-Instruct",
+ "device": "mps",
+ "labels": [
+  "activate_my_card",
+  "card_arrival",
+  "card_delivery_estimate",
+  "card_not_working",
+  "card_payment_fee_charged",
+  "card_payment_not_recognised",
+  "compromised_card",
+  "declined_card_payment",
+  "lost_or_stolen_card",
+  "pending_card_payment"
+ ],
+ "sizes": {
+  "memory": 60,
+  "search": 50,
+  "test": 100
+ },
+ "stats": {
+  "proposed": 10,
+  "rejected": 5,
+  "duplicates": 3,
+  "evaluated": 5
+ },
+ "selected": "004_llm_t1_1",
+ "minutes_search": 29.8,
+ "minutes_total": 31.8,
+ "task_model_calls": 1100,
+ "proposer_model": "Qwen/Qwen2.5-1.5B-Instruct",
+ "proposer_reads": [
+  {
+   "t": 1,
+   "j": 0,
+   "paths": [
+    "002_few_shot_all/traces.jsonl"
+   ],
+   "fallback": false
+  },
+  {
+   "t": 1,
+   "j": 1,
+   "paths": [
+    "001_few_shot_8/scores.json",
+    "002_few_shot_all/scores.json",
+    "000_zero_shot/traces.jsonl"
+   ],
+   "fallback": false
+  },
+  {
+   "t": 2,
+   "j": 0,
+   "paths": [
+    "004_llm_t1_1/traces.jsonl"
+   ],
+   "fallback": false
+  },
+  {
+   "t": 2,
+   "j": 1,
+   "paths": [
+    "004_llm_t1_1/harness.py",
+    "004_llm_t1_1/scores.json",
+    "004_llm_t1_1/traces.jsonl"
+   ],
+   "fallback": false
+  },
+  {
+   "t": 3,
+   "j": 0,
+   "paths": [
+    "004_llm_t1_1/harness.py",
+    "004_llm_t1_1/traces.jsonl"
+   ],
+   "fallback": true
+  },
+  {
+   "t": 3,
+   "j": 1,
+   "paths": [
+    "004_llm_t1_1/harness.py",
+    "005_llm_t2_0/scores.json",
+    "005_llm_t2_0/traces.jsonl"
+   ],
+   "fallback": false
+  },
+  {
+   "t": 4,
+   "j": 0,
+   "paths": [
+    "004_llm_t1_1/traces.jsonl",
+    "005_llm_t2_0/scores.json",
+    "005_llm_t2_0/harness.py"
+   ],
+   "fallback": false
+  },
+  {
+   "t": 4,
+   "j": 1,
+   "paths": [
+    "004_llm_t1_1/traces.jsonl",
+    "005_llm_t2_0/scores.json",
+    "006_llm_t2_1/traces.jsonl"
+   ],
+   "fallback": false
+  },
+  {
+   "t": 5,
+   "j": 0,
+   "paths": [
+    "004_llm_t1_1/traces.jsonl",
+    "005_llm_t2_0/scores.json",
+    "005_llm_t2_0/harness.py"
+   ],
+   "fallback": false
+  },
+  {
+   "t": 5,
+   "j": 1,
+   "paths": [
+    "004_llm_t1_1/traces.jsonl",
+    "005_llm_t2_0/scores.json",
+    "006_llm_t2_1/traces.jsonl"
+   ],
+   "fallback": false
+  }
+ ]
+}

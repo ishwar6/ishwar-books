@@ -1,0 +1,7 @@
+Symptom2Disease (gretelai/symptom_to_diagnosis): 22 labels
+memory: 751 labeled examples the harness may read
+search: 100 held-out training examples (to pick a harness)
+test:   212 examples of the official test split, never used to choose anything
+training texts dropped because the same text is in the test split: 2
+labels: allergy, arthritis, bronchial asthma, cervical spondylosis, chicken pox, common cold, dengue, diabetes, drug reaction, fungal infection, gastroesophageal reflux disease, hypertension, impetigo, jaundice, malaria, migraine, peptic ulcer disease, pneumonia, psoriasis, typhoid, urinary tract infection, varicose veins
+example: "I have a burning sensation in my stomach that comes and goes. It's worse when I eat and when I lie down. I also have heartburn and indigestion." -> peptic ulcer disease

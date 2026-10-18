@@ -1,0 +1,12 @@
+/* Links from the demo to the parts of the series that explain each panel. */
+const S = '/papers/meta-harness/'
+export const BG = S + 'background-what-a-harness-is'
+export const P1 = S + 'part-1-the-big-idea'
+export const P2 = S + 'part-2-the-method'
+export const P3 = S + 'part-3-text-classification'
+export const P4 = S + 'part-4-math-and-terminalbench'
+export const P5 = S + 'part-5-limits-and-what-came-after'
+export const P6 = S + 'part-6-build-it-from-scratch'
+export const SCRATCH = 'https://github.com/ishwar6/ishwar-books/tree/main/code/papers/meta-harness/scratch'
+export const DEMO_CODE = 'https://github.com/ishwar6/ishwar-books/tree/main/code/papers/meta-harness/demo'
+export const ARXIV = 'https://arxiv.org/abs/2603.28052'

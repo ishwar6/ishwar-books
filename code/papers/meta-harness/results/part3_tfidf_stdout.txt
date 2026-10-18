@@ -1,0 +1,13 @@
+vocabulary: ours 988 words, scikit-learn 988 words
+largest difference between the two matrices: 1.11e-16
+  word 'and'        in 728 of 751 texts, idf = 1.031
+  word 'stomach'    in  69 of 751 texts, idf = 3.374
+  word 'burning'    in  25 of 751 texts, idf = 4.365
+  word 'heartburn'  in  20 of 751 texts, idf = 4.578
+test queries with the same top-5 neighbours: 212 of 212
+query: "I have a burning sensation in my stomach that comes and goes. It's worse when I eat and wh..."
+  0.673  peptic ulcer disease     "I have a burning sensation in my upper stomach that comes an..."
+  0.566  peptic ulcer disease     "I have a burning feeling in my stomach. It's worse when I ea..."
+  0.561  gastroesophageal reflux disease "I have a burning sensation in my chest and throat. It feels ..."
+  0.505  gastroesophageal reflux disease "I have a burning sensation in my throat that comes and goes,..."
+  0.498  gastroesophageal reflux disease "I get heartburn and indigestion a lot. It's worse when I eat..."

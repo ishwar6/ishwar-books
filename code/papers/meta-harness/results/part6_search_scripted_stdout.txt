@@ -1,0 +1,46 @@
+run scripted-1: proposer scripted, 5 iterations x 2 proposals
+task model Qwen/Qwen2.5-0.5B-Instruct on mps; 10 labels; memory 60, search 50, test 100 (test is never shown to the proposer)
+== seeds (3)
+  + 000_zero_shot                                search acc  32.0%   ctx   402 chars   calls 1.0   (37.3s)
+  + 001_few_shot_8                               search acc  42.0%   ctx  1139 chars   calls 1.0   (47.3s)
+  + 002_few_shot_all                             search acc  26.0%   ctx  5803 chars   calls 1.0   (42.7s)
+== iteration 1: 2 proposals (0s to propose)
+  + 003_8_tfidf_examples                         search acc  54.0%   ctx  1177 chars   calls 1.0   (37.0s)
+  + 004_8_random_examples_coverage               search acc  34.0%   ctx  2022 chars   calls 1.0   (43.0s)
+== iteration 2: 2 proposals (0s to propose)
+  + 005_8_tfidf_examples_contrastive             search acc  54.0%   ctx  1177 chars   calls 1.0   (60.4s)
+  + 006_8_tfidf_examples_verify                  search acc  56.0%   ctx  2318 chars   calls 2.0   (127.2s)
+== iteration 3: 2 proposals (0s to propose)
+  + 007_8_tfidf_examples_contrastive_verify      search acc  56.0%   ctx  2318 chars   calls 2.0   (122.3s)
+  + 008_16_tfidf_examples_verify                 search acc  50.0%   ctx  3093 chars   calls 2.0   (157.1s)
+== iteration 4: 2 proposals (0s to propose)
+  + 009_4_tfidf_examples_verify                  search acc  50.0%   ctx  1923 chars   calls 2.0   (95.7s)
+  + 010_8_tfidf_examples_verify_careful_instruct search acc  56.0%   ctx  2480 chars   calls 2.0   (81.8s)
+== iteration 5: 2 proposals (0s to propose)
+  + 011_8_first_examples_verify                  search acc  54.0%   ctx  2342 chars   calls 2.0   (70.2s)
+  + 012_60_tfidf_examples_verify                 search acc  58.0%   ctx  6956 chars   calls 2.0   (72.0s)
+== search done in 16.8 min: {'proposed': 10, 'rejected': 0, 'duplicates': 0, 'evaluated': 10}
+Pareto frontier on the search set (accuracy up, prompt characters down):
+  000_zero_shot                                 32.0%    402 chars
+  001_few_shot_8                                42.0%   1139 chars
+  003_8_tfidf_examples                          54.0%   1177 chars
+  005_8_tfidf_examples_contrastive              54.0%   1177 chars
+  006_8_tfidf_examples_verify                   56.0%   2318 chars
+  007_8_tfidf_examples_contrastive_verify       56.0%   2318 chars
+  012_60_tfidf_examples_verify                  58.0%   6956 chars
+== test set (100 messages) for 13 candidates
+  000_zero_shot                                search  32.0%  test  38.0%  gap  -6.0   (frontier)
+  001_few_shot_8                               search  42.0%  test  42.0%  gap  +0.0   (frontier)
+  002_few_shot_all                             search  26.0%  test  29.0%  gap  -3.0
+  003_8_tfidf_examples                         search  54.0%  test  53.0%  gap  +1.0   (frontier)
+  004_8_random_examples_coverage               search  34.0%  test  36.0%  gap  -2.0
+  005_8_tfidf_examples_contrastive             search  54.0%  test  53.0%  gap  +1.0   (frontier)
+  006_8_tfidf_examples_verify                  search  56.0%  test  55.0%  gap  +1.0   (frontier)
+  007_8_tfidf_examples_contrastive_verify      search  56.0%  test  55.0%  gap  +1.0   (frontier)
+  008_16_tfidf_examples_verify                 search  50.0%  test  52.0%  gap  -2.0
+  009_4_tfidf_examples_verify                  search  50.0%  test  52.0%  gap  -2.0
+  010_8_tfidf_examples_verify_careful_instruct search  56.0%  test  53.0%  gap  +3.0
+  011_8_first_examples_verify                  search  54.0%  test  50.0%  gap  +4.0
+  012_60_tfidf_examples_verify                 search  58.0%  test  50.0%  gap  +8.0   (frontier)
+selected by search accuracy: 012_60_tfidf_examples_verify search 58.0% test 50.0%
+total 35.2 min, 3000 task-model calls

@@ -1,0 +1,7 @@
+zero-shot              extra context       0 chars   test accuracy 40.6%
+few-shot (8)           extra context   1,336 chars   test accuracy 40.1%
+draft-verification     extra context   3,553 chars   test accuracy 86.8%
+label-primed query     extra context   5,504 chars   test accuracy 79.7%
+Method 1 (sweep):       frontier = ['zero-shot', 'draft-verification']
+Method 2 (definition):  frontier = ['zero-shot', 'draft-verification']
+same frontier: True

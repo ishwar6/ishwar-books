@@ -1,0 +1,34 @@
+== 1. The task
+10 labels: activate_my_card, card_arrival, card_delivery_estimate, card_not_working, ...
+memory 60 (labeled stream), search 50, test 100
+example: 'I made a purchase with my card and I was charged a fee for using it' -> card_payment_fee_charged
+== 2. The frozen model: greedy decoding two ways
+from scratch: 'card_payment_not_recognised'  generate(): 'card_payment_not_recognised'  gold: card_payment_fee_charged
+from scratch: 'pending_card_payment'         generate(): 'pending_card_payment'         gold: card_payment_not_recognised
+from scratch: 'declined_card_payment'        generate(): 'declined_card_payment'        gold: card_payment_fee_charged
+same reply in 3 of 3 prompts
+== 3. TF-IDF retrieval two ways
+vocabulary: ours 198 words, sklearn 198 words
+largest difference in cosine scores over 5 queries x 60 documents: 1.7e-16
+same top-5 neighbours in 5 of 5 queries
+query: 'I made a purchase with my card and I was charged a fee for using it'
+  0.531  card_payment_fee_charged   'What is the fee charged for using my card?'
+  0.357  card_payment_fee_charged   'Am I getting charged for making a payment?'
+  0.299  card_payment_fee_charged   'I paid with a card and there is an extra charge. Why?'
+== 4. Interface validation (Algorithm 1, line 11)
+the README harness         passed in 2.3 ms  
+reads a file               rejected in 0.0 ms  forbidden pattern '\\bopen\\s*\\(': a harness may not touch files, pro
+returns a made-up label    rejected in 0.9 ms  predict() returned 'other', which is not one of the labels
+has no Harness class       rejected in 1.0 ms  no class named Harness
+== 5. The objective: the mean reward over the search set
+tiny example: rewards [1, 0, 1, 1, 0] -> mean 0.60
+012_60_tfidf_examples_verify: 29 rewards of 1 out of 50 -> 58.0%  (scores.json: 58.0%)
+== 6. The Pareto frontier two ways
+13 candidates; by definition: [0, 1, 3, 5, 6, 7, 12]; by sort and sweep: [0, 1, 3, 5, 6, 7, 12]; same: True
+  000_zero_shot                                 32.0%    402 chars
+  001_few_shot_8                                42.0%   1139 chars
+  003_8_tfidf_examples                          54.0%   1177 chars
+  005_8_tfidf_examples_contrastive              54.0%   1177 chars
+  006_8_tfidf_examples_verify                   56.0%   2318 chars
+  007_8_tfidf_examples_contrastive_verify       56.0%   2318 chars
+  012_60_tfidf_examples_verify                  58.0%   6956 chars

@@ -480,6 +480,9 @@ python mh_part1.py   # downloads Qwen/Qwen2.5-1.5B-Instruct (about 3 GB) and gre
 
 </details>
 
+> [!TIP] Try it
+> Open a real harness search in your browser, with every candidate's code, scores and traces: [the interactive demo](/papers/meta-harness/demo).
+
 ## The paper and the code
 
 [Meta-Harness on arXiv](https://arxiv.org/abs/2603.28052) · [project page](https://yoonholee.com/meta-harness/) · [our scripts for this part](https://github.com/ishwar6/ishwar-books/tree/main/code/papers/meta-harness)

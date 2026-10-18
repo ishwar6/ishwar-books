@@ -1,0 +1,14 @@
+--- model.generate with repetition_penalty=1.1
+ours: 'Gastroesophageal reflux disease (GERD)'   generate: 'Gastroesophageal Reflux Disease (GERD)'
+ours: 'Gastroesophageal reflux disease (GERD)'   generate: 'Gastroesophageal Reflux Disease (GERD)'
+ours: 'Migraine'                                 generate: 'Migraine'
+ours: 'Pneumonia'                                generate: 'Pneumonia'
+ours: 'psoriasis'                                generate: 'psoriasis'
+same text: 3 of 5, same label after parse(): 5 of 5
+--- model.generate with repetition_penalty=1.0
+ours: 'Gastroesophageal reflux disease (GERD)'   generate: 'Gastroesophageal reflux disease (GERD)'
+ours: 'Gastroesophageal reflux disease (GERD)'   generate: 'Gastroesophageal reflux disease (GERD)'
+ours: 'Migraine'                                 generate: 'Migraine'
+ours: 'Pneumonia'                                generate: 'Pneumonia'
+ours: 'psoriasis'                                generate: 'psoriasis'
+same text: 5 of 5, same label after parse(): 5 of 5

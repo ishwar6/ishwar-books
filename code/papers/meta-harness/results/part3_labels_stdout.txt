@@ -1,0 +1,23 @@
+disease                           n  zero-shot  label-primed
+malaria                          10         0%          100%
+peptic ulcer disease             10         0%           90%
+drug reaction                     8         0%           75%
+jaundice                          7        14%           86%
+allergy                          10        30%           90%
+diabetes                         10        20%           80%
+hypertension                     10         0%           60%
+fungal infection                  9         0%           56%
+dengue                           10         0%           50%
+arthritis                        10        60%          100%
+pneumonia                        10        50%           90%
+varicose veins                   10        60%          100%
+typhoid                           9        11%           44%
+chicken pox                      10        20%           50%
+common cold                      10        60%           80%
+psoriasis                        10        80%          100%
+urinary tract infection           9        67%           78%
+cervical spondylosis             10        70%           80%
+gastroesophageal reflux disease  10        80%           90%
+impetigo                         10        80%           90%
+migraine                         10        80%           90%
+bronchial asthma                 10        90%           70%

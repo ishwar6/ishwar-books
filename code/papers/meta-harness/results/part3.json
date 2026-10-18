@@ -1,0 +1,132 @@
+{
+ "rows": {
+  "zero-shot": {
+   "search": 36.0,
+   "search_n": 100,
+   "test": 40.56603773584906,
+   "test_n": 212,
+   "extra": 0.0,
+   "calls": 1.0,
+   "invalid": 20
+  },
+  "few-shot (8)": {
+   "search": 34.0,
+   "search_n": 100,
+   "test": 40.094339622641506,
+   "test_n": 212,
+   "extra": 1336.0,
+   "calls": 1.0,
+   "invalid": 4
+  },
+  "draft-verification": {
+   "search": 84.0,
+   "search_n": 100,
+   "test": 86.79245283018868,
+   "test_n": 212,
+   "extra": 3552.7216981132074,
+   "calls": 2.0,
+   "invalid": 0
+  },
+  "label-primed query": {
+   "search": 76.0,
+   "search_n": 100,
+   "test": 79.71698113207547,
+   "test_n": 212,
+   "extra": 5503.584905660377,
+   "calls": 1.0,
+   "invalid": 0
+  },
+  "TF-IDF 5-NN vote (no model)": {
+   "search": 90.0,
+   "search_n": 100,
+   "test": 89.62264150943396,
+   "test_n": 212,
+   "extra": 0.0,
+   "calls": 0.0,
+   "invalid": 0
+  }
+ },
+ "labels": [
+  "allergy",
+  "arthritis",
+  "bronchial asthma",
+  "cervical spondylosis",
+  "chicken pox",
+  "common cold",
+  "dengue",
+  "diabetes",
+  "drug reaction",
+  "fungal infection",
+  "gastroesophageal reflux disease",
+  "hypertension",
+  "impetigo",
+  "jaundice",
+  "malaria",
+  "migraine",
+  "peptic ulcer disease",
+  "pneumonia",
+  "psoriasis",
+  "typhoid",
+  "urinary tract infection",
+  "varicose veins"
+ ],
+ "per_label": {
+  "zero-shot": {
+   "peptic ulcer disease": 0.0,
+   "drug reaction": 0.0,
+   "pneumonia": 50.0,
+   "fungal infection": 0.0,
+   "cervical spondylosis": 70.0,
+   "gastroesophageal reflux disease": 80.0,
+   "psoriasis": 80.0,
+   "arthritis": 60.0,
+   "malaria": 0.0,
+   "typhoid": 11.11111111111111,
+   "migraine": 80.0,
+   "bronchial asthma": 90.0,
+   "diabetes": 20.0,
+   "jaundice": 14.285714285714286,
+   "chicken pox": 20.0,
+   "urinary tract infection": 66.66666666666667,
+   "impetigo": 80.0,
+   "hypertension": 0.0,
+   "common cold": 60.0,
+   "dengue": 0.0,
+   "varicose veins": 60.0,
+   "allergy": 30.0
+  },
+  "label-primed query": {
+   "peptic ulcer disease": 90.0,
+   "drug reaction": 75.0,
+   "pneumonia": 90.0,
+   "fungal infection": 55.55555555555556,
+   "cervical spondylosis": 80.0,
+   "gastroesophageal reflux disease": 90.0,
+   "psoriasis": 100.0,
+   "arthritis": 100.0,
+   "malaria": 100.0,
+   "typhoid": 44.44444444444444,
+   "migraine": 90.0,
+   "bronchial asthma": 70.0,
+   "diabetes": 80.0,
+   "jaundice": 85.71428571428571,
+   "chicken pox": 50.0,
+   "urinary tract infection": 77.77777777777777,
+   "impetigo": 90.0,
+   "hypertension": 60.0,
+   "common cold": 80.0,
+   "dengue": 50.0,
+   "varicose veins": 100.0,
+   "allergy": 90.0
+  }
+ },
+ "frontier": [
+  "zero-shot",
+  "draft-verification"
+ ],
+ "sizes": {
+  "memory": 751,
+  "search": 100,
+  "test": 212
+ }
+}

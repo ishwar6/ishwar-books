@@ -1,0 +1,39 @@
+run local-llm-1: proposer local-llm, 5 iterations x 2 proposals
+task model Qwen/Qwen2.5-0.5B-Instruct on mps; 10 labels; memory 60, search 50, test 100 (test is never shown to the proposer)
+== seeds (3)
+  + 000_zero_shot                                search acc  32.0%   ctx   402 chars   calls 1.0   (75.6s)
+  + 001_few_shot_8                               search acc  42.0%   ctx  1139 chars   calls 1.0   (68.2s)
+  + 002_few_shot_all                             search acc  26.0%   ctx  5803 chars   calls 1.0   (79.1s)
+== iteration 1: 2 proposals (413s to propose)
+  x 003_llm_t1_0                                 rejected: ImportError: cannot import name 'log' from 'hlib' (/Users/admin/Desktop/ishwar-books/code/
+  + 004_llm_t1_1                                 search acc  48.0%   ctx  1848 chars   calls 1.0   (40.7s)
+== iteration 2: 2 proposals (237s to propose)
+  + 005_llm_t2_0                                 search acc  36.0%   ctx  1870 chars   calls 1.0   (36.9s)
+  + 006_llm_t2_1                                 search acc  48.0%   ctx  1848 chars   calls 1.0   (31.9s)
+== iteration 3: 2 proposals (376s to propose)
+  x 007_llm_t3_0                                 rejected: duplicate: same code as 004_llm_t1_1
+  x 008_llm_t3_1                                 rejected: duplicate: same code as 004_llm_t1_1
+== iteration 4: 2 proposals (239s to propose)
+  x 009_llm_t4_0                                 rejected: NameError: name 'aspect' is not defined | draft = parse_label(self.llm(self.prompt(text, s
+  + 010_llm_t4_1                                 search acc  48.0%   ctx  1848 chars   calls 1.0   (12.9s)
+== iteration 5: 2 proposals (111s to propose)
+  x 011_llm_t5_0                                 rejected: duplicate: same code as 005_llm_t2_0
+  + 012_llm_t5_1                                 search acc  48.0%   ctx  1848 chars   calls 1.0   (8.6s)
+== search done in 29.8 min: {'proposed': 10, 'rejected': 5, 'duplicates': 3, 'evaluated': 5}
+Pareto frontier on the search set (accuracy up, prompt characters down):
+  000_zero_shot                                 32.0%    402 chars
+  001_few_shot_8                                42.0%   1139 chars
+  004_llm_t1_1                                  48.0%   1848 chars
+  006_llm_t2_1                                  48.0%   1848 chars
+  010_llm_t4_1                                  48.0%   1848 chars
+  012_llm_t5_1                                  48.0%   1848 chars
+== test set (100 messages) for 7 candidates
+  000_zero_shot                                search  32.0%  test  38.0%  gap  -6.0   (frontier)
+  001_few_shot_8                               search  42.0%  test  42.0%  gap  +0.0   (frontier)
+  002_few_shot_all                             search  26.0%  test  29.0%  gap  -3.0
+  004_llm_t1_1                                 search  48.0%  test  46.0%  gap  +2.0   (frontier)
+  006_llm_t2_1                                 search  48.0%  test  46.0%  gap  +2.0   (frontier)
+  010_llm_t4_1                                 search  48.0%  test  46.0%  gap  +2.0   (frontier)
+  012_llm_t5_1                                 search  48.0%  test  46.0%  gap  +2.0   (frontier)
+selected by search accuracy: 004_llm_t1_1 search 48.0% test 46.0%
+total 31.8 min, 1100 task-model calls

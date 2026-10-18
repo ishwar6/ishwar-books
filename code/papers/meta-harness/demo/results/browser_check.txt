@@ -1,0 +1,4 @@
+paper numbers: 67/67 values on the page equal paper_numbers.json
+run tab: first candidate shown 804 ms after navigation
+runs: 84/84 values equal the run files (scripted-1, local-llm-1)
+console or page errors: 0

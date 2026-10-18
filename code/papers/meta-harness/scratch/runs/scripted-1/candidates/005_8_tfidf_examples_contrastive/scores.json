@@ -1,0 +1,29 @@
+{
+ "accuracy": 54.0,
+ "correct": 27,
+ "n": 50,
+ "ctx_chars": 1177,
+ "calls_per_message": 1.0,
+ "invalid": 0,
+ "crashes": 0,
+ "accuracy_by_label": {
+  "activate_my_card": "4/5",
+  "card_arrival": "0/5",
+  "card_delivery_estimate": "4/5",
+  "card_not_working": "1/5",
+  "card_payment_fee_charged": "4/5",
+  "card_payment_not_recognised": "1/5",
+  "compromised_card": "2/5",
+  "declined_card_payment": "4/5",
+  "lost_or_stolen_card": "2/5",
+  "pending_card_payment": "5/5"
+ },
+ "top_confusions": {
+  "card_arrival -> pending_card_payment": 4,
+  "card_payment_not_recognised -> pending_card_payment": 3,
+  "lost_or_stolen_card -> declined_card_payment": 2,
+  "compromised_card -> pending_card_payment": 2,
+  "card_not_working -> pending_card_payment": 2
+ },
+ "seconds": 60.4
+}

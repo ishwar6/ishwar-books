@@ -1,0 +1,132 @@
+[
+ {
+  "folder": "000_zero_shot",
+  "seed": true,
+  "frontier": true,
+  "search_acc": 32.0,
+  "ctx_chars": 402,
+  "calls": 1.0,
+  "test_acc": 38.0,
+  "gap": -6.0
+ },
+ {
+  "folder": "001_few_shot_8",
+  "seed": true,
+  "frontier": true,
+  "search_acc": 42.0,
+  "ctx_chars": 1139,
+  "calls": 1.0,
+  "test_acc": 42.0,
+  "gap": 0.0
+ },
+ {
+  "folder": "002_few_shot_all",
+  "seed": true,
+  "frontier": false,
+  "search_acc": 26.0,
+  "ctx_chars": 5803,
+  "calls": 1.0,
+  "test_acc": 29.0,
+  "gap": -3.0
+ },
+ {
+  "folder": "003_8_tfidf_examples",
+  "seed": false,
+  "frontier": true,
+  "search_acc": 54.0,
+  "ctx_chars": 1177,
+  "calls": 1.0,
+  "test_acc": 53.0,
+  "gap": 1.0
+ },
+ {
+  "folder": "004_8_random_examples_coverage",
+  "seed": false,
+  "frontier": false,
+  "search_acc": 34.0,
+  "ctx_chars": 2022,
+  "calls": 1.0,
+  "test_acc": 36.0,
+  "gap": -2.0
+ },
+ {
+  "folder": "005_8_tfidf_examples_contrastive",
+  "seed": false,
+  "frontier": true,
+  "search_acc": 54.0,
+  "ctx_chars": 1177,
+  "calls": 1.0,
+  "test_acc": 53.0,
+  "gap": 1.0
+ },
+ {
+  "folder": "006_8_tfidf_examples_verify",
+  "seed": false,
+  "frontier": true,
+  "search_acc": 56.0,
+  "ctx_chars": 2318,
+  "calls": 2.0,
+  "test_acc": 55.0,
+  "gap": 1.0
+ },
+ {
+  "folder": "007_8_tfidf_examples_contrastive_verify",
+  "seed": false,
+  "frontier": true,
+  "search_acc": 56.0,
+  "ctx_chars": 2318,
+  "calls": 2.0,
+  "test_acc": 55.0,
+  "gap": 1.0
+ },
+ {
+  "folder": "008_16_tfidf_examples_verify",
+  "seed": false,
+  "frontier": false,
+  "search_acc": 50.0,
+  "ctx_chars": 3093,
+  "calls": 2.0,
+  "test_acc": 52.0,
+  "gap": -2.0
+ },
+ {
+  "folder": "009_4_tfidf_examples_verify",
+  "seed": false,
+  "frontier": false,
+  "search_acc": 50.0,
+  "ctx_chars": 1923,
+  "calls": 2.0,
+  "test_acc": 52.0,
+  "gap": -2.0
+ },
+ {
+  "folder": "010_8_tfidf_examples_verify_careful_instruct",
+  "seed": false,
+  "frontier": false,
+  "search_acc": 56.0,
+  "ctx_chars": 2480,
+  "calls": 2.0,
+  "test_acc": 53.0,
+  "gap": 3.0
+ },
+ {
+  "folder": "011_8_first_examples_verify",
+  "seed": false,
+  "frontier": false,
+  "search_acc": 54.0,
+  "ctx_chars": 2342,
+  "calls": 2.0,
+  "test_acc": 50.0,
+  "gap": 4.0
+ },
+ {
+  "folder": "012_60_tfidf_examples_verify",
+  "seed": false,
+  "frontier": true,
+  "search_acc": 58.0,
+  "ctx_chars": 6956,
+  "calls": 2.0,
+  "test_acc": 50.0,
+  "gap": 8.0
+ }
+]

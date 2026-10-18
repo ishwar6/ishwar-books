@@ -34,10 +34,10 @@ Harnesses are mostly written by hand: a person reads failures, guesses a fix, an
 
 1. **[The Big Idea](part-1-the-big-idea.md)**: the title, Figure 1, the abstract and §1.
 2. **[The Method](part-2-the-method.md)**: §2, Table 1, §3, Figure 2 and Algorithm 1. The objective, the filesystem of experience, and the proposer.
-3. **Text Classification** (coming soon): §4.1, Tables 2 to 5, Figures 3 and 4, and the discovered harnesses of the appendix.
+3. **[Text Classification](part-3-text-classification.md)**: §4.1, Tables 2 to 5, Figures 3 and 4, and the discovered harnesses of the appendix.
 4. **[Math Retrieval and TerminalBench-2](part-4-math-and-terminalbench.md)**: §4.2 and §4.3, Tables 6 and 7, and the discovered harnesses.
 5. **[Limits, and What Came After](part-5-limits-and-what-came-after.md)**: §5, the proposer's behaviour in Appendix A, and the later work on self-improving harnesses.
-6. **Build It from Scratch** (coming soon): a small Meta-Harness loop in Python, run on a laptop.
+6. **[Build It from Scratch](part-6-build-it-from-scratch.md)**: a small Meta-Harness loop in Python, run on a laptop.
 
 ## How to read the boxes
 

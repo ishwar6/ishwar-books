@@ -1,0 +1,4 @@
+{
+  "title": "Meta-Harness, the search loop",
+  "description": "Open a real harness search: every candidate's code, traces and score, as the proposer sees them, and the gap between the search set and the held-out test set. Then choose what a proposer may read, and explore the paper's own results."
+}

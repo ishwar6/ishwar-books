@@ -1,0 +1,80 @@
+[
+ {
+  "folder": "000_zero_shot",
+  "seed": true,
+  "frontier": true,
+  "search_acc": 32.0,
+  "ctx_chars": 402,
+  "calls": 1.0,
+  "test_acc": 38.0,
+  "gap": -6.0
+ },
+ {
+  "folder": "001_few_shot_8",
+  "seed": true,
+  "frontier": true,
+  "search_acc": 42.0,
+  "ctx_chars": 1139,
+  "calls": 1.0,
+  "test_acc": 42.0,
+  "gap": 0.0
+ },
+ {
+  "folder": "002_few_shot_all",
+  "seed": true,
+  "frontier": false,
+  "search_acc": 26.0,
+  "ctx_chars": 5803,
+  "calls": 1.0,
+  "test_acc": 29.0,
+  "gap": -3.0
+ },
+ {
+  "folder": "004_llm_t1_1",
+  "seed": false,
+  "frontier": true,
+  "search_acc": 48.0,
+  "ctx_chars": 1848,
+  "calls": 1.0,
+  "test_acc": 46.0,
+  "gap": 2.0
+ },
+ {
+  "folder": "005_llm_t2_0",
+  "seed": false,
+  "frontier": false,
+  "search_acc": 36.0,
+  "ctx_chars": 1870,
+  "calls": 1.0
+ },
+ {
+  "folder": "006_llm_t2_1",
+  "seed": false,
+  "frontier": true,
+  "search_acc": 48.0,
+  "ctx_chars": 1848,
+  "calls": 1.0,
+  "test_acc": 46.0,
+  "gap": 2.0
+ },
+ {
+  "folder": "010_llm_t4_1",
+  "seed": false,
+  "frontier": true,
+  "search_acc": 48.0,
+  "ctx_chars": 1848,
+  "calls": 1.0,
+  "test_acc": 46.0,
+  "gap": 2.0
+ },
+ {
+  "folder": "012_llm_t5_1",
+  "seed": false,
+  "frontier": true,
+  "search_acc": 48.0,
+  "ctx_chars": 1848,
+  "calls": 1.0,
+  "test_acc": 46.0,
+  "gap": 2.0
+ }
+]

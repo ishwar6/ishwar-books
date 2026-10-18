@@ -1,0 +1,1 @@
+NameError: name 'aspect' is not defined | draft = parse_label(self.llm(self.prompt(text, shown, extra=self.labels[-1], aspect=aspect)), self.labels) or self.labels[0]

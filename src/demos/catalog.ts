@@ -22,4 +22,11 @@ export const demoGuides: Record<string, DemoGuide> = {
     mode: 'Live model + saved runs',
     actions: ['Step through the decoder', 'Explore attention heads', 'Break the positions or the mask'],
   },
+  'meta-harness': {
+    category: 'Harness search',
+    title: 'Open the folder an agent searches through.',
+    summary: 'Browse a real harness search: every candidate\'s code, traces and score. Choose what the proposer may read, and explore the paper\'s results.',
+    mode: 'Saved search run + paper numbers',
+    actions: ['Browse candidates and diffs', 'See the overfitting gap', 'Scores vs summaries vs traces'],
+  },
 }

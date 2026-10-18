@@ -1,0 +1,9 @@
+model: Qwen/Qwen2.5-1.5B-Instruct, greedy decoding, device mps
+harness                        search acc  test acc  calls  extra chars  no label
+zero-shot                           36.0%     40.6%      1            0        20
+few-shot (8)                        34.0%     40.1%      1        1,336         4
+draft-verification                  84.0%     86.8%      2        3,553         0
+label-primed query                  76.0%     79.7%      1        5,504         0
+TF-IDF 5-NN vote (no model)         90.0%     89.6%      0            0         0
+check with scikit-learn accuracy_score (label-primed query, test): 79.7%
+one standard error of a test accuracy near 80% on 212 examples: about 2.8 points
