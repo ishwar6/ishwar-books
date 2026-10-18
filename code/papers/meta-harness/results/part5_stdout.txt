@@ -1,0 +1,68 @@
+== 1. Noise on a small benchmark: TerminalBench-2 has 89 tasks
+one task = 100 / 89 = 1.12 points
+standard error at 64.4% on 89 tasks: from scratch 5.08 points, scipy 5.08 points, same: True
+rough 95% range for one run: 64.4 +- 9.9 points
+  evo_marker_fix       -5.6 points = -5.0 tasks if each task ran once
+  evo_single_confirm   -6.7 points = -6.0 tasks if each task ran once
+  evo_strip_only       -1.1 points = -1.0 tasks if each task ran once
+runs per task (1 to 10) that fit 64.4, 58.9, 57.8 and 63.3 exactly: [9, 10]
+
+== 2. The winner's curse: the best of N equal candidates on a small search set
+40 candidates, all truly 40% accurate, search set of 100 examples
+expected best search score: simulation 50.70%, exact 50.68%, agree within 0.3: True
+the winner looks 10.7 points better than it is
+inflation of the best search score (points), exact:
+  candidates  n=50     n=88     n=100    n=250    
+           1  0.0      0.0      0.0      0.0      
+           4  7.1      5.4      5.1      3.2      
+          10  10.7     8.1      7.6      4.8      
+          40  15.1     11.4     10.7     6.7      
+         109  17.8     13.4     12.6     7.9      
+
+== 3. A real run: 12 prompt harnesses around Qwen2.5-0.5B-Instruct on SST-2
+model Qwen/Qwen2.5-0.5B-Instruct, device mps, float32
+SST-2 validation split into search 60, held-out 60, test 300 (disjoint)
+label scoring check on 5 prompts: max difference ours vs library loss = 2.96e-05, agree: True
+harness         search  held-out   test
+A-zero           83.3%     86.7%  87.3%
+A-4shot-s1       91.7%     95.0%  91.3%
+A-4shot-s2       90.0%     95.0%  92.0%
+A-4shot-s3       90.0%     85.0%  90.0%
+A-4shot-s4       88.3%     90.0%  89.7%
+A-4shot-s5       93.3%     93.3%  90.0%
+B-zero           66.7%     68.3%  72.7%
+B-4shot-s1       80.0%     86.7%  84.3%
+B-4shot-s2       80.0%     81.7%  81.7%
+B-4shot-s3       83.3%     85.0%  86.0%
+B-4shot-s4       83.3%     78.3%  79.3%
+B-4shot-s5       76.7%     73.3%  73.7%
+chosen by search score: A-4shot-s5: search 93.3%, test 90.0%, gap +3.3 points
+best on test (unknown during search): A-4shot-s2 at 92.0%; mean test of all 12: 84.8%
+rank correlation of search and test over 12 harnesses: ours 0.912, scipy 0.912, agree: True
+standard error of one accuracy on 60 examples near 93%: 3.2 points
+
+== 4. Self-Harness's acceptance rule: improve one split, hurt neither
+rule checked on all 25 pairs of changes from -2 to +2: both methods agree: True
+examples: (+3, 0) -> True, (+5, -1) -> False, (0, 0) -> False
+current harness: A-zero (search 50/60, held-out 52/60)
+  A-4shot-s1     d_in  +5  d_ho  +5  -> accept
+  A-4shot-s2     d_in  +4  d_ho  +5  -> accept
+  A-4shot-s3     d_in  +4  d_ho  -1  -> reject
+  A-4shot-s4     d_in  +3  d_ho  +2  -> accept
+  A-4shot-s5     d_in  +6  d_ho  +4  -> accept
+  B-zero         d_in -10  d_ho -11  -> reject
+  B-4shot-s1     d_in  -2  d_ho  +0  -> reject
+  B-4shot-s2     d_in  -2  d_ho  -3  -> reject
+  B-4shot-s3     d_in  +0  d_ho  -1  -> reject
+  B-4shot-s4     d_in  +0  d_ho  -5  -> reject
+  B-4shot-s5     d_in  -4  d_ho  -8  -> reject
+accepted 4 of 11
+largest accepted gain: A-4shot-s1: test 91.3% (current harness 87.3%)
+
+== 5. Cost per step: compare every pair, or only with the last harness
+  population   2:     1 pairs by hand,     1 with math.comb, trajectory-local: 1 pair
+  population  10:    45 pairs by hand,    45 with math.comb, trajectory-local: 1 pair
+  population  40:   780 pairs by hand,   780 with math.comb, trajectory-local: 1 pair
+  population 109:  5886 pairs by hand,  5886 with math.comb, trajectory-local: 1 pair
+
+done in 587 s

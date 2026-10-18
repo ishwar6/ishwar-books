@@ -1,0 +1,41 @@
+{
+ "with_app": {
+  "sections": [
+   "PWD",
+   "LS",
+   "LANG",
+   "PKG",
+   "MEM"
+  ],
+  "chars": 827
+ },
+ "no_app": {
+  "sections": [
+   "PWD",
+   "LS"
+  ]
+ },
+ "reset": {
+  "steps": [
+   "1:cmd",
+   "2:cmd",
+   "3:done -> checklist",
+   "4:cmd",
+   "5:done -> checklist",
+   "6:cmd",
+   "7:done -> checklist",
+   "8:done -> END"
+  ],
+  "end": 8
+ },
+ "no_reset": {
+  "steps": [
+   "1:cmd",
+   "2:cmd",
+   "3:done -> checklist",
+   "4:cmd",
+   "5:done -> END"
+  ],
+  "end": 5
+ }
+}

@@ -1,0 +1,10 @@
+24 decontaminated MATH test problems, levels 1-3: {'default': 6, 'number_theory': 6, 'combinatorics': 6, 'geometry': 6}
+model Qwen/Qwen2.5-1.5B-Instruct on mps, greedy, max 512 new tokens, solutions cut at 1200 chars
+    no retrieval: 14/24 =  58.3%   combin 3/6  defaul 3/6  geomet 4/6  number 4/6   prompt    91 tokens    234 s
+   (no \boxed answer in 3 outputs)
+ random few-shot: 11/24 =  45.8%   combin 2/6  defaul 4/6  geomet 3/6  number 2/6   prompt  1036 tokens    299 s
+      BM25 top-3: 12/24 =  50.0%   combin 2/6  defaul 3/6  geomet 4/6  number 3/6   prompt   849 tokens    276 s
+  routed harness: 13/24 =  54.2%   combin 2/6  defaul 3/6  geomet 4/6  number 4/6   prompt   923 tokens    181 s
+random few-shot vs no retrieval: fixes 1, breaks 4
+BM25 top-3 vs no retrieval: fixes 1, breaks 3
+routed harness vs no retrieval: fixes 1, breaks 2

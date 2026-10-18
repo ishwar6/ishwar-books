@@ -1,0 +1,67 @@
+== 1. BM25 by hand: five tiny documents, query "prime remainder"
+N = 5, lengths = [9, 11, 7, 4, 7], avgdl = 7.600
+idf(prime) = 0.3365   (in 2 of 5 docs)
+idf(remainder) = 1.0986   (in 1 of 5 docs)
+idf(the) = 0.1987   (in 4 of 5 docs)
+doc 2: tf(prime) = 3, length 11, k1 * (1 - b + b * dl/avgdl) = 2.0033, tf part = 1.4990
+doc 4: tf(prime) = 1, length 4, k1 * (1 - b + b * dl/avgdl) = 0.9671, tf part = 1.2709
+tf part, dl = 0.5 x avgdl, tf = 1..10: [1.29, 1.7, 1.9, 2.03, 2.11, 2.16, 2.2, 2.24, 2.26, 2.29]
+tf part, dl = 1.0 x avgdl, tf = 1..10: [1.0, 1.43, 1.67, 1.82, 1.92, 2.0, 2.06, 2.11, 2.14, 2.17]
+tf part, dl = 2.0 x avgdl, tf = 1..10: [0.69, 1.08, 1.33, 1.51, 1.64, 1.74, 1.82, 1.88, 1.94, 1.98]
+scores: [1.0145, 0.5044, 0.0, 0.4276, 0.0]
+rank_bm25: [1.0145, 0.5044, 0.0, 0.4276, 0.0] max diff 1.1e-16
+
+== 2. Tokenizers on one problem
+text: Compute $\frac{1}{2}+x^{2}$ where $x^2 = 9$ and $\angle ABC = 90^\circ$.
+naive: ['compute', 'frac', '1', '2', 'x', '2', 'where', 'x', '2', '9', 'and', 'angle', 'abc', '90', 'circ']
+math : ['compute', '\\frac', '1', '2', 'x', '^{2}', 'where', 'x', '^2', '9', 'and', '\\angle', 'abc', '90', '\\circ']
+
+== 3. The corpus: MATH train = corpus, MATH test = queries
+corpus 7500 problems, test 5000 problems (23.8 s to load)
+test subjects: {'Algebra': 1187, 'Counting & Probability': 474, 'Geometry': 479, 'Intermediate Algebra': 903, 'Number Theory': 540, 'Prealgebra': 871, 'Precalculus': 546}
+Method 1 (ours): indexed in 1.2 s, 7501 distinct tokens, avgdl 42.2
+Method 2 (rank_bm25): indexed in 0.8 s
+20 queries: largest score difference 3.6e-12; same top-5 list for 20 of 20
+
+== 4. Decontamination (Appendix C.2): prefix match or word Jaccard >= 0.8
+491 of 5000 test problems match a corpus problem (49 s)
+  e.g. If $2^8=4^x$, what is the value of $x$?
+  e.g. What is the number of units in the distance from the origin to the point $(-8,6)$ in a coo
+
+== 5. The lexical router, scored against the dataset's subject labels
+train: 7500 problems, router accuracy 76.4%
+test: 4509 problems, router accuracy 77.6%
+    true route | combinat geometry number_t  default | correct
+ combinatorics |      257       45       43       80 |  60.5%
+      geometry |        6      369        5       63 |  83.3%
+ number_theory |       12       17      415       70 |  80.7%
+       default |       78      385      206     2458 |  78.6%
+  route('How many ways can 4 books be arranged on a shelf?') = combinatorics
+  route('What is the remainder when $2^{100}$ is divided by 7?') = number_theory
+  route('In triangle $ABC$, $AB = 5$ and $\\angle C = 90^\\circ$. Find $BC$.') = geometry
+  route('Solve for $x$: $3x + 7 = 22$.') = default
+
+== 6. The routed harness on one test problem per route
+hard geometry index: 421 level-5 geometry problems
+[combinatorics] query: 'In how many ways can we choose 3 distinct letters of the alphabet, without regar'
+    -> Prealgebra, level 5: 'Acme Corporation has released an alphabet soup in which each'
+    -> Prealgebra, level 5: 'In how many ways can a president and a 2-person committee be'
+    -> Counting & Probability, level 5: 'I have a bag with $6$ marbles numbered from $1$ to $6.$ Math'
+[default] query: 'Evaluate $\\log_{5^2}5^4$.'
+    -> Algebra, level 3: 'Evaluate $\\log_{3}{81}-\\log_{3}{\\frac{1}{9}}$.'
+    -> Algebra, level 3: 'Evaluate $\\log_432$.'
+    -> Algebra, level 2: 'Evaluate $\\log_5625$.'
+[number_theory] query: 'What is the last nonzero digit to the right of the decimal point in the decimal '
+    -> Number Theory, level 3: 'What is the last digit of the decimal expansion of $\\frac{1}'
+    -> Number Theory, level 2: 'What is the first nonzero digit to the right of the decimal '
+    -> Prealgebra, level 3: 'What is the 100th digit to the right of the decimal point in'
+[geometry] query: 'In the diagram, what is the perimeter of the sector of the circle with radius 12'
+    -> Geometry, level 5: 'The base of a triangular piece of paper $ABC$ is $12\\text{ c'
+    -> Geometry, level 4: 'In the diagram, $AOB$ is a sector of a circle with $\\angle A'
+    -> Geometry, level 2: 'Two sectors of a circle of radius $12$ are placed side by si'
+
+== 7. Do the retrieved examples share the query's subject? (400 test problems)
+ bm25 top-3 (naive tokens): 62.0% of retrieved examples share the subject
+  bm25 top-3 (math tokens): 62.6% of retrieved examples share the subject
+            routed harness: 62.8% of retrieved examples share the subject
+routed harness: 2.83 examples per problem on average (76 s for 400 queries x 3 methods)
