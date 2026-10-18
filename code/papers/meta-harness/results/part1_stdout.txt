@@ -1,0 +1,54 @@
+== 1. One frozen model, one task, four harnesses
+model: Qwen/Qwen2.5-1.5B-Instruct on mps, greedy decoding, weights never change
+task: Symptom2Disease, 22 labels, memory 853 labeled examples, eval 60 test examples
+harness               accuracy  right  input tokens
+A_bare                   0.000   0/60          72.4
+B_labels                 0.433  26/60         145.4
+C_labels_lenient         0.517  31/60         145.4
+D_labels_retrieval       0.767  46/60         368.0
+time for 4 x 60 model calls: 350 s
+the first outputs of harness A (12 new tokens at most):
+  'Based on your symptoms of skin irritations, rashes,'
+  'Based on your symptoms of frequent coughing, difficulty breathing,'
+best 0.767, worst 0.000, gap 76.7 points, ratio undefined (worst is 0)
+
+== 2. The prompt the model sees: built by hand (Method 1) and by the chat template (Method 2)
+Method 1 length 611 chars, Method 2 length 611 chars, identical: True
+harness A (no system turn): identical: True
+the start of the prompt of harness B, as the model reads it:
+  | <|im_start|>system
+  | Possible diagnoses: allergy, arthritis, bronchial asthma, cervical spondylosis, chicken pox, common cold, deng ...
+  | <|im_start|>user
+
+== 3. Accuracy counted by hand (Method 1) and by scikit-learn (Method 2)
+A_bare               ours 0.0000  sklearn 0.0000  agree: True
+B_labels             ours 0.4333  sklearn 0.4333  agree: True
+C_labels_lenient     ours 0.5167  sklearn 0.5167  agree: True
+D_labels_retrieval   ours 0.7667  sklearn 0.7667  agree: True
+
+== 4. Feedback about harness B, three ways
+a score:               10 tokens  -> B_labels: accuracy 0.433
+a short summary:       32 tokens
+the full traces:    11729 tokens  (60 prompts, outputs and verdicts)
+traces / score = 1173x
+what only the traces show: 34 wrong answers, and 13 of them are outputs that match no label
+  output 'gastroesophageal reflux disease (GERD)' gold 'gastroesophageal reflux disease'
+  output 'gastroesophageal reflux disease (GERD)' gold 'gastroesophageal reflux disease'
+  output 'Urinary tract infection (UTI)'    gold 'urinary tract infection'
+5 of the 13 rejected outputs name the right disease inside a longer answer
+
+== 5. Search the trace files: our Python (Method 1) and grep (Method 2)
+A_bare/traces.jsonl              Method 1  60   grep  60
+B_labels/traces.jsonl            Method 1  34   grep  34
+C_labels_lenient/traces.jsonl    Method 1  29   grep  29
+D_labels_retrieval/traces.jsonl  Method 1  14   grep  14
+Method 1 and grep agree: True
+8 files in the store: A_bare/scores.json, A_bare/traces.jsonl, B_labels/scores.json, B_labels/traces.jsonl, C_labels_lenient/scores.json, C_labels_lenient/traces.jsonl, D_labels_retrieval/scores.json, D_labels_retrieval/traces.jsonl
+
+== 6. The paper's headline numbers, checked
+text classification: Meta-Harness 48.6 vs ACE 40.9 (points)        7.7
+context: ACE 50.8K vs Meta-Harness 11.4K tokens (times fewer)      4.46
+TerminalBench-2, Opus 4.6: 76.4 vs Terminus-KIRA 74.7 (points)     1.7
+TerminalBench-2, Haiku 4.5: 37.6 vs Goose 35.5 (points)            2.1
+the 6x source: same model, 12% vs 2% of 50 tasks (ratio)           6.0
+12% and 2% of 50 tasks, as task counts                             (6.0, 1.0)

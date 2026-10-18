@@ -1,0 +1,68 @@
+{
+ "table1_ratio": 384.61538461538464,
+ "toy": {
+  "H_A": 0.7,
+  "H_B": 0.75
+ },
+ "pool": {
+  "acc": 0.875,
+  "misses": 12,
+  "search": 24,
+  "test": 48
+ },
+ "objective_real": {
+  "zero_shot": 0.5833333333333334,
+  "few_shot_4": 0.18055555555555558
+ },
+ "pareto_table2": [
+  "Few-Shot (32)",
+  "Few-Shot (8)",
+  "Meta-Harness",
+  "Zero-Shot"
+ ],
+ "search_points": {
+  "000_zero_shot": [
+   0.5,
+   178.91666666666666
+  ],
+  "001_few_shot_4": [
+   0.16666666666666666,
+   430.9166666666667
+  ],
+  "002_one_word_answer": [
+   0.5833333333333334,
+   230.91666666666666
+  ],
+  "003_retrieve_4": [
+   0.3333333333333333,
+   637.5
+  ],
+  "004_retrieve_balanced": [
+   0.2916666666666667,
+   660.7916666666666
+  ]
+ },
+ "test": {
+  "000_zero_shot": {
+   "search": 0.5,
+   "test": 0.9166666666666666,
+   "prompt_chars": 158.72916666666666
+  },
+  "002_one_word_answer": {
+   "search": 0.5833333333333334,
+   "test": 0.9375,
+   "prompt_chars": 210.72916666666666
+  }
+ },
+ "reads": {
+  "source": 4,
+  "trace": 2,
+  "score": 5,
+  "other": 6
+ },
+ "fs": {
+  "files": 22,
+  "chars": 102243,
+  "tokens": 25303
+ }
+}

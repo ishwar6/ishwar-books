@@ -1,0 +1,41 @@
+{
+ "model": "Qwen/Qwen2.5-1.5B-Instruct",
+ "device": "mps",
+ "n_eval": 60,
+ "labels": 22,
+ "harnesses": {
+  "A_bare": {
+   "accuracy": 0.0,
+   "right": 0,
+   "mean_input_tokens": 72.4,
+   "sklearn_accuracy": 0.0
+  },
+  "B_labels": {
+   "accuracy": 0.43333333333333335,
+   "right": 26,
+   "mean_input_tokens": 145.4,
+   "sklearn_accuracy": 0.43333333333333335
+  },
+  "C_labels_lenient": {
+   "accuracy": 0.5166666666666667,
+   "right": 31,
+   "mean_input_tokens": 145.4,
+   "sklearn_accuracy": 0.5166666666666667
+  },
+  "D_labels_retrieval": {
+   "accuracy": 0.7666666666666667,
+   "right": 46,
+   "mean_input_tokens": 368.0,
+   "sklearn_accuracy": 0.7666666666666667
+  }
+ },
+ "feedback_tokens": {
+  "score": 10,
+  "summary": 32,
+  "traces": 11729
+ },
+ "unparsed_B": 13,
+ "wrong_B": 34,
+ "right_but_rejected_B": 5,
+ "grep_agree": true
+}
