@@ -1,0 +1,56 @@
+{
+ "pareto": {
+  "unique": {
+   "zero-shot": 2,
+   "few-shot": 2,
+   "retrieval": 5
+  },
+  "method1": [
+   "few-shot",
+   "retrieval",
+   "zero-shot"
+  ],
+  "method2": [
+   "few-shot",
+   "retrieval",
+   "zero-shot"
+  ]
+ },
+ "puct": [
+  {
+   "name": "A: best reward, built on 7 times",
+   "Q": 0.9,
+   "P": 0.6,
+   "n": 7,
+   "score": 1.748528137423857
+  },
+  {
+   "name": "B: good reward, built on once",
+   "Q": 0.8,
+   "P": 0.5,
+   "n": 1,
+   "score": 1.918033988749895
+  },
+  {
+   "name": "C: weak reward, never built on",
+   "Q": 0.4,
+   "P": 0.2,
+   "n": 0,
+   "score": 1.0
+  }
+ ],
+ "meta_prompt": [
+  "Here are earlier instructions with their accuracy. Higher is better.",
+  "",
+  "Instruction: Show only the list of labels.",
+  "Accuracy: 73.3",
+  "",
+  "Instruction: Show one fixed example question for each label.",
+  "Accuracy: 75.0",
+  "",
+  "Instruction: Show the 6 most similar labelled questions from memory.",
+  "Accuracy: 78.3",
+  "",
+  "Write a new instruction that is different from all of the above and has a higher accuracy."
+ ]
+}

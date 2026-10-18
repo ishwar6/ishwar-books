@@ -1,0 +1,124 @@
+{
+ "task": {
+  "intents": [
+   "activate_my_card",
+   "card_arrival",
+   "card_delivery_estimate",
+   "card_not_working",
+   "declined_card_payment",
+   "lost_or_stolen_card"
+  ],
+  "memory": 771,
+  "test": 60
+ },
+ "tfidf": {
+  "max_diff": 2.9720478078587576e-08,
+  "same_top": 60,
+  "vocab": 563
+ },
+ "template_equal": true,
+ "harness": {
+  "Qwen2.5-0.5B-Instruct/zero-shot": {
+   "acc": 41.666666666666664,
+   "right": 25,
+   "invalid": 3,
+   "tokens": 74.1
+  },
+  "Qwen2.5-0.5B-Instruct/few-shot": {
+   "acc": 51.666666666666664,
+   "right": 31,
+   "invalid": 3,
+   "tokens": 190.1
+  },
+  "Qwen2.5-0.5B-Instruct/retrieval": {
+   "acc": 83.33333333333333,
+   "right": 50,
+   "invalid": 1,
+   "tokens": 192.3
+  },
+  "Qwen2.5-1.5B-Instruct/zero-shot": {
+   "acc": 73.33333333333333,
+   "right": 44,
+   "invalid": 1,
+   "tokens": 74.1
+  },
+  "Qwen2.5-1.5B-Instruct/few-shot": {
+   "acc": 75.0,
+   "right": 45,
+   "invalid": 0,
+   "tokens": 190.1
+  },
+  "Qwen2.5-1.5B-Instruct/retrieval": {
+   "acc": 78.33333333333333,
+   "right": 47,
+   "invalid": 0,
+   "tokens": 192.3
+  }
+ },
+ "flips": {
+  "fixed": 8,
+  "broken": 5
+ },
+ "react": [
+  {
+   "q": "I paid 3 bills of 47.85 EUR and 2 bills of 118.4 EUR. How much did I pay in total?",
+   "gold": 380.35,
+   "bare": 332.6,
+   "strict": 118.4,
+   "ours": 380.35,
+   "ours_steps": [
+    [
+     "47.85 + 47.85 + 47.85 + 118.4 + 118.4",
+     380.35
+    ]
+   ],
+   "native": 380.35,
+   "native_steps": [
+    [
+     "47.85*3+118.4*2",
+     380.35
+    ]
+   ]
+  },
+  {
+   "q": "My balance was 1250.75 EUR. I sent 3 transfers of 212.6 EUR each. What is my balance now?",
+   "gold": 612.95,
+   "bare": 925.75,
+   "strict": 3.0,
+   "ours": 612.95,
+   "ours_steps": [
+    [
+     "1250.75 - (212.6 * 3)",
+     612.95
+    ]
+   ],
+   "native": 612.95,
+   "native_steps": [
+    [
+     "1250.75 - (212.6*3)",
+     612.95
+    ]
+   ]
+  },
+  {
+   "q": "The card fee is 2.9% of a 845 EUR payment. How much is the fee?",
+   "gold": 24.505000000000003,
+   "bare": 25.69,
+   "strict": 0.029,
+   "ours": 24.505,
+   "ours_steps": [
+    [
+     "845 * 0.029",
+     24.505
+    ]
+   ],
+   "native": 24.51,
+   "native_steps": [
+    [
+     "0.029*845",
+     24.505
+    ]
+   ]
+  }
+ ]
+}

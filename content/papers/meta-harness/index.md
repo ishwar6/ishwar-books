@@ -30,7 +30,7 @@ Harnesses are mostly written by hand: a person reads failures, guesses a fix, an
 
 ## How the six parts are organised
 
-**Before Part 1 (optional): What a Harness Is** (coming soon). The model, the loop around it, and the earlier ways people tried to optimise prompts and programs.
+**Before Part 1 (optional): [What a Harness Is](background-what-a-harness-is.md).** The model, the loop around it, and the earlier ways people tried to optimise prompts and programs.
 
 1. **[The Big Idea](part-1-the-big-idea.md)**: the title, Figure 1, the abstract and §1.
 2. **[The Method](part-2-the-method.md)**: §2, Table 1, §3, Figure 2 and Algorithm 1. The objective, the filesystem of experience, and the proposer.
