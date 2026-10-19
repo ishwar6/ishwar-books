@@ -1,0 +1,48 @@
+== 1. Attention for one query over three tokens (d = 2)
+scores  q.k/sqrt(2): [0.707, 0.0, 0.707]
+weights softmax    : [0.401, 0.198, 0.401] sum 1.000
+output, Method 1   : [0.802, 0.599]
+output, Method 2   : [0.802, 0.599] agree: True
+
+== 2. Do the keys of earlier tokens change when more tokens follow? (OPT-125M, FP32, CPU)
+8 tokens alone, then the same 8 tokens followed by 9 more
+largest change of a key or value of the first 8 tokens, over all 12 layers: 7.39e-06
+largest key value, for scale: 6.5
+
+== 3. Layer 0 for the newest token, rebuilt from the cache by hand
+input to layer 0: (1, 1, 768) (one token); cached keys: (1, 12, 17, 64)
+attention weights of head 0 over the 17 tokens: 0.04 0.05 0.01 0.03 0.02 0.01 0.04 0.02 0.02 0.01 0.01 0.02 0.02 0.03 0.07 0.58 0.03
+Method 1 (by hand from the cache) vs Method 2 (the library): max difference 5.96e-08
+
+== 4. Contiguous memory: a first-fit allocator (memory of 32 slots)
+after A=8, B=6, C=8, D=6:  AAAAAAAABBBBBBCCCCCCCCDDDDDD....
+after B and D finish:      AAAAAAAA......CCCCCCCC..........   free 16, largest gap 10
+request E needs 12 slots in one piece: refused, although 16 slots are free
+the same memory in blocks of 2 slots, any block anywhere:
+  free blocks 8; E needs 6 blocks: granted
+trace of 5000 requests in 4096 slots, sizes 20 to 400; a request that does not fit is refused:
+  contiguous first fit: memory holding data 81.6% on average; 2468 refused, 2456 of them while enough slots were free in total; slots not holding data at a refusal: 746 on average
+  blocks of 16:         memory holding data 91.9% on average; 2473 refused; slots not holding data at a refusal: 305 on average
+
+== 4b. The buddy allocator rounds every request up to a power of two
+  request    25 -> chunk    32:    7 slots never used (22% of the chunk)
+  request   300 -> chunk   512:  212 slots never used (41% of the chunk)
+  request   513 -> chunk  1024:  511 slots never used (50% of the chunk)
+  request  1500 -> chunk  2048:  548 slots never used (27% of the chunk)
+
+== 5. Paging: from a virtual address to a physical one
+virtual  10000 -> page 2, offset 1808 -> frame 7 -> physical  30480; bit method agrees: True
+virtual   4095 -> page 0, offset 4095 -> frame 5 -> physical  24575; bit method agrees: True
+virtual   4096 -> page 1, offset    0 -> frame 2 -> physical   8192; bit method agrees: True
+this laptop's page size: 16384 bytes (16 KB)
+
+== 5b. Pages on demand: map 1 GB, then touch 256 MB of it
+resident memory before:   1023.5 MB
+after mapping 1 GB:       1023.5 MB   (+0.0 MB)
+after touching 256 MB:    1279.5 MB   (+256.0 MB, 16384 pages written)
+
+== 5c. The waste of paging is the unused end of the last page
+       1 bytes -> 1 pages of 4096 =   4096 bytes, 4095 unused
+    4096 bytes -> 1 pages of 4096 =   4096 bytes,    0 unused
+    4097 bytes -> 2 pages of 4096 =   8192 bytes, 4095 unused
+   10000 bytes -> 3 pages of 4096 =  12288 bytes, 2288 unused

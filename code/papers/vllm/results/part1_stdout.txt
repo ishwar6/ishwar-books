@@ -1,0 +1,58 @@
+== 1. The KV cache of one token
+OPT-13B config: 40 layers, hidden size 5120, max length 2048 tokens
+Method 1, formula: 2 x 5120 x 40 x 2 bytes = 819,200 bytes = 800 KB per token
+one request of 2048 tokens: 1,677,721,600 bytes = 1.68 GB
+OPT-125M: 12 layers, hidden size 768; prompt of 17 tokens
+shape of the keys of layer 0: (1, 12, 17, 64)  (batch, heads, tokens, head size), torch.float16
+Method 1, formula: 36,864 bytes per token x 17 tokens = 626,688 bytes
+Method 2, real tensors: 626,688 bytes; agree: True
+
+== 2. Figure 1 (left): a 13B model on a 40 GB A100
+weights: 13B parameters x 2 bytes = 26 GB = 65% of 40 GB
+KV cache room at 30% of the GPU: 12 GB = 14,648 tokens of OPT-13B
+requests of 2048 tokens that fit: 7.2
+
+== 3. Greedy generation three ways: no cache, our own KV cache loop, model.generate
+64 new tokens; same tokens, no cache vs our cache: True; our cache vs generate: True
+text: ', a new nation, a new nation, a new nation, a new nation, a new nation, a new nation, a ne' ...
+cache after generation: 80 tokens = 2,949,120 bytes (the last token gets its key and value at the next step)
+time: no cache 0.308 s, with cache 0.260 s (1.2x)
+with a 400-token prompt: no cache 0.633 s, with cache 0.270 s (2.3x)
+
+== 4. The prompt phase against the generation phase (OPT-125M, 400 tokens)
+prompt phase, 400 tokens in one pass:       9.6 ms =    41,536 tokens/s
+the same 400 tokens one at a time:       1629.9 ms =       245 tokens/s
+one pass is 169x faster for the same work
+
+== 5. One decode step for a batch of requests (each with a 128-token context)
+batch  step ms  tokens/s
+    1     4.51       221
+    2     5.45       367
+    4     5.07       788
+    8     6.18     1,294
+   16     7.22     2,217
+   32     7.93     4,033
+   64    10.01     6,393
+from batch 1 to 64: step time x2.2, throughput x28.9
+
+== 6. How much reserved KV cache memory holds real tokens (Alpaca lengths, OPT tokenizer)
+2000 requests; mean prompt 18.9 tokens, mean output 58.4 tokens, longest 514 tokens
+scheme       token states  reserved  never used  Method 2 agrees
+max (2048)           3.6%      2.7%       93.7%             True
+pow2                41.2%     31.3%       27.4%             True
+oracle              56.8%     43.2%        0.0%             True
+paged (16)          90.7%      8.4%        0.8%             True
+external fragmentation is not simulated: we place no requests in a real address space
+requests of OPT-13B that fit in 12 GB of KV cache, on average over their lifetime:
+  max (2048)    2048.0 slots per request ->    7.2 requests
+  pow2           177.5 slots per request ->   82.5 requests
+  oracle         128.9 slots per request ->  113.7 requests
+  paged (16)      80.7 slots per request ->  181.5 requests
+
+== 7. The paper's headline numbers, checked
+Figure 2, token states in Orca (Max)      20.4%   -> waste  79.6%
+Figure 2, token states in Orca (Pow2)     26.8%   -> waste  73.2%
+Figure 2, token states in Orca (Oracle)   38.2%   -> waste  61.8%
+Figure 2, token states in vLLM            96.3%   -> waste   3.7%
+Figure 2: vLLM keeps 4.7x to 2.5x more of the memory for real tokens
+§3: 819,200 bytes x 2048 tokens = 1.56 GiB = 1.68 GB ("1.6 GB")
