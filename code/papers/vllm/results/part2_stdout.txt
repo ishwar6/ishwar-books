@@ -1,0 +1,82 @@
+== 1. Eq. 1: the probability of a sentence is a product of next-token probabilities
+token      P(token | earlier)
+'Four'               1.23e-05
+' score'             5.54e-05
+' and'               2.99e-02
+' seven'             1.69e-02
+' years'             1.21e-03
+' ago'               7.47e-02
+' our'               1.68e-03
+' fathers'           5.16e-04
+product, Method 1 (8 passes): 2.710e-23
+product, Method 2 (1 pass):     2.710e-23
+library loss 6.4953 -> exp(-loss x 8) = 2.710e-23; max difference of the conditionals 2.5e-07
+
+== 2. The same token gets a different KV cache at a different position or after different words
+'the cat sat on the mat': "the" at token positions 1 and 5
+  layer  0: keys of the two "the" are equal: False; cosine similarity 0.638
+  layer 11: keys of the two "the" are equal: False; cosine similarity 0.843
+'I saw the' against 'We ate the': "the" is token 3 in both
+  layer  0: max difference of the keys of "the" 0.00e+00; cosine similarity 1.000
+  layer  1: max difference of the keys of "the" 4.74e-01; cosine similarity 0.997
+  layer 11: max difference of the keys of "the" 2.68e+00; cosine similarity 0.922
+layer 0 sees only the token and its position; from layer 1 on, the key carries the earlier words
+
+== 3. One 5120 x 5120 FP16 weight matrix (OPT-13B size) times n token vectors, on the laptop GPU
+n tokens  time ms  TFLOP/s  FLOPs per byte
+       1    0.196     0.27             1.0
+       2    0.216     0.49             2.0
+       4    0.211     0.99             4.0
+       8    0.218     1.92             8.0
+      16    0.210     4.00            15.9
+      32    0.226     7.42            31.6
+      64    0.233    14.43            62.4
+     128    0.272    24.70           121.9
+     256    0.595    22.55           232.7
+     512    1.782    15.06           426.7
+from 1 to 64 tokens: time x1.2 for 64x the work; from 1 to 512: time x9.1 for 512x the work
+
+== 4. Request-level batching (pad to the longest) against iteration-level batching (Alpaca output lengths)
+300 requests, one every 12 steps; output lengths: mean 52.1, shortest 1, longest 306; batch of 8
+                 steps to finish  mean wait (steps)  padding slot-steps
+request-level              5,519              927.3              24,784
+iteration-level            3,697                0.2                   0
+useful slot-steps (one token each): 15,643 in both; padding share of request-level batches 61.3%; closed form for padding agrees: True
+
+== 5. KV cache size from the real configs (FP16, 2 bytes per number)
+model      layers hidden KB per token GB per 2048 tokens weights GB
+opt-125m       12    768           36               0.08       0.25
+opt-1.3b       24   2048          192               0.40       2.60
+opt-13b        40   5120          800               1.68      26.00
+opt-66b        64   9216        2,304               4.83     132.00
+OPT-13B on an 80 GB GPU: 54 GB left after the weights = 32 requests of 2048 tokens
+
+== 6. Parallel sampling and beam search with model.generate (OPT-125M)
+prompt of 16 tokens, 4 samples of up to 40 new tokens; cache shape of layer 0: (4, 12, 55, 64)
+the 4 copies of the prompt keys are identical: True
+cache held: 16,220,160 bytes; the prompt stored 4 times = 4,718,592 bytes, of which 3 copies (3,538,944 bytes, 22% of the cache) are duplicates
+  sample 1: '\nWrite the code to get the sum of the numbers for each varia'
+  sample 2: 'This also looks pretty cool.  Thanks for sharing that :)\nTha'
+  sample 3: '\nIf a function returns zero from the table and the return am'
+  sample 4: '\nWrite your function to return a function that returns an ar'
+beam search, 4 beams, 30 new tokens: all 4 share their first 3 new tokens
+new tokens stored once per beam: 120; stored once per distinct prefix: 86 (28% less)
+  beam 1: '\nWrite a function that returns the sum of a list of numbers.\n\nWrite a '
+  beam 2: '\nWrite a Python function that returns the sum of a list of numbers.\n\nW'
+  beam 3: '\nWrite a Python function that returns the sum of a list of numbers.\n\nW'
+  beam 4: '\nWrite a function that returns the sum of a list of integers.\n\nWrite a'
+
+== 7. The output length is unknown until the model stops
+20 sampled answers to one question (stop at </s> or 200 tokens): lengths [2, 3, 3, 4, 5, 6, 15, 19, 23, 27, 28, 29, 35, 48, 73, 88, 151, 200, 200, 200]
+2000 Alpaca answers: shortest 1, median 43, 90th percentile 127, longest 499 tokens
+
+== 8. Figure 3: the slots of two pre-allocated requests at the current step
+request A: chunk of 2048: token states 9, reserved 2, never used 2,037; useful share 0.44%
+request B: chunk of 512: token states 4, reserved 1, never used 507; useful share 0.78%
+both chunks: 2,560 slots; token states 13, reserved 3, never used 2,544; even at the end only 16 slots (0.62%) ever hold a token
+
+== 9. Compaction means copying the KV cache: how fast does this laptop copy GPU memory?
+copy 1 GiB: 8.1 ms = 132.7 GB copied per second
+moving 12 GB of KV cache at that speed: 90 ms, during which no request writes a token
+
+saved results/part2.json

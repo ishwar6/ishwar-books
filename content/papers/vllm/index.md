@@ -33,7 +33,7 @@ This paper shows that the serving systems of 2023 wasted most of that memory. Th
 **Before Part 1 (optional): [The KV Cache and Paging](background-the-kv-cache-and-paging.md).** How attention uses keys and values, and how an operating system gives each program its own pages of memory.
 
 1. **[The Big Idea](part-1-the-big-idea.md)**: the title, the abstract, Figures 1 and 2, and §1. Where the memory of a GPU goes, and why most of the KV cache memory was wasted.
-2. **Why Memory Is the Bottleneck** (coming soon): §2 and §3, Figure 3. The two phases of generation, batching, and the three kinds of waste.
+2. **[Why Memory Is the Bottleneck](part-2-why-memory-is-the-bottleneck.md)**: §2 and §3, Figure 3. The two phases of generation, batching, and the three kinds of waste.
 3. **PagedAttention** (coming soon): §4.1 to §4.3, Figures 4 to 7. Attention over blocks, the block table, and the KV cache manager.
 4. **Sharing, Scheduling and Many GPUs** (coming soon): §4.4 to §4.6 and §5, Figures 8 to 10. Copy-on-write, beam search, preemption and swapping, and distributed execution.
 5. **The Experiments** (coming soon): §6 to §10. Throughput against latency, sharing, the ablations, and the limits.
