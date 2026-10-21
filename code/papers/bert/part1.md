@@ -9,12 +9,9 @@ tags: [bert, nlp, transformers]
 
 In October 2018, four researchers at Google posted a paper called **BERT**. It reported new best results on eleven language tasks at once. A year later, in October 2019, Google wrote that BERT would help its search engine understand about one in ten English searches in the US. BERT-style models are still used today inside search engines, spam filters, support-ticket routers and retrieval systems.
 
-This series reads the paper slowly, in the paper's own order. Each piece shows the exact lines of the paper as a highlighted screenshot in a teal box, with what they say and what they mean. A yellow box explains every new word, and a picture or real code with its real output follows when it helps.
+This series reads the paper slowly, in the paper's own order. Each piece shows the exact lines of the paper as a highlighted screenshot in a teal box, with what they say and what they mean. A picture or real code with its real output follows when it helps.
 
 The small `Paper §1` tag above each heading tells you which section of the paper you are reading. The screenshots come from the paper's second arXiv version (May 2019), the one most people read today.
-
-> [!DEFINITION] Definition boxes
-> A yellow box like this explains one technical word, the first time it appears. If you already know the word, skip the box.
 
 ## The title {§Title}
 

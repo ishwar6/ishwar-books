@@ -443,6 +443,8 @@ a.project-card:hover { transform: translateY(-2px); }
 .prose figure:not(.fig) { margin: 2em 0; }
 .prose figure:not(.fig) img { margin: 0; width: 100%; border: 1px solid var(--border-soft); }
 .prose figure:not(.fig) figcaption { margin-top: 0.7em; font-size: 0.8em; color: var(--muted); text-align: center; }
+/* portrait photos and small diagrams: keep their own width instead of filling the column */
+.prose figure.narrow img { width: auto; max-width: min(100%, 380px); margin: 0 auto; }
 .prose a[href^="#t="] { font-size: 0.8em; font-weight: 700; text-decoration: none; padding: 2px 9px; border-radius: 999px; background: color-mix(in srgb, var(--h2) 14%, transparent); color: var(--h2); }
 
 @media (max-width: 720px) { .nav { gap: 0; } .nav a { padding: 6px 9px; font-size: 14.5px; } }

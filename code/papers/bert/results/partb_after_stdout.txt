@@ -1,0 +1,46 @@
+== 7. BERT (2018) against ModernBERT (2024), read from the released models
+                               BERT-base   ModernBERT-base
+layers                                12                22
+hidden size                          768               768
+feed-forward size                  3,072             1,152
+attention heads                       12                12
+vocabulary                        30,522            50,368
+longest input (tokens)               512             8,192
+parameters (millions)              109.5             149.7
+(ModernBERT uses GeGLU: its first feed-forward layer makes 2 x 1,152 = 2,304 numbers, one half a value, the other a gate)
+BERT-base        "The capital of France is [MASK]." -> paris (0.42), lille (0.07), lyon (0.06), marseille (0.04), tours (0.03)
+ModernBERT-base  "The capital of France is [MASK]." -> Paris (0.92), Lyon (0.04), Nancy (0.02), Nice (0.01), Orleans (0.00)
+BERT-base        on a 2,000-token input: fails: RuntimeError
+ModernBERT-base  on a 2,000-token input: runs
+
+== 8. ModernBERT: every third layer looks at the whole text, the others at a 128-token window
+layers: 22; global layers (0-based): [0, 3, 6, 9, 12, 15, 18, 21] -> 8 global, 14 local; window 128 tokens
+query-key pairs at 8,192 tokens: all global 1.476e+09, alternating 5.516e+08 -> 37.4% of the work
+
+== 9. LLaDA (2025): L = -E_t [ (1/t) * sum over masked tokens of log p(x_i | x_t) ], t ~ U(0, 1)
+t = 0.15:  1 of 16 tokens masked; loss by hand 1.3920, library 1.3920; per masked token 0.209 nats
+t = 0.50:  7 of 16 tokens masked; loss by hand 38.7060, library 38.7060; per masked token 2.765 nats
+t = 0.90: 14 of 16 tokens masked; loss by hand 94.4002, library 94.4002; per masked token 6.069 nats
+BERT itself is the t = 0.15 case without the 1/t weight: one fixed masking ratio
+
+== 10. Writing with BERT: start from [MASK] x 8, unmask the most confident blank each step
+step 1: fills "." (p = 0.98)   the best thing about a quiet morning is _ _ _ _ _ _ _ .
+step 2: fills "not" (p = 0.54)   the best thing about a quiet morning is not _ _ _ _ _ _ .
+step 3: fills "to" (p = 0.41)   the best thing about a quiet morning is not to _ _ _ _ _ .
+step 4: fills "a" (p = 0.15)   the best thing about a quiet morning is not to _ _ _ a _ .
+step 5: fills "for" (p = 0.30)   the best thing about a quiet morning is not to _ _ for a _ .
+step 6: fills "while" (p = 0.50)   the best thing about a quiet morning is not to _ _ for a while .
+step 7: fills "be" (p = 0.53)   the best thing about a quiet morning is not to be _ for a while .
+step 8: fills "alone" (p = 0.49)   the best thing about a quiet morning is not to be alone for a while .
+(eight steps for eight words: one model call per word, the same count as a left-to-right model)
+
+== 11. How much of the text each model hides during training (from the papers named)
+  2018  BERT        15%                         BERT paper, §3.1
+  2019  RoBERTa     15%                         RoBERTa paper, §2.4; NeoBERT paper, Table 1
+  2024  ModernBERT  30%                         ModernBERT paper, §2.2.2
+  2025  NeoBERT     20%                         NeoBERT paper, Table 1
+  2025  mmBERT      30%, then 15%, then 5%      mmBERT paper, §3.3
+  2025  LLaDA       any share from 0 to 100%    LLaDA paper, §2.1
+  2026  UltraBERT   5% and 50% in every batch   UltraBERT paper, §4
+
+saved results/partb_after.json

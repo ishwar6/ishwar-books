@@ -1,0 +1,201 @@
+{
+ "compare": {
+  "BERT-base": {
+   "layers": 12,
+   "hidden": 768,
+   "ffn": 3072,
+   "heads": 12,
+   "vocab": 30522,
+   "max_len": 512,
+   "params": 109.514298
+  },
+  "ModernBERT-base": {
+   "layers": 22,
+   "hidden": 768,
+   "ffn": 1152,
+   "heads": 12,
+   "vocab": 50368,
+   "max_len": 8192,
+   "params": 149.655232
+  }
+ },
+ "fill": {
+  "BERT-base": [
+   [
+    "paris",
+    0.41679152846336365
+   ],
+   [
+    "lille",
+    0.07141704857349396
+   ],
+   [
+    "lyon",
+    0.06339352577924728
+   ],
+   [
+    "marseille",
+    0.04444779455661774
+   ],
+   [
+    "tours",
+    0.03029709681868553
+   ]
+  ],
+  "ModernBERT-base": [
+   [
+    "Paris",
+    0.9233461618423462
+   ],
+   [
+    "Lyon",
+    0.03594721481204033
+   ],
+   [
+    "Nancy",
+    0.02305123768746853
+   ],
+   [
+    "Nice",
+    0.00616869842633605
+   ],
+   [
+    "Orleans",
+    0.002584344008937478
+   ]
+  ]
+ },
+ "long": {
+  "BERT-base": "fails: RuntimeError",
+  "ModernBERT-base": "runs"
+ },
+ "alternating": {
+  "layers": 22,
+  "global_layers": 8,
+  "window": 128,
+  "share": 0.37357954545454547
+ },
+ "diffusion_loss": [
+  {
+   "t": 0.15,
+   "masked": 1,
+   "of": 16,
+   "hand": 1.3920444801067098,
+   "lib": 1.392044480106718,
+   "per_token": 0.2088066720160077
+  },
+  {
+   "t": 0.5,
+   "masked": 7,
+   "of": 16,
+   "hand": 38.70598001497454,
+   "lib": 38.70598001497462,
+   "per_token": 2.764712858212473
+  },
+  {
+   "t": 0.9,
+   "masked": 14,
+   "of": 16,
+   "hand": 94.40020694899444,
+   "lib": 94.40020694899442,
+   "per_token": 6.0685847324353555
+  }
+ ],
+ "write": {
+  "prompt": "the best thing about a quiet morning is",
+  "steps": [
+   {
+    "step": 1,
+    "filled": ".",
+    "conf": 0.9838095903396606,
+    "text": "_ _ _ _ _ _ _ ."
+   },
+   {
+    "step": 2,
+    "filled": "not",
+    "conf": 0.538077712059021,
+    "text": "not _ _ _ _ _ _ ."
+   },
+   {
+    "step": 3,
+    "filled": "to",
+    "conf": 0.4102165699005127,
+    "text": "not to _ _ _ _ _ ."
+   },
+   {
+    "step": 4,
+    "filled": "a",
+    "conf": 0.15027642250061035,
+    "text": "not to _ _ _ a _ ."
+   },
+   {
+    "step": 5,
+    "filled": "for",
+    "conf": 0.3002042770385742,
+    "text": "not to _ _ for a _ ."
+   },
+   {
+    "step": 6,
+    "filled": "while",
+    "conf": 0.4968687891960144,
+    "text": "not to _ _ for a while ."
+   },
+   {
+    "step": 7,
+    "filled": "be",
+    "conf": 0.5262283682823181,
+    "text": "not to be _ for a while ."
+   },
+   {
+    "step": 8,
+    "filled": "alone",
+    "conf": 0.4902033507823944,
+    "text": "not to be alone for a while ."
+   }
+  ]
+ },
+ "mask_ratio": [
+  [
+   "2018",
+   "BERT",
+   "15%",
+   "BERT paper, \u00a73.1"
+  ],
+  [
+   "2019",
+   "RoBERTa",
+   "15%",
+   "RoBERTa paper, \u00a72.4; NeoBERT paper, Table 1"
+  ],
+  [
+   "2024",
+   "ModernBERT",
+   "30%",
+   "ModernBERT paper, \u00a72.2.2"
+  ],
+  [
+   "2025",
+   "NeoBERT",
+   "20%",
+   "NeoBERT paper, Table 1"
+  ],
+  [
+   "2025",
+   "mmBERT",
+   "30%, then 15%, then 5%",
+   "mmBERT paper, \u00a73.3"
+  ],
+  [
+   "2025",
+   "LLaDA",
+   "any share from 0 to 100%",
+   "LLaDA paper, \u00a72.1"
+  ],
+  [
+   "2026",
+   "UltraBERT",
+   "5% and 50% in every batch",
+   "UltraBERT paper, \u00a74"
+  ]
+ ]
+}

@@ -11,6 +11,7 @@ code: https://github.com/google-research/bert
 date: 2026-10-04
 tags: [bert, transformers, nlp, pre-training]
 learn:
+  - "How the field got to BERT: n-grams, word2vec, RNNs, attention, the Transformer, ELMo and GPT, each with its equation"
   - "Why reading in both directions matters, and why older models could not do it"
   - "How BERT turns text into numbers: WordPiece tokens, [CLS], [SEP], segment and position embeddings"
   - "The two pre-training tasks, masked language modelling and next sentence prediction, run on the real model"
@@ -26,6 +27,8 @@ The paper is short (nine pages plus an appendix), but dense. This breakdown read
 
 ## How the six parts are organised
 
+**Before Part 1 (optional): [Before and After BERT](background-before-and-after-bert.md).** The road to BERT, from counting word pairs to word vectors, recurrent networks, attention and pre-training, and what came after it: the benchmark curves, RoBERTa, T5, GPT-3, scaling laws and ModernBERT.
+
 Each part follows the paper's own sections:
 
 1. **[The Big Idea: Reading in Both Directions](part-1-the-big-idea.md)**: the title, the Abstract and §1. Why one-directional language models are a limit, and BERT's fix.
@@ -38,7 +41,6 @@ Each part follows the paper's own sections:
 ## How to read the boxes
 
 - A **teal "From the paper" box** shows the exact lines of the paper as a highlighted screenshot. Click the screenshot to see it at full size. Under it, **What it says** gives the main words of the paper. **What it means** then explains those lines, and what the authors mean but do not write. When the box shows a different paper, the box gives the name of that paper.
-- A **yellow definition box** explains a technical word the first time it appears. If you already know the word, skip the box.
 - The small **Paper §3.1** tag above a heading tells you which section of the paper you are reading, so you can follow along in the PDF.
 - A **green "Key takeaways" box** ends every part with what to remember.
 

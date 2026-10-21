@@ -1,0 +1,74 @@
+== 1. A bigram model of WikiText-2: P(w_t | w_{t-1}) = count(w_{t-1}, w_t) / count(w_{t-1})
+training text: 1,694,385 words, 61,887 different words, 667,984 different word pairs
+test text: 198,980 words
+perplexity, unigram (no context): 2,079
+perplexity, bigram with add-one smoothing: 8,342
+perplexity, bigram mixed with unigram (0.7 / 0.3): 1,059
+test word pairs never seen in training: 36.3%
+check: the probabilities after "the" add up to 1.000000
+most likely words after "the": first (0.012), th (0.007), song (0.006), game (0.005), same (0.005)
+
+== 2. word2vec (skip-gram, negative sampling) trained from scratch on WikiText-2
+826,181 training words after subsampling (t = 0.0001), vocabulary of 19,963 words (seen at least 5 times); 100 dimensions, window 2, 5 negatives, 5 epochs
+3,304,718 (centre, context) pairs per epoch
+check on one batch: loss by hand 2.621636, library 2.621636
+epoch 1: mean loss 2.7942
+epoch 2: mean loss 2.4860
+epoch 3: mean loss 2.2887
+epoch 4: mean loss 2.1591
+epoch 5: mean loss 2.0632
+nearest to 'king': ragnaill 0.75, narasimha 0.75, brienne 0.73, gall 0.72, murchad 0.72, ashurbanipal 0.72
+nearest to 'france': italy 0.72, spain 0.71, netherlands 0.70, austria 0.69, ukraine 0.68, russia 0.67
+nearest to 'music': drammatica 0.76, dubstep 0.70, shimomura 0.69, nirvana 0.68, diamandis 0.68, accompanying 0.68
+nearest to 'river': missouri 0.80, tributary 0.80, confluence 0.78, tributaries 0.78, pongola 0.77, platte 0.77
+nearest to 'bank': waterway 0.70, loyalsock 0.68, plunketts 0.66, susquehanna 0.66, barbours 0.66, logging 0.66
+king - man + woman: closest words vira, narasimha, eldest, brienne, regency; "queen" is number 445
+
+== 3. A plain RNN, h_t = tanh(W h_{t-1} + U x_t): how much does the last state feel each earlier input?
+hidden size 32, 60 steps, largest stretch of W = 0.9
+ distance from the end  gradient size (by hand)   autograd
+                     0                 3.04e+00   3.04e+00
+                     1                 1.18e+00   1.18e+00
+                     2                 4.61e-01   4.61e-01
+                     5                 1.40e-02   1.40e-02
+                    10                 4.59e-05   4.59e-05
+                    20                 2.56e-09   2.56e-09
+                    40                 7.10e-19   7.10e-19
+                    59                 2.43e-28   2.43e-28
+largest relative difference between the two methods: 0.0e+00
+
+== 4. One vector per word (word2vec, BERT input table) against one vector per use (BERT last layer)
+word2vec: "bank" has one vector for every sentence; its neighbours are waterway, loyalsock, plunketts, susquehanna
+BERT input table: cosine of "bank" in sentence 1 and sentence 2: 1.000
+BERT last layer, cosine similarity of "bank" between sentences:
+  'he sat on the bank of the river.'           vs 'she put her money in the bank.'             0.485
+  'he sat on the bank of the river.'           vs 'the bank approved my loan.'                 0.400
+  'he sat on the bank of the river.'           vs 'we walked along the bank of the stream.'    0.899
+  'she put her money in the bank.'             vs 'the bank approved my loan.'                 0.787
+  'she put her money in the bank.'             vs 'we walked along the bank of the stream.'    0.487
+  'the bank approved my loan.'                 vs 'we walked along the bank of the stream.'    0.431
+
+== 5. Kaplan et al. (2020): L(N) = (N_c / N)^alpha_N, alpha_N = 0.076, N_c = 8.8e13 (test loss in nats per token)
+GPT (2018)              0.1B parameters -> predicted loss 2.83
+BERT-large (2018)       0.3B parameters -> predicted loss 2.60
+GPT-2 (2019)            1.5B parameters -> predicted loss 2.30
+T5 (2019)              11.0B parameters -> predicted loss 1.98
+GPT-3 (2020)          175.0B parameters -> predicted loss 1.60
+ten times the parameters multiplies the loss by 10^-0.076 = 0.839
+(the law is fitted on non-embedding parameters of models trained on WebText2; the sizes above are total counts)
+
+== 6. The progress curves (scores copied from the papers named)
+GLUE (human baseline 87.1):
+  2018-04  BiLSTM + ELMo + Attn    70.0   GLUE paper, Table 4 (multi-task)
+  2018-06  OpenAI GPT              72.8   BERT paper, §4.1
+  2018-10  BERT-large              80.5   BERT paper, §4.1
+  2019-06  XLNet                   88.4   ALBERT paper, Table 9
+  2019-07  RoBERTa                 88.5   ALBERT paper, Table 9
+  2019-09  ALBERT                  89.4   ALBERT paper, Table 9
+  2019-10  T5-11B                  90.3   T5 paper, Table 14
+SuperGLUE (human baseline 89.8):
+  2019-05  BERT-large              69.0   SuperGLUE paper, Table 3
+  2019-10  T5-11B                  89.3   DeBERTa paper, §1
+  2021-01  DeBERTa-1.5B            89.9   DeBERTa paper, §1 (leaderboard, January 2021)
+
+saved results/partb.json
