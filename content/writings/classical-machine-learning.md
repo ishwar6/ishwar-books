@@ -11,7 +11,7 @@ accent: "#5fd4b0"
 
 A bank must decide whether to approve a loan. It has a table: one row per past customer, with columns for income, debt, age of the account and whether the loan was repaid. A spam filter has a similar job with words instead of columns. Neither needs a model with billions of parameters. For problems like these, a family of older methods is often faster, cheaper and just as accurate.
 
-[Part 1](from-neuron-to-opus.md) followed neural networks from the 1943 neuron to today's Claude models. This part follows the other branch: the statistical methods that learn from examples without deep networks. Some of them are more than two hundred years old. During the 1990s and 2000s, while neural networks were out of fashion, these methods were machine learning. Each section gives the key equation, with small numbers you can check by hand.
+[Part 1](from-neuron-to-opus.md) followed neural networks from the 1943 neuron to today's Claude models. This part follows the other branch: the statistical methods that learn from examples without deep networks. Some of them are more than two hundred years old. During the 1990s and 2000s, while neural networks were out of fashion, these methods were machine learning. Each section gives the key equation, with small numbers you can check by hand. [Part 3](reinforcement-learning-history.md) covers reinforcement learning, [Part 4](how-models-are-trained-today.md) covers how language models are trained today, and [Part 5](inside-a-modern-language-model.md) covers how the base model is built.
 
 > [!TIP] The whole idea in one minute
 > Every method here answers the same question: given examples with known answers, how do you predict the answer for a new one?

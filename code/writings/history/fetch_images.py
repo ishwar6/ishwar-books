@@ -17,7 +17,19 @@ FILES = [
     ('img-kernel', "File:Kernel trick idea.svg", 1100),
     ('img-iris', "File:Anderson's Iris data set.png", 900),
     ('img-galton', "File:Francis Galton 1850s.jpg", 500),
+    # Part 3: reinforcement learning
+    ('img-puzzlebox', 'File:Original "Puzzle Box" Apparatus Design.png', 463),
+    ('img-menace', "File:Mscroggs-MENACE-cropped.jpg", 1000),
+    ('img-ibm701', "File:IBM 701console.jpg", 600),
+    ('img-atari', "File:Atari-2600-Wood-4Sw-Set.jpg", 900),
+    ('img-sutton', "File:Richard Sutton, October 27, 2016.jpg", 371),
+    ('img-shadowhand', "File:Shadow Hand Bulb large.jpg", 600),
+    # Part 5: inside a modern language model
+    ('img-tpu3', "File:Tensor Processing Unit 3.0.jpg", 900),
+    ('img-tpu4', "File:TPU v4 (cropped).png", 800),
 ]
+ONLY = os.environ.get('ONLY')
+AS_JPG = {'img-tpu4'}   # a large PNG photo: save it as JPEG to keep the page light
 def get(url):
     for i in range(5):
         try:
@@ -26,6 +38,8 @@ def get(url):
             print('  retry', e); time.sleep(4 + 4 * i)
     raise SystemExit('failed ' + url)
 for name, title, w in FILES:
+    if ONLY and name not in ONLY.split(','):
+        continue
     q = urllib.parse.urlencode(dict(action='query', titles=title, prop='imageinfo', iiprop='url|extmetadata', iiurlwidth=w, format='json'))
     d = json.loads(get('https://commons.wikimedia.org/w/api.php?' + q))
     p = next(iter(d['query']['pages'].values()))
@@ -37,6 +51,8 @@ for name, title, w in FILES:
     if im.width > w:
         im = im.resize((w, int(im.height * w / im.width)), Image.LANCZOS)
     jpg = im.mode in ('RGB', 'L') and title.lower().endswith(('.jpg', '.jpeg'))
+    if name in AS_JPG:
+        im, jpg = im.convert('RGB'), True
     if not jpg and im.mode in ('RGBA', 'LA', 'P'):
         bg = Image.new('RGB', im.size, 'white'); im = im.convert('RGBA'); bg.paste(im, mask=im.split()[3]); im = bg
     path = os.path.join(OUT, name + ('.jpg' if jpg else '.png'))

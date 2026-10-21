@@ -13,7 +13,7 @@ You type a question into a chat window. A few seconds later, a model answers in 
 
 This refresher walks that chain. It starts with a 1943 paper that drew a brain cell as a logic switch, and ends with Anthropic's Claude Opus 5.5 in October 2026. It gives the key equation of each big step, with small numbers you can check by hand. Where a paper changed the field, you see the page itself, with the key words marked.
 
-This part follows one line: neural networks, from a single artificial neuron to today's agents. A second line ran beside it: statistical methods such as regression, decision trees and boosting, which still win on many business problems. They have their own part, [Classical Machine Learning](classical-machine-learning.md).
+This part follows one line: neural networks, from a single artificial neuron to today's agents. A second line ran beside it: statistical methods such as regression, decision trees and boosting, which still win on many business problems. They have their own part, [Classical Machine Learning](classical-machine-learning.md). [Part 3](reinforcement-learning-history.md) follows learning from reward, and [Part 4](how-models-are-trained-today.md) shows how language models are trained today. [Part 5](inside-a-modern-language-model.md) opens the base model itself: its data, scale and architecture.
 
 > [!TIP] The whole idea in one minute
 > A machine that learns needs a **model** with knobs to turn, **data** that shows good answers, and **compute** to turn the knobs many times. Each era was stuck on one of the three. Backpropagation lacked data and speed; GPUs and ImageNet gave both, and the Transformer used that speed well. Pre-training gave knowledge, human feedback made it helpful, and tools made it an agent.
@@ -595,7 +595,7 @@ In the last stage, the language model is trained with reinforcement learning, of
 >
 > These are the three rooms of the cooking school. In step 1, the model copies answers that people wrote. In step 2, people rank several answers, and the reward model learns the rankings. In step 3, no person is needed: the reward model scores new answers and PPO moves the model toward higher scores.
 
-In 2023, Rafael Rafailov and colleagues at Stanford published **DPO** (direct preference optimisation). It folds the reward model and the reinforcement learning step into one loss. It raises the probability of the preferred answer and lowers that of the rejected one, relative to the starting model. Many open models use it because it is simpler and more stable.
+In 2023, Rafael Rafailov and colleagues at Stanford published **DPO** (direct preference optimisation). It folds the reward model and the reinforcement learning step into one loss. It raises the probability of the preferred answer and lowers that of the rejected one, relative to the starting model. Many open models use it because it is simpler and more stable. [Part 4](how-models-are-trained-today.md) tells the full story of RLHF, DPO and the reasoning models that came after.
 
 ### November 2022
 

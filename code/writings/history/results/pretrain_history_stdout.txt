@@ -1,0 +1,226 @@
+
+==============================================================================
+1. Byte-pair encoding on the toy vocabulary of Sennrich et al. (2016)
+==============================================================================
+start: {'l o w </w>': 5, 'l o w e r </w>': 2, 'n e w e s t </w>': 6, 'w i d e s t </w>': 3}
+first pair counts: {('e', 's'): 9, ('s', 't'): 9, ('t', '</w>'): 9, ('w', 'e'): 8, ('l', 'o'): 7, ('o', 'w'): 7}
+merge  1: 'e'      + 's'      (count  9) -> ['l o w </w>', 'l o w e r </w>', 'n e w es t </w>', 'w i d es t </w>']
+merge  2: 'es'     + 't'      (count  9) -> ['l o w </w>', 'l o w e r </w>', 'n e w est </w>', 'w i d est </w>']
+merge  3: 'est'    + '</w>'   (count  9) -> ['l o w </w>', 'l o w e r </w>', 'n e w est</w>', 'w i d est</w>']
+merge  4: 'l'      + 'o'      (count  7) -> ['lo w </w>', 'lo w e r </w>', 'n e w est</w>', 'w i d est</w>']
+merge  5: 'lo'     + 'w'      (count  7) -> ['low </w>', 'low e r </w>', 'n e w est</w>', 'w i d est</w>']
+merge  6: 'n'      + 'e'      (count  6) -> ['low </w>', 'low e r </w>', 'ne w est</w>', 'w i d est</w>']
+merge  7: 'ne'     + 'w'      (count  6) -> ['low </w>', 'low e r </w>', 'new est</w>', 'w i d est</w>']
+merge  8: 'new'    + 'est</w>' (count  6) -> ['low </w>', 'low e r </w>', 'newest</w>', 'w i d est</w>']
+merge  9: 'low'    + '</w>'   (count  5) -> ['low</w>', 'low e r </w>', 'newest</w>', 'w i d est</w>']
+merge 10: 'w'      + 'i'      (count  3) -> ['low</w>', 'low e r </w>', 'newest</w>', 'wi d est</w>']
+encode 'lowest': ['low', 'est</w>']
+encode 'newer': ['new', 'e', 'r', '</w>']
+encode 'wider': ['wi', 'd', 'e', 'r', '</w>']
+encode 'low': ['low</w>']
+
+==============================================================================
+2. Cross-entropy and perplexity
+==============================================================================
+loss 11.76 nats per token -> perplexity exp(L) =  128027.45
+loss  4.00 nats per token -> perplexity exp(L) =      54.60
+loss  2.00 nats per token -> perplexity exp(L) =       7.39
+loss  1.69 nats per token -> perplexity exp(L) =       5.42
+random guess over 128,000 tokens: loss ln(128000) = 11.76, perplexity 128,000
+p(true token) = 0.9: loss -ln p = 0.105
+p(true token) = 0.5: loss -ln p = 0.693
+p(true token) = 0.01: loss -ln p = 4.605
+
+==============================================================================
+3. Training compute C = 6 N D (Kaplan et al. 2020)
+==============================================================================
+GPT-3 175B                 N = 1.75e+11, D = 3e+11: 6ND = 3.15e+23 FLOPs, tokens per parameter = 1.7
+Gopher 280B                N = 2.8e+11, D = 3e+11: 6ND = 5.04e+23 FLOPs, tokens per parameter = 1.1
+Chinchilla 70B             N = 7e+10, D = 1.4e+12: 6ND = 5.88e+23 FLOPs, tokens per parameter = 20.0
+Llama 3 8B                 N = 8e+09, D = 1.5e+13: 6ND = 7.2e+23 FLOPs, tokens per parameter = 1,875.0
+Llama 3 405B               N = 4.05e+11, D = 1.56e+13: 6ND = 3.79e+25 FLOPs, tokens per parameter = 38.5
+DeepSeek-V3 (37B active)   N = 3.7e+10, D = 1.48e+13: 6ND = 3.29e+24 FLOPs, tokens per parameter = 400.0
+tiny check: N = 1e9, D = 20e9 -> 6ND = 1.2e+20
+per token, per parameter: 2 FLOPs forward (one multiply, one add) + 4 FLOPs backward = 6
+
+==============================================================================
+4. The Chinchilla loss fit L(N, D) = E + A / N^alpha + B / D^beta (Hoffmann et al. 2022, eq. 10)
+==============================================================================
+Gopher 280B, 300B tokens      : E = 1.69, A/N^a = 0.0521, B/D^b = 0.2511, L = 1.9933
+Chinchilla 70B, 1.4T tokens   : E = 1.69, A/N^a = 0.0835, B/D^b = 0.1632, L = 1.9366
+compute-optimal exponents from the fit: N_opt ~ C^0.452, D_opt ~ C^0.548
+  budget C |   fit: N_opt      D_opt    D/N |  20 tokens/param: N         D
+     1e+21 |     1.82e+09   9.14e+10   50.1 |            2.89e+09  5.77e+10
+     1e+22 |     5.16e+09   3.23e+11   62.6 |            9.13e+09  1.83e+11
+     1e+23 |     1.46e+10   1.14e+12   78.2 |            2.89e+10  5.77e+11
+  5.76e+23 |     3.22e+10   2.98e+12   92.6 |            6.93e+10  1.39e+12
+     1e+24 |     4.13e+10   4.04e+12   97.7 |            9.13e+10  1.83e+12
+   3.8e+25 |     2.13e+11   2.97e+13  139.0 |            5.63e+11  1.13e+13
+Note: the fit (Approach 3) gives fewer parameters and more tokens than the paper's Approaches 1 and 2;
+the paper's Table 3 (Approach 1) gives 67B parameters and 1.5T tokens for 5.76e23 FLOPs.
+
+==============================================================================
+4a. The replication fit of Besiroglu et al. (2024): E = 1.8172, A = 482.01, B = 2085.43, alpha = 0.3478, beta = 0.3658
+==============================================================================
+C = 5.76e+23: N_opt = 7.22e+10, D_opt = 1.33e+12, tokens per parameter = 18.4
+C = 3.8e+25: N_opt = 6.19e+11, D_opt = 1.02e+13, tokens per parameter = 16.5
+iso-FLOP C = 1e+21: lowest loss 2.3289 at N = 1.84e+09 (curve over N from 3.2e7 to 1e12)
+iso-FLOP C = 1e+22: lowest loss 2.1386 at N = 5.2e+09 (curve over N from 3.2e7 to 1e12)
+iso-FLOP C = 1e+23: lowest loss 2.0050 at N = 1.47e+10 (curve over N from 3.2e7 to 1e12)
+iso-FLOP C = 5.76e+23: lowest loss 1.9307 at N = 3.22e+10 (curve over N from 3.2e7 to 1e12)
+
+==============================================================================
+4b. Over-training: a small model on many tokens, under the same fit (an illustration only)
+==============================================================================
+Llama-3-8B-like run: C = 7.2e+23; fit loss 1.9485
+compute-optimal under the fit for the same C: N = 3.56e+10, D = 3.37e+12, loss 1.9226
+extra loss of the small model: 0.0259; serving cost per token is 4.5 times lower
+the same 8B model with 20 tokens per parameter (160B tokens): loss 2.1640
+
+==============================================================================
+5. Attention cost: the score matrix grows with the square of the length
+==============================================================================
+n =     2,048: n^2 = 4.19e+06 scores; one head, bf16:            8 MiB
+n =     8,192: n^2 = 6.71e+07 scores; one head, bf16:          128 MiB
+n =    32,768: n^2 = 1.07e+09 scores; one head, bf16:        2,048 MiB
+n =   131,072: n^2 = 1.72e+10 scores; one head, bf16:       32,768 MiB
+n = 1,048,576: n^2 = 1.1e+12 scores; one head, bf16:    2,097,152 MiB
+
+==============================================================================
+6. LayerNorm vs RMSNorm on x = [1, 2, 3, 4]
+==============================================================================
+LayerNorm: mean 2.5, std 1.1180 -> [-1.3416 -0.4472  0.4472  1.3416]
+RMSNorm:   rms sqrt(mean(x^2)) = sqrt(7.5) = 2.7386 -> [0.3651 0.7303 1.0954 1.4606]
+
+==============================================================================
+7. SwiGLU
+==============================================================================
+SiLU(-2) = -0.2384
+SiLU(-1) = -0.2689
+SiLU(+0) = +0.0000
+SiLU(+1) = +0.7311
+SiLU(+2) = +1.7616
+tiny SwiGLU: x W = 2, x V = 3 -> SiLU(2) * 3 = 5.2848 ; x V = 0 closes the gate -> 0
+Llama 3 8B: d = 4096, d_ff = 14336 = 3.50 d; FFN weights per layer 3 d d_ff = 176,160,768
+Llama 3 70B: d = 8192, d_ff = 28672 = 3.50 d; FFN weights per layer 3 d d_ff = 704,643,072
+Llama 3 405B: d = 16384, d_ff = 53248 = 3.25 d; FFN weights per layer 3 d d_ff = 2,617,245,696
+original Transformer FFN: 2 matrices of d x 4d = 8 d^2; SwiGLU with d_ff = 8/3 d: 3 x d x 8/3 d = 8 d^2
+
+==============================================================================
+8. RoPE: rotate by position, the dot product sees only the distance
+==============================================================================
+q = [1.  0.5], k = [ 0.8 -0.2], theta = 0.3; plain q.k = 0.7000
+q at position   3, k at position   1 (distance 2): q.k = 0.2389
+q at position   7, k at position   5 (distance 2): q.k = 0.2389
+q at position 102, k at position 100 (distance 2): q.k = 0.2389
+q at position   5, k at position   1 (distance 4): q.k = -0.3056
+base  10,000: theta_0 = 1.0000 rad/token (wavelength 6.28 tokens), slowest theta = 0.000115 (wavelength 54,410 tokens)
+base 500,000: theta_0 = 1.0000 rad/token (wavelength 6.28 tokens), slowest theta = 2.46e-06 (wavelength 2,559,196 tokens)
+position interpolation from 8K to 128K: scale s = 16
+
+==============================================================================
+9. KV cache per token and for a 128K context (bf16, 2 bytes)
+==============================================================================
+Llama-3-70B shape, MHA (64 KV heads)                   :  2,621,440 bytes/token =   2560.0 KiB; 128K tokens:  320.00 GiB
+Llama-3-70B shape, GQA (8 KV heads, as built)          :    327,680 bytes/token =    320.0 KiB; 128K tokens:   40.00 GiB
+Llama-3-70B shape, MQA (1 KV head)                     :     40,960 bytes/token =     40.0 KiB; 128K tokens:    5.00 GiB
+DeepSeek-V3 shape, MHA (128 heads x 128)               :  3,997,696 bytes/token =   3904.0 KiB; 128K tokens:  488.00 GiB
+DeepSeek-V3 shape, MLA (512 + 64 per layer, as built)  :     70,272 bytes/token =     68.6 KiB; 128K tokens:    8.58 GiB
+GQA saving vs MHA (Llama shape): 8x; MLA vs MHA (DeepSeek shape): 56.9x
+
+==============================================================================
+10. A tiny mixture-of-experts router: softmax, top-2, Switch load-balancing loss
+==============================================================================
+router logits for one token: [ 2.   1.   0.5  0.1 -0.3 -1.   0.   0.3]
+softmax probabilities: [0.4528 0.1666 0.101  0.0677 0.0454 0.0225 0.0613 0.0827]
+top-2 experts: [0, 1], probabilities [0.4528, 0.1666], renormalised gate weights [0.7311, 0.2689]
+output = 0.7311 * FFN_0(x) + 0.2689 * FFN_1(x)
+balanced: f_i = P_i = 1/8 -> aux = N sum f_i P_i = 1.0000
+collapsed: every token to expert 0 with probability 1 -> aux = 8.0000
+two favourite experts: f = [0.5, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], P = [0.4, 0.4, 0.05, 0.05, 0.03, 0.03, 0.02, 0.02] -> aux = 3.2000
+random router biased to experts 0 and 1, 4096 tokens, top-1: load f = [0.468, 0.248, 0.044, 0.049, 0.049, 0.05, 0.048, 0.043]
+   aux = 1.7124 (1.0 is perfectly balanced); with alpha = 0.01 the added loss is 0.01712
+Mixtral 8x7B: 13B of 47B parameters active per token = 27.7%
+DeepSeek-V2: 21B of 236B parameters active per token = 8.9%
+DeepSeek-V3: 37B of 671B parameters active per token = 5.5%
+DeepSeek-V3 MoE layer: 1 shared + 8 of 256 routed experts active = 9 expert FFNs of 257
+
+==============================================================================
+11. Learning-rate schedule: linear warm-up, then cosine decay (Llama 3 405B settings)
+==============================================================================
+step         0: lr = 0.000e+00
+step     4,000: lr = 4.000e-05
+step     8,000: lr = 8.000e-05
+step   304,000: lr = 6.855e-05
+step   604,000: lr = 4.040e-05
+step   904,000: lr = 1.225e-05
+step 1,200,000: lr = 8.000e-07
+assumption: the 1,200,000 steps count from the start, warm-up included
+
+==============================================================================
+12. One AdamW step
+==============================================================================
+w = 1.0, g = 0.5, lr = 0.001, beta1 = 0.9, beta2 = 0.95, weight decay = 0.1
+m = 0.0500, v = 0.012500, m_hat = 0.5000, v_hat = 0.2500
+Adam step = lr * m_hat / sqrt(v_hat) = 0.001000; decay = lr * wd * w = 0.000100; new w = 0.998900
+same step with g = 50.0: Adam step = 0.001000 (the first step is lr times the sign)
+
+==============================================================================
+13. Memory: training states and inference weights
+==============================================================================
+7.5B (ZeRO example): mixed-precision Adam, 16 bytes/param = 120 GB; 80 GB GPUs needed just for these states: 2
+70B: mixed-precision Adam, 16 bytes/param = 1,120 GB; 80 GB GPUs needed just for these states: 14
+405B: mixed-precision Adam, 16 bytes/param = 6,480 GB; 80 GB GPUs needed just for these states: 81
+70B weights at 16 bits: 140 GB
+70B weights at  8 bits: 70 GB
+70B weights at  4 bits: 35 GB
+DeepSeek-V3 671B weights at 8 bits (FP8): 671 GB; at 16 bits: 1342 GB
+ZeRO-3 over 64 GPUs for 7.5B: 16 * 7.5e9 / 64 = 1.875 GB per GPU
+
+==============================================================================
+14. Parallelism: tensor split and the pipeline bubble
+==============================================================================
+tensor parallel, 4 GPUs: a 4096 x 14336 FFN matrix becomes 4 slices of 4096 x 3584
+tensor parallel, 8 GPUs: a 4096 x 14336 FFN matrix becomes 8 slices of 4096 x 1792
+pipeline with p =  4 stages and m =  4 micro-batches: idle (bubble) fraction (p-1)/(m+p-1) = 0.429
+pipeline with p =  4 stages and m =  8 micro-batches: idle (bubble) fraction (p-1)/(m+p-1) = 0.273
+pipeline with p =  4 stages and m = 32 micro-batches: idle (bubble) fraction (p-1)/(m+p-1) = 0.086
+pipeline with p = 16 stages and m = 64 micro-batches: idle (bubble) fraction (p-1)/(m+p-1) = 0.190
+
+==============================================================================
+15. DeepSeek-V3 reported cost (Table 1), and an estimate of the achieved speed
+==============================================================================
+pre-training 2,664K + context extension 119K + post-training 5K = 2788 K H800 GPU hours
+at $2 per GPU hour: $5.576M ; check: 180K GPU hours per trillion tokens x 14.8 = 2664.0 K
+our estimate: 6 x 37e9 x 14.8e12 = 3.29e+24 FLOPs over 2,664K GPU hours = 343 TFLOPS per GPU (attention FLOPs not counted)
+days on 2,048 GPUs: 54.2
+that is 35% of the H100/H800 dense BF16 peak of 989.4 TFLOPS
+Llama 3 405B estimate: 3.8e25 FLOPs on 16,384 GPUs at 989.4 TFLOPS x 38% MFU = 71 days
+Llama 3 405B estimate: 3.8e25 FLOPs on 16,384 GPUs at 989.4 TFLOPS x 43% MFU = 63 days
+
+==============================================================================
+16. Speculative decoding: expected tokens per target-model pass, (1 - a^(g+1)) / (1 - a) (Leviathan et al.)
+==============================================================================
+acceptance a = 0.6, draft length g = 4: 2.306 tokens per pass
+acceptance a = 0.8, draft length g = 4: 3.362 tokens per pass
+acceptance a = 0.85, draft length g = 1: 1.850 tokens per pass
+acceptance a = 0.9, draft length g = 1: 1.900 tokens per pass
+
+==============================================================================
+17. Near-duplicate detection: Jaccard of word 3-grams, and MinHash buckets (FineWeb: 14 buckets of 8)
+==============================================================================
+10 and 10 shingles, 9 shared, 11 in the union: Jaccard = 0.8182
+similarity 0.50: chance to be flagged 1 - (1 - s^8)^14 = 0.0533
+similarity 0.70: chance to be flagged 1 - (1 - s^8)^14 = 0.5645
+similarity 0.75: chance to be flagged 1 - (1 - s^8)^14 = 0.7716
+similarity 0.80: chance to be flagged 1 - (1 - s^8)^14 = 0.9235
+similarity 0.90: chance to be flagged 1 - (1 - s^8)^14 = 0.9996
+
+==============================================================================
+18. Images as tokens (ViT patches)
+==============================================================================
+224 x 224 image, 16 x 16 patches: (224/16)^2 = 196 tokens, each patch has 768 numbers (RGB)
+896 x 896 image, 14 x 14 patches: (896/14)^2 = 4096 tokens, each patch has 588 numbers (RGB)
+1024 x 1024 image, 16 x 16 patches: (1024/16)^2 = 4096 tokens, each patch has 768 numbers (RGB)
+
+wrote results/pretrain_history.json

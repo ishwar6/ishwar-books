@@ -1,0 +1,150 @@
+
+======================================================================
+1. The corridor: Bellman expectation equation for a random policy (left or right with 1/2 each)
+======================================================================
+V_random(1..3) = [-0.5  0.   0.5]
+check at cell 3: 0.5*(1 + 0.9*0) + 0.5*(0 + 0.9*V(2)) = 0.5000
+
+======================================================================
+2. Value iteration (Bellman optimality), gamma = 0.9
+======================================================================
+sweep 1: V(1), V(2), V(3) = 0.0000, 0.0000, 1.0000
+sweep 2: V(1), V(2), V(3) = 0.0000, 0.9000, 1.0000
+sweep 3: V(1), V(2), V(3) = 0.8100, 0.9000, 1.0000
+sweep 4: V(1), V(2), V(3) = 0.8100, 0.9000, 1.0000
+sweep 5: V(1), V(2), V(3) = 0.8100, 0.9000, 1.0000
+Q*(s, left), Q*(s, right):
+  cell 1: -1.0000, 0.8100
+  cell 2: 0.7290, 0.9000
+  cell 3: 0.8100, 1.0000
+
+======================================================================
+3. TD(0): one update by hand, alpha = 0.5
+======================================================================
+V(3) <- 0 + 0.5 * (1 + 0.9*0 - 0) = 0.5000
+next episode, step 2 -> 3, reward 0: V(2) <- 0 + 0.5 * (0 + 0.9*0.5 - 0) = 0.2250
+
+======================================================================
+4. Q-learning on the corridor, alpha = 0.5, epsilon = 0.2, 500 episodes from cell 2, seed 0
+======================================================================
+first updates that changed the table (episode, cell, action, reward, target, old Q, new Q):
+   (0, 1, 'left', -1.0, -1.0, 0.0, -0.5)
+   (1, 3, 'right', 1.0, 1.0, 0.0, 0.5)
+   (2, 2, 'right', 0.0, 0.45, 0.0, 0.225)
+   (2, 3, 'left', 0.0, 0.2025, 0.0, 0.1013)
+   (2, 2, 'right', 0.0, 0.45, 0.225, 0.3375)
+   (2, 3, 'right', 1.0, 1.0, 0.5, 0.75)
+learned Q(s, left), Q(s, right) after 500 episodes:
+  cell 1: -0.9922, 0.8100   greedy: right
+  cell 2: 0.7290, 0.9000   greedy: right
+  cell 3: 0.8100, 1.0000   greedy: right
+largest gap to Q*: 0.0078
+hand example: Q(3, right) <- 0 + 0.5 * (1 + 0 - 0) = 0.5
+hand example: Q(2, right) with Q(3,right)=0.5: 0 + 0.5 * (0 + 0.9 * 0.5 - 0) = 0.225
+
+======================================================================
+5. DQN target with a frozen target network (numbers by hand)
+======================================================================
+y = r + gamma * max Q_target(s', .) = 0.5 + 0.9 * 1.4 = 1.7600
+loss (y - Q(s,a))^2 = (1.7600 - 1.2)^2 = 0.3136
+
+======================================================================
+6. Two-armed bandit: greedy vs epsilon-greedy. Arm A pays 1 with p = 0.4, arm B with p = 0.6. 1,000 pulls, 2,000 runs
+======================================================================
+epsilon = 0.0: mean reward per pull 0.5155, runs whose final pick is B: 0.579
+epsilon = 0.1: mean reward per pull 0.5815, runs whose final pick is B: 1.000
+always B would give 0.6 per pull
+
+======================================================================
+7. REINFORCE on the bandit: softmax policy over two preferences theta, learning rate 0.1
+======================================================================
+start pi = [0.5 0.5]; pull B, reward 1; grad log pi(B) = [-0.5  0.5]; theta -> [-0.05  0.05]; pi(B) -> 0.5250
+with baseline b = 0.5: theta -> [-0.025  0.025]; pi(B) -> 0.5125
+with baseline b = 0.5, pull A, reward 0: theta -> [-0.025  0.025]; pi(B) -> 0.5125
+baseline=False: after 500 pulls mean pi(B) = 0.929 over 500 runs; variance of the gradient term in the first 50 pulls = 0.1140
+baseline=True: after 500 pulls mean pi(B) = 0.934 over 500 runs; variance of the gradient term in the first 50 pulls = 0.0711
+
+======================================================================
+8. Actor-critic: the advantage from a one-step TD error
+======================================================================
+A = r + gamma V(s') - V(s) = 0 + 0.9 * 0.81 - 0.5 = 0.2290
+
+======================================================================
+9. PPO clipped objective, epsilon = 0.2
+======================================================================
+ratio | A=+1: unclipped, clipped, min | A=-1: unclipped, clipped, min
+ 0.5  | +0.50 +0.80 +0.50 | -0.50 -0.80 -0.80
+ 0.8  | +0.80 +0.80 +0.80 | -0.80 -0.80 -0.80
+ 1.0  | +1.00 +1.00 +1.00 | -1.00 -1.00 -1.00
+ 1.1  | +1.10 +1.10 +1.10 | -1.10 -1.10 -1.10
+ 1.2  | +1.20 +1.20 +1.20 | -1.20 -1.20 -1.20
+ 1.5  | +1.50 +1.20 +1.20 | -1.50 -1.20 -1.50
+ 2.0  | +2.00 +1.20 +1.20 | -2.00 -1.20 -2.00
+ratio from probabilities: new 0.30 / old 0.20 = 1.5
+
+======================================================================
+10. AlphaZero: PUCT selection and the training loss on small numbers
+======================================================================
+move a: Q=0.50, U = 1.5*0.6*sqrt(12)/(1+10) = 0.2834, Q+U = 0.7834
+move b: Q=0.40, U = 1.5*0.3*sqrt(12)/(1+2) = 0.5196, Q+U = 0.9196
+move c: Q=0.00, U = 1.5*0.1*sqrt(12)/(1+0) = 0.5196, Q+U = 0.5196
+value term (z - v)^2 = (1 - 0.6)^2 = 0.1600
+policy term -sum pi log p = 0.8869   (pi = [0.7 0.2 0.1], p = [0.5 0.3 0.2])
+total without the weight penalty = 1.0469
+
+======================================================================
+11. Bradley-Terry reward-model loss
+======================================================================
+r_w - r_l = +2.0: P(winner preferred) = 0.8808, loss = 0.1269
+r_w - r_l = +0.5: P(winner preferred) = 0.6225, loss = 0.4741
+r_w - r_l = +0.0: P(winner preferred) = 0.5000, loss = 0.6931
+r_w - r_l = -2.0: P(winner preferred) = 0.1192, loss = 2.1269
+
+======================================================================
+12. The RLHF objective with a KL penalty, beta = 0.1, per answer
+======================================================================
+answer 1: reward 2.0, log pi = -12.0, log pi_ref = -11.0, log ratio = -1.0, penalised reward = 2.0 - 0.1 * -1.0 = 2.1000
+answer 2: reward 2.6, log pi = -14.0, log pi_ref = -22.0, log ratio = +8.0, penalised reward = 2.6 - 0.1 * 8.0 = 1.8000
+
+======================================================================
+13. DPO loss, beta = 0.1 (sequence log-probabilities)
+======================================================================
+implicit reward of winner = 0.1 * (-10 - (-12)) = 0.2000
+implicit reward of loser  = 0.1 * (-15 - (-14)) = -0.1000
+margin = 0.3000, sigma = 0.5744, loss = 0.5544
+at the start (policy = reference): margin 0, loss = ln 2 = 0.6931
+gradient weight sigma(-margin) at the start = 0.5, now = 0.4256
+
+======================================================================
+14. Best-of-n: chance that at least one of n answers is right (p = 0.3 each), and the KL of best-of-n
+======================================================================
+n =  1: 1 - 0.7^n = 0.3000; KL(best-of-n || base) = log n - (n-1)/n = 0.0000 nats
+n =  2: 1 - 0.7^n = 0.5100; KL(best-of-n || base) = log n - (n-1)/n = 0.1931 nats
+n =  4: 1 - 0.7^n = 0.7599; KL(best-of-n || base) = log n - (n-1)/n = 0.6363 nats
+n =  8: 1 - 0.7^n = 0.9424; KL(best-of-n || base) = log n - (n-1)/n = 1.2044 nats
+n = 16: 1 - 0.7^n = 0.9967; KL(best-of-n || base) = log n - (n-1)/n = 1.8351 nats
+n = 64: 1 - 0.7^n = 1.0000; KL(best-of-n || base) = log n - (n-1)/n = 3.1745 nats
+
+======================================================================
+15. GRPO: group-relative advantages for 8 answers to one maths question (1 = correct)
+======================================================================
+rewards [1 0 0 1 1 0 0 0]; mean = 0.3750; std (population) = 0.4841
+advantages (r - mean) / std: [ 1.291 -0.775 -0.775  1.291  1.291 -0.775 -0.775 -0.775]
+Dr. GRPO style (r - mean), no division by std: [ 0.625 -0.375 -0.375  0.625  0.625 -0.375 -0.375 -0.375]
+an easy question, 7 of 8 right: advantages [ 0.378  0.378  0.378  0.378  0.378  0.378  0.378 -2.646]
+all 8 right: std = 0, every advantage is 0, the question teaches nothing
+
+======================================================================
+16. The discounted return and UCB (small extra examples)
+======================================================================
+return of rewards 0, 0, 1 with gamma 0.9: 0 + 0.9*0 + 0.81*1 = 0.81
+return of rewards 1, 1, 1, 1, ... forever with gamma 0.9: 1 / (1 - 0.9) = 10.0
+UCB at t = 100, c = 1: arm A: Q = 0.55, N = 90, bonus sqrt(ln 100 / 90) = 0.2262, score = 0.7762
+UCB at t = 100, c = 1: arm B: Q = 0.4, N = 10, bonus sqrt(ln 100 / 10) = 0.6786, score = 1.0786
+
+======================================================================
+17. pass@k (the unbiased estimator of Chen et al. 2021): n = 10 samples, c = 3 correct
+======================================================================
+pass@1 = 1 - C(7,1) / C(10,1) = 1 - 7 / 10 = 0.3000
+pass@5 = 1 - C(7,5) / C(10,5) = 1 - 21 / 252 = 0.9167
+Arena-style Bradley-Terry: two models whose scores differ by 1 -> P(A preferred) = 0.7311
