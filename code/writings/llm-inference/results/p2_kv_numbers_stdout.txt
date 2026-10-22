@@ -1,0 +1,35 @@
+== 1. Attention as a lookup: a query, three keys, three values
+  The  key [0.0, 1.0]  q.k = 0  /sqrt(2) = 0.00  weight = 0.088
+  cat  key [3.0, 0.0]  q.k = 3  /sqrt(2) = 2.12  weight = 0.734
+  sat  key [1.0, 1.0]  q.k = 1  /sqrt(2) = 0.71  weight = 0.178
+  answer = 0.088*[1.0, 0.0] + 0.734*[0.0, 4.0] + 0.178*[2.0, 2.0] = [0.44, 3.29]
+  PyTorch scaled_dot_product_attention gives [0.44, 3.29]
+
+== 2. The KV cache of a real model: Qwen2.5-0.5B, bfloat16
+  config: layers 24, query heads 14, KV heads 2, head_dim 64, device mps
+  100 tokens: 24 layers, key tensor of layer 0 (1, 2, 100, 64) torch.bfloat16, cache 1,228,800 bytes
+  200 tokens: 24 layers, key tensor of layer 0 (1, 2, 200, 64) torch.bfloat16, cache 2,457,600 bytes
+  measured: 12,288 bytes per token; formula 2 x 24 x 2 x 64 x 2 = 12,288 bytes
+
+== 3. KV bytes per token = 2 x layers x KV heads x head_dim x bytes
+  Qwen2.5-0.5B    24 layers   2 KV heads   64 dims:     12 KiB/token,   1.5 GiB for 131,072 tokens
+  Llama 3.1 8B    32 layers   8 KV heads  128 dims:    128 KiB/token,  16.0 GiB for 131,072 tokens
+  Llama 3.1 70B   80 layers   8 KV heads  128 dims:    320 KiB/token,  40.0 GiB for 131,072 tokens
+  Llama 2 7B      32 layers  32 KV heads  128 dims:    512 KiB/token,  64.0 GiB for 131,072 tokens
+  Llama 3.1 8B with other attention layouts (32 layers, head_dim 128, 2 bytes):
+    MHA, 32 KV heads   512 KiB/token,  64.0 GiB for 128K tokens
+    GQA, 8 KV heads    128 KiB/token,  16.0 GiB for 128K tokens
+    MQA, 1 KV head      16 KiB/token,   2.0 GiB for 128K tokens
+    GQA + 8-bit cache    64 KiB/token,   8.0 GiB for 128K tokens
+  Qwen2.5-0.5B, 16 sequences x 8,192 tokens: 1.50 GiB of cache
+
+== 4. One decode step of Llama 3.1 8B on an H100 must read (3.35 TB/s)
+  weights 16.1 GB -> at least 4.8 ms
+  one 128K-token cache 17.2 GB (16 GiB) -> at least 5.1 ms more
+  on an 80 GB H100, after the weights: room for 3 such conversations at full length (63.9 GB / 17.2 GB)
+
+== 5. Toy GPU memory: a row of 24 slots, one slot = the K and V of one token (all layers)
+  reserved: A books 8, prompt 3, wrote 2 -> holds 5, 3 reserved for tokens still to come
+  internal: B books 8, uses 4, 4 never used
+  external: AAAAAAAABBBBCCCCCCDDDDDD -> B, D finish -> AAAAAAAA....CCCCCC......; free 10 in gaps [4, 6]; E needs 7 in one piece: refused
+  all three: PPPWWRRI___PPWRIIII_____ (24 slots): tokens 8, reserved 3, never used 5, free 8 in gaps of 3 and 5 (next request needs 6: refused); holding tokens 33%

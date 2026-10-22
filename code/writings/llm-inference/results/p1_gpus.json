@@ -1,0 +1,47 @@
+{
+ "A100 80GB SXM": {
+  "gb": 80,
+  "bw": 2.039,
+  "tflops": 312,
+  "ridge": 153.01618440411966,
+  "floor_ms": 7.876410004904364,
+  "max_tps": 126.96139476961396,
+  "src": "nvidia.com/en-us/data-center/a100: 80GB HBM2e, 2,039 GB/s, BF16 312 TFLOPS (624 with sparsity)"
+ },
+ "H100 SXM": {
+  "gb": 80,
+  "bw": 3.35,
+  "tflops": 989,
+  "ridge": 295.2238805970149,
+  "floor_ms": 4.794029850746268,
+  "max_tps": 208.5927770859278,
+  "src": "nvidia.com/en-us/data-center/h100: 80GB, 3.35TB/s, BF16 1,979 TFLOPS with sparsity -> 989 dense"
+ },
+ "H200 SXM": {
+  "gb": 141,
+  "bw": 4.8,
+  "tflops": 989,
+  "ridge": 206.04166666666669,
+  "floor_ms": 3.3458333333333337,
+  "max_tps": 298.879202988792,
+  "src": "nvidia.com/en-us/data-center/h200: 141GB, 4.8TB/s, BF16 1,979 TFLOPS with sparsity -> 989 dense"
+ },
+ "B200 (HGX)": {
+  "gb": 180,
+  "bw": 7.7,
+  "tflops": 2250,
+  "ridge": 292.2077922077922,
+  "floor_ms": 2.085714285714286,
+  "max_tps": 479.4520547945205,
+  "src": "NVIDIA Blackwell datasheet, HGX B200 per GPU: 180 GB HBM3E, 7.7 TB/s, FP16/BF16 4.5 PFLOPS sparse -> 2,250 dense"
+ },
+ "MI300X": {
+  "gb": 192,
+  "bw": 5.3,
+  "tflops": 1307.4,
+  "ridge": 246.6792452830189,
+  "floor_ms": 3.030188679245283,
+  "max_tps": 330.01245330012455,
+  "src": "amd.com MI300X page and data sheet: 192 GB HBM3, 5.3 TB/s, BF16 1307.4 TFLOPS dense"
+ }
+}

@@ -1,0 +1,64 @@
+device: mps, torch 2.14.1
+layers 24, hidden 896, mlp 4864, vocab 151936, tied True
+weights: 494,032,768 total, 136,134,656 in the embedding (= output head), 357,898,112 in the layers
+weight bytes (bf16): 0.988 GB
+FLOPs per decoded token (2 x all weights): 0.988 GFLOP
+FLOPs per prefill token (2 x layer weights, attention not counted): 0.716 GFLOP
+one 896x896 matrix: 802,816 weights, 1.61 MB, one token = 1.61 MFLOP -> 1.0 FLOP/byte
+  batch   1:     1.61 MFLOP for the same 1.61 MB -> 1 FLOP/byte
+  batch   4:     6.42 MFLOP for the same 1.61 MB -> 4 FLOP/byte
+  batch 128:   205.52 MFLOP for the same 1.61 MB -> 128 FLOP/byte
+memory roof here: 262 GB/s (published Part 1 measurement)
+H100 (NVIDIA spec): 989 TFLOP/s dense BF16, 3.35 TB/s -> ridge 295 FLOP/byte
+  H100 roofline at   1 FLOP/byte: at most    3.4 TFLOP/s (  0.3% of the roof)
+  H100 roofline at   4 FLOP/byte: at most   13.4 TFLOP/s (  1.4% of the roof)
+  H100 roofline at  64 FLOP/byte: at most  214.4 TFLOP/s ( 21.7% of the roof)
+  H100 roofline at 128 FLOP/byte: at most  428.8 TFLOP/s ( 43.4% of the roof)
+  H100 roofline at 512 FLOP/byte: at most  989.0 TFLOP/s (100.0% of the roof)
+point, FLOP/byte (weights only), achieved TFLOP/s, weight bytes per second
+  prefill 512 tokens    370.9 FLOP/byte   13.38 TFLOP/s     36 GB/s
+  decode batch 1          1.0 FLOP/byte    0.10 TFLOP/s     99 GB/s
+  decode batch 4          4.0 FLOP/byte    0.36 TFLOP/s     89 GB/s
+  decode batch 8          8.0 FLOP/byte    0.66 TFLOP/s     83 GB/s
+  decode batch 32        32.0 FLOP/byte    2.09 TFLOP/s     65 GB/s
+  decode batch 64        64.0 FLOP/byte    3.21 TFLOP/s     50 GB/s
+  decode batch 128      128.0 FLOP/byte    4.32 TFLOP/s     34 GB/s
+weight read floor: 3.77 ms per step
+Qwen2.5-0.5B notes (KV cache) per token: 12,288 bytes = 12 KiB
+  batch   1 x 512 tokens each: 6 MiB of notes (weights: 942 MiB)
+  batch 128 x 512 tokens each: 768 MiB of notes (weights: 942 MiB)
+Llama 3.1 8B on an 80 GB H100: weights 16.1 GB, 63.9 GB left (before working memory)
+  conversations of 4,096 tokens that fit: at most 119.1  (512 MiB each)
+  conversations of 131,072 tokens that fit: at most 3.7  (16,384 MiB each)
+  batch   1: step 10.0 ms -> each user gets 100.0 tokens/s, GPU total    100 tokens/s
+  batch   4: step 11.1 ms -> each user gets  90.1 tokens/s, GPU total    360 tokens/s
+  batch   8: step 11.9 ms -> each user gets  84.0 tokens/s, GPU total    672 tokens/s
+  batch  32: step 15.1 ms -> each user gets  66.2 tokens/s, GPU total   2119 tokens/s
+  batch  64: step 19.7 ms -> each user gets  50.8 tokens/s, GPU total   3249 tokens/s
+  batch 128: step 29.3 ms -> each user gets  34.1 tokens/s, GPU total   4369 tokens/s
+step time ~ 10.6 ms + 0.146 ms per sequence (fit on batch 8..128)
+  batch   1: fixed 10.6 ms, per-sequence part   0.1 ms ->  10.7 ms predicted
+  batch   4: fixed 10.6 ms, per-sequence part   0.6 ms ->  11.1 ms predicted
+  batch   8: fixed 10.6 ms, per-sequence part   1.2 ms ->  11.7 ms predicted
+  batch  32: fixed 10.6 ms, per-sequence part   4.7 ms ->  15.2 ms predicted
+  batch  64: fixed 10.6 ms, per-sequence part   9.3 ms ->  19.9 ms predicted
+  batch 128: fixed 10.6 ms, per-sequence part  18.6 ms ->  29.2 ms predicted
+ceiling as batch grows without limit: 6,865 tokens/s
+reading the notes of 128 sequences x 512 tokens at 262 GB/s: 3.1 ms of the 29.3 ms step
+largest gap between the line and the measured step, batch 4..128: 0.18 ms
+arithmetic of one decode token on an H100 at full speed: 1.0 microseconds
+prefill 16 tokens 10.8 ms vs decode 1 token 10.0 ms: 8% more time for 16x the tokens
+read 512 vs write 512: 5158 / 27.4 = 188x
+batch 128 vs 1: step 2.9x slower, tokens/s 44x more
+notes at batch 128 x 512: 0.81 GB; weights 0.99 GB
+batch 4: fixed part is 95% of the predicted step
+  batch   1: 10.0 ms, 100 tokens/s total (published), 100 tokens/s per user
+  batch   2: 10.6 ms, 190 tokens/s total (published), 94 tokens/s per user
+  batch   4: 11.1 ms, 361 tokens/s total (published), 90 tokens/s per user
+  batch   8: 11.9 ms, 670 tokens/s total (published), 84 tokens/s per user
+  batch  16: 12.8 ms, 1,247 tokens/s total (published), 78 tokens/s per user
+  batch  32: 15.1 ms, 2,120 tokens/s total (published), 66 tokens/s per user
+  batch  64: 19.7 ms, 3,242 tokens/s total (published), 51 tokens/s per user
+  batch 128: 29.3 ms, 4,367 tokens/s total (published), 34 tokens/s per user
+row by row: 1->8 step +19%, 8 seqs = 6.7x tokens; 32->64 tokens x1.53; 64->128 tokens x1.35
+prefill vs decode-batch-1 arithmetic rate: 135x

@@ -1,0 +1,17 @@
+1. vLLM may use 0.92 x 80 GB = 73.60 GB
+2. minus weights 16.06 GB and working memory 4 GB = 53.54 GB for the KV cache
+   log line: Available KV cache memory: 49.86 GiB
+
+--kv-cache-dtype auto (BF16): one block = 65,536 bytes per layer x 32 layers = 2 MiB
+3. blocks = 53.54 GB / 2 MiB = 25,529 blocks = 408,464 tokens
+4. --max-model-len 131,072: 8,192 blocks per request -> log line: GPU KV cache size: 408,464 tokens, Maximum concurrency for 131,072 tokens per request: 3.12x
+4. --max-model-len 8,192: 512 blocks per request -> log line: GPU KV cache size: 408,464 tokens, Maximum concurrency for 8,192 tokens per request: 49.86x
+   requests of 1,024 tokens (prompt + answer): 398 fit at once
+   requests of 4,096 tokens (prompt + answer): 99 fit at once
+
+--kv-cache-dtype fp8: one block = 32,768 bytes per layer x 32 layers = 1 MiB
+3. blocks = 53.54 GB / 1 MiB = 51,059 blocks = 816,944 tokens
+4. --max-model-len 131,072: 8,192 blocks per request -> log line: GPU KV cache size: 816,944 tokens, Maximum concurrency for 131,072 tokens per request: 6.23x
+4. --max-model-len 8,192: 512 blocks per request -> log line: GPU KV cache size: 816,944 tokens, Maximum concurrency for 8,192 tokens per request: 99.72x
+   requests of 1,024 tokens (prompt + answer): 797 fit at once
+   requests of 4,096 tokens (prompt + answer): 199 fit at once

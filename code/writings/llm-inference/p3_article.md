@@ -1,0 +1,803 @@
+---
+title: "How vLLM Serves Thousands: Paging, Batching and Caching"
+description: "How vLLM stores the KV cache in small pages, shares and reuses them, and schedules every step: from 48 to 415 requests on one GPU, pauses cut from 463 ms to 40 ms, a 7x faster first token."
+date: 2026-09-28
+tags: [inference, vllm, llm]
+series: "LLM Inference from the Ground Up"
+series_part: 3
+motif: blocks
+accent: "#c4a1ff"
+---
+
+One GPU can hold the notes of a few hundred conversations, or of a few dozen. The hardware is the same in both cases. The difference is only in how the notes are stored.
+
+[Part 1](llm-inference-1-prefill-and-decode.md) showed that decode is limited by memory traffic. So a GPU earns its keep only when it decodes many sequences in one step, as a **batch**. [Part 2](llm-inference-2-kv-cache.md) showed what limits the batch. Every sequence keeps a **KV cache**, and it grows with every token. Storing it as one reserved slab wastes most of the memory. The vLLM paper measured older systems using only 20.4% to 38.2% of their KV memory for real tokens.
+
+This part shows how vLLM fixes that, one idea at a time. The first idea is about 60 years old, and it comes from the operating system on your laptop.
+
+> [!TIP] The whole idea in one minute
+> The serving engine vLLM cuts the KV cache into small **blocks** of 16 tokens. It hands them out one at a time, like an operating system hands out pages of memory. A small table per request records where its blocks are. That one change removes almost all the waste from Part 2. It also lets requests share blocks and reuse the blocks of an earlier prompt. And it lets the scheduler add and remove requests at every step.
+
+## A lesson from operating systems
+
+Your laptop runs dozens of programs at once. Each one asks for memory while it runs, and none of them knows in advance how much it will need. A browser tab can use 50 MB or 2 GB. This is the same problem that Part 2 ended with: something grows, nobody knows how far, and the memory is shared.
+
+Operating systems solved it in the 1960s with **virtual memory** and **paging**. Before the mechanism, an analogy.
+
+Think of a ring binder with loose pages and a contents page at the front. The report's pages do not need to sit next to each other in the binder. Page 1 of the report can be the 5th sheet, and page 2 can be the 2nd. The contents page tells you where each one is. When the report gets longer, you take any blank sheet, write on it, and add one line to the contents page. You never had to set aside 200 blank sheets on the first day.
+
+That is paging. Memory is cut into small pieces of one fixed size, called **pages**. Each program sees its own pages in a neat order: page 0, page 1, page 2. In the real memory chips, each page can sit anywhere. A **page table**, one per program, records where each page really is.
+
+> [!DEFINITION] Physical memory and virtual memory
+> **Physical memory** is the real memory chips (RAM, or the GPU's own memory) with real addresses. **Virtual memory** is the neat, private view that the operating system gives each program. The program uses its own addresses, and the system translates them to physical ones.
+
+> [!DEFINITION] Page, frame and page table
+> A **page** is a fixed-size piece of a program's memory, often 4 KiB. A **frame** is a page-sized slot in physical memory. The **page table** is a small list per program: for each page, which frame holds it.
+
+{{FIG:os_pages|Program A sees four pages in order. Its page table says where each one really is: frames 5, 2, 8 and 0, mixed in with the pages of program B. The program never notices.}}
+
+Now the important part: what happens when a program needs more memory. It asks, and the operating system takes **any** free frame. The frame becomes the program's next page, and the page table gets one more row. The program does not reserve its maximum up front. It gets memory one page at a time, at the moment it needs it.
+
+{{FIG:os_grow|Step 1: program A holds four pages, and frames 3, 7 and 9 are free. Step 2: A needs more, so the operating system gives it frame 3 as page 4 and adds one row to A's page table.}}
+
+Look at the three kinds of waste from Part 2 with this picture in mind. A program never holds memory for data it might write later, because it gets a page only when it writes. Its last page can be partly empty, but that is at most one page. And because every page and every frame is the same size, any free frame fits any request, so small useless gaps cannot form. Keep these three facts in mind. The rest of this section moves them, one to one, onto the GPU.
+
+## The same idea for the KV cache
+
+In 2023 a team at UC Berkeley noticed that the KV cache has the same shape of problem. They applied paging to it and called the result **PagedAttention**. They built a serving engine around it and called it **vLLM**.
+
+> [!PAPER] Kwon et al. (2023), Efficient Memory Management for Large Language Model Serving with PagedAttention · §4.2 · page 5
+> [![The paragraph that compares vLLM's memory manager to virtual memory, with analogous to the virtual memory, fixed-sized pages, needs not to be fully reserved in advance and fixed-size KV blocks, like pages in virtual memory highlighted](/img/writings/llm-inference/p3-vm-idea.png)](/img/writings/llm-inference/p3-vm-idea.png)
+>
+> **What it says:** the memory manager is "analogous to the virtual memory" of operating systems. The OS cuts memory into "fixed-sized pages", and physical memory "needs not to be fully reserved in advance". vLLM organises the KV cache "as fixed-size KV blocks, like pages in virtual memory."
+>
+> **What it means:**
+>
+> The authors say openly that the idea is borrowed. A page becomes a **KV block**. A program becomes a request. A page table becomes a **block table**. The memory chips become the GPU's memory.
+>
+> The sentence that matters most is the one about reserving. Older serving systems reserved a slab for the longest possible answer when a request arrived. The new design reserves nothing ahead. It hands out one block at a time, like an operating system hands out pages.
+
+The KV cache is cut into **blocks**. One block holds the keys and values of a fixed number of tokens: 16 by default. Each request sees its own blocks in order, called **logical blocks**. Block 0 has tokens 1 to 16, block 1 has tokens 17 to 32, and so on. In GPU memory, each one is stored in a **physical block** that can be anywhere. A **block table**, one per request, records which physical block holds each logical one.
+
+> [!DEFINITION] KV block
+> A fixed-size piece of the KV cache that holds the keys and values of 16 tokens (vLLM's default). For Llama 3.1 8B, at 128 KiB per token from Part 2, one block across all 32 layers is 2 MiB.
+
+> [!DEFINITION] Block table
+> A small list per request. Entry $$i$$ gives the number of the physical block that holds the request's logical block $$i$$. It is the page table of the KV cache.
+
+{{FIG:kv_blocks|Request A has 37 tokens in three logical blocks, and request B has 20 tokens in two. Their block tables, [7, 1, 3] and [2, 6], point at physical blocks scattered in GPU memory. Physical blocks 0, 4 and 5 are free for anyone.}}
+
+At startup, vLLM measures how much GPU memory is left after the model's weights and working memory. It cuts all of that into physical blocks and puts them in a **free pool**. Take the simulation further down: Llama 3.1 8B on one 80 GB GPU. Its KV memory budget is 51.94 GB, or 24,766 blocks of 16 tokens.
+
+> [!PAPER] Kwon et al. (2023), Efficient Memory Management for Large Language Model Serving with PagedAttention · §4 · page 5
+> [![Figure 4 of the paper: a scheduler, a KV cache manager with block tables, CPU and GPU block allocators, and workers that each hold a model shard and a cache engine](/img/writings/llm-inference/p3-figure4.png)](/img/writings/llm-inference/p3-figure4.png)
+>
+> **What it says:** Figure 4 is the "vLLM system overview": a scheduler, a KV cache manager that holds the block tables, a GPU block allocator and a CPU block allocator, and workers that run the model.
+>
+> **What it means:**
+>
+> Read the picture from the top. The **scheduler** decides which requests run in the next step. The **KV cache manager** owns every block table. The two **block allocators** keep the free pools. One is for blocks in GPU memory, and one is for blocks copied out to CPU memory (see the section on preemption).
+>
+> The workers on the right are GPUs. They do the arithmetic, and they store the blocks, but they do not decide anything. In each step they get a list of tokens and the block tables, and they read and write the blocks those tables name. All the bookkeeping is in one place, on the left.
+
+## One request, token by token
+
+Now follow one request from its first token. Say the prompt is 30 tokens. Prefill (Part 1) computes the keys and values of all 30 at once. They need room for 30 tokens, so the request gets two blocks from the free pool, say blocks 7 and 1. The first holds tokens 1 to 16. The second holds tokens 17 to 30 and has 2 empty slots.
+
+Decode then adds one token per step. Token 31 goes into an empty slot of block 1, and token 32 fills it. Token 33 has no room, so the request gets one more block from the pool, block 3, and one more entry in its block table. Nothing else moves. Tokens 34 to 48 fill block 3, and token 49 gets block 12.
+
+{{FIG:grow_steps|One request with a 30-token prompt, step by step. It holds two blocks while they have room. Token 33 gets a new block, and token 49 gets another. The dashed outline marks the block that was just added.}}
+
+These are the real outputs of our small allocator, `p3_paging.py`, which follows the same rule:
+
+```text
+== 4. A request with a 30-token prompt grows to 50 tokens (block size 16)
+tokens 30: block table [7, 1], last block filled 14/16, empty slots  2
+tokens 31: block table [7, 1], last block filled 15/16, empty slots  1
+tokens 32: block table [7, 1], last block filled 16/16, empty slots  0
+tokens 33: block table [7, 1, 3], last block filled  1/16, empty slots 15
+tokens 48: block table [7, 1, 3], last block filled 16/16, empty slots  0
+tokens 49: block table [7, 1, 3, 12], last block filled  1/16, empty slots 15
+tokens 50: block table [7, 1, 3, 12], last block filled  2/16, empty slots 14
+```
+
+The paper walks through the same steps with a block size of 4, so that the picture fits on a page.
+
+> [!PAPER] Kwon et al. (2023), Efficient Memory Management for Large Language Model Serving with PagedAttention · §4.3 · page 6
+> [![Figure 6 of the paper: the prompt Four score and seven years ago our, logical blocks on the left, a block table in the middle with physical block numbers and fill counts, and physical blocks on the right](/img/writings/llm-inference/p3-figure6.png)](/img/writings/llm-inference/p3-figure6.png)
+> [![The walk-through of Figure 6, with does not require reserving the memory for the maximum possible generated, the prompt has 7 tokens, so vLLM maps the first 2 logical KV blocks, one slot remains available and allocates a new physical block highlighted](/img/writings/llm-inference/p3-walkthrough.png)](/img/writings/llm-inference/p3-walkthrough.png)
+>
+> **What it says:** vLLM "does not require reserving the memory for the maximum possible generated sequence length". "The prompt has 7 tokens, so vLLM maps the first 2 logical KV blocks" to physical blocks 7 and 1. The first decode step uses the one slot that remains. At the second step the last block is full, so vLLM "allocates a new physical block (physical block 3)".
+>
+> **What it means:**
+>
+> Follow the small circled numbers in the figure. Step 1 is prefill: seven prompt tokens fill block 0 (four slots) and three slots of block 1. Step 2 writes "fathers" into the last free slot of block 1, and the "# filled" column of the block table goes from 3 to 4. Step 3 writes "brought", finds no room, and gets physical block 3.
+>
+> The block table has two columns: which physical block, and how many of its slots are filled. The second column is how the kernel knows where the real tokens end in a partly filled block.
+
+Two requests at once look the same. Each has its own block table, and their blocks mix in the same physical pool.
+
+> [!PAPER] Kwon et al. (2023), Efficient Memory Management for Large Language Model Serving with PagedAttention · §4.3 · page 6
+> [![Figure 7 of the paper: request A and request B with their logical blocks, both mapped into one set of physical blocks](/img/writings/llm-inference/p3-figure7.png)](/img/writings/llm-inference/p3-figure7.png)
+>
+> **What it says:** Figure 7 shows "Storing the KV cache of two requests at the same time". The blocks of request A ("Four score and seven...") and request B ("It was the best of times") sit side by side in one physical pool.
+>
+> **What it means:**
+>
+> Physical block 1 holds A's tokens, block 2 holds B's, block 3 holds A's again. Neither request knows or cares. Each one follows its own block table.
+>
+> This is what lets a server keep hundreds of requests in flight. A request that finishes returns its blocks to the pool, and the very next step can hand them to someone else.
+
+## Attention, block by block
+
+There is one catch. Attention (Part 2) compares the new token's query with the key of **every** earlier token, then mixes their values. A normal attention kernel expects those keys and values in one unbroken array. With paging, they are in pieces.
+
+> [!DEFINITION] Kernel
+> A function that runs on the GPU, on thousands of cores at once. "The attention kernel" is the GPU code that computes attention for every sequence in a batch.
+
+So vLLM wrote its own attention kernel, which reads the cache through the block table. For each logical block in order, it looks up the physical block number, reads that block's keys, and computes the scores of those 16 tokens. When all blocks are done, it applies the softmax over all the scores together and mixes the values in the same way.
+
+{{FIG:paged_attn|The kernel for one new token. It reads the block table, then visits physical blocks 7, 1 and 3 in logical order. Each block gives the scores of its tokens. One softmax over all 37 scores and one weighted sum give the output.}}
+
+> [!PAPER] Kwon et al. (2023), Efficient Memory Management for Large Language Model Serving with PagedAttention · §4.1 · page 5
+> [![Figure 5 of the paper: the query vector for forth points to three non-contiguous blocks of key and value vectors](/img/writings/llm-inference/p3-figure5.png)](/img/writings/llm-inference/p3-figure5.png)
+> [![The text under Figure 5, with identifies and fetches different KV blocks separately and not contiguous on the physical memory highlighted](/img/writings/llm-inference/p3-kernel-fetch.png)](/img/writings/llm-inference/p3-kernel-fetch.png)
+>
+> **What it says:** the PagedAttention kernel "identifies and fetches different KV blocks separately". In Figure 5 the query of "forth" meets three blocks that are "not contiguous on the physical memory". The kernel multiplies the query with the keys of one block at a time, then with the values.
+>
+> **What it means:**
+>
+> The arithmetic is the attention of Part 2, unchanged. Only the place where the kernel finds the keys and values is different. Instead of "the next 37 rows of one array", it is "16 rows at block 7, then 16 rows at block 1, then 5 rows at block 3".
+>
+> Because the arithmetic does not change, neither does the answer. Paging changes where the numbers sit, not what the model computes.
+
+We can check that claim. Our script stores the keys and values of 37 tokens in a pool of 8 blocks, using the block table [7, 1, 3]. Method 1 is our own blockwise attention, following the paper. Method 2 is PyTorch's built-in attention on the same keys and values in one ordinary array:
+
+```python
+def paged_attention(q, pool_k, pool_v, block_table, n_tok):
+    """Method 1: the paper's blockwise form. Visit blocks in logical order, look up each physical block."""
+    scores, values = [], []
+    for j, phys in enumerate(block_table):
+        filled = min(B, n_tok - j * B)                  # the last block may be partly filled
+        Kj = pool_k[phys, :filled]                      # (filled, d): one lookup, one block
+        scores.append(Kj @ q / math.sqrt(d))            # q . k for the tokens of this block
+        values.append(pool_v[phys, :filled])
+    s = torch.cat(scores)
+    a = torch.exp(s - s.max()); a = a / a.sum()          # softmax over all 37 tokens
+    return a @ torch.cat(values)
+```
+
+```text
+== 6. Attention read block by block through a block table equals ordinary attention (CPU, FP32)
+block table [7, 1, 3], 37 tokens, block size 16
+Method 1 (blocks through the table) vs Method 2 (PyTorch on one contiguous array): max difference 1.5e-07
+block lookups for this token: 3; contiguous reads: 1
+```
+
+The difference is 0.00000015, which is rounding noise in 32-bit numbers. The last line is the cost we come back to below: three lookups instead of one read.
+
+## The three wastes, one at a time
+
+Now we can return to the three kinds of waste from Part 2 and look at each one with blocks. We use one running example. A request has 37 tokens so far. Its answer will end when it reaches 300 tokens, but nobody knows that yet. An older system reserves a slab of 2,048 slots for it, the model's maximum.
+
+### Waste 1: reserved slots
+
+**The problem.** A slot that is reserved now, for a token that will be written later, is empty until then. Other requests cannot use it in the meantime. In our example the slab has 2,048 slots and holds 37 tokens. The answer will reach 300 tokens, so 263 of the empty slots are **reserved slots**: they will be used, but not yet. Some of them stay empty for hundreds of steps.
+
+**With blocks.** vLLM gives the request 3 blocks, 48 slots, for its 37 tokens. 11 slots are empty, and the next 11 tokens fill them. The 4th block comes only at token 49. At any moment, a request holds at most one block that is not full.
+
+{{FIG:waste_reserved|Reserved slots. Top: the slab holds 37 tokens, 263 slots kept for tokens still to come, and 1,748 slots the answer will never reach. Middle: the same request with blocks, drawn on the same scale. Bottom: those 48 slots zoomed in, with 11 empty slots for the next 11 tokens.}}
+
+In bytes, for Llama 3.1 8B, the difference right now is 256 MiB for the slab against 6 MiB for three blocks.
+
+### Waste 2: internal fragmentation
+
+**The problem.** When the answer ends, any slot it never reached was wasted for the whole life of the request. This is **internal fragmentation**: waste inside a request's own reservation. In our example the answer ends at 300 tokens, so 1,748 of the 2,048 slots were never used. Only 14.6% of the slab ever held data.
+
+> [!DEFINITION] Fragmentation
+> Free memory that cannot be used well. **Internal** fragmentation is unused space inside a piece of memory that someone holds. **External** fragmentation is free space between the pieces, in gaps too small to be useful.
+
+**With blocks.** The request ends with 19 blocks, 304 slots, for 300 tokens. Only the last block has empty slots: 4 of them. The worst case is 15 empty slots, if a request ends with one token in its last block. That is a fixed limit, no matter how long the answer is.
+
+{{FIG:waste_internal|Internal fragmentation. A finished 300-token answer used 14.6% of its 2,048-slot slab. With 16-token blocks it holds 19 blocks, and only the last one has empty slots: 4 of 16.}}
+
+```text
+== 3. One request of 37 tokens: a 2,048-slot reservation vs 16-token blocks
+contiguous: reserved 2,048 slots, used 37, empty 2,011 (1.8% used)
+paged: 3 blocks x 16 = 48 slots, used 37, empty 11 (77.1% used)
+if the request will end at 300 tokens: of the 2,011 empty slots now, 263 are reserved slots (filled later) and 1,748 are internal fragmentation (never filled)
+at the end, contiguous: 1,748 slots never used (14.6% used); paged: 19 blocks = 304 slots, 4 never used (98.7% used)
+```
+
+The paper states this limit in one sentence.
+
+> [!PAPER] Kwon et al. (2023), Efficient Memory Management for Large Language Model Serving with PagedAttention · §4.3 · page 6
+> [![The paragraph after Figure 6, with physical block is only allocated when all previous blocks, limits all the memory wastes for a request within one block, and its KV blocks can be freed highlighted](/img/writings/llm-inference/p3-one-block.png)](/img/writings/llm-inference/p3-one-block.png)
+>
+> **What it says:** "a new physical block is only allocated when all previous blocks are full", so vLLM "limits all the memory wastes for a request within one block". When a request finishes, "its KV blocks can be freed" for other requests.
+>
+> **What it means:**
+>
+> This one rule removes the first two wastes together. No slot is held for the far future, because new blocks come only when needed. No large tail is left empty at the end, because the request never had one.
+>
+> The last clause matters for the scheduler. A finished request's blocks go straight back to the free pool, and they are useful at once, because any block fits any request. That is the third waste.
+
+### Waste 3: external fragmentation
+
+**The problem.** Older systems needed each request's slab in one piece. Over time, as requests of different sizes arrive and finish, the free memory breaks up into gaps between slabs. A new request can fail to fit even when the total free memory is large enough.
+
+Here is a tiny memory of 16 slots. Three requests, A, B and C, are still running, and 7 slots are free, in gaps of 2, 3 and 2. Request D needs 6 slots in one piece, and no gap is big enough.
+
+**With blocks.** Cut the same memory into blocks of 2 slots. D needs 3 blocks, and there are 3 free blocks: 2, 5 and 7. They are not next to each other, but that does not matter, because D's block table records where they are. Every block has the same size, so a free block always fits.
+
+{{FIG:waste_external|External fragmentation. Top: seven free slots, but no gap holds the six slots that request D needs in one piece. Bottom: with blocks of two slots, D takes the free blocks 2, 5 and 7, and its block table records them.}}
+
+```text
+== 5. External fragmentation: 16 slots of memory, three requests finished, one new request
+memory AAAA..BBB...CC..  free slots 7, free gaps [2, 3, 2], largest gap 3
+a new request needs 6 slots in one piece: fits contiguously? False
+with blocks of 2 slots: free blocks 3, the request needs 3: fits? True
+```
+
+Look again at the bottom of the figure. B has 3 tokens, so its second block holds one token and one empty slot. That empty slot is internal fragmentation, limited to one block, as above. Paging does not make waste zero. It moves all of it into the last block of each request, where it is small and bounded.
+
+### All three together
+
+To see the effect at the scale of a real server, I simulated 200,000 requests. The server is one 80 GB GPU with Llama 3.1 8B (128 KiB of cache per token, from Part 2). Prompt and answer lengths came from wide, realistic spreads, and each request was caught at a random moment in its life. The question: of the memory each policy sets aside, how much holds tokens, and how many requests fit at once?
+
+{{FIG:sim_policies|Share of KV memory that holds real tokens under four allocation policies, and how many requests fit at once in the same memory. Simulated with Llama 3.1 8B's cache size on an 80 GB GPU.}}
+
+| Allocation policy | Memory holding real tokens | Requests that fit |
+|---|---|---|
+| reserve the model's maximum length (8,192 tokens) | 11.6% | 48 |
+| reserve prompt + the request's `max_tokens` | 33.7% | 141 |
+| reserve the exact final length (impossible: needs the future) | 83.5% | 349 |
+| **paged, 16-token blocks** | **99.2%** | **415** |
+
+Paging beats even the "oracle" that magically knows every answer's length. The oracle still has to reserve the space for tokens that it has not written yet: waste 1. My simulation also leaves out external fragmentation, so the three slab policies look better here than they would on a real server. With blocks, the last block of a request had 7.5 empty slots on average, out of 16.
+
+The real system agrees. The paper measured the memory of real serving runs.
+
+> [!PAPER] Kwon et al. (2023), Efficient Memory Management for Large Language Model Serving with PagedAttention · §1 · page 2
+> [![Figure 2 of the paper: stacked bars of KV cache usage for three Orca variants and vLLM, split into token states, reservation, internal fragmentation and external fragmentation](/img/papers/vllm/p1-figure2.png)](/img/papers/vllm/p1-figure2.png)
+>
+> **What it says:** Figure 2 shows the "average percentage of memory wastes in different LLM serving systems". The green part, token states, is 20.4% to 38.2% for three versions of the older system Orca and 96.3% for vLLM.
+>
+> **What it means:**
+>
+> The colours are the three wastes of this section. Orange is "reservation", waste 1. Red is internal fragmentation, waste 2. Grey is external fragmentation and other overhead, waste 3. In the vLLM bar, all three shrink to a thin line at the top.
+>
+> The three Orca bars differ in how much they reserve per request. Max reserves the model's maximum of 2,048 tokens. Pow2 reserves up to twice the real output length. Oracle knows the exact length in advance. Even with perfect knowledge, Orca (Oracle) keeps 25.2% as reservation and loses 36.6% to fragmentation.
+
+More useful memory means more requests per step, which means larger batches. Across their tests, the authors report **2 to 4 times** the throughput of the best systems of the time, "with the same level of latency".
+
+### Why 16 tokens per block?
+
+A smaller block wastes less in the last block, but the kernel then does more lookups for less data each time. A larger block is the reverse. The authors tried sizes from 1 to 256.
+
+> [!PAPER] Kwon et al. (2023), Efficient Memory Management for Large Language Model Serving with PagedAttention · §7.2 · page 12
+> [![The conclusion of the block size study, with the block size 16 is large enough to efficiently utilize the GPU and small enough to avoid significant internal fragmentation highlighted](/img/writings/llm-inference/p3-block-size.png)](/img/writings/llm-inference/p3-block-size.png)
+>
+> **What it says:** "the block size 16 is large enough to efficiently utilize the GPU and small enough to avoid significant internal fragmentation in most workloads". So 16 is vLLM's default.
+>
+> **What it means:**
+>
+> Think of buying eggs. Boxes of one egg are flexible but slow to carry. Boxes of 200 are fast to carry, but you rarely need exactly 200, so many are left over. A box of a dozen or so is a good middle.
+>
+> For short requests the trade is sharp. In the paper's Alpaca test, where many requests are shorter than a large block, sizes above 32 got much slower. A block of 128 tokens for a 40-token answer is mostly empty, which is waste 2 again.
+
+## The price of paging
+
+Nothing is free. The block table adds a step to every read of the cache. This section shows what that step costs, and why vLLM pays it.
+
+Start with an analogy. You read a bound book straight through, page after page. Now the same book is in loose pages, spread over several rooms, with an index on the front door: "pages 1 to 16 in room 7, pages 17 to 32 in room 1". To read it, you check the index, walk to room 7, read, come back, check again, walk to room 1. The words are the same. The reading takes longer because of the index and the walking.
+
+A GPU reads memory fastest in long, regular sweeps. With one contiguous array, the kernel knows the start address and the length, and its thousands of threads read straight through. With blocks, it must first read the block table, compute where each block starts, and treat the last, partly filled block in a different way. In one batch, every request also has a different length and a different table.
+
+{{FIG:cost_gather|Top: one contiguous array, read in a single sweep from a known start. Bottom: paged storage. The kernel reads the block table, then jumps to blocks 7, 1 and 3, with extra work for each block.}}
+
+The paper measured this cost directly. It compared the attention kernel of vLLM with the attention kernel of FasterTransformer, a fast NVIDIA library that keeps the cache in one contiguous array.
+
+> [!PAPER] Kwon et al. (2023), Efficient Memory Management for Large Language Model Serving with PagedAttention · §7.1 · page 12
+> [![Section 7.1, Kernel Microbenchmark, with extra overheads of accessing the block table, executing extra branches, 20 to 26 percent higher attention kernel latency, only affects the attention operator and significantly outperform FasterTransformer in end-to-end performance highlighted](/img/writings/llm-inference/p3-kernel-overhead.png)](/img/writings/llm-inference/p3-kernel-overhead.png)
+> [![Figure 18a of the paper: kernel latency in microseconds against context lengths 64, 128 and 256, for vLLM and FasterTransformer at batch sizes 8 and 32](/img/writings/llm-inference/p3-figure18.png)](/img/writings/llm-inference/p3-figure18.png)
+>
+> **What it says:** the vLLM kernels have "extra overheads of accessing the block table, executing extra branches, and handling variable sequence lengths". This leads to "20–26% higher attention kernel latency" than FasterTransformer. The authors believe the overhead is small because it "only affects the attention operator", and vLLM still "significantly outperform[s] FasterTransformer in end-to-end performance".
+>
+> **What it means:**
+>
+> Read the left chart of Figure 18. The horizontal axis is the context length: how many earlier tokens each sequence attends to. The vertical axis is the time of one attention kernel call, in microseconds. Blue lines are vLLM, orange lines are FasterTransformer, at batch sizes 8 and 32. Every blue line sits a little above its orange partner: that gap is the 20 to 26%.
+>
+> The paper names three sources of the gap. "Accessing the block table" is the index on the front door. "Extra branches" are the checks a GPU thread must make, such as "is this the last block, and how full is it?". Branches are costly on a GPU, because threads that run in step must wait for each other when they take different paths. "Variable sequence lengths" means each request in the batch has a different number of blocks.
+>
+> The right chart, Figure 18b, is the block size study from the section above.
+
+> [!DEFINITION] FasterTransformer
+> An NVIDIA library of fast GPU kernels for transformer models, widely used for serving before vLLM. It stores each sequence's KV cache in one contiguous array.
+
+So attention is slower. Why is the whole system still much faster? There are two reasons.
+
+**First, attention is only part of a step.** A decode step also runs the large matrix multiplications of every layer, which read all the model's weights (Part 1). Paging does not touch that work. If attention were, for example, a quarter of a step, a 26% slower attention would make the step about 6.5% slower. That share is an assumption for the arithmetic only. The real share depends on the model, the batch and the context length.
+
+**Second, paging buys a much larger batch.** In our simulation the same GPU fits 415 requests instead of 48 when it reserves the maximum length. Part 1 measured what batch size is worth. Going from 1 to 128 sequences gave 44 times more tokens per second, for a step only about 3 times slower. A small tax on one part of each step buys many more sequences in that step.
+
+{{FIG:cost_gain|What paging costs and what it buys. Left: the attention kernel takes 20 to 26 percent longer than a contiguous one (paper, Figure 18a). Right: the same memory holds 415 requests instead of 48 (our simulation).}}
+
+The authors also reduced the cost with care. They merged the block lookup into the attention kernel itself, so the gather and the arithmetic happen in one pass.
+
+> [!PAPER] Kwon et al. (2023), Efficient Memory Management for Large Language Model Serving with PagedAttention · §5.1 · page 9
+> [![Kernel optimisation 2, Fusing block read and attention, with read KV cache according to the block table, attention operations on the fly and assign a GPU warp to read each block highlighted](/img/writings/llm-inference/p3-kernel-opt.png)](/img/writings/llm-inference/p3-kernel-opt.png)
+>
+> **What it says:** they adapted FasterTransformer's kernel "to read KV cache according to the block table and perform attention operations on the fly". To keep memory reads efficient, they "assign a GPU warp to read each block".
+>
+> **What it means:**
+>
+> "On the fly" means there is no separate step that first copies the scattered blocks into one array. That copy would read and write the whole cache once more, which is the most expensive thing a memory-bound step can do.
+>
+> A **warp** is a group of 32 GPU threads that run in step. If 32 threads read 32 neighbouring numbers together, the GPU serves them in one wide memory read. One warp per block keeps each read inside one block, where the numbers are next to each other. Inside a block, the reads are as regular as in an ordinary array.
+
+Today vLLM runs attention through several kernel libraries, and all of them read the cache through block tables. The trade stayed the same: a small tax on attention for a large gain in memory.
+
+## Sharing blocks
+
+Blocks bring a second gift. Two requests can point at **the same physical block**. Nothing in the block table forbids it.
+
+Where does this help? Some requests ask for several answers to one prompt: "give me three versions of this email" (called parallel sampling). Beam search, used in translation, keeps several candidate answers and extends the best ones. In both cases, many sequences start with the same tokens. Their keys and values are the same too, so they need to be stored only once.
+
+The analogy is two students sharing one textbook. That works well while both only read it. When one student wants to write notes in the margin of page 12, they photocopy page 12 and write on the copy. The rest of the book stays shared. Operating systems do exactly this when a program splits into two (called a fork), and the name of the trick is **copy-on-write**.
+
+> [!DEFINITION] Reference count
+> A number kept with each physical block: how many block tables point at it. A block goes back to the free pool only when its count reaches 0.
+
+> [!DEFINITION] Copy-on-write
+> Share a block until someone wants to change it. Then copy that one block, give the copy to the writer, and keep sharing the rest.
+
+Here is the trick on a small example: two samples of one 20-token prompt. The prompt fills block 7 and 4 slots of block 1. Both samples point at both blocks, so each block has a reference count of 2. Then each sample writes its own token 21 into block 1.
+
+{{FIG:cow|Copy-on-write in three steps. 1: both samples share blocks 7 and 1. 2: sample 1 wants to write into block 1, which is shared, so vLLM copies it to block 3 and sample 1 writes there. 3: block 1 now has one user, so sample 2 writes into it directly.}}
+
+```text
+== 7. Copy-on-write: two samples of one 20-token prompt (block size 16)
+after prefill: tables {'sample 1': [7, 1], 'sample 2': [7, 1]}, ref counts {7: 2, 1: 2}, blocks stored 2 (without sharing: 4)
+sample 1 writes token 21: block 1 is shared (ref 2), copy it to block 3, ref of 1 -> 1
+sample 2 writes token 21: block 1 has ref 1, write in place
+now: tables {'sample 1': [7, 3], 'sample 2': [7, 1]}, ref counts {7: 2, 1: 1, 3: 1}, blocks stored 3
+```
+
+> [!PAPER] Kwon et al. (2023), Efficient Memory Management for Large Language Model Serving with PagedAttention · §4.4 · page 7
+> [![Figure 8 of the paper: samples A1 and A2 share physical blocks 7 and 1; a copy-on-write arrow copies block 1 to block 3, and the reference count goes from 2 to 1](/img/writings/llm-inference/p3-figure8.png)](/img/writings/llm-inference/p3-figure8.png)
+> [![The copy-on-write paragraph, with reference count of the corresponding physical block is greater than 1, allocates a new physical block, decreases the reference count to 1 and directly writes highlighted](/img/writings/llm-inference/p3-cow.png)](/img/writings/llm-inference/p3-cow.png)
+>
+> **What it says:** when sample A1 writes to its last block, vLLM sees that the block's "reference count ... is greater than 1". It "allocates a new physical block (physical block 3)", copies the data, and "decreases the reference count to 1". Then sample A2 "directly writes" into block 1.
+>
+> **What it means:**
+>
+> The figure is our example with the paper's words. The two samples share the prompt "Four score and seven years ago our", then write "fathers" and "mothers". Only the last, partly filled block of the prompt is ever copied. Full blocks are never written again, so they stay shared forever.
+>
+> How much does this save? The paper measured it on OPT-13B with the Alpaca data. Sharing saved 6.1% to 9.8% of KV memory for parallel sampling, and 37.6% to 55.2% for beam search. Beam search saves more, because its candidates share long stretches of their answers, not only the prompt.
+
+## Prefix caching: reuse across time
+
+Sharing among the requests running right now is good. Sharing **across time** is better. Many requests to one service start with the same long text: a system prompt with instructions, or the same document with a different question. If a thousand users send requests that start with the same 2,000-token system prompt, why compute its keys and values a thousand times?
+
+The analogy is a coffee shop that sells one drink 500 times a morning. It does not grind fresh beans for each cup from zero. It keeps ground coffee ready, and only the last steps happen per order.
+
+The paper describes the idea for a prefix that the service provider declares in advance.
+
+> [!PAPER] Kwon et al. (2023), Efficient Memory Management for Large Language Model Serving with PagedAttention · §4.4 · page 8
+> [![The shared prefix paragraph, with store the KV cache of the prefix in advance, how OS handles shared library across processes and only needs to execute on the user's task input highlighted](/img/writings/llm-inference/p3-shared-prefix.png)](/img/writings/llm-inference/p3-shared-prefix.png)
+>
+> **What it says:** the service can "store the KV cache of the prefix in advance", "as how OS handles shared library across processes". A new request maps its first blocks to those cached blocks, and the prompt phase "only needs to execute on the user's task input".
+>
+> **What it means:**
+>
+> On a laptop, many programs use the same library of code. It is loaded into memory once, and every program's page table points at it. A shared prompt prefix is the same: its blocks are computed once, and every request's block table points at them.
+>
+> The paper's version needs the provider to declare the shared prefixes. Today vLLM finds them by itself, with no declaration, through **automatic prefix caching**.
+
+How does vLLM find a match without being told? It gives every **full** block a name: a hash of the 16 tokens in the block and of the name of the block before it. Each name includes the name before it. So a block's name stands for the whole text from the start to the end of that block. Two requests that start with the same 32 tokens get the same first two names.
+
+> [!DEFINITION] Hash
+> A function that turns any input into a short fixed-size code, such as `9266d336`. The same input always gives the same code, and different inputs almost always give different codes.
+
+When a request arrives, vLLM computes the names of its full blocks, in order, and looks each one up in a table of cached blocks. It reuses every block it finds until the first miss. Prefill then runs only for the tokens after that point.
+
+{{FIG:prefix_hash|Three requests, each with three full blocks. Request 2 has the same first 32 tokens as request 1, so its first two block names match and those blocks are reused. Request 3 differs only in its first token, so every one of its names differs and nothing is reused.}}
+
+```text
+== 8. Prefix caching: each full block is named by a hash of its tokens and of the block before it
+request 1: 50 tokens, full-block hashes ['9266d336', 'e9d16e46', 'df7fc873'], reused from cache 0 blocks = 0 tokens, prefill 50 tokens
+request 2: 49 tokens, full-block hashes ['9266d336', 'e9d16e46', '3953b78c'], reused from cache 2 blocks = 32 tokens, prefill 17 tokens
+request 3: 50 tokens, full-block hashes ['5b33b966', '255d9ee6', '9925b8e7'], reused from cache 0 blocks = 0 tokens, prefill 50 tokens
+```
+
+Request 3 shows why the name must include the block before it. Its second block has the same 16 tokens as request 1's second block. But their keys and values are different. In a transformer, the keys and values of a token depend on every token before it (Part 2). Reusing that block would give wrong answers, and the chained name prevents it.
+
+How much does it save? I measured a 2,048-token shared system prompt followed by a 64-token question:
+
+| | Time to first token |
+|---|---|
+| full prefill of prompt + question | 98.3 ms |
+| system prompt reused from cache, prefill only the question | **14.2 ms** |
+
+That is **7 times faster**, and the next token is identical: the largest difference in any output score between the two runs was exactly 0.0. The saved prefill is not an approximation. It is the same arithmetic, done once instead of twice.
+
+What happens to cached blocks when memory gets tight? When a request finishes, its blocks go to the free pool but keep their names and contents. If a new request matches them, they come back out of the pool. If the pool needs a block, it takes the one used least recently. So the cache costs no memory that anyone else needs.
+
+> [!NOTE] Which version
+> In vLLM v0.32.0 (October 2026), automatic prefix caching is **on by default** (`enable_prefix_caching = True` in the cache configuration). In the current docs, each block's hash has three inputs. They are the parent block's hash, the block's tokens, and extra values such as a LoRA adapter ID. A LoRA adapter is a small set of extra weights that changes the model's behaviour for one kind of task. Only full blocks are cached, so the last partial block of a prompt is always computed again.
+
+## Continuous batching
+
+So far the topic was memory. The next ideas are about time: who runs in each step.
+
+Batching (Part 1) helps only while the batch stays full. The simple way to batch is **static**: gather 64 requests, run them together until all are finished, then take the next 64. But answers have very different lengths. A request that ends after 20 tokens leaves its slot empty while the batch waits for one that runs to 2,000.
+
+The analogy is a bus that leaves only when every passenger from the last trip has got off at the final stop. Most seats ride empty for most of the trip. A better bus lets someone off at every stop and lets the next person in the queue get on.
+
+> [!DEFINITION] Step (iteration)
+> One forward pass of the model over the current batch. In decode, every sequence in the batch gets one new token per step.
+
+{{FIG:static_cont|Static batching keeps a slot idle until the slowest request in its batch finishes. Continuous batching gives a freed slot to the next waiting request at once.}}
+
+**Continuous batching** decides who is in the batch **at every step**. It was introduced by the Orca system (Yu et al., OSDI 2022), under the name *iteration-level scheduling*. When a request finishes, its slot goes to the next one in line at the next step.
+
+> [!PAPER] Kwon et al. (2023), Efficient Memory Management for Large Language Model Serving with PagedAttention · §2.3 · page 3
+> [![The paragraph on fine-grained batching, with the iteration level, completed requests are removed from the batch and new ones are added, waiting for a single iteration and eliminate the need to pad highlighted](/img/papers/vllm/p2-fine-batching.png)](/img/papers/vllm/p2-fine-batching.png)
+>
+> **What it says:** these techniques "operate at the iteration level". "After each iteration, completed requests are removed from the batch, and new ones are added." A new request waits for "a single iteration", not for the whole batch.
+>
+> **What it means:**
+>
+> A step takes a few tens of milliseconds, so "wait one step" means a new request starts almost at once. With static batching it could wait for the longest answer of the batch ahead of it, which can be many seconds.
+>
+> The phrase "eliminate the need to pad" is the other gain. A static batch makes every sequence the same length by padding the short ones with dummy tokens, and the GPU computes on those dummies. Continuous batching does not need them.
+
+I simulated 4,096 requests with realistic answer lengths, served through 64 slots:
+
+| | Steps to finish all requests | Slots doing useful work |
+|---|---|---|
+| static batching | 114,566 | 21% |
+| continuous batching | 25,127 | 96% |
+
+Same requests, same slots, **4.6 times fewer steps**. The exact ratio depends on how uneven the answer lengths are, but the direction is always the same. Orca reported a **36.9x** throughput gain over NVIDIA FasterTransformer on GPT-3 175B "at the same level of latency."
+
+Continuous batching and paging need each other. Requests that join and leave at every step would shred a memory made of slabs. Every arrival needs a new slab, and every departure leaves a gap of a different size. With blocks, a finished request returns its blocks to the pool, and the next one takes whichever blocks it needs.
+
+In vLLM's current engine, called V1, the batch for each step is one long row of tokens. Every scheduled token from every request sits end to end, and position numbers and the block tables keep each request's tokens apart. There is no padding and no fixed slot count. V1 became the default engine in v0.8 (2025), and since v0.11 it is the only one.
+
+## Chunked prefill
+
+Continuous batching lets a new request join at the next step. But what if the new request's prefill is huge?
+
+Prefill and decode behave in opposite ways (Part 1). A decode step is short and comes again and again. The prefill of a long prompt is one large step. Say 16 users are reading streamed answers, and a new user sends an 8,192-token document. Without care, that prefill runs as one step, and **every streaming user freezes** until it is done. From their side, the text stops.
+
+The analogy is a supermarket with one till. A customer with a full trolley arrives behind ten people with one item each. A fair till serves a few of the trolley's items, then one of the quick customers, then a few more items. The trolley takes a little longer, but nobody else waits a long time.
+
+**Chunked prefill** cuts the long prompt into slices and adds one slice to each step, next to the normal decodes. We can estimate the effect from step costs measured in Part 1. Sixteen decodes took 12.8 ms, a 512-token prefill 27.4 ms, and an 8,192-token prefill 450.5 ms.
+
+{{FIG:chunked|Top: the 8,192-token prefill runs in one step and all 16 streaming users wait. Bottom: chunked prefill cuts it into 512-token slices that run alongside the ongoing decodes.}}
+
+| | Longest pause for streaming users | Long prompt's first token |
+|---|---|---|
+| no chunking | 463 ms | 463 ms |
+| 512-token chunks | **40 ms** | 643 ms |
+
+These are estimates built by adding measured step costs, not a measured mixed batch. Later slices cost a little more than the first, because they attend to the slices before them. So the real chunked numbers would be a little higher. The trade they show is the real one.
+
+The streaming users' worst pause drops from almost half a second to 40 ms. The price is that the long prompt's first token arrives later, because its prefill is now spread over 16 steps.
+
+> [!PAPER] Agrawal et al. (2024), Taming Throughput-Latency Tradeoff in LLM Inference with Sarathi-Serve · §1 · page 2
+> [![Sarathi-Serve's two key ideas, with chunked-prefills, stall-free and without pausing ongoing decodes highlighted](/img/writings/llm-inference/p3-sarathi-chunk.png)](/img/writings/llm-inference/p3-sarathi-chunk.png)
+>
+> **What it says:** "chunked-prefills" split a prefill "into equal compute-sized chunks" over several steps. "Stall-free" scheduling lets "new requests to join a running batch without pausing ongoing decodes".
+>
+> **What it means:**
+>
+> The two ideas work as a pair. Chunking makes the prefill small enough to fit in a step. Stall-free scheduling puts the decodes in each step first, then fills the rest with a slice of prefill. The decodes never wait.
+>
+> Sarathi-Serve reported up to **2.6x** higher serving capacity than the vLLM of that time, for Mistral-7B on one A100 GPU. Later, vLLM adopted the same approach.
+
+In vLLM V1, chunked prefill is **on by default**. Each step has a **token budget**, set by `--max-num-batched-tokens`. The scheduler first puts in every running decode, then fills the rest of the budget with prefill chunks. The docs describe the trade of this knob. Smaller values give better inter-token latency, because fewer prefill tokens slow down each decode step. Larger values give a better time to first token.
+
+## When memory runs out anyway
+
+Paging makes memory go much further, but a GPU can still fill up. Many long answers can grow at once, and each one needs a new block every 16 tokens. When a running request needs a block and the pool is empty, something must give way. The scheduler **preempts** a request. It takes all of that request's blocks back and puts the request back in the queue.
+
+> [!DEFINITION] Preemption
+> Stopping a running request before it is finished, to free its resources, and resuming it later.
+
+> [!PAPER] Kwon et al. (2023), Efficient Memory Management for Large Language Model Serving with PagedAttention · §4.5 · page 8
+> [![The start of section 4.5, with output lengths are not known a priori and can run out of the GPU's physical blocks highlighted](/img/writings/llm-inference/p3-preempt.png)](/img/writings/llm-inference/p3-preempt.png)
+>
+> **What it says:** "output lengths are not known a priori", so as requests grow, vLLM "can run out of the GPU's physical blocks to store the newly generated KV cache".
+>
+> **What it means:**
+>
+> This is the price of not reserving. A slab system knows at admission that a request will fit to the end. A paged system admits requests on the bet that they will not all grow long at once. Usually the bet is right, and that is why it fits so many more. Sometimes it is wrong, and then it needs a plan.
+>
+> The plan has two rules. The request that arrived last gives way first, so that early requests always make progress. And a request gives up all its blocks at once, never some of them, because attention needs every block of a sequence in every step.
+
+Which request gives way? The one that arrived last. What happens to its blocks? There are two options.
+
+- **Swap**: copy the blocks to CPU memory, and copy them back when the request runs again. This is the operating system's classic method, which moves pages to disk.
+- **Recompute**: drop the blocks. When the request runs again, join its prompt **and** the tokens it already wrote into one new prompt. Then run one prefill over all of it.
+
+{{FIG:preempt|When GPU memory is full, the newest request gives way. Swap copies its blocks to CPU memory and back later. Recompute frees them and rebuilds them later with one prefill over the prompt and the tokens written so far.}}
+
+> [!PAPER] Kwon et al. (2023), Efficient Memory Management for Large Language Model Serving with PagedAttention · §4.5 · page 8
+> [![The paragraphs on swapping and recomputation, with we copy evicted blocks to the CPU memory, recompute the KV, concatenated with the original user prompt as a new and one prompt phase iteration highlighted](/img/writings/llm-inference/p3-swap-recompute.png)](/img/writings/llm-inference/p3-swap-recompute.png)
+>
+> **What it says:** for swapping, "we copy evicted blocks to the CPU memory". For recomputation, the tokens generated so far are "concatenated with the original user prompt as a new prompt", and their KV cache "can be generated in one prompt phase iteration".
+>
+> **What it means:**
+>
+> Recomputation sounds wasteful: throw away work, then do it again. But look at which work. Writing those tokens took many slow decode steps. Rebuilding their keys and values takes one prefill. Part 1 showed that prefill handles many tokens in one pass, at a far lower cost per token.
+>
+> Swapping has its own cost. The link between CPU and GPU memory is much slower than the GPU's own memory, and many small blocks make many small transfers.
+
+The paper compared the two.
+
+> [!PAPER] Kwon et al. (2023), Efficient Memory Management for Large Language Model Serving with PagedAttention · §7.3 · page 13
+> [![The comparison of swapping and recomputation, with swapping incurs excessive overhead with small block sizes, never higher than 20% of swapping's latency and comparable end-to-end highlighted](/img/writings/llm-inference/p3-swap-vs-recompute.png)](/img/writings/llm-inference/p3-swap-vs-recompute.png)
+>
+> **What it says:** "swapping incurs excessive overhead with small block sizes". Recomputation's overhead is "never higher than 20% of swapping's latency". For block sizes from 16 to 64, the two give "comparable end-to-end performance".
+>
+> **What it means:**
+>
+> Small blocks hurt swapping because each block is a separate small copy, and the CPU-GPU link is efficient only for large copies. Recomputation does not care about the block size, because it never reads the old blocks. It rebuilds the keys and values from the tokens.
+>
+> At the default size of 16, the two are about equal in the paper's test. Later engines chose recomputation, which needs no CPU memory and no copies.
+
+In vLLM V1 the default is **recompute**. The docs say it "has lower overhead in the V1 architecture". Preemption is a warning sign in production. If logs show it often, the server is short of KV memory, and the knobs in the next sections help.
+
+## The whole engine, in one loop
+
+Every idea so far fits into one short loop that runs every few milliseconds.
+
+{{FIG:engine_loop|vLLM's engine loop: schedule this step's work, run one forward pass over all of it, append the new tokens and free finished requests, repeat.}}
+
+1. **Schedule.** Decide what runs in this step. First come the running requests that need their next token, then chunks of waiting prompts, within the token budget. Each new token needs a slot in a block. If the pool is empty, preempt the newest request. Look up each new prompt's full blocks by name, to skip work that the prefix cache already holds.
+2. **Forward pass.** Lay every scheduled token end to end in one batch, with each request's block table, and run the model once. The attention kernel reads and writes blocks through the tables.
+3. **Post-process.** Append each sampled token to its request. Return the blocks of finished requests to the free pool, with their names kept for the prefix cache. Then loop.
+
+Each line uses an idea that this part built: blocks and tables (paging), continuous batching, chunked prefill, preemption and prefix caching.
+
+## The knobs that matter
+
+Most of these ideas are on by default. These are the settings people tune most often. Defaults are from vLLM v0.32.0.
+
+| Flag | What it controls |
+|---|---|
+| `--gpu-memory-utilization` | Fraction of GPU memory vLLM may use (default 0.92). What the weights and working memory do not need becomes KV blocks. |
+| `--max-model-len` | Longest prompt + answer allowed. A lower value means less memory per request in the worst case. |
+| `--max-num-seqs` | Most sequences in one step. |
+| `--max-num-batched-tokens` | Token budget per step. Smaller: smoother streaming. Larger: faster first token. |
+| `--block-size` | Tokens per KV block (16 by default). |
+| `--kv-cache-dtype` | Store the cache in `fp8` to fit about twice as many tokens (Part 2). |
+| `--enable-prefix-caching` / `--no-enable-prefix-caching` | Reuse cached blocks across requests (on by default). |
+
+Engine arguments change between releases, so check them against the version you run (`vllm serve --help`).
+
+## Running vLLM for the first time
+
+Everything on this page happens inside one command. On a machine with an NVIDIA GPU and vLLM installed, this starts a server for Llama 3.1 8B:
+
+```bash
+vllm serve meta-llama/Llama-3.1-8B-Instruct
+```
+
+The server downloads the weights and loads them onto the GPU. Then it answers requests on port 8000, in the same format as the OpenAI API, so most client libraries can talk to it. The knobs from the table above go on the same line. For example, this asks for shorter requests and an FP8 cache:
+
+```bash
+vllm serve meta-llama/Llama-3.1-8B-Instruct \
+  --gpu-memory-utilization 0.92 \
+  --max-model-len 8192 \
+  --kv-cache-dtype fp8
+```
+
+### The two lines to look for at startup
+
+Before the server accepts its first request, it prints a long log. Two lines in it tell you how big the KV cache is. In vLLM v0.32.0, the code that prints them is in `vllm/v1/worker/gpu_worker.py` and `vllm/v1/core/kv_cache_utils.py`, and their format is:
+
+```text
+Available KV cache memory: %s GiB
+GPU KV cache size: %s tokens, Maximum concurrency for %s tokens per request: %.2fx
+```
+
+The first line is the memory that became KV blocks. The second line turns it into tokens. "Maximum concurrency" is how many requests of the full `--max-model-len` could have their whole cache in memory at the same time. Real requests are usually shorter, so more of them fit.
+
+> [!DEFINITION] Concurrency
+> The number of requests that are in progress at the same moment. In vLLM's log, it is the number of requests of the longest allowed length that fit in the KV cache together.
+
+### Computing those lines yourself
+
+You can work out both lines before you start the server, with the formula from Part 2 and the blocks from this page. We have no NVIDIA GPU for this series, so the numbers below are **computed, not measured**. They follow vLLM v0.32.0's own formulas, for Llama 3.1 8B on one 80 GB H100.
+
+1. **What vLLM may use.** The total memory times `--gpu-memory-utilization`: 80 GB × 0.92 = 73.60 GB.
+2. **What is left for the cache.** Take away the weights, 16.06 GB, and the working memory. vLLM measures the working memory in a test run at startup. We assume 4 GB, as in the simulation above. That leaves 53.54 GB, which the log shows as 49.86 GiB.
+3. **Blocks.** One block holds 16 tokens at 128 KiB each: 2 MiB. So 53.54 GB holds 25,529 blocks, which is 408,464 tokens.
+4. **Concurrency.** Llama 3.1 8B allows 131,072 tokens by default. One request that long needs 8,192 blocks, so 25,529 ÷ 8,192 = 3.12 such requests fit.
+
+{{FIG:startup_math|The startup arithmetic, computed for Llama 3.1 8B on one H100 with vLLM v0.32.0's formulas. 73.60 GB may be used, 53.54 GB is left after the weights and the working memory, which is 25,529 blocks or 408,464 tokens.}}
+
+With these assumptions, the two lines would read:
+
+```text
+Available KV cache memory: 49.86 GiB
+GPU KV cache size: 408,464 tokens, Maximum concurrency for 131,072 tokens per request: 3.12x
+```
+
+With `--max-model-len 8192`, the cache is the same size, but each full request needs only 512 blocks, so the concurrency becomes 49.86x. With `--kv-cache-dtype fp8`, each block is 1 MiB, and the cache doubles to 816,944 tokens. The simulation earlier on this page kept 90% of memory instead of 92%, which is why its budget was a little smaller.
+
+The real numbers will differ a little. Your driver reports its own total memory, and the test run measures the working memory instead of assuming it. But if your log shows a much smaller cache than this, look for the cause. Another process may be using the GPU, or `--gpu-memory-utilization` may be set low.
+
+### Watching the ideas at work: the metrics
+
+A running server shows the ideas of this page as numbers. It publishes them at `http://localhost:8000/metrics`, in the text format of Prometheus, a common monitoring tool. These are the names in vLLM v0.32.0. Prometheus adds `_total` to the names of counters.
+
+> [!DEFINITION] Metric, gauge, counter and histogram
+> A **metric** is a number that a server publishes about itself. A **gauge** shows a value now, such as memory in use. A **counter** only goes up, such as the total number of preemptions. A **histogram** counts how many values fell in each range, such as how many first tokens took under 0.1 s.
+
+| Metric | What it shows | Healthy | A warning sign |
+|---|---|---|---|
+| `vllm:kv_cache_usage_perc` | share of KV blocks in use (1 means 100%) | high under load, with room left | stuck near 1, together with waiting requests |
+| `vllm:num_requests_running` | requests in the current batch | close to what memory allows | far below it while requests wait |
+| `vllm:num_requests_waiting` | requests in the queue | near 0 most of the time | growing: the server cannot keep up |
+| `vllm:num_preemptions` | requests stopped to free blocks (counter) | flat, or rising slowly | rising fast: the cache is too small for the load |
+| `vllm:prefix_cache_hits` ÷ `vllm:prefix_cache_queries` | share of prompt tokens found in the prefix cache | high when prompts share a system prompt | near 0 when you expected reuse |
+| `vllm:time_to_first_token_seconds` | TTFT, as a histogram | within your target | a long tail: queueing or long prefills |
+| `vllm:inter_token_latency_seconds` | the time between tokens (TPOT), as a histogram | steady | spikes: long prefills in the same steps, or a batch that is too large |
+
+The server also prints a short summary to its log every 10 seconds by default. It shows the prompt and generation throughput, the running and waiting requests and the KV cache usage. When there are preemptions or prefix cache hits, it shows those too. A later page in this series covers monitoring in depth.
+
+## Beyond one GPU
+
+A model too large for one GPU is split across several. The most common split is **tensor parallelism**: every layer's matrices are cut into parts, and each GPU computes its part. For attention, each GPU takes some of the heads.
+
+> [!DEFINITION] Tensor parallelism
+> Running one model on several GPUs by splitting each layer's weights among them. Every GPU works on every token, on its share of each layer, and the GPUs exchange partial results in every layer.
+
+How do blocks work then? Every GPU processes the same tokens, so every GPU needs the same block positions. The scheduler keeps **one** block table per request and sends it to all GPUs with each step. Block 7 means the same thing on every GPU. Each GPU stores only the keys and values of its own heads in its copy of block 7.
+
+{{FIG:tp_blocks|Tensor parallelism on two GPUs. The scheduler keeps one block table per request. Both GPUs use the same block numbers, and each stores the keys and values of its own four KV heads.}}
+
+Two more ideas build on what this part showed. [Part 7](llm-inference-7-beyond-one-gpu.md) covers both in depth.
+
+**Separate GPUs for prefill and decode.** Chunked prefill lets the two phases share a GPU politely. The stronger option is to put them on different GPUs. Some GPUs only prefill, others only decode, and the KV cache moves from one to the other. DistServe (Zhong et al., OSDI 2024) showed that this can serve up to 7.4x more requests. Or it can meet 12.6x tighter latency targets, because each phase gets GPUs sized for its own limit.
+
+**Speculative decoding.** Part 1 measured that processing 16 tokens costs about the same as processing one (10.8 ms against 10.0 ms). Speculative decoding uses that. A cheap helper guesses the next few tokens, and the big model checks them all in one pass, up to the first wrong guess. The output is the same as if the big model wrote every token itself. [Part 4](llm-inference-4-speculative-decoding.md) builds it from scratch and measures it.
+
+## The series so far, on one page
+
+| Idea | The problem | The fix | What we measured or simulated |
+|---|---|---|---|
+| prefill vs decode | writing is 190x slower than reading | understand it: decode is memory-bound | 27 ms to read 512 tokens, 5.2 s to write 512 |
+| batching | one sequence wastes each weight read | decode many sequences per step | 44x throughput at 128 sequences |
+| KV cache | recomputing the past every step | keep keys and values | next token at 8,192: 449 ms to 11.5 ms |
+| PagedAttention | reserved memory sits empty | 16-token blocks, allocated on demand | 48 to 415 requests at once |
+| sharing blocks | parallel samples store one prompt many times | point at the same blocks, copy on write | (paper) 6.1% to 55.2% less KV memory |
+| prefix caching | the same prompt prefilled again and again | reuse blocks by name (hash) | first token 98 ms to 14 ms |
+| continuous batching | slots idle behind the slowest request | refill slots every step | 4.6x fewer steps |
+| chunked prefill | long prompts freeze streaming users | slice prompts into each step | worst pause 463 ms to 40 ms |
+
+Every one of these ideas goes back to two facts from Part 1. Decode is limited by memory, not by arithmetic. And a GPU is productive only when it decodes many sequences at once. The whole design of vLLM fits as many sequences as possible into memory, and keeps every step full.
+
+> [!TAKEAWAYS]
+> - vLLM stores the KV cache in **blocks** of 16 tokens. A request gets a new block only when its last one is full, like a program gets pages from an operating system.
+> - A **block table** per request maps its logical blocks, in order, to physical blocks anywhere in GPU memory.
+> - **Reserved slots** disappear, and **internal fragmentation** is limited to the last block (at most 15 slots). **External fragmentation** cannot happen, because every block has the same size.
+> - In our simulation, the same GPU fits 415 requests instead of 48. The paper measured 96.3% of KV memory holding tokens, against 20.4% to 38.2% before.
+> - The cost: the attention kernel itself is **20 to 26% slower** than a contiguous kernel. The system is still much faster, because attention is only part of a step and the batch gets far larger.
+> - Blocks can be **shared** with reference counts and copy-on-write, and **reused** across requests through prefix caching (7x faster first token in our test).
+> - At startup vLLM logs its KV cache size in tokens and its maximum concurrency. For Llama 3.1 8B on one H100 the formulas give about **408,464 tokens** (computed, not measured). Its `/metrics` endpoint shows cache usage, waiting requests and preemptions as the server runs.
+> - **Continuous batching**, **chunked prefill** and **preemption** decide who runs in each step. In vLLM v0.32.0, prefix caching and chunked prefill are on by default, and preemption recomputes.
+
+<details>
+<summary>The simulation and the small checks: p3_paging.py</summary>
+
+The script `code/writings/llm-inference/p3_paging.py` reproduces the two simulations of this page and the small examples. Here is the simulation part.
+
+```python
+"""KV allocation policies and static vs continuous batching (pure Python + numpy)."""
+import heapq, math
+import numpy as np
+
+rng = np.random.default_rng(42)
+
+# ---- how much KV memory each policy wastes (Llama 3.1 8B on one 80 GB GPU)
+PER_TOKEN = 2 * 32 * 8 * 128 * 2                    # 128 KiB, from the config
+BUDGET = 0.9 * 80e9 - 8.03e9 * 2 - 4e9              # 90% of memory, minus weights and ~4 GB working memory
+N, MAX_LEN, MAX_TOKENS, BLOCK = 200_000, 8192, 2048, 16
+prompt = np.clip(rng.lognormal(math.log(512), 0.9, N), 16, 6000).astype(int)
+output = np.clip(rng.lognormal(math.log(256), 0.9, N), 8, MAX_TOKENS).astype(int)
+now = prompt + (rng.uniform(0, 1, N) * output).astype(int)   # a random moment in each request's life
+
+policies = {
+    "reserve max length": np.full(N, MAX_LEN),
+    "reserve prompt + max_tokens": prompt + MAX_TOKENS,
+    "reserve exact final length": prompt + output,
+    "paged, 16-token blocks": np.ceil(now / BLOCK).astype(int) * BLOCK,
+}
+for name, reserved in policies.items():
+    print(f"{name:28s} useful {now.sum() / reserved.sum():6.1%}   fits {BUDGET / (reserved.mean() * PER_TOKEN):5.0f} requests")
+
+# ---- static vs continuous batching: 4,096 requests, 64 slots
+SLOTS = 64
+lens = np.clip(rng.lognormal(math.log(256), 0.9, 4096), 8, 2048).astype(int)
+static = sum(lens[i:i + SLOTS].max() for i in range(0, len(lens), SLOTS))
+free = [0] * SLOTS
+for L in lens:
+    heapq.heappush(free, heapq.heappop(free) + L)
+continuous = max(free)
+print(f"static {static:,} steps, continuous {continuous:,} steps, {static / continuous:.1f}x")
+```
+
+```text
+== 1. How much reserved KV memory holds real tokens (simulation, Llama 3.1 8B, one 80 GB GPU)
+reserve max length           useful  11.6%   fits    48 requests
+reserve prompt + max_tokens  useful  33.7%   fits   141 requests
+reserve exact final length   useful  83.5%   fits   349 requests
+paged, 16-token blocks       useful  99.2%   fits   415 requests
+paged: mean empty slots in the last block 7.5 (always 0 to 15)
+
+== 2. Static vs continuous batching (simulation, 4,096 requests, 64 slots)
+static 114,566 steps, useful 21%
+continuous 25,127 steps, useful 96%
+ratio 4.6x
+```
+
+</details>
+
+<details>
+<summary>The startup arithmetic: p3_vllm_startup.py</summary>
+
+The script `code/writings/llm-inference/p3_vllm_startup.py` works out the two startup lines with vLLM v0.32.0's formulas. It runs no model and needs no GPU. Its output:
+
+```text
+1. vLLM may use 0.92 x 80 GB = 73.60 GB
+2. minus weights 16.06 GB and working memory 4 GB = 53.54 GB for the KV cache
+   log line: Available KV cache memory: 49.86 GiB
+
+--kv-cache-dtype auto (BF16): one block = 65,536 bytes per layer x 32 layers = 2 MiB
+3. blocks = 53.54 GB / 2 MiB = 25,529 blocks = 408,464 tokens
+4. --max-model-len 131,072: 8,192 blocks per request -> log line: GPU KV cache size: 408,464 tokens, Maximum concurrency for 131,072 tokens per request: 3.12x
+4. --max-model-len 8,192: 512 blocks per request -> log line: GPU KV cache size: 408,464 tokens, Maximum concurrency for 8,192 tokens per request: 49.86x
+   requests of 1,024 tokens (prompt + answer): 398 fit at once
+   requests of 4,096 tokens (prompt + answer): 99 fit at once
+
+--kv-cache-dtype fp8: one block = 32,768 bytes per layer x 32 layers = 1 MiB
+3. blocks = 53.54 GB / 1 MiB = 51,059 blocks = 816,944 tokens
+4. --max-model-len 131,072: 8,192 blocks per request -> log line: GPU KV cache size: 816,944 tokens, Maximum concurrency for 131,072 tokens per request: 6.23x
+4. --max-model-len 8,192: 512 blocks per request -> log line: GPU KV cache size: 816,944 tokens, Maximum concurrency for 8,192 tokens per request: 99.72x
+   requests of 1,024 tokens (prompt + answer): 797 fit at once
+   requests of 4,096 tokens (prompt + answer): 199 fit at once
+```
+
+</details>
+
+<details>
+<summary>Research notes: what changed in vLLM since the paper</summary>
+
+The paper describes vLLM as of 2023. Several parts changed in the engine that people run today, V1, which became the default in v0.8 (2025) and the only engine in v0.11.
+
+- **Prefix caching** went from provider-declared prefixes to automatic matching by chained block hashes, on by default. The hash also includes extra values, such as a LoRA adapter ID or a cache salt. Two requests then never share blocks that only look the same.
+- **Chunked prefill** is on by default, and the scheduler always puts decodes first.
+- **Preemption** recomputes by default. The paper's swap path to CPU memory is no longer the default.
+- **Attention kernels** come from several libraries, which all read the cache through block tables. The paper's own kernel was the first of them.
+
+The paper's footnote 1 adds a detail. A block can hold the keys and values of all layers together, or each layer can have its own blocks and block tables. The authors report no performance difference and chose separate blocks per layer. That is why this page talks about "a block" as 16 tokens across layers: it is the same total memory either way.
+
+</details>
+
+## References
+
+1. W. Kwon et al. [*Efficient Memory Management for Large Language Model Serving with PagedAttention*](https://arxiv.org/abs/2309.06180). SOSP 2023.
+2. G.-I. Yu et al. *Orca: A Distributed Serving System for Transformer-Based Generative Models.* OSDI 2022.
+3. A. Agrawal et al. [*Taming Throughput-Latency Tradeoff in LLM Inference with Sarathi-Serve*](https://arxiv.org/abs/2403.02310). OSDI 2024.
+4. Y. Zhong et al. [*DistServe: Disaggregating Prefill and Decoding for Goodput-optimized Large Language Model Serving*](https://arxiv.org/abs/2401.09670). OSDI 2024.
+5. vLLM documentation: [Optimization and tuning](https://docs.vllm.ai/en/stable/configuration/optimization/), [Engine arguments](https://docs.vllm.ai/en/stable/configuration/engine_args/), [Automatic prefix caching design](https://docs.vllm.ai/en/stable/design/prefix_caching/).
+6. vLLM source, v0.32.0: [cache configuration](https://github.com/vllm-project/vllm/blob/v0.32.0/vllm/config/cache.py) (block size, prefix caching and memory defaults), [kv_cache_utils.py](https://github.com/vllm-project/vllm/blob/v0.32.0/vllm/v1/core/kv_cache_utils.py) (the KV cache size and concurrency log line), [gpu_worker.py](https://github.com/vllm-project/vllm/blob/v0.32.0/vllm/v1/worker/gpu_worker.py) (the available KV memory) and [metrics/loggers.py](https://github.com/vllm-project/vllm/blob/v0.32.0/vllm/v1/metrics/loggers.py) (the metric names).
+7. vLLM documentation: [Production metrics](https://docs.vllm.ai/en/stable/usage/metrics/).
+
+**Next:** [Part 4, speculative decoding](llm-inference-4-speculative-decoding.md): a cheap helper guesses several tokens, and the big model checks them all in one step.

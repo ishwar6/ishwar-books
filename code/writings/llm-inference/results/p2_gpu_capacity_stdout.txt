@@ -1,0 +1,18 @@
+Llama 3.1 8B: 8,030,261,248 weights -> 16.1 GB in BF16; KV per token BF16 128 KiB, FP8 64 KiB
+Llama 3.1 70B: 70,553,706,496 weights -> 141.1 GB in BF16; KV per token BF16 320 KiB, FP8 160 KiB
+assumption: 10% of GPU memory kept for working memory
+
+Llama 3.1 8B   on 1 x H100 80GB : weights  16.1 GB per GPU, KV memory   55.9 GB in total =   426,784 tokens BF16 /   853,568 FP8 | conversations that fit: 4,096 tok BF16  104, FP8  208; 32,768 tok BF16  13, FP8  26
+Llama 3.1 8B   on 1 x H200 141GB: weights  16.1 GB per GPU, KV memory  110.8 GB in total =   845,638 tokens BF16 / 1,691,276 FP8 | conversations that fit: 4,096 tok BF16  206, FP8  412; 32,768 tok BF16  25, FP8  51
+Llama 3.1 8B   on 1 x B200 180GB: weights  16.1 GB per GPU, KV memory  145.9 GB in total = 1,113,429 tokens BF16 / 2,226,859 FP8 | conversations that fit: 4,096 tok BF16  271, FP8  543; 32,768 tok BF16  33, FP8  67
+
+Llama 3.1 70B  on 2 x H100 80GB : weights  70.6 GB per GPU, KV memory    2.9 GB in total =     8,827 tokens BF16 /    17,654 FP8 | conversations that fit: 4,096 tok BF16    2, FP8    4; 32,768 tok BF16   0, FP8   0
+Llama 3.1 70B  on 4 x H100 80GB : weights  35.3 GB per GPU, KV memory  146.9 GB in total =   448,280 tokens BF16 /   896,561 FP8 | conversations that fit: 4,096 tok BF16  109, FP8  218; 32,768 tok BF16  13, FP8  27
+Llama 3.1 70B  on 2 x H200 141GB: weights  70.6 GB per GPU, KV memory  112.7 GB in total =   343,910 tokens BF16 /   687,820 FP8 | conversations that fit: 4,096 tok BF16   83, FP8  167; 32,768 tok BF16  10, FP8  20
+Llama 3.1 70B  on 4 x H200 141GB: weights  35.3 GB per GPU, KV memory  366.5 GB in total = 1,118,446 tokens BF16 / 2,236,893 FP8 | conversations that fit: 4,096 tok BF16  273, FP8  546; 32,768 tok BF16  34, FP8  68
+Llama 3.1 70B  on 1 x B200 180GB: weights 141.1 GB per GPU, KV memory   20.9 GB in total =    63,759 tokens BF16 /   127,518 FP8 | conversations that fit: 4,096 tok BF16   15, FP8   31; 32,768 tok BF16   1, FP8   3
+Llama 3.1 70B  on 2 x B200 180GB: weights  70.6 GB per GPU, KV memory  182.9 GB in total =   558,143 tokens BF16 / 1,116,287 FP8 | conversations that fit: 4,096 tok BF16  136, FP8  272; 32,768 tok BF16  17, FP8  34
+
+70B on one H100 80GB: usable 72 GB vs weights 141.1 GB -> does not fit
+70B on one H200 141GB: usable 127 GB vs weights 141.1 GB -> does not fit
+70B on one B200 180GB: usable 162 GB vs weights 141.1 GB -> fits, 20.9 GB left for KV

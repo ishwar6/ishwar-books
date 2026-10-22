@@ -1,0 +1,16 @@
+Llama 3.1 8B weights in BF16: 16.1 GB
+GPU              HBM GB   TB/s  TFLOP/s  ridge  floor ms  max tok/s  weights % of HBM
+A100 80GB SXM        80   2.04      312    153      7.88        127              20%
+H100 SXM             80   3.35      989    295      4.79        209              20%
+H200 SXM            141   4.80      989    206      3.35        299              11%
+B200 (HGX)          180   7.70     2250    292      2.09        479               9%
+MI300X              192   5.30     1307    247      3.03        330               8%
+A100 -> B200: compute x7.2, bandwidth x3.8, ridge 153 -> 292
+A100 -> H100: compute x3.2, bandwidth x1.6
+H100 -> H200: same compute, bandwidth x1.43, ridge 295 -> 206
+batch needed to reach the ridge (weights only, about 1 FLOP per byte per sequence): A100 80GB SXM 153, H100 SXM 295, H200 SXM 206, B200 (HGX) 292, MI300X 247
+source A100 80GB SXM: nvidia.com/en-us/data-center/a100: 80GB HBM2e, 2,039 GB/s, BF16 312 TFLOPS (624 with sparsity)
+source H100 SXM: nvidia.com/en-us/data-center/h100: 80GB, 3.35TB/s, BF16 1,979 TFLOPS with sparsity -> 989 dense
+source H200 SXM: nvidia.com/en-us/data-center/h200: 141GB, 4.8TB/s, BF16 1,979 TFLOPS with sparsity -> 989 dense
+source B200 (HGX): NVIDIA Blackwell datasheet, HGX B200 per GPU: 180 GB HBM3E, 7.7 TB/s, FP16/BF16 4.5 PFLOPS sparse -> 2,250 dense
+source MI300X: amd.com MI300X page and data sheet: 192 GB HBM3, 5.3 TB/s, BF16 1307.4 TFLOPS dense

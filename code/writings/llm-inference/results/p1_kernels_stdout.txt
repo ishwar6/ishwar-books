@@ -1,0 +1,8 @@
+device: mps, torch 2.14.1
+one decode step (batch 1, 512-token context): 1328 PyTorch operations, 448 of them views or no-op type checks, 880 that do work on the GPU
+most common working ops: mul 220, linear 169, add 146, cat 97, pow 49, mean 49, rsqrt 49, neg 48, scaled_dot_product_attention 24, silu 24
+per layer (24 layers): about 37 working ops
+tiny op 'add on 16 numbers': 3.4 microseconds per op (median of 7 runs of 2,000)
+tiny op '16x16 matrix times a vector': 27.7 microseconds per op (median of 7 runs of 2,000)
+880 working ops x 3.4 us = 3.0 ms of launch cost per decode step, if each op costs what a tiny op costs
+decode step measured now: 15.0 ms (published Part 1 value: 10.0 ms)

@@ -1,0 +1,22 @@
+vocabulary size: 151,665
+'The cat sat on the': 5 tokens
+      785  'The'
+     8251  ' cat'
+     7578  ' sat'
+      389  ' on'
+      279  ' the'
+'What is the capital of France?': 7 tokens
+     3838  'What'
+      374  ' is'
+      279  ' the'
+     6722  ' capital'
+      315  ' of'
+     9625  ' France'
+       30  '?'
+'Tokenization is unbelievably useful': 6 tokens
+     3323  'Token'
+     2022  'ization'
+      374  ' is'
+    38937  ' unbelie'
+    88134  'vably'
+     5390  ' useful'

@@ -1,0 +1,51 @@
+== 1. How much reserved KV memory holds real tokens (simulation, Llama 3.1 8B, one 80 GB GPU)
+reserve max length           useful  11.6%   fits    48 requests
+reserve prompt + max_tokens  useful  33.7%   fits   141 requests
+reserve exact final length   useful  83.5%   fits   349 requests
+paged, 16-token blocks       useful  99.2%   fits   415 requests
+paged: mean empty slots in the last block 7.5 (always 0 to 15)
+
+== 2. Static vs continuous batching (simulation, 4,096 requests, 64 slots)
+static 114,566 steps, useful 21%
+continuous 25,127 steps, useful 96%
+ratio 4.6x
+
+== 3. One request of 37 tokens: a 2,048-slot reservation vs 16-token blocks
+contiguous: reserved 2,048 slots, used 37, empty 2,011 (1.8% used)
+paged: 3 blocks x 16 = 48 slots, used 37, empty 11 (77.1% used)
+Llama 3.1 8B, 128 KiB per token: contiguous holds 256 MiB, paged holds 6 MiB, one 16-token block is 2 MiB
+KV memory in the simulation's budget: 51.94 GB = 24,766 blocks of 16 tokens
+worst case for paged: 15 empty slots in the last block; best case: 0
+if the request will end at 300 tokens: of the 2,011 empty slots now, 263 are reserved slots (filled later) and 1,748 are internal fragmentation (never filled)
+at the end, contiguous: 1,748 slots never used (14.6% used); paged: 19 blocks = 304 slots, 4 never used (98.7% used)
+
+== 4. A request with a 30-token prompt grows to 50 tokens (block size 16)
+tokens 30: block table [7, 1], last block filled 14/16, empty slots  2
+tokens 31: block table [7, 1], last block filled 15/16, empty slots  1
+tokens 32: block table [7, 1], last block filled 16/16, empty slots  0
+tokens 33: block table [7, 1, 3], last block filled  1/16, empty slots 15
+tokens 48: block table [7, 1, 3], last block filled 16/16, empty slots  0
+tokens 49: block table [7, 1, 3, 12], last block filled  1/16, empty slots 15
+tokens 50: block table [7, 1, 3, 12], last block filled  2/16, empty slots 14
+new block at token: 1 -> 7, 17 -> 1, 33 -> 3, 49 -> 12
+
+== 5. External fragmentation: 16 slots of memory, three requests finished, one new request
+memory AAAA..BBB...CC..  free slots 7, free gaps [2, 3, 2], largest gap 3
+a new request needs 6 slots in one piece: fits contiguously? False
+with blocks of 2 slots: free blocks 3, the request needs 3: fits? True
+
+== 6. Attention read block by block through a block table equals ordinary attention (CPU, FP32)
+block table [7, 1, 3], 37 tokens, block size 16
+Method 1 (blocks through the table) vs Method 2 (PyTorch on one contiguous array): max difference 1.5e-07
+block lookups for this token: 3; contiguous reads: 1
+
+== 7. Copy-on-write: two samples of one 20-token prompt (block size 16)
+after prefill: tables {'sample 1': [7, 1], 'sample 2': [7, 1]}, ref counts {7: 2, 1: 2}, blocks stored 2 (without sharing: 4)
+sample 1 writes token 21: block 1 is shared (ref 2), copy it to block 3, ref of 1 -> 1
+sample 2 writes token 21: block 1 has ref 1, write in place
+now: tables {'sample 1': [7, 3], 'sample 2': [7, 1]}, ref counts {7: 2, 1: 1, 3: 1}, blocks stored 3
+
+== 8. Prefix caching: each full block is named by a hash of its tokens and of the block before it
+request 1: 50 tokens, full-block hashes ['9266d336', 'e9d16e46', 'df7fc873'], reused from cache 0 blocks = 0 tokens, prefill 50 tokens
+request 2: 49 tokens, full-block hashes ['9266d336', 'e9d16e46', '3953b78c'], reused from cache 2 blocks = 32 tokens, prefill 17 tokens
+request 3: 50 tokens, full-block hashes ['5b33b966', '255d9ee6', '9925b8e7'], reused from cache 0 blocks = 0 tokens, prefill 50 tokens
