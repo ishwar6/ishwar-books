@@ -154,14 +154,14 @@
       "id": "kv-cache",
       "label": "KV cache",
       "group": "inference",
-      "route": "writings/llm-inference-2-kv-cache#what-exactly-gets-stored",
+      "route": "writings/llm-inference-2-kv-cache#what-exactly-is-stored",
       "blurb": "The keys and values of every past token, kept in memory so they are not recomputed. It is the biggest memory bill."
     },
     {
       "id": "vllm",
       "label": "vLLM: paging and batching",
       "group": "inference",
-      "route": "writings/llm-inference-3-vllm#idea-1-store-the-cache-in-pages",
+      "route": "writings/llm-inference-3-vllm#the-same-idea-for-the-kv-cache",
       "blurb": "Serving thousands of requests by paging the KV cache like an operating system and batching continuously."
     },
     {

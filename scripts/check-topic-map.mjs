@@ -58,7 +58,7 @@ try {
 
   const selected = render('/map?topic=kv-cache')
   assert.equal(title(selected), 'KV cache')
-  assert.match(selected, /href="\/writings\/llm-inference-2-kv-cache\/#what-exactly-gets-stored"/)
+  assert.match(selected, /href="\/writings\/llm-inference-2-kv-cache\/#what-exactly-is-stored"/)
   const related = selected.slice(selected.indexOf('class="tm-connections"'))
   assert.match(related, /Prefill and decode/, 'Direct connections should appear')
   assert.doesNotMatch(related, /Images as patches/, 'Unconnected topics should stay out of the detail panel')
