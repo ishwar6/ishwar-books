@@ -1,0 +1,10 @@
+img-tir-plate: (480, 720) 46 KB | CC BY-SA 3.0 | KlausFoehl | https://commons.wikimedia.org/wiki/File:Acrylglas_Totalreflexion01_2009-05-07.jpg
+img-tir-block: (640, 472) 30 KB | CC BY-SA 3.0 | Friedrich Graf | https://commons.wikimedia.org/wiki/File:Total_internal_reflection.jpg
+img-lcos-coin: (300, 225) 13 KB | CC BY-SA 4.0 | Forth Dimension Displays | https://commons.wikimedia.org/wiki/File:WXGA-R5_compared_to_1_Euro.jpg
+img-microled: (770, 547) 88 KB | CC BY-SA 4.0 | Santasgift | https://commons.wikimedia.org/wiki/File:First_active-driven_microLED_microdisplay.jpg
+img-photo-dark: (800, 600) 95 KB | CC0 | JaredMcKenzie | https://commons.wikimedia.org/wiki/File:ROCKBROS_photochromic_lens_darkened_in_sunlight.jpg
+img-photo-clear: (800, 600) 57 KB | CC0 | JaredMcKenzie | https://commons.wikimedia.org/wiki/File:Photochromic_cycling_lens_in_low_light_conditions.jpg
+img-emg-lab: (760, 570) 90 KB | CC BY-SA 3.0 | D. Gordon E. Robertson | https://commons.wikimedia.org/wiki/File:EMG_-_SIMI.jpg
+img-glass-evolution: (1000, 523) 151 KB | CC BY 4.0 | Michael Weinold | https://commons.wikimedia.org/wiki/File:Google_Glasses_Evolution.png
+img-hololens: (760, 505) 90 KB | Public domain | NASA | https://commons.wikimedia.org/wiki/File:ISS-46_Scott_Kelly_with_HoloLens_in_the_Destiny_lab.jpg
+img-photochromic.jpg (1612, 600)

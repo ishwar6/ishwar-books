@@ -1,0 +1,146 @@
+
+==============================================================================
+1. Why a screen 2 cm from the eye cannot be read
+==============================================================================
+focus on an object at  200 cm needs   0.5 dioptres of extra focusing power
+focus on an object at   25 cm needs   4.0 dioptres of extra focusing power
+focus on an object at    2 cm needs  50.0 dioptres of extra focusing power
+
+==============================================================================
+2. A lens makes a virtual image far away (thin lens, example f = 10 mm)
+==============================================================================
+display 10.0 mm from a 10 mm lens: image at infinity (parallel rays)
+display  9.9 mm from a 10 mm lens: image 0.99 m in front of the eye (virtual image)
+display  9.5 mm from a 10 mm lens: image 0.19 m in front of the eye (virtual image)
+display  9.0 mm from a 10 mm lens: image 0.09 m in front of the eye (virtual image)
+
+==============================================================================
+3. Snell's law: air to glass (n = 1.5) at 30 degrees
+==============================================================================
+sin(30) = 0.500; sin(theta2) = 0.5 / 1.5 = 0.333; theta2 = 19.5 deg
+glass to air at 30 deg: sin(theta2) = 1.5 x 0.5 = 0.75, theta2 = 48.6 deg (bends away from the normal)
+glass to air at 45 deg: 1.5 x sin(45) = 1.061 > 1, so no ray can leave: total internal reflection
+
+==============================================================================
+4. Critical angle for total internal reflection, against air
+==============================================================================
+water                          n = 1.333  critical angle = 48.6 deg   TIR window = 41.4 deg
+common glass / acrylic         n = 1.5    critical angle = 41.8 deg   TIR window = 48.2 deg
+best glass Meta had in 2016    n = 1.8    critical angle = 33.7 deg   TIR window = 56.3 deg
+lithium niobate                n = 2.3    critical angle = 25.8 deg   TIR window = 64.2 deg
+silicon carbide (Orion)        n = 2.7    critical angle = 21.7 deg   TIR window = 68.3 deg
+
+==============================================================================
+5. Fresnel reflection at normal incidence (why bare glass reflects about 4%)
+==============================================================================
+R = ((1.5 - 1)/(1.5 + 1))^2 = 0.040 = 4%
+
+==============================================================================
+6. Zigzag inside a plate: distance between bounces on the same face (example thickness 1 mm)
+==============================================================================
+ray at 45 deg from the normal in a 1.0 mm plate: hits the same face every 2 t tan(a) = 2.00 mm
+ray at 50 deg from the normal in a 1.0 mm plate: hits the same face every 2 t tan(a) = 2.38 mm
+ray at 60 deg from the normal in a 1.0 mm plate: hits the same face every 2 t tan(a) = 3.46 mm
+ray at 70 deg from the normal in a 1.0 mm plate: hits the same face every 2 t tan(a) = 5.49 mm
+over an example 30 mm path at 60 deg: 8.7 round trips
+
+==============================================================================
+7. Angles of the picture inside the glass
+==============================================================================
+a ray 10 deg off-axis in air is 6.65 deg off-axis inside n = 1.5 glass
+
+==============================================================================
+8. Partly reflecting mirrors that share the light equally (US 6,829,095 examples)
+==============================================================================
+reflectances 33%, 50%, 100% -> each mirror sends 33%, 33%, 33% to the eye; 0% goes on past the last mirror
+reflectances 20%, 25%, 33% -> each mirror sends 20%, 20%, 20% to the eye; 40% goes on past the last mirror
+6 mirrors, each sending 1/6: reflectances 17%, 20%, 25%, 33%, 50%, 100%
+
+==============================================================================
+9. Pixels per degree
+==============================================================================
+diagonal pixels = 600 x sqrt(2) = 848.5
+side angle (small-angle) = 20 / sqrt(2) = 14.14 deg
+pixels per degree = 848.5 / 20 = 42.4  (Meta says 42)
+one pixel spans 60 / 42.4 = 1.41 arcminutes; 20/20 vision resolves about 1 arcminute = 60 ppd
+to reach 60 ppd over the same 14.14 deg square you would need 849 x 849 pixels
+with Guttag's estimate of about 400 x 400 effective pixels: 28.3 effective pixels per degree
+a square 30 deg diagonal field at 42 ppd needs about 891 x 891 pixels
+  that is 2.2 times the 600 x 600 = 360,000 pixels of the Ray-Ban Display
+a square 70 deg diagonal field at 42 ppd needs about 2079 x 2079 pixels
+  that is 12.0 times the 600 x 600 = 360,000 pixels of the Ray-Ban Display
+
+==============================================================================
+10. How big the picture looks (example: a square at a 40 cm reading distance)
+==============================================================================
+a 14.14 deg square is the size of a 9.9 cm square seen from 40 cm
+
+==============================================================================
+11. The LCoS chip and the projector focal length
+==============================================================================
+600 pixels x 3.8 um = 2.28 mm; 648 x 3.8 um = 2.462 mm (brief: 2.462 mm)
+a single ideal lens that spreads 2.28 mm over 14.14 deg needs f = 9.2 mm
+pixels on the chip: 360,000; pixel area 14.4 um^2
+
+==============================================================================
+12. Field-sequential colour
+==============================================================================
+90 frames/s x 3 colour fields = 270 colour fields/s, so each field lasts at most 3.7 ms
+one 90 Hz frame lasts 11.1 ms; one 30 Hz content update lasts 33.3 ms = 3 display frames
+
+==============================================================================
+13. Contrast of a see-through display against the world
+==============================================================================
+5,000 nits on clear sky, clear lens                  background    8000 nits -> contrast   1.62 : 1
+5,000 nits on clear sky, lens at 18%                 background    1440 nits -> contrast   4.47 : 1
+5,000 nits on clear sky, lens at 8%                  background     640 nits -> contrast   8.81 : 1
+250 nits (monitor level) on clear sky, clear lens    background    8000 nits -> contrast   1.03 : 1
+5,000 nits on cloudy sky, clear lens                 background    2000 nits -> contrast   3.50 : 1
+
+==============================================================================
+14. Where the projector light goes: how much enters the pupil
+==============================================================================
+solid angle of a 14.14 x 14.14 deg square = 0.0606 sr
+pupil 1.5 mm: area 1.77 mm^2, flux into the eye = L x A x Omega = 0.54 mlm = 0.05% of the 1 lm from the projector
+pupil 3.0 mm: area 7.07 mm^2, flux into the eye = L x A x Omega = 2.14 mlm = 0.21% of the 1 lm from the projector
+pupil 4.0 mm: area 12.57 mm^2, flux into the eye = L x A x Omega = 3.81 mlm = 0.38% of the 1 lm from the projector
+if no light were lost, 1 lm at 5,000 nits over that cone would fill 3299 mm^2 (a 57 x 57 mm square)
+
+==============================================================================
+15. Light that leaks forward
+==============================================================================
+Meta, 2%: at full brightness 100 nits leave the front, against 5000 nits to the eye
+Guttag, 1.5%: at full brightness 75 nits leave the front, against 5000 nits to the eye
+brightness range: 5,000 / 30 = 167 times
+
+==============================================================================
+16. Power budget
+==============================================================================
+960 mWh / 6 h = 160 mW average over a day of mixed use
+the same battery would last 1.0 h at a constant 1 W
+
+==============================================================================
+17. Prescription range in focal lengths
+==============================================================================
++/-4.0 dioptres = a lens with focal length 1/4.0 m = 25 cm
+
+==============================================================================
+18. Diffraction grating: the colours split (example period 400 nm, glass n = 1.5)
+==============================================================================
+blue  450 nm: sin(theta) = 450/(1.5 x 400) = 0.750, theta = 48.6 deg, trapped by TIR
+green 530 nm: sin(theta) = 530/(1.5 x 400) = 0.883, theta = 62.0 deg, trapped by TIR
+red   630 nm: sin(theta) = 1.050 > 1, no first-order ray inside the glass at all
+
+==============================================================================
+19. An ideal ceiling on field of view for a grating-coupled guide (one direction)
+==============================================================================
+common glass / acrylic         n = 1.5: FOV <= 2 asin((n - 1)/2) =  29.0 deg (grazing rays allowed; real designs get less)
+best glass Meta had in 2016    n = 1.8: FOV <= 2 asin((n - 1)/2) =  47.2 deg (grazing rays allowed; real designs get less)
+lithium niobate                n = 2.3: FOV <= 2 asin((n - 1)/2) =  81.1 deg (grazing rays allowed; real designs get less)
+silicon carbide (Orion)        n = 2.7: FOV <= 2 asin((n - 1)/2) = 116.4 deg (grazing rays allowed; real designs get less)
+
+==============================================================================
+20. The Neural Band research device (Nature 2025)
+==============================================================================
+16 channels x 2000 samples/s = 32,000 numbers per second
+handwriting: 20.9 WPM with sEMG vs 25.1 WPM writing on a surface: 83%
