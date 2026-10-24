@@ -1,0 +1,30 @@
+Wrote 24 supplier pages (12,129 words, about 505 each), 16 news items, 19 ports.
+
+The known answer, computed in code from the same facts (sorted by landed cost per basket, GBP):
+id   name                      landed  days    MOQ  verdict
+S03  Sun Harbour Kitchen        32.99    54    500  REJECT: open safety recall (pans)
+S11  Golden Wok Industrial      34.23    54  2,000  REJECT: MOQ 2,000 > 1,000
+S07  Hanil Kitchen              34.75    75    500  REJECT: delivery 75 days > 60
+S05  Anatolia Metal             39.25    26    600  ok
+S24  Pacific Rim Kitchen        39.62    67    500  REJECT: delivery 67 days > 60
+S09  Ganges Steel Craft         39.72    49    500  ok
+S12  Atlas Kitchen Trading      39.90    25    400  ok
+S06  Pearl River Housewares     39.95    61    800  REJECT: delivery 61 days > 60
+S13  Saigon Hearth              40.53    56    500  ok
+S21  Yangtze Steel Home         41.00    61    900  REJECT: delivery 61 days > 60
+S08  Lumen Homeware             41.05    21    300  ok
+S04  Vistula Enamel             41.90    22    400  ok
+S01  Duro Cookware              42.75    19    300  ok
+S16  Lotus Pan Works            43.86    56    600  ok
+S19  Bosphorus Housewares       43.93    24    500  REJECT: suspended ethical audit
+S17  Iberia Forge               44.35    18    300  ok
+S23  Andes Housewares           44.78    44    400  ok
+S14  Moravia Ceramics           45.00    23    300  ok
+S18  Mumbai Kitchen Exports     45.56    53    700  ok
+S02  Kestrel Steelworks         47.50    12    200  ok
+S10  Bremer Kuche               47.55    15    250  ok
+S22  Carpathia Kitchen          48.90    18    350  ok
+S15  Delta Cookware             50.00    10    150  ok
+S20  Tuscan Copper              54.00    24    200  ok
+
+Gold picks (three cheapest that pass every rule): S05, S09, S12

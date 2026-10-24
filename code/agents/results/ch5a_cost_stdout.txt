@@ -1,0 +1,17 @@
+No saved trace yet: using an assumed page size of 700 tokens.
+Assumptions: n = 24 pages to read, a base prompt P = 1,500 tokens, 300 output tokens per call kept in the history,
+a 500-token brief and a 600-token report per subagent, 3 calls for the lead, 6 s per model call, tools take no time.
+
+design                              input tokens  calls  chain  time (s)
+one agent, 1 tool call per turn          337,500     25     25       150
+one agent, 6 tool calls per turn          67,500      5      5        30
+one agent, 24 tool calls per turn         27,000      2      2        12
+lead + 2 subagents (1 call per turn)       214,700     29     16        96
+lead + 4 subagents (1 call per turn)       148,900     31     10        60
+lead + 6 subagents (1 call per turn)       131,100     33      8        48
+lead + 8 subagents (1 call per turn)       125,300     35      7        42
+lead + 4 subagents (6 per turn)           48,900     11      5        30
+
+The re-reading term (d+o)*n*(n+1)/2 alone is 300,000 tokens for one agent with one call per turn, 89% of its input.
+Splitting the reading over m subagents cuts that term by about m; batching tool calls in one agent cuts it by about b.
+Each subagent adds fixed costs (its own prompt, a brief, a report) and the lead adds its own calls.

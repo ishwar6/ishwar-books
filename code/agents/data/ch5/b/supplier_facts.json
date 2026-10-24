@@ -1,0 +1,68 @@
+[
+ {
+  "id": "S1",
+  "name": "Kestrel Cookware",
+  "price_gbp": 11.4,
+  "uk_days": 9,
+  "moq": 300,
+  "risks": [
+   "main kiln is down for repair until February 2027",
+   "family-owned, single factory"
+  ]
+ },
+ {
+  "id": "S2",
+  "name": "Lotus Steelworks",
+  "price_gbp": 7.85,
+  "uk_days": 34,
+  "moq": 1200,
+  "risks": [
+   "ISO 9001 certificate expires in March 2027",
+   "two late shipments in 2026"
+  ]
+ },
+ {
+  "id": "S3",
+  "name": "Harbin Enamel Co.",
+  "price_gbp": 6.1,
+  "uk_days": 41,
+  "moq": 2000,
+  "risks": [
+   "coating failed one EU lead-migration test in 2025",
+   "prices quoted for orders placed before June 2027"
+  ]
+ },
+ {
+  "id": "S4",
+  "name": "Vardar Kitchen",
+  "price_gbp": 9.95,
+  "uk_days": 12,
+  "moq": 500,
+  "risks": [
+   "owner is in a contract dispute with a former distributor",
+   "no UKCA marking yet"
+  ]
+ },
+ {
+  "id": "S5",
+  "name": "Brightline Housewares",
+  "price_gbp": 8.3,
+  "uk_days": 38,
+  "moq": 1000,
+  "risks": [
+   "factory sits in a typhoon flood zone",
+   "new owner since 2026"
+  ]
+ },
+ {
+  "id": "S6",
+  "name": "Oakmere Forge",
+  "price_gbp": 14.75,
+  "uk_days": 3,
+  "moq": 150,
+  "risks": [
+   "capacity limited to 4,000 units a month",
+   "steel surcharge may add up to 6%"
+  ]
+ }
+]

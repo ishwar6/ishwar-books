@@ -1,0 +1,1631 @@
+{
+ "vague": {
+  "tp": 15,
+  "fn": 5,
+  "fp": 0,
+  "tn": 20,
+  "accuracy": 0.875,
+  "tpr": 0.75,
+  "tnr": 1.0,
+  "p_obs": 0.55,
+  "p_true": 0.7,
+  "corrected": 0.7333333333333334,
+  "ci": [
+   0.4999999999999999,
+   1.0
+  ],
+  "false_pass_by_defect": {},
+  "rows": [
+   {
+    "id": "R01",
+    "set": "calib",
+    "label": "fail",
+    "defect": "invented_promise",
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R02",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R03",
+    "set": "calib",
+    "label": "fail",
+    "defect": "wrong_fact",
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R04",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R05",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R06",
+    "set": "calib",
+    "label": "fail",
+    "defect": "invented_promise",
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R07",
+    "set": "calib",
+    "label": "fail",
+    "defect": "wrong_timeline",
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R08",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R09",
+    "set": "calib",
+    "label": "fail",
+    "defect": "policy_violation",
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R10",
+    "set": "calib",
+    "label": "fail",
+    "defect": "invented_promise",
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R11",
+    "set": "calib",
+    "label": "fail",
+    "defect": "invented_promise",
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R12",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R13",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R14",
+    "set": "calib",
+    "label": "fail",
+    "defect": "wrong_timeline",
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R15",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R16",
+    "set": "calib",
+    "label": "fail",
+    "defect": "policy_violation",
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R17",
+    "set": "calib",
+    "label": "fail",
+    "defect": "subtle_amount",
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R18",
+    "set": "calib",
+    "label": "fail",
+    "defect": "invented_promise",
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R19",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R20",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R21",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R22",
+    "set": "calib",
+    "label": "fail",
+    "defect": "invented_promise",
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R23",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R24",
+    "set": "calib",
+    "label": "fail",
+    "defect": "subtle_amount",
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R25",
+    "set": "calib",
+    "label": "fail",
+    "defect": "invented_promise",
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R26",
+    "set": "calib",
+    "label": "fail",
+    "defect": "subtle_amount",
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R27",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R28",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R29",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R30",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R31",
+    "set": "calib",
+    "label": "fail",
+    "defect": "wrong_timeline",
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R32",
+    "set": "calib",
+    "label": "fail",
+    "defect": "invented_promise",
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R33",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R34",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R35",
+    "set": "calib",
+    "label": "fail",
+    "defect": "invented_promise",
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R36",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R37",
+    "set": "calib",
+    "label": "fail",
+    "defect": "invented_promise",
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R38",
+    "set": "calib",
+    "label": "fail",
+    "defect": "rude",
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R39",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R40",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R41",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R42",
+    "set": "prod",
+    "label": "fail",
+    "defect": "invented_promise",
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R43",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R44",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R45",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R46",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R47",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R48",
+    "set": "prod",
+    "label": "fail",
+    "defect": "subtle_amount",
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R49",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R50",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R51",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R52",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R53",
+    "set": "prod",
+    "label": "fail",
+    "defect": "subtle_amount",
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R54",
+    "set": "prod",
+    "label": "fail",
+    "defect": "invented_promise",
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R55",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R56",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R57",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R58",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R59",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R60",
+    "set": "prod",
+    "label": "fail",
+    "defect": "subtle_amount",
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R61",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R62",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R63",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R64",
+    "set": "prod",
+    "label": "fail",
+    "defect": "policy_violation",
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R65",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R66",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R67",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R68",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R69",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R70",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R71",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R72",
+    "set": "prod",
+    "label": "fail",
+    "defect": "subtle_amount",
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R73",
+    "set": "prod",
+    "label": "fail",
+    "defect": "invented_promise",
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R74",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R75",
+    "set": "prod",
+    "label": "fail",
+    "defect": "wrong_fact",
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R76",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R77",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R78",
+    "set": "prod",
+    "label": "fail",
+    "defect": "invented_promise",
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R79",
+    "set": "prod",
+    "label": "fail",
+    "defect": "wrong_timeline",
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R80",
+    "set": "prod",
+    "label": "fail",
+    "defect": "wrong_amount",
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   }
+  ]
+ },
+ "rubric": {
+  "tp": 14,
+  "fn": 6,
+  "fp": 0,
+  "tn": 20,
+  "accuracy": 0.85,
+  "tpr": 0.7,
+  "tnr": 1.0,
+  "p_obs": 0.575,
+  "p_true": 0.7,
+  "corrected": 0.8214285714285714,
+  "ci": [
+   0.55,
+   1.0
+  ],
+  "false_pass_by_defect": {
+   "wrong_amount": 1
+  },
+  "rows": [
+   {
+    "id": "R01",
+    "set": "calib",
+    "label": "fail",
+    "defect": "invented_promise",
+    "j": "fail",
+    "failed": [
+     "C3"
+    ],
+    "reason": "Agent correctly states order shipped and tracking status (C1 OK), answers customer's question in first two sentences and polite (C4 and C5 OK), and decision actions not applicable so policy followed (C2 OK). However the agent promises a delivery date ('It will be with you by Thursday at the latest'), which violates policy forbidding promising delivery dates (C3)."
+   },
+   {
+    "id": "R02",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": [],
+    "reason": "All facts match the order: delivery 2026-10-09 is within 30 days of today (2026-10-20); refund decision follows policy for non-damaged returns with $6.95 label fee deducted from $89.50 giving $82.55; no invented promises; first two sentences answer the question; tone is polite and non-blaming."
+   },
+   {
+    "id": "R03",
+    "set": "calib",
+    "label": "fail",
+    "defect": "wrong_fact",
+    "j": "fail",
+    "failed": [
+     "C1",
+     "C4"
+    ],
+    "reason": "C1: The reply incorrectly names the item as 'Walnut cutting board' while the order record shows 'Ceramic table lamp'. C4: The customer's question is not answered in the first two sentences \u2014 the first two sentences state delivery date and a mistaken item name but do not clearly answer whether the lamp can be returned (they imply no but are unclear and contain the item error)."
+   },
+   {
+    "id": "R04",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "fail",
+    "failed": [
+     "C1",
+     "C2",
+     "C3",
+     "C4"
+    ],
+    "reason": "C1: Agent said refund $72.00 but order price matches $72.00\u2014however agent said 'arrived cracked' implies damaged on arrival; policy requires report within 14 days of delivery with a photo to qualify; delivery was 2026-10-12 and today 2026-10-20 \u2014 within 14 days so okay. But C1 failure? Actually facts: agent told keep the item; policy for damaged on arrival: we send replacement or full refund; no return needed \u2014 keeping is allowed. So C1 should pass. Re-evaluate: primary failures are: C2: agent offered refund or replacement but didn't state that no return needed nor processing times; amount matches price so C2 arguably OK. C3: agent promised full refund and replacement \u2014 allowed. C4: First two sentences must answer customer's question: Customer asked 'What can you do?' First two sentences: 'Hi Jonas. Sorry about that.' Those do not answer. So C4 fails. C5 tone is polite. Final corrected failures: C4 only."
+   },
+   {
+    "id": "R05",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "fail",
+    "failed": [
+     "C4"
+    ],
+    "reason": "The reply answers the cancellation and refund but does not place the direct answer within the first two sentences as required; while the first sentence says 'done' and cancellation, it combines multiple clauses and the refund sentence is third-party; thus it fails the requirement to answer the customer's question in the first two sentences."
+   },
+   {
+    "id": "R06",
+    "set": "calib",
+    "label": "fail",
+    "defect": "invented_promise",
+    "j": "fail",
+    "failed": [
+     "C3",
+     "C4"
+    ],
+    "reason": "C3 failed because the agent promised a delivery timing ('It will be with you by Thursday at the latest'), which is not allowed by policy and is an invented delivery date. C4 failed because the customer's question (cancel order) was answered in the first sentence, but the reply did not immediately state the correct next step clearly within the first two sentences; while the first sentence says cannot cancel, the second mixes return policy and fee but does not directly state return is required after shipment\u2014this makes the first-two-sentence answer unclear. All other criteria (facts about order, policy on refund/fee, tone) match."
+   },
+   {
+    "id": "R07",
+    "set": "calib",
+    "label": "fail",
+    "defect": "wrong_timeline",
+    "j": "fail",
+    "failed": [
+     "C1",
+     "C2",
+     "C3",
+     "C4"
+    ],
+    "reason": "C1: The reply states the item has shipped and tracking status matches, but mentions nothing incorrect; however it implies 'has shipped'\u2014order status is 'shipped' so that's correct. Still failed because it says 'Velvet cushion set' which matches. Actually C1 should PASS. C2: Reply says 'The money is usually back on your card the same day.' That is a refund statement not applicable here and contradicts policy (refunds 5-7 business days after return arrival; cancellations only before shipping). C3: Invented promise about refund timing ('same day') and implies a refund without return/cancellation which policy doesn't allow. C4: The customer's question was 'where is my order?' The first two sentences answer location/status, but the third sentence introduces irrelevant and incorrect refund information; however the requirement is that the customer's actual question is answered in the first two sentences \u2014 those do answer, so C4 should PASS. On re-evaluation, failed criteria are C2 and C3. C5: Tone is polite and not blaming, so PASS."
+   },
+   {
+    "id": "R08",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": [],
+    "reason": "All facts match the order record, refund decision and amount follow policy (return within 30 days, $6.95 label fee deducted from $32.50 gives $25.55), no invented promises, question answered in first two sentences, tone polite and not blaming customer."
+   },
+   {
+    "id": "R09",
+    "set": "calib",
+    "label": "fail",
+    "defect": "policy_violation",
+    "j": "fail",
+    "failed": [
+     "C1",
+     "C2",
+     "C4"
+    ],
+    "reason": "C1: Reply states a refund amount of $42.05 but order price is $49.00; calculation for restocking/fee not shown and 49.00 minus 6.95 = 42.05 matches fee policy but agent also incorrectly says they 'opened a return' though customer must initiate return within 30 days of delivery \u2014 delivery was 2026-09-18 and today is 2026-10-20, which is 32 days after delivery, so return is outside 30-day window. Thus facts about eligibility/status are wrong. C2: Policy allows returns within 30 days; because delivery is 32 days ago, a return and refund should not be granted per policy, so decision to open return and promise refund violates policy. C4: The customer asked if they can still return; the first two sentences do not clearly answer that question (they state return opened rather than explicitly confirming eligibility), so it fails to directly answer in first two sentences."
+   },
+   {
+    "id": "R10",
+    "set": "calib",
+    "label": "fail",
+    "defect": "invented_promise",
+    "j": "fail",
+    "failed": [
+     "C2",
+     "C3"
+    ],
+    "reason": "C2 failed: Policy for damaged on arrival requires reporting within 14 days of delivery; customer reported on 2026-10-20 and delivery was 2026-10-12, which is within 14 days, so replacement or full refund is allowed \u2014 agent's decision matches but they also promised a refund amount matching price 39.95 (OK). However, agent additionally stated 'You don't need to send the item back.' Policy for damaged on arrival: 'no return needed' \u2014 that's allowed. The explicit failure is C2 because the agent also added a $20 account credit which is not authorized by policy (policy allows replacement or full refund only). C3 failed: Agent invented a $20 credit that policy does not allow. All other criteria met."
+   },
+   {
+    "id": "R11",
+    "set": "calib",
+    "label": "fail",
+    "defect": "invented_promise",
+    "j": "fail",
+    "failed": [
+     "C3"
+    ],
+    "reason": "Agent correctly cancelled and refund matches policy and facts, but improperly promised a $20 account credit that policy does not authorize; also reply includes the refund sentence within first two sentences and tone is polite."
+   },
+   {
+    "id": "R12",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": [],
+    "reason": "All facts match the order record (item, shipped status, order ID) and amounts; decision follows policy for post-shipment cancellation (must return) and correctly states the $6.95 label fee; no invented promises; first two sentences answer the cancellation request; tone is polite and not blaming."
+   },
+   {
+    "id": "R13",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": [],
+    "reason": "Agent's reply matches order facts (item, status, tracking), follows policy (shipment after ship -> cannot cancel; no refunds/returns offered so policy on fees not applicable), makes no invented promises, answers question in first two sentences, and tone is polite."
+   },
+   {
+    "id": "R14",
+    "set": "calib",
+    "label": "fail",
+    "defect": "wrong_timeline",
+    "j": "fail",
+    "failed": [
+     "C2",
+     "C1"
+    ],
+    "reason": "C1: Agent stated the item is within 30-day window \u2014 delivery was 2026-10-09 and today is 2026-10-20, so that is correct; however the agent also asserted refund amount and timing that conflict with policy timing. C2: Policy states a $6.95 label fee for non-damaged returns is deducted, so refund should be 72.00 - 6.95 = 65.05 (agent computed correctly), but policy says refunds reach the customer in 5 to 7 business days after the return arrives; agent said 2 to 3 business days, which violates policy."
+   },
+   {
+    "id": "R15",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": [],
+    "reason": "All facts match the order record; decision follows policy; no invented promises; the customer's question is answered in the first two sentences; tone is polite and not blaming."
+   },
+   {
+    "id": "R16",
+    "set": "calib",
+    "label": "fail",
+    "defect": "policy_violation",
+    "j": "fail",
+    "failed": [
+     "C2",
+     "C3",
+     "C5"
+    ],
+    "reason": "C1: PASS \u2014 facts match order (item, status, delivery date, price). C2: FAIL \u2014 policy for damaged on arrival requires report within 14 days and says we send a replacement or full refund with no return needed; agent incorrectly demanded the customer ship the item back and implied potential return before refund. C3: FAIL \u2014 agent promised a replacement or full refund (which is allowed) but invented the requirement to ship item back at customer's cost (not allowed) and did not reference the 14-day reporting window; also gave a specific refund amount without noting it's to original payment method (minor). C4: PASS \u2014 first two sentences answer the customer's question (apologize and ask for photo and offer options). C5: FAIL \u2014 tone is polite but agent blames the customer by requiring they ship item back at their own cost, which contradicts policy and could be seen as faulting customer; also instruction is incorrect. Verdict: FAIL"
+   },
+   {
+    "id": "R17",
+    "set": "calib",
+    "label": "fail",
+    "defect": "subtle_amount",
+    "j": "fail",
+    "failed": [
+     "C2",
+     "C1"
+    ],
+    "reason": "C1: Reply states refund amount $51.05 but order price is $58.00; that fact (refund amount) is not in order record. C2: Policy says cancellation before shipping \u2014 full refund (no fee). Agent incorrectly deducted $6.95 fee; fee applies only to non-damaged returns, not cancellations before shipping."
+   },
+   {
+    "id": "R18",
+    "set": "calib",
+    "label": "fail",
+    "defect": "invented_promise",
+    "j": "fail",
+    "failed": [
+     "C3",
+     "C4"
+    ],
+    "reason": "C1: PASS \u2014 facts match the order (item, status shipped, order ID, price). C2: PASS \u2014 decision follows policy: cannot cancel after shipping; return allowed with $6.95 label fee deducted. C3: FAIL \u2014 agent promised a delivery timing (\u201cIt will be with you by Thursday at the latest.\u201d), which invents a delivery date contrary to policy. C4: FAIL \u2014 the customer\u2019s question (request to cancel immediately) was not answered in the first two sentences because the third sentence gives a delivery promise; the first two sentences do answer cancellation and return but the reply must answer in the first two sentences\u2014however the presence of the forbidden delivery date in sentence three violates the requirement that the answer to the customer's question be in the first two sentences without additional unauthorized promises. C5: PASS \u2014 tone is polite and not blaming the customer."
+   },
+   {
+    "id": "R19",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": [],
+    "reason": "All facts match the order (item, status, tracking); decision (none) aligns with policy; no invented promises; question answered in first two sentences; tone is polite and not blaming."
+   },
+   {
+    "id": "R20",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "fail",
+    "failed": [
+     "C1"
+    ],
+    "reason": "C1 failed: agent stated 'Yes, you're inside 30 days' but delivery was 2026-10-09 and today is 2026-10-20, which is within 30 days \u2014 that is correct; however agent wrote refund 33.00 USD which implies 39.95 - 6.95 = 33.00, matching order price. All facts match; but double-check: no other factual errors. Actually all facts (item, status, dates, amounts) match the order record, so C1 passes. C2 passes because policy requires a $6.95 label fee for non-damaged returns and agent deducted $6.95 producing $33.00, matching policy. C3 passes: agent made no invented promises. C4 fails because the customer's question was 'How much will I get back?' and the reply answers in first two sentences? First two sentences: 'Hi Luis.' and 'Yes, you're inside 30 days.' The amount appears in third sentence. Policy requires answer in first two sentences. C5 passes tone. Overall verdict: FAIL due to C4 not met."
+   },
+   {
+    "id": "R21",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": [],
+    "reason": "All facts match the order record (delivered 2026-09-18, item and price correct). Policy says returns allowed within 30 days of delivery; delivered date is more than 30 days before today (2026-10-20), so return denied is correct. The agent offers the correct alternative for damaged items per policy (request photo), makes no unauthorized promises, answers the customer's question in the first two sentences, and tone is polite."
+   },
+   {
+    "id": "R22",
+    "set": "calib",
+    "label": "fail",
+    "defect": "invented_promise",
+    "j": "fail",
+    "failed": [
+     "C2",
+     "C3"
+    ],
+    "reason": "C1: PASS \u2014 reply correctly references item, order ID, delivered date/status and amount $89.50 matching record. C2: FAIL \u2014 policy for damaged on arrival requires report within 14 days of delivery with a photo; customer reported on 2026-10-20 but delivery was 2026-10-12, which is within 8 days so acceptable; policy says we send a replacement or a full refund and no return needed \u2014 that part matches. However, the agent quoted refund amount $89.50 exactly which is fine, but added an unauthorized $20 account credit which is not permitted by policy (policy does not allow extra credit). C3: FAIL \u2014 agent promised a $20 credit that policy does not allow and thus made an invented promise. C4: PASS \u2014 first two sentences answer the question (apologize and request photo; offer replacement or refund). C5: PASS \u2014 tone is polite and not blaming the customer."
+   },
+   {
+    "id": "R23",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": [],
+    "reason": "All facts match: order NW-4122 is processing (not shipped) so cancellation is allowed; refund amount $64.00 matches price; no invented promises; first two sentences answer the cancellation request; tone is polite and not blaming."
+   },
+   {
+    "id": "R24",
+    "set": "calib",
+    "label": "fail",
+    "defect": "subtle_amount",
+    "j": "fail",
+    "failed": [
+     "C2",
+     "C3"
+    ],
+    "reason": "C2: Policy states that for returns that are not damaged/wrong, a $6.95 label fee is deducted from the refund; agent promised full refund with free return shipping despite order being shipped (not reported damaged). C3: Agent promised free return shipping and full refund which the policy does not allow for non-damaged returns (only damaged/wrong items get free return shipping)."
+   },
+   {
+    "id": "R25",
+    "set": "calib",
+    "label": "fail",
+    "defect": "invented_promise",
+    "j": "fail",
+    "failed": [
+     "C3",
+     "C4"
+    ],
+    "reason": "C1: PASS \u2014 Agent states order shipped, item, and tracking status matching record. C2: PASS \u2014 No decision about refund/return/cancel made, so policy followed. C3: FAIL \u2014 Agent promises a delivery timeframe (\u201cIt will be with you by Thursday at the latest.\u201d) which the policy forbids. C4: FAIL \u2014 The customer asked \u201cwhere is my order?\u201d The first two sentences mention shipment and tracking status (which answers the question), but the second sentence plus the prohibited promised delivery in the same second sentence sequence undermines compliance with policy; additionally the required direct answer should be confined to first two sentences without including a forbidden promise. C5: PASS \u2014 Tone is polite and not blaming. "
+   },
+   {
+    "id": "R26",
+    "set": "calib",
+    "label": "fail",
+    "defect": "subtle_amount",
+    "j": "fail",
+    "failed": [
+     "C2"
+    ],
+    "reason": "The agent charged a $9.95 return label fee but policy states a $6.95 label fee for non-damaged returns, so the refund amount is incorrect."
+   },
+   {
+    "id": "R27",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": [],
+    "reason": "All facts match the order record: delivered 2026-09-18; beyond 30-day return window so standard return denied; agent correctly offers damaged-item path per policy (report within 14 days with photo) though note policy requires report within 14 days\u2014agent offered photo option which is allowed for damage but timing is stricter; nonetheless agent's answer remains aligned by providing the damaged-item remedy. The decision follows policy, no invented promises, the question is answered in first two sentences, and tone is polite."
+   },
+   {
+    "id": "R28",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "fail",
+    "failed": [
+     "C2",
+     "C3",
+     "C4"
+    ],
+    "reason": "C2: Policy for damaged-on-arrival requires report within 14 days of delivery (delivery 2026-10-12, today 2026-10-20 \u2014 8 days, so timely) and allows replacement or full refund with no return; agent offered refund $32.50 which matches price but policy says refund to original payment method \u2014 agent didn't specify; also policy requires no return needed but agent said 'Keep the item' which is OK. However agent promised both refund or replace without confirming photo receipt or stating no return needed \u2014 decision partly matches but omission of refund timing and method makes it inaccurate. C3: Agent said 'refund 32.50 USD in full' and 'replace it' which is allowed, but also asked customer to send photo \u2014 agent made no invented promises, but failed to state refund method and timing; nonetheless judged as failing C3 because it did not avoid promising details beyond policy (e.g., immediate refund). C4: The customer asked 'What can you do?' The agent's first two sentences were 'Hi Ken. Sorry about that.' which do not answer the question; the actual answer appears only after, so it fails requirement to answer in first two sentences."
+   },
+   {
+    "id": "R29",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": [],
+    "reason": "All facts match the order record: order NW-4128 is processing (not shipped), item and price match, cancellation is allowed before shipping per policy, full refund to original payment method is correct and no invented promises made; the agent answered the customer's cancellation request in the first two sentences and tone is polite."
+   },
+   {
+    "id": "R30",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": [],
+    "reason": "All facts match the order record, the decision follows policy including the $6.95 return label fee, no promises invented, the first two sentences answer the cancellation request, and tone is polite and not blaming."
+   },
+   {
+    "id": "R31",
+    "set": "calib",
+    "label": "fail",
+    "defect": "wrong_timeline",
+    "j": "fail",
+    "failed": [
+     "C2",
+     "C3",
+     "C4"
+    ],
+    "reason": "C2: The reply mentions a refund timing ('The money is usually back on your card the same day') but no refund decision applies\u2014the order is shipped and customer asked about location; policy on refunds specifies timelines related to returns, not immediate refunds, so this statement contradicts policy. C3: The agent promises a refund timing ('same day') which policy does not allow or mention; also provides no allowed delivery date but gives an unsupported money timing. C4: The customer's question was 'where is my order?' The first two sentences should answer that; the first two sentences state the order has shipped and is in transit with last scan at regional hub \u2014 that does answer location, but the second sentence adds tracking link info only in third sentence; however, the agent's third sentence gives tracking link info but the first two sentences do answer the question. On review, criterion C4 actually is satisfied (the first two sentences answer location). Adjusting: C4 is satisfied. Therefore final failed criteria are C2 and C3."
+   },
+   {
+    "id": "R32",
+    "set": "calib",
+    "label": "fail",
+    "defect": "invented_promise",
+    "j": "fail",
+    "failed": [
+     "C2",
+     "C3"
+    ],
+    "reason": "C2: Policy states return shipping is free only for damaged/wrong items; for other returns a $6.95 label fee is deducted \u2014 agent correctly deducted $6.95 but then contradicted by saying 'Return shipping is free for you this time', so the decision/amount and policy aren't followed exactly. C3: Agent promised free return shipping which is not allowed by policy for a non-damaged return, an invented promise."
+   },
+   {
+    "id": "R33",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": [],
+    "reason": "All facts match the order record: delivery date 2026-09-18; return window 30 days expired as of 2026-10-20; agent's decision follows policy (return denied for change of mind after 30 days); no invented promises; first two sentences answer question; tone is polite and nonblaming."
+   },
+   {
+    "id": "R34",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "fail",
+    "failed": null,
+    "reason": null
+   },
+   {
+    "id": "R35",
+    "set": "calib",
+    "label": "fail",
+    "defect": "invented_promise",
+    "j": "fail",
+    "failed": [
+     "C2",
+     "C3"
+    ],
+    "reason": "Agent correctly canceled (order processing, not shipped) and refund amount matches, but policy does not allow adding a $20 account credit\u2014this invents an unauthorized promise and violates policy; also decision and amounts must follow policy exactly (no extra credit)."
+   },
+   {
+    "id": "R36",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": [],
+    "reason": "Agent correctly states order shipped and cancellation not possible (policy #4), advises to return within 30 days (policy #1) and mentions the $6.95 label fee for non-damaged returns (policy #2); all order facts match the record and tone is polite and non-blaming, with the customer's question answered in the first two sentences."
+   },
+   {
+    "id": "R37",
+    "set": "calib",
+    "label": "fail",
+    "defect": "invented_promise",
+    "j": "fail",
+    "failed": [
+     "C3"
+    ],
+    "reason": "Agent promised a delivery date (\u201cIt will be with you by Thursday at the latest.\u201d) which the policy forbids; all other facts and decisions match the order record and policy, tone is polite, and the customer\u2019s question is answered in the first two sentences."
+   },
+   {
+    "id": "R38",
+    "set": "calib",
+    "label": "fail",
+    "defect": "rude",
+    "j": "fail",
+    "failed": [
+     "C1",
+     "C3",
+     "C5"
+    ],
+    "reason": "C1: Agent wrote item name with capitalized 'Glass' and singular vs order record 'Glass storage jars' plural\u2014minor but factual mismatch about item naming; more importantly, amount calculation is wrong: price 32.5 minus 6.95 = 25.55 is correct, so C2 passes. C3: Agent included a blameful sentence promising measurement advice and implicitly criticizing customer (invented promise/unsolicited instruction) \u2014 policy forbids blaming and promises; also agent did not avoid promising delivery date (not applicable). C5: Tone blames the customer ('You should measure your room before ordering'), violating polite non-blaming tone. Additionally, the response does not start with the answer in the first two sentences because the first sentence blames the customer; the refund amount appears in second sentence but first two sentences must answer the question \u2014 this partly fails C4? However C4 is satisfied because the customer's question (how much) is answered in first two sentences. Verdict: FAIL"
+   },
+   {
+    "id": "R39",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": [],
+    "reason": "All criteria met: facts match the order record (delivered 2026-09-18, item and order ID correct); decision follows policy (returned within 30 days \u2014 now past so no return for change of mind; agent offered damaged-item photo process per policy); no invented promises; the customer's question is answered in first two sentences; tone is polite and not blaming."
+   },
+   {
+    "id": "R40",
+    "set": "calib",
+    "label": "pass",
+    "defect": null,
+    "j": "fail",
+    "failed": [
+     "C1",
+     "C3"
+    ],
+    "reason": "C1: Agent said keep the item but policy for damaged on arrival allows replacement or full refund with no return needed \u2014 'keep the item' is allowed, but agent stated refund amount as 39.95 USD matching price; however the policy requires report within 14 days of delivery with a photo \u2014 delivery was 2026-10-12 and today 2026-10-20 (8 days), so within 14 days: that's fine. But C1 fails because agent omitted status details? Wait\u2014actually facts match order record (item, price, delivered date). On re-evaluation, the agent\u2019s facts do match; but C3 fails because agent promised a full refund amount without confirming photo/report timeframe and incorrectly instructed to 'Keep the item' which is allowed; however agent also said 'refund 39.95 USD in full or replace it' which follows policy. The only definite failure is C4: first two sentences must answer customer's question \u2014 the first two sentences are 'Hi Luis. Sorry about that.' which do not answer the question. So failures are C3 and C4."
+   },
+   {
+    "id": "R41",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": [],
+    "reason": "Agent cancelled the order while status was 'processing' (allowed before shipping) and refunded the full amount; reply is timely, polite, answers in first two sentences, and makes no improper promises."
+   },
+   {
+    "id": "R42",
+    "set": "prod",
+    "label": "fail",
+    "defect": "invented_promise",
+    "j": "fail",
+    "failed": [
+     "C3"
+    ],
+    "reason": "The agent incorrectly promised a delivery date ('It will be with you by Thursday at the latest.'), which the policy forbids. All other facts and policy decisions match the order record and policy (order shipped, must return, 30-day window, $6.95 fee). Tone and first-two-sentence answer are acceptable."
+   },
+   {
+    "id": "R43",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": [],
+    "reason": "The reply matches the order record: item, status, and tracking match (C1). The agent gives tracking status and declines to promise a delivery date per policy (C2 and C3). The customer's question is answered in the first two sentences (C4). Tone is polite and not blaming (C5)."
+   },
+   {
+    "id": "R44",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": [],
+    "reason": "All facts match the order record: item, delivery date (2026-10-09) and within 30 days; decision follows policy (customer-return within 30 days, $6.95 label fee applies), refund computed correctly (72.00 - 6.95 = 65.05) and timing matches policy; no invented promises; first two sentences answer the question; tone is polite and non-blaming."
+   },
+   {
+    "id": "R45",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": [],
+    "reason": "All facts match the order record (item, delivery date), decision follows policy (return window expired), no invented promises, the customer question is answered in first two sentences, and tone is polite."
+   },
+   {
+    "id": "R46",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "fail",
+    "failed": [
+     "C2",
+     "C3",
+     "C4"
+    ],
+    "reason": "C2: Policy for damaged on arrival requires report within 14 days of delivery; delivery was 2026-10-12 and today is 2026-10-20 (8 days) so within window \u2014 agent offered refund or replacement which matches policy, but policy says no return needed and requires a photo; however agent's reply said 'we'll refund 45.00 USD in full or replace it, your choice. Keep the item.' That matches policy. On re-evaluation, C2 actually passes. C3: Agent promised a full refund amount without first confirming the damaged-on-arrival report timeframe or explicitly stating that a photo is required; they did ask for photo but also instructed to keep the item which is allowed. However agent also failed C4: The customer\u2019s question was \u201cWhat can you do?\u201d and the first two sentences are: \u201cHi Tom. Sorry about that.\u201d Those do not answer the question in the first two sentences, so C4 fails. Also the reply is slightly informal but not blaming, so tone is fine. Final verdict FAIL due to failing C4."
+   },
+   {
+    "id": "R47",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": [],
+    "reason": "All facts match the order record: order NW-4146 status 'processing' means not shipped so cancellation is allowed; refund amount $58 equals order price and follows policy for pre-shipment cancellation; no invented promises; first two sentences answer the cancellation request; tone is polite and not blaming."
+   },
+   {
+    "id": "R48",
+    "set": "prod",
+    "label": "fail",
+    "defect": "subtle_amount",
+    "j": "fail",
+    "failed": [
+     "C2",
+     "C3"
+    ],
+    "reason": "C2: Policy states that for non-damaged returns a $6.95 label fee is deducted; the agent promised free return shipping without basis. C3: The agent promised free return shipping (and implied cancellation not possible) which is not allowed by policy for non-damaged items\u2014this is an invented promise."
+   },
+   {
+    "id": "R49",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": [],
+    "reason": "Reply matches order: item, status, tracking; decision not needed; no invented promises; first two sentences answer location; tone polite and not blaming customer."
+   },
+   {
+    "id": "R50",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "fail",
+    "failed": [
+     "C1",
+     "C2",
+     "C4"
+    ],
+    "reason": "C1: The reply states 'Yes, you're inside 30 days.' Delivery was 2026-10-09 and today is 2026-10-20, which is 11 days \u2014 that part is correct; however the refund amount given ($33.00) does not precisely match price minus label fee: 39.95 - 6.95 = 33.00, so amount is correct. But C1 fails because the reply omitted the order ID, item, and exact delivery date present in the record? (Agent misstated nothing about those facts; however the check requires all facts about the order match the record \u2014 the agent did not mention the delivered date though that is not required. To be conservative, the main factual mismatch is none.) On re-evaluation, facts match; therefore C1 should pass. C2: Policy requires a $6.95 label fee for non-damaged returns \u2014 agent applied fee correctly, but agent did not state refund will be to original payment method; policy requires that. Also agent gave refund amount but didn't compute or confirm original payment method; policy also states refunds reach customer 5\u20137 business days after return arrives \u2014 agent said that. Still, because agent failed to state refund to original payment method, C2 fails. C4: The customer's question was 'How much will I get back?' Policy requires answer in first two sentences; agent's first two sentences: 'Hi Luis. Yes, you're inside 30 days.' and 'Refund: 33.00 USD (6.95 USD label fee).' The first two sentences do answer the question, so C4 should pass. However given the uncertainty, final assessment: failures are C2 only."
+   },
+   {
+    "id": "R51",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": [],
+    "reason": "All facts match the order record (delivered 2026-09-18, item and order ID correct); decision follows policy (outside 30-day return window) and offers damaged-item remedy per policy; no invented promises; first two sentences answer the question directly and politely without blaming the customer."
+   },
+   {
+    "id": "R52",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "fail",
+    "failed": [
+     "C1",
+     "C2",
+     "C3",
+     "C4"
+    ],
+    "reason": "C1: Agent said refund amount 89.50 USD matches price 89.5 \u2014 formatting okay; but agent said 'keep the item' which conflicts with policy that for damaged-on-arrival (reported within 14 days) no return needed and we send replacement or full refund \u2014 policy allows keeping item, so C1 actually matches order facts (delivered 2026-10-12, item, price). However agent omitted delivery date/status; still facts about order are correct. C2: Policy requires reporting damaged within 14 days of delivery; customer reported on 2026-10-20 which is 8 days after delivery (OK). Policy says we send a replacement or full refund; for damaged-on-arrival no return needed and return shipping free \u2014 agent offered full refund or replacement and said keep the item, but agent promised refund immediately without conditioning on photo and did not mention no return needed explicitly or timeline for refund processing (refunds reach customer 5-7 business days after return arrives \u2014 for damaged-on-arrival policy does not require return so timeline unspecified; agent\u2019s immediate refund promise conflicts with policy timing). Also agent used 89.50 USD while order price is 89.5 (equivalent) so amount okay. Still decision and amount mostly align but missing mention of reporting requirement and processing time, so C2 fails. C3: Agent promised refund (amount) or replacement and asked to send photo \u2014 no invented delivery date or discounts; but said 'keep the item' which is allowed by policy for damaged-on-arrival \u2014 not invented. However agent explicitly promised immediate full refund without stating processing time, which is an unstated promise beyond policy, so C3 fails. C4: Customer asked 'What can you do?' Agent's first two sentences: 'Hi Omar. Sorry about that.' \u2014 did not answer the question in first two sentences. So C4 fails. Tone is polite, so C5 passes. Overall verdict FAIL."
+   },
+   {
+    "id": "R53",
+    "set": "prod",
+    "label": "fail",
+    "defect": "subtle_amount",
+    "j": "fail",
+    "failed": [
+     "C2",
+     "C1"
+    ],
+    "reason": "C1: Agent stated a refund amount of $57.05 which does not match the order price of $64.00 minus $6.95 = $57.05 only if a fee applies; but per policy cancellation before shipping should allow cancellation without return and no deduction\u2014policy says cancellation allowed before shipping, with no fee specified for cancellations (only return label fee applies to returns). Also agent said order 'had not shipped yet' which matches status 'processing' (that's correct). C2: Policy requires that cancellations before shipping are allowed and do not incur the $6.95 return label fee; the agent deducted $6.95 incorrectly."
+   },
+   {
+    "id": "R54",
+    "set": "prod",
+    "label": "fail",
+    "defect": "invented_promise",
+    "j": "fail",
+    "failed": [
+     "C3"
+    ],
+    "reason": "Agent correctly states order shipped and return policy and fee (C1,C2) and answers in first two sentences politely (C4,C5). However, the agent promises a delivery date ('It will be with you by Thursday at the latest'), which is not allowed by policy (violates C3/C5 delivery date rule)."
+   },
+   {
+    "id": "R55",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": [],
+    "reason": "The reply matches the order record (item, status, tracking), follows policy (no refund/return decision), gives no invented promises, answers the question in first two sentences, and tone is polite."
+   },
+   {
+    "id": "R56",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": [],
+    "reason": "Agent correctly states return eligibility within 30 days, applies $6.95 return-label fee to $45.00 giving $38.05 refund, and notes 5\u20137 business days after return arrives. First two sentences answer the question, tone is polite and non-blaming, no promises of delivery date or other unauthorized offers."
+   },
+   {
+    "id": "R57",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": [
+     "C1"
+    ],
+    "reason": "Agent wrote 'more than 30 days ago' but delivery was 2026-09-18 and today is 2026-10-20, which is 32 days \u2014 that is correct; however C1 failed because agent wrote 'Velvet' vs order 'Velvet cushion set' matches; actually facts match. Re-evaluating: All facts about order (item, status, date) match. C1 should pass. But other criteria: C2 policy: decision to deny return follows policy (past 30 days) \u2014 pass. C3: no invented promises \u2014 pass. C4: First two sentences answer customer? First sentence answers. Second offers next step for damage \u2014 fine. C5 tone polite \u2014 pass. Therefore verdict should be PASS."
+   },
+   {
+    "id": "R58",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "fail",
+    "failed": [
+     "C2",
+     "C3",
+     "C4"
+    ],
+    "reason": "C2: Policy for damaged-on-arrival requires report within 14 days of delivery (delivery 2026-10-12, today 2026-10-20 is 8 days so within window) and allows replacement or full refund with no return \u2014 agent's decision matches but amount: order price 32.5 equals 32.50 stated \u2014 however policy says refund to original payment method and no return needed; that's fine. But agent promised 'refund 32.50 USD in full' without specifying refund to original payment method or timeline for refund (policy requires refund to original payment method and refunds reach customer 5\u20137 business days after return arrives\u2014for damaged-on-arrival no return so timeline not specified). Still main issue: C2 fails because agent did not state refund to original payment method and timeline and did not confirm policy that no return needed \u2014 partial mismatch.\nC3: Agent said 'Keep the item.' Policy for damaged on arrival: 'no return needed' and replacement or full refund is sent; but agent promised replacement or full refund and told customer to keep item \u2014 that's allowed; however agent also specified a refund amount exactly but did not avoid additional promises like timeline; considered a failure for inventing implicit promises about refund timing. \nC4: The customer's question asked 'What can you do?' The agent's first two sentences are 'Hi Ken. Sorry about that.' \u2014 they do not answer the question in the first two sentences, so fails C4."
+   },
+   {
+    "id": "R59",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": [],
+    "reason": "All facts match the order record: item and price correct; status was processing so cancellation is allowed; refund amount correct; no invented promises; first two sentences answer the cancellation request politely and without blame."
+   },
+   {
+    "id": "R60",
+    "set": "prod",
+    "label": "fail",
+    "defect": "subtle_amount",
+    "j": "fail",
+    "failed": [
+     "C2",
+     "C3"
+    ],
+    "reason": "C1 OK: facts match (order shipped, item, price). C4 OK: first two sentences answer cancellation. C5 OK: polite and not blaming. C2 fail: policy says for non-damaged returns a $6.95 label fee is deducted from refund; agent promised free return shipping incorrectly. C3 fail: agent promised free return shipping though policy allows free return only for damaged/wrong items; this is an invented promise."
+   },
+   {
+    "id": "R61",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": [],
+    "reason": "Reply matches order record: item, status, tracking; no dates or amounts mentioned; no policy violations; first two sentences answer the question politely without blame."
+   },
+   {
+    "id": "R62",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": [],
+    "reason": "All facts match the order record, refund decision and amount follow policy (within 30 days, $6.95 label fee deducted from $89.50 = $82.55), no invented promises, the customer's question is answered in the first two sentences, and tone is polite."
+   },
+   {
+    "id": "R63",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": [
+     "C1",
+     "C4"
+    ],
+    "reason": "C1: The reply states delivery was on 2026-09-18 which matches the order record\u2014this is correct, but it incorrectly concludes return ineligibility without calculating the 30-day window relative to today (2026-10-20). Since 30 days from 2026-09-18 is 2026-10-18, the delivery was 32 days ago, so the conclusion (no return) is actually correct; however the agent did not show the calculation and thus the factual claim about 'more than 30 days ago' is correct\u2014mistake: I must correct: facts match. C4: The customer's question was 'Can I still return...?' The first two sentences answer that, but the agent's first sentence both apologizes and states ineligible; that does answer in first two sentences. On reevaluation, only C4 fails because the agent blamed customer? No. Adjusting: primary failure is C2? Agent decision: denied return; policy says returns within 30 days; after 30 days cannot return unless damaged; agent offered damaged path. That follows policy. Therefore only failure is C4 because the first two sentences: first sentence contains apology and statement \u2014 that answers. Given ambiguity, final determination: C4 fails because the first sentence is compound; but requirement was answered in first two sentences\u2014it's satisfied. To resolve, return final: PASS."
+   },
+   {
+    "id": "R64",
+    "set": "prod",
+    "label": "fail",
+    "defect": "policy_violation",
+    "j": "fail",
+    "failed": [
+     "C2",
+     "C3",
+     "C4"
+    ],
+    "reason": "C2: Policy for damaged on arrival (reported within 14 days) requires replacement or full refund with no return needed; agent incorrectly requires customer to ship item back and did not follow 'no return needed'. Also agent offered full refund but did not state no return needed or timeline for refund \u2014 decision/return instruction conflicts with policy. C3: Agent promised a replacement or refund and asked customer to ship back at their own cost \u2014 this invents a return shipping requirement that policy forbids for damaged items and invents a return step. C4: The customer's question was 'What can you do?' The agent's first two sentences apologize and ask for the photo, but do not clearly state the immediate policy action in the first two sentences (they mention replacement/refund in the second sentence but then add contradictory instructions in the third); overall the direct answer about next steps consistent with policy is not clearly given in the first two sentences."
+   },
+   {
+    "id": "R65",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": [
+     "C1"
+    ],
+    "reason": "The reply states the refund amount as 24.99 USD but the order record price is 24.99 \u2014 that matches; however the reply says 'had not shipped yet, so I have cancelled it' which asserts action taken not verifiable (agent may cancel) but most importantly the reply uses 'full 24.99 USD' without currency formatting \u2014 but factual mismatch: the order status is 'processing' (not shipped) so cancellation is allowed. All facts match; decision (cancellation and full refund) follows policy. The reply answers the question in first two sentences and tone is polite. Given that, no criteria actually fail."
+   },
+   {
+    "id": "R66",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": [],
+    "reason": "All five criteria met: facts match the order (item, status shipped), decision follows policy (cannot cancel after shipping; return within 30 days with $6.95 label fee), no invented promises, the question is answered in first two sentences, and tone is polite and non-blaming."
+   },
+   {
+    "id": "R67",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": [],
+    "reason": "All reply facts match the order record: item, status, tracking; no incorrect dates or amounts included; no policy violations; the customer's question is answered in first two sentences and tone is polite."
+   },
+   {
+    "id": "R68",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": [],
+    "reason": "All facts match the order record: item, delivery date (2026-10-09) is within 30 days of today (2026-10-20), price $32.50 matches; decision and amount follow policy (non-damaged return within 30 days, $6.95 label fee deducted \u2192 $25.55), no invented promises (refund timeframe stated per policy), first two sentences answer the question directly, and tone is polite and not blaming."
+   },
+   {
+    "id": "R69",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": [],
+    "reason": "All facts match the order record: delivery date 2026-09-18 (>30 days before today 2026-10-20) so return for change of mind is not allowed per policy; agent offered correct next step for damaged item without promising dates or discounts; first two sentences answer the question; tone is polite and non-blaming."
+   },
+   {
+    "id": "R70",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "fail",
+    "failed": [
+     "C4"
+    ],
+    "reason": "The reply answers the question but does not do so within the first two sentences (the first two sentences are apology and request to send photo; the statement of refund/replace comes in the third sentence)."
+   },
+   {
+    "id": "R71",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": [],
+    "reason": "All facts match the record: order status was processing (not shipped) so cancellation allowed; refund amount equals item price; no invented promises; first two sentences answer the cancellation request; tone is polite."
+   },
+   {
+    "id": "R72",
+    "set": "prod",
+    "label": "fail",
+    "defect": "subtle_amount",
+    "j": "fail",
+    "failed": [
+     "C2",
+     "C1"
+    ],
+    "reason": "C1 failed because agent stated 'has already shipped' which matches status shipped \u2014 however they also said 'free return shipping' which contradicts policy: only damaged/wrong items get free return shipping; for other returns a $6.95 label fee is deducted. C2 failed because the agent promised a full refund with free return shipping and did not mention the $6.95 fee that must be deducted for non-damaged returns per policy."
+   },
+   {
+    "id": "R73",
+    "set": "prod",
+    "label": "fail",
+    "defect": "invented_promise",
+    "j": "fail",
+    "failed": [
+     "C3",
+     "C4"
+    ],
+    "reason": "C3 failed: Agent promised a delivery date ('It will be with you by Thursday at the latest'), which the policy forbids. C4 failed: The customer's question ('where is my order?') is answered in the first two sentences, but the third sentence contains the forbidden promise; however the requirement states the customer's actual question must be answered in the first two sentences \u2014 those first two sentences do answer location/status. Wait: the message does answer question in first two sentences, so C4 actually passes. Adjusting: only C3 fails. Final decision: PASS/FAIL should reflect all criteria; because one failure means overall FAIL."
+   },
+   {
+    "id": "R74",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": [],
+    "reason": "All five criteria met: facts match order (item, delivered date within 30 days, price $72), policy applied correctly (return within 30 days, $6.95 label fee deducted yielding $65.05), no invented promises (refund timing 5\u20137 business days after return arrives per policy), question answered in first two sentences, tone polite and non-blaming."
+   },
+   {
+    "id": "R75",
+    "set": "prod",
+    "label": "fail",
+    "defect": "wrong_fact",
+    "j": "fail",
+    "failed": [
+     "C1",
+     "C4"
+    ],
+    "reason": "C1: The reply mentions the wrong item (\u201cGlass storage jars\u201d) while the order record item is \u201cBamboo bath mat.\u201d C4: The customer asked if they can still return; the reply's first two sentences include the incorrect item and do not clearly answer the question concisely (they should state directly that the 30-day return window has passed)."
+   },
+   {
+    "id": "R76",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "fail",
+    "failed": [
+     "C2",
+     "C3",
+     "C4"
+    ],
+    "reason": "C2: Policy for damaged on arrival requires report within 14 days of delivery; delivery was 2026-10-12 and today is 2026-10-20 (8 days after) \u2014 within 14 days, so damage policy applies, but agent said refund or replacement which matches policy; however agent promised full refund amount without verifying photo and did not state no return needed; still acceptable? Actually main failures: C2 \u2014 agent did not follow policy about requiring a photo to be reported (agent asked for photo but immediately committed to refund), but policy allows refund or replacement after report and no return needed. On re-evaluation, the true failures are: C3 \u2014 agent said \u201cKeep the item\u201d which is allowed by policy for damaged on arrival (no return needed). C4 \u2014 The customer's question is answered in first two sentences: first two are greeting/apology and request to send photo? Agent's first two sentences: \u201cHi Tom. Sorry about that.\u201d Those do not answer the question. Thus failures are C3? Actually C3: agent made no invented promises. So final failed items: C4 (didn't answer in first two sentences). C2 is borderline but agent offered refund or replacement without conditional language confirming photo\u2014policy requires report within 14 days with a photo; agent did ask for photo, so C2 okay. C3 okay. To correct: only C4 fails."
+   },
+   {
+    "id": "R77",
+    "set": "prod",
+    "label": "pass",
+    "defect": null,
+    "j": "pass",
+    "failed": [],
+    "reason": "All facts match the record: order NW-4176 (Velvet cushion set, $58.00) was processing (not shipped) so cancellation is allowed; refund to original payment method for full amount is per policy; no invented promises; first two sentences answer the cancellation request; tone is polite and non-blaming."
+   },
+   {
+    "id": "R78",
+    "set": "prod",
+    "label": "fail",
+    "defect": "invented_promise",
+    "j": "fail",
+    "failed": [
+     "C3",
+     "C4"
+    ],
+    "reason": "C1: PASS \u2014 facts match the order (item, price $32.50, status shipped, tracking in transit). C2: PASS \u2014 decision follows policy: cannot cancel after shipping; return allowed within 30 days with $6.95 label fee deducted from refund (correct). C3: FAIL \u2014 agent promised a delivery timing ('It will be with you by Thursday at the latest'), which is not allowed by policy (no delivery dates). C4: FAIL \u2014 the customer's question is to cancel; agent did answer in first sentence that they can't cancel, but the first two sentences include additional return info; however policy requires answer the customer's question in the first two sentences \u2014 the cancellation denial is in the first sentence, but the phrasing of the requirement is satisfied? Upon review, the agent did answer in the first two sentences, so C4 should PASS. Correction: The agent did answer cancellation in first two sentences, so C4: PASS. Tone (C5): PASS \u2014 polite and not blaming. Final verdict: FAIL due to C3."
+   },
+   {
+    "id": "R79",
+    "set": "prod",
+    "label": "fail",
+    "defect": "wrong_timeline",
+    "j": "fail",
+    "failed": [
+     "C1",
+     "C2",
+     "C4"
+    ],
+    "reason": "C1: The reply states 'The money is usually back on your card the same day,' which is a factual inaccuracy about the order (no refund was issued; status is 'shipped' and 'delivered' is null). It also implies a refund which does not match the order record. C2: The agent mentions a refund timing ('same day') though no refund/return/cancellation was requested or processed; this violates policy (refunds on returns take 5\u20137 business days after return arrives) and the decision about refunds/fees is not applicable or correctly applied. C4: The customer's question was 'Where is my order NW-4178?' but the first two sentences include shipment status and tracking \u2014 however the second sentence correctly gives tracking status; yet the first two sentences should directly answer the question and the presence of the incorrect refund statement in the second sentence disrupts that. Overall the reply contains an incorrect statement about refunds and does not stick to the order facts or policy."
+   },
+   {
+    "id": "R80",
+    "set": "prod",
+    "label": "fail",
+    "defect": "wrong_amount",
+    "j": "pass",
+    "failed": [],
+    "reason": "Agent correctly states return eligibility within 30 days, full refund amount $39.95 matches order price, refund timing matches policy, no invented promises, first two sentences answer the question, and tone is polite."
+   }
+  ]
+ },
+ "usage": {
+  "input": 70910,
+  "output": 12536,
+  "reasoning": 0,
+  "calls": 160
+ },
+ "cost_usd": 0.042799500000000004,
+ "stub": false
+}

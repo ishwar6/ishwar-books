@@ -1,0 +1,21 @@
+$ python ch6b_judge.py
+model gpt-5-mini, reasoning effort minimal; 80 replies x 2 judge prompts = 160 calls
+== judge prompt: vague
+calibration set (40 labelled replies, 20 pass / 20 fail)
+                 judge PASS   judge FAIL
+  label pass      TP = 15      FN =  5
+  label fail      FP =  0      TN = 20
+  accuracy 87.5%   TPR 75.0%   TNR 100.0%   unparsed verdicts 0
+production set (40 replies, true pass rate 70.0%)
+  judge raw pass rate 55.0%   corrected 73.3%   bootstrap 95% interval 50.0% to 100.0% (2000 resamples)
+  false passes by defect (both sets): {}
+== judge prompt: rubric
+calibration set (40 labelled replies, 20 pass / 20 fail)
+                 judge PASS   judge FAIL
+  label pass      TP = 14      FN =  6
+  label fail      FP =  0      TN = 20
+  accuracy 85.0%   TPR 70.0%   TNR 100.0%   unparsed verdicts 3
+production set (40 replies, true pass rate 70.0%)
+  judge raw pass rate 57.5%   corrected 82.1%   bootstrap 95% interval 55.0% to 100.0% (2000 resamples)
+  false passes by defect (both sets): {'wrong_amount': 1}
+== usage: 160 calls, 70910 input tokens, 12536 output tokens; cost 0.0428 USD; stub used: False

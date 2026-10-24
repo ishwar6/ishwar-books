@@ -1,0 +1,32 @@
+Code-based checks on the support agent (52 messages). A message passes only if every check that applies to it passes.
+
+== draft checks ==
+run                 format          action          lookup     refund_call  no_false_claim no_date_promise    quotes_order    PASS   rate  95% Wilson CI     cost $
+v1                  52/52           27/52           38/38           41/52           51/52           52/52           24/38    25/52  48.1%  [35.1%, 61.3%]   0.0242
+v1 repeat           52/52           26/52           38/38           41/52           51/52           51/52           22/38    25/52  48.1%  [35.1%, 61.3%]   0.0230
+v2                  52/52           43/52           37/38           47/52           47/52           51/52           23/38    30/52  57.7%  [44.2%, 70.1%]   0.0486
+v2 repeat           52/52           45/52           33/38           43/52           45/52           52/52           23/38    29/52  55.8%  [42.3%, 68.4%]   0.0451
+
+== revised checks ==
+run                 format          action          lookup     refund_call  no_false_claim no_date_promise    quotes_order    PASS   rate  95% Wilson CI     cost $
+v1                  52/52           27/52           38/38           41/52           51/52           52/52            0/0     25/52  48.1%  [35.1%, 61.3%]   0.0242
+v1 repeat           52/52           26/52           38/38           41/52           51/52           51/52            0/0     25/52  48.1%  [35.1%, 61.3%]   0.0230
+v2                  52/52           43/52           37/38           47/52           47/52           52/52            0/0     39/52  75.0%  [61.8%, 84.8%]   0.0486
+v2 repeat           52/52           45/52           33/38           43/52           45/52           52/52            0/0     35/52  67.3%  [53.8%, 78.5%]   0.0451
+
+v1, draft checks against the hand labels: both pass 20, both fail 27, agreement 90.4%
+  code pass but human fail (5): M15 M17 M33 M42 M51
+  code fail but human pass (0): 
+
+v1, revised checks against the hand labels: both pass 20, both fail 27, agreement 90.4%
+  code pass but human fail (5): M15 M17 M33 M42 M51
+  code fail but human pass (0): 
+
+Revised checks: changes between runs (independent-samples interval)
+       v1 -> v1 repeat change +0.0%  (SE 9.8%, 95% CI [-19.2%, +19.2%])
+       v2 -> v2 repeat change -7.7%  (SE 8.9%, 95% CI [-25.0%, +9.7%])
+       v1 -> v2        change +26.9%  (SE 9.2%, 95% CI [+9.0%, +44.9%])
+v1 repeat -> v2 repeat change +19.2%  (SE 9.5%, 95% CI [+0.6%, +37.9%])
+paired v1 -> v2: 16 messages fail on v1 and pass on v2, 2 pass on v1 and fail on v2; McNemar chi-square (corrected) 9.39 (3.84 needed for p < 0.05)
+messages whose verdict flipped between two runs of the SAME prompt: v1 4 of 52, v2 12 of 52
+Same prompt, same messages, two runs: the change between repeats is the noise floor. A prompt change must clear it.

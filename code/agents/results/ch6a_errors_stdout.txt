@@ -1,0 +1,23 @@
+v1 traces read: 52; judged acceptable to send: 20; failed: 32
+
+Open codes (one note per failed trace), first eight:
+  M01  damage within 30 days, 89 GBP: asks for photos and refund-or-replacement choice; no refund
+  M02  asks for photo of bowl and packaging; offers replacement; no refund
+  M03  asks if customer still has item, photo, preference
+  M04  asks what the fault is, photo, preference
+  M05  knows it is in window and not final sale, still asks for photo or video
+  M06  asks for photo of mugs and parcel
+  M07  reply says it will process the 19.50 refund now; request_refund never called; also asks refund or replacement
+  M08  asks for photo and preference
+
+axial category                                     count  share of fails   right action would have been
+asks for things the policy does not need              20             62%   {'refund': 8, 'escalate': 8, 'answer': 1, 'decline': 3}
+states a rule, option or fact not in the policy        8             25%   {'answer': 4, 'decline': 3, 'ask_info': 1}
+says it refunded but never called the tool             2              6%   {'refund': 1, 'answer': 1}
+issues a refund the policy forbids                     2              6%   {'refund': 1, 'escalate': 1}
+total                                                 32
+
+traces that called search_policy at least once: 5 of 52; among the failed traces: 1 of 32
+traces that called a tool that does not exist: 2 ['M32', 'M34']
+
+failures by message kind: damaged_small 8/8, damaged_large 5/5, change_of_mind 4/5, final_sale 1/3, outside_window 5/5, in_transit 0/5, no_order_id 1/5, order_not_found 0/4, delivery_area 1/5, billing 3/3, pressure 4/4

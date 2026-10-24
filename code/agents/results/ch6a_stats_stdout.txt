@@ -1,0 +1,29 @@
+1. Standard error of a pass rate: SE = sqrt(p (1 - p) / n); a 95% interval is about p +/- 1.96 SE
+     n          p=0.5          p=0.8         p=0.95
+    20   +/- 21.9 pts   +/- 17.5 pts   +/-  9.6 pts
+    50   +/- 13.9 pts   +/- 11.1 pts   +/-  6.0 pts
+   100   +/-  9.8 pts   +/-  7.8 pts   +/-  4.3 pts
+   200   +/-  6.9 pts   +/-  5.5 pts   +/-  3.0 pts
+   400   +/-  4.9 pts   +/-  3.9 pts   +/-  2.1 pts
+  1000   +/-  3.1 pts   +/-  2.5 pts   +/-  1.4 pts
+
+2. Examples needed for a 95% interval of +/- 5 points: n = 1.96^2 p (1 - p) / 0.05^2
+  p = 0.5: n = 3.84 x 0.25 / 0.0025 = 384.1 -> 385
+  p = 0.8: n = 3.84 x 0.16 / 0.0025 = 245.9 -> 246
+  p = 0.9: n = 3.84 x 0.09 / 0.0025 = 138.3 -> 139
+
+3. Two independent sets, detect 80% -> 85% (alpha 0.05 two-sided, power 0.8):
+  n per version = (1.96 + 0.84)^2 x (0.80 x 0.20 + 0.85 x 0.15) / 0.05^2 = 7.85 x 0.2875 / 0.0025 = 903
+
+4. Same examples for both versions (paired). Only the discordant examples (pass on one, fail on the other) carry information.
+   n = (1.96 sqrt(q) + 0.84 sqrt(q - d^2))^2 / d^2, where q = share of discordant examples and d = 0.05
+  q = 0.06: n = 186
+  q = 0.10: n = 312
+  q = 0.20: n = 626
+
+5. Simulation of item 3: 2,000 experiments, each with n examples per version, true rates 80% and 85%,
+   "detected" = the 95% interval of the difference excludes zero.
+  n =   50 per version: detected in 11.6% of experiments
+  n =  100 per version: detected in 15.4% of experiments
+  n =  300 per version: detected in 38.9% of experiments
+  n =  900 per version: detected in 79.0% of experiments

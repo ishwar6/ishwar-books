@@ -1,0 +1,5 @@
+today is fixed at 2026-10-20; refunds above 100 GBP need a person
+64 orders, 8 policy sections, 52 messages
+messages by kind: {'damaged_small': 8, 'damaged_large': 5, 'change_of_mind': 5, 'final_sale': 3, 'outside_window': 5, 'in_transit': 5, 'no_order_id': 5, 'order_not_found': 4, 'delivery_area': 5, 'billing': 3, 'pressure': 4}
+expected actions: {'refund': 10, 'escalate': 9, 'answer': 16, 'decline': 8, 'ask_info': 9}
+final-sale orders: 4  in transit: 8

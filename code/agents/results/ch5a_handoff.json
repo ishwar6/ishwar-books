@@ -1,0 +1,945 @@
+{
+ "summary": {
+  "thin": {
+   "facts": 3.6666666666666665,
+   "cost": 1,
+   "days": 0,
+   "verdict": 2.6666666666666665,
+   "facts_all": [
+    4,
+    3,
+    4
+   ],
+   "took_over": 0,
+   "input": 4561,
+   "output": 2289.3333333333335,
+   "calls": 2,
+   "seconds": 24.48674472173055,
+   "usd": 0.005718916666666666,
+   "json_format": 0
+  },
+  "brief": {
+   "facts": 11.333333333333334,
+   "cost": 3,
+   "days": 3,
+   "verdict": 5.333333333333333,
+   "facts_all": [
+    12,
+    12,
+    10
+   ],
+   "took_over": 0,
+   "input": 30756,
+   "output": 2104.3333333333335,
+   "calls": 6.666666666666667,
+   "seconds": 20.747935215632122,
+   "usd": 0.011897666666666668,
+   "json_format": 3
+  },
+  "history": {
+   "facts": 11,
+   "cost": 3,
+   "days": 2.3333333333333335,
+   "verdict": 5.666666666666667,
+   "facts_all": [
+    10,
+    12,
+    11
+   ],
+   "took_over": 3,
+   "input": 24681,
+   "output": 2826.3333333333335,
+   "calls": 4.666666666666667,
+   "seconds": 35.950931469599404,
+   "usd": 0.011822916666666666,
+   "json_format": 0
+  }
+ },
+ "runs": [
+  {
+   "cond": "thin",
+   "run": 1,
+   "rows": {
+    "S03": {
+     "cost": false,
+     "days": false,
+     "verdict": false,
+     "said": {
+      "landed_cost_gbp": null,
+      "delivery_days": 20,
+      "verdict": "accept"
+     },
+     "eligible": false,
+     "graded_by": "extractor"
+    },
+    "S07": {
+     "cost": false,
+     "days": false,
+     "verdict": false,
+     "said": {
+      "landed_cost_gbp": null,
+      "delivery_days": 35,
+      "verdict": "accept"
+     },
+     "eligible": false,
+     "graded_by": "extractor"
+    },
+    "S08": {
+     "cost": false,
+     "days": false,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": null,
+      "delivery_days": 16,
+      "verdict": "accept"
+     },
+     "eligible": true,
+     "graded_by": "extractor"
+    },
+    "S09": {
+     "cost": false,
+     "days": false,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": null,
+      "delivery_days": 21,
+      "verdict": "accept"
+     },
+     "eligible": true,
+     "graded_by": "extractor"
+    },
+    "S12": {
+     "cost": true,
+     "days": false,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": 39.9,
+      "delivery_days": 24,
+      "verdict": "accept"
+     },
+     "eligible": true,
+     "graded_by": "extractor"
+    },
+    "S19": {
+     "cost": false,
+     "days": false,
+     "verdict": false,
+     "said": {
+      "landed_cost_gbp": null,
+      "delivery_days": 12,
+      "verdict": "accept"
+     },
+     "eligible": false,
+     "graded_by": "extractor"
+    }
+   },
+   "n": {
+    "cost": 1,
+    "days": 0,
+    "verdict": 3,
+    "facts": 4
+   },
+   "total": {
+    "calls": 2,
+    "input": 4561,
+    "output": 2144,
+    "reasoning": 320,
+    "tool_calls": 6,
+    "peak_context": 4268,
+    "usd": 0.00542825
+   },
+   "seconds": 24.97118902206421,
+   "report": "Below is a concise sourcing briefing for Northwind Home (2027 kitchenware), summarising findings for suppliers S03, S07, S08, S09, S12 and S19 and a short recommendation for next steps.\n\nSummary table (key commercial facts)\n- S03 \u2014 Sun Harbour Kitchen (Ningbo, China)\n  - Reference basket price: 270.00 CNY (FOB Ningbo)\n  - Lead time: 20 days\n  - MOQ: 500 units / product line\n  - Port: Ningbo\n  - Payment: 60 days after delivery (approved accounts)\n  - Certifications: ISO 9001, BSCI, SEDEX member\n  - Strengths: long history, traceable steel, strong QC (hand checks & lab testing), plastic-free packaging, private-label capability, fast sampling (samples within 1 week)\n  - Risks/notes: China origin \u2014 consider duties and current geopolitical/shipping volatility\n\n- S07 \u2014 Hanil Kitchen (Busan, South Korea)\n  - Reference basket price: 40.00 USD (FOB Busan)\n  - Lead time: 35 days\n  - MOQ: 500 units / product line\n  - Port: Busan\n  - Payment: 60 days after delivery (approved accounts)\n  - Certifications: LFGB tested, BSCI, FDA food contact\n  - Strengths: strong food-contact testing, traceability, sustainability reporting, good engineering/testing\n  - Risks/notes: higher lead time and higher unit-cost regionally (Korea); likely higher landed cost but positive quality credentials\n\n- S08 \u2014 Lumen Homeware (Leix\u00f5es/Porto, Portugal)\n  - Reference basket price: 47.00 EUR (FOB Leix\u00f5es)\n  - Lead time: 16 days (fastest)\n  - MOQ: 300 units / product line (lowest MOQ)\n  - Port: Leix\u00f5es\n  - Payment: Letter of credit\n  - Certifications: LFGB tested, FDA, SEDEX member\n  - Strengths: short lead time, low MOQ, EU origin (simpler compliance to EU/UK rules), strong QC (hand checks), private-label options\n  - Risks/notes: unit price higher than Asian suppliers; favourable for small/fast-turn SKUs or premium ranges\n\n- S09 \u2014 Ganges Steel Craft (Mundra, India)\n  - Reference basket price: 3,900.00 INR (FOB Mundra)\n  - Lead time: 21 days\n  - MOQ: 500 units / product line\n  - Port: Mundra\n  - Payment: Letter of credit\n  - Certifications: FDA, LFGB tested, ISO 9001\n  - Strengths: long history, reliable packing and sample-match claims, private-label options\n  - Risks/notes: currency/price conversion needed; infrastructure/shipping to UK via Mundra \u2014 check transit times and potential customs handling costs\n\n- S12 \u2014 Atlas Kitchen Trading (Valencia, Spain)\n  - Reference basket price: 39.90 GBP (DDP to buyer's UK warehouse)\n  - Lead time: 24 days\n  - MOQ: 400 units / product line\n  - Shipping: DDP to UK warehouse (port = UK warehouse)\n  - Production sites: 2 factories\n  - Payment: Letter of credit\n  - Certifications: BSCI, ISO 14001, FDA\n  - Strengths: DDP pricing removes import complexity, EU-based manufacture, sustainability certifications, private-label services\n  - Risks/notes: delivered price already includes duties/freight \u2014 good for predictable landed cost; confirm exact UK warehouse location and responsibilities\n\n- S19 \u2014 Bosphorus Housewares (Istanbul, Turkey)\n  - Reference basket price: 1,850.00 TRY (FOB Istanbul)\n  - Lead time: 12 days (shortest)\n  - MOQ: 500 units / product line\n  - Port: Istanbul\n  - Payment: 30% deposit, 70% before shipping\n  - Certifications: BSCI, SEDEX member, LFGB tested\n  - Strengths: very short production lead time, EU-proximate (Turkey), private-label services, sustainability reporting\n  - Risks/notes: currency volatility (TRY), payment terms more front-loaded (30/70), confirm landed cost to UK (duties/route)\n\nQuality, sustainability & compliance highlights\n- All six suppliers report food-contact testing and industry certifications; common ones: LFGB, FDA, ISO 9001, BSCI, SEDEX \u2014 check original certificates and issue/expiry dates during due diligence.\n- S03 and S07 emphasise traceability to mills and lab-verified coatings; S08 and S12 highlight EU-based compliance (useful for UK/EU market rules); S19 publishes sustainability reporting. Confirm documentary evidence during supplier audits.\n\nCommercial / logistics observations\n- Lowest FOB reference: S09 (India) in local currency \u2014 convert to GBP for comparison; S07 (USD 40) and S12 (DDP GBP 39.90) are useful benchmarks. S08 (47 EUR) is higher but offers short lead time and low MOQ.\n- Fastest lead times: S19 (12 days), S08 (16 days), S03 (20 days), S09 (21 days). S07 is longest at 35 days.\n- Lowest MOQ: S08 at 300 units; others generally 400\u2013500.\n- Payment terms vary: S03/S07 offer 60 days after delivery for approved accounts (very favourable), S19 requires 30/70 up-front split, S08/S09/S12 prefer letters of credit.\n\nImmediate risks to confirm (due diligence actions)\n1. Verify certificates (LFGB, FDA, ISO, BSCI/SEDEX) \u2014 request scanned originals and audit history.\n2. Ask for exact unit FOB/EXW prices in GBP (or convert) for apples-to-apples comparison, including weight/CBM per basket and cartonisation.\n3. Get formal samples (ordering process, lead time, cost) and a production sample acceptance test plan.\n4. Confirm freight options and transit days to the UK (sea/air) and request freight quotes to calculate landed cost. (I can run transit/freight lookups if you want specific ports.)\n5. Check supplier audit reports and any trade-news flags (recalls, sanctions, audit failures) before placing POs.\n\nRecommendation (proposed sourcing strategy for 2027)\n- Short-term/pilot: Order sample batches from S08 (Portugal) and S19 (Turkey) for a premium / fast-turn range \u2014 they combine short lead times and strong QC with easy European logistics. S08\u2019s low MOQ is useful for testing seasonal colours/private-label variations.\n- Volume & cost balance: Evaluate S03 (China) and S09 (India) for cost-competitive volume sourcing after verifying certificates and matching sample quality. S03 offers faster lead time than typical China vendors and favourable payment terms for approved accounts.\n- Specialist or premium lines: Consider S07 (Korea) for premium enamel or specialty lines where additional food-contact testing and engineering credentials justify higher cost.\n- If predictable landed cost and lower operational overhead for imports are priorities, S12 (Spain) with DDP to UK is attractive \u2014 it simplifies supply chain and budgeting.\n\nSuggested next steps I can complete for Northwind Home (pick which you want me to run)\n1. Convert all reference basket prices to GBP and compute approximate landed cost (need confirmation of basket weight/CBM and preferred shipping port / service).\n2. Run shipping transit time and estimated freight-per-basket for specific export ports (Ningbo, Busan, Leix\u00f5es, Mundra, Istanbul, or UK warehouse) to compare landed time/cost.\n3. Request and log supplier certificates and recent audit reports; search trade news for any negative items (I can run news checks).\n4. Prepare a one-page sample test checklist and sample order plan for the chosen suppliers.\n\nWhich next step do you want me to take now? (I can start with price-to-GBP conversions and freight/transit lookups or request certificate verification / news checks.)",
+   "json_format": false,
+   "took_over": false
+  },
+  {
+   "cond": "brief",
+   "run": 1,
+   "rows": {
+    "S03": {
+     "cost": true,
+     "days": true,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": 32.99,
+      "delivery_days": 54,
+      "verdict": "reject"
+     },
+     "eligible": false,
+     "graded_by": "code"
+    },
+    "S07": {
+     "cost": true,
+     "days": true,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": 34.75,
+      "delivery_days": 75,
+      "verdict": "reject"
+     },
+     "eligible": false,
+     "graded_by": "code"
+    },
+    "S08": {
+     "cost": true,
+     "days": true,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": 41.05,
+      "delivery_days": 21,
+      "verdict": "accept"
+     },
+     "eligible": true,
+     "graded_by": "code"
+    },
+    "S09": {
+     "cost": true,
+     "days": true,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": 39.72,
+      "delivery_days": 49,
+      "verdict": "accept"
+     },
+     "eligible": true,
+     "graded_by": "code"
+    },
+    "S12": {
+     "cost": true,
+     "days": true,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": 39.9,
+      "delivery_days": 25,
+      "verdict": "accept"
+     },
+     "eligible": true,
+     "graded_by": "code"
+    },
+    "S19": {
+     "cost": true,
+     "days": true,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": 43.93,
+      "delivery_days": 24,
+      "verdict": "reject"
+     },
+     "eligible": false,
+     "graded_by": "code"
+    }
+   },
+   "n": {
+    "cost": 3,
+    "days": 3,
+    "verdict": 6,
+    "facts": 12
+   },
+   "total": {
+    "calls": 3,
+    "input": 11489,
+    "output": 1990,
+    "reasoning": 832,
+    "tool_calls": 18,
+    "peak_context": 6070,
+    "usd": 0.00685225
+   },
+   "seconds": 16.30861473083496,
+   "report": "{\n  \"suppliers\": [\n    {\n      \"id\": \"S03\",\n      \"currency\": \"CNY\",\n      \"basket_price\": 270.00,\n      \"incoterm\": \"FOB\",\n      \"landed_cost_gbp\": 32.99,\n      \"delivery_days\": 54,\n      \"moq\": 500,\n      \"verdict\": \"reject\",\n      \"reason\": \"Open product safety recall (see news) \u2014 supplier has an active recall; Northwind rule: reject for open safety recall.\",\n      \"risks\": \"Open recall for 28 cm non-stick frying pans (coating flaking); ongoing remediation with no end date.\"\n    },\n    {\n      \"id\": \"S07\",\n      \"currency\": \"USD\",\n      \"basket_price\": 40.00,\n      \"incoterm\": \"FOB\",\n      \"landed_cost_gbp\": 34.75,\n      \"delivery_days\": 75,\n      \"moq\": 500,\n      \"verdict\": \"reject\",\n      \"reason\": \"Total delivery days (production + transit) = 75, which exceeds the 60-day limit.\",\n      \"risks\": \"Production capacity change reported (added night shift) but still long lead/transit; no safety recall or audit suspension found.\"\n    },\n    {\n      \"id\": \"S08\",\n      \"currency\": \"EUR\",\n      \"basket_price\": 47.00,\n      \"incoterm\": \"FOB\",\n      \"landed_cost_gbp\": 41.05,\n      \"delivery_days\": 21,\n      \"moq\": 300,\n      \"verdict\": \"accept\",\n      \"reason\": \"Meets delivery (21 days <= 60), MOQ (300 <= 1000) and no disqualifying news items.\",\n      \"risks\": \"News item about unrelated US company with similar name; no company-specific open recalls or audit suspensions found.\"\n    },\n    {\n      \"id\": \"S09\",\n      \"currency\": \"INR\",\n      \"basket_price\": 3900.00,\n      \"incoterm\": \"FOB\",\n      \"landed_cost_gbp\": 39.72,\n      \"delivery_days\": 49,\n      \"moq\": 500,\n      \"verdict\": \"accept\",\n      \"reason\": \"Meets delivery (49 days <= 60) and MOQ (500 <= 1000).\",\n      \"risks\": \"Historical recall (chef's knife handles) closed in 2025 \u2014 corrective actions completed; monitor quality controls on knife handles.\"\n    },\n    {\n      \"id\": \"S12\",\n      \"currency\": \"GBP\",\n      \"basket_price\": 39.90,\n      \"incoterm\": \"DDP\",\n      \"landed_cost_gbp\": 39.90,\n      \"delivery_days\": 25,\n      \"moq\": 400,\n      \"verdict\": \"accept\",\n      \"reason\": \"DDP price used as landed cost; meets delivery (25 days) and MOQ (400). No disqualifying news.\",\n      \"risks\": \"News: opened UK bonded warehouse (operational change) \u2014 confirms DDP capability; no open recalls or audit suspensions.\"\n    },\n    {\n      \"id\": \"S19\",\n      \"currency\": \"TRY\",\n      \"basket_price\": 1850.00,\n      \"incoterm\": \"FOB\",\n      \"landed_cost_gbp\": 43.93,\n      \"delivery_days\": 24,\n      \"moq\": 500,\n      \"verdict\": \"reject\",\n      \"reason\": \"Independent ethical audit suspended (reported) \u2014 Northwind rule: reject for suspended ethical audit.\",\n      \"risks\": \"Suspended ethical audit due to excessive overtime at stamping plant; re-audit not expected before 2027.\"\n    }\n  ]\n}",
+   "json_format": true,
+   "took_over": false
+  },
+  {
+   "cond": "history",
+   "run": 1,
+   "rows": {
+    "S03": {
+     "cost": false,
+     "days": false,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": null,
+      "delivery_days": null,
+      "verdict": "reject"
+     },
+     "eligible": false,
+     "graded_by": "code"
+    },
+    "S07": {
+     "cost": false,
+     "days": false,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": null,
+      "delivery_days": null,
+      "verdict": "reject"
+     },
+     "eligible": false,
+     "graded_by": "code"
+    },
+    "S08": {
+     "cost": true,
+     "days": true,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": 41.05,
+      "delivery_days": 21,
+      "verdict": "accept"
+     },
+     "eligible": true,
+     "graded_by": "code"
+    },
+    "S09": {
+     "cost": true,
+     "days": true,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": 39.72,
+      "delivery_days": 49,
+      "verdict": "accept"
+     },
+     "eligible": true,
+     "graded_by": "code"
+    },
+    "S12": {
+     "cost": true,
+     "days": false,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": 39.9,
+      "delivery_days": 24,
+      "verdict": "accept"
+     },
+     "eligible": true,
+     "graded_by": "code"
+    },
+    "S19": {
+     "cost": false,
+     "days": false,
+     "verdict": false,
+     "said": {
+      "landed_cost_gbp": null,
+      "delivery_days": null,
+      "verdict": null
+     },
+     "eligible": false,
+     "graded_by": "code"
+    }
+   },
+   "n": {
+    "cost": 3,
+    "days": 2,
+    "verdict": 5,
+    "facts": 10
+   },
+   "total": {
+    "calls": 4,
+    "input": 17895,
+    "output": 2085,
+    "reasoning": 1536,
+    "tool_calls": 12,
+    "peak_context": 5871,
+    "usd": 0.00864375
+   },
+   "seconds": 21.977395057678223,
+   "report": "{\"picks\":[{\"id\":\"S09\",\"name\":\"Ganges Steel Craft\",\"landed_cost_gbp\":39.72,\"delivery_days\":49,\"risks\":\"Closed knife-handle recall in 2025 (corrective action completed) \u2014 prior quality issue; origin India so longer supply chain exposure and 4% import duty applies; MOQ 500 (meets rule).\"},{\"id\":\"S12\",\"name\":\"Atlas Kitchen Trading\",\"landed_cost_gbp\":39.90,\"delivery_days\":24,\"risks\":\"DDP via UK bonded warehouse (dependency on their warehouse operations); trade terms are letter of credit; production in Spain so no import duty. No open safety/ethics issues found.\"},{\"id\":\"S08\",\"name\":\"Lumen Homeware\",\"landed_cost_gbp\":41.05,\"delivery_days\":21,\"risks\":\"Single factory supplier and payment by letter of credit (slower payment terms); possible name confusion with unrelated US recall (not connected) \u2014 no open safety/ethics issues for this supplier.\"}],\"rejected\":[{\"id\":\"S03\",\"reason\":\"Open product safety recall (non-stick coating flaking) reported for Sun Harbour Kitchen \u2014 rule 6 requires rejection.\"},{\"id\":\"S07\",\"reason\":\"Delivery days 75 exceed 60 (production 35 + transit 40) \u2014 rule 4 requires rejection.\"}]}",
+   "json_format": false,
+   "took_over": true
+  },
+  {
+   "cond": "thin",
+   "run": 2,
+   "rows": {
+    "S03": {
+     "cost": false,
+     "days": false,
+     "verdict": false,
+     "said": {
+      "landed_cost_gbp": null,
+      "delivery_days": 20,
+      "verdict": "accept"
+     },
+     "eligible": false,
+     "graded_by": "extractor"
+    },
+    "S07": {
+     "cost": false,
+     "days": false,
+     "verdict": false,
+     "said": {
+      "landed_cost_gbp": null,
+      "delivery_days": 35,
+      "verdict": "unclear"
+     },
+     "eligible": false,
+     "graded_by": "extractor"
+    },
+    "S08": {
+     "cost": false,
+     "days": false,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": null,
+      "delivery_days": 16,
+      "verdict": "accept"
+     },
+     "eligible": true,
+     "graded_by": "extractor"
+    },
+    "S09": {
+     "cost": false,
+     "days": false,
+     "verdict": false,
+     "said": {
+      "landed_cost_gbp": null,
+      "delivery_days": 21,
+      "verdict": "unclear"
+     },
+     "eligible": true,
+     "graded_by": "extractor"
+    },
+    "S12": {
+     "cost": true,
+     "days": false,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": 39.9,
+      "delivery_days": 24,
+      "verdict": "accept"
+     },
+     "eligible": true,
+     "graded_by": "extractor"
+    },
+    "S19": {
+     "cost": false,
+     "days": false,
+     "verdict": false,
+     "said": {
+      "landed_cost_gbp": null,
+      "delivery_days": 12,
+      "verdict": "accept"
+     },
+     "eligible": false,
+     "graded_by": "extractor"
+    }
+   },
+   "n": {
+    "cost": 1,
+    "days": 0,
+    "verdict": 2,
+    "facts": 3
+   },
+   "total": {
+    "calls": 2,
+    "input": 4561,
+    "output": 2534,
+    "reasoning": 320,
+    "tool_calls": 6,
+    "peak_context": 4268,
+    "usd": 0.006208249999999999
+   },
+   "seconds": 27.306162118911743,
+   "report": "Here are concise, comparable supplier profiles for Northwind Home\u2019s 2027 kitchenware sourcing (S03, S07, S08, S09, S12, S19). Each profile lists the key commercial terms, quality/certification, lead time/MOQ, shipping port and any notes relevant to UK sourcing and risk.\n\nSummary fields used: Reference basket price (supplier quote), Trade terms (FOB/DDP, payment), Lead time, MOQ, Shipping port, Production sites, Certifications / quality, Sustainability & packaging, Notable operational notes / risks.\n\n1) S03 \u2014 Sun Harbour Kitchen (Ningbo, China)\n- Reference basket price: 270.00 CNY per basket (28 cm frying pan, 20 cm chef's knife, set of 3 mixing bowls), FOB Ningbo.\n- Trade terms: FOB Ningbo; payment: 60 days after delivery for approved accounts.\n- Lead time: 20 days from confirmed order.\n- MOQ: 500 units per product line.\n- Shipping port: Ningbo.\n- Production sites: 3 factories.\n- Certifications / quality: ISO 9001, BSCI, SEDEX member. Steel traceability to mill; batch certificates. Accelerated wear tests; induction-tested bases.\n- Sustainability / packaging: Plastic-free packaging, vegetable inks, recycled outer cartons. Design for repair, EU/UK food-contact testing.\n- Notes / risk: Short lead time and multiple production sites \u2192 good flexibility. FOB pricing in CNY requires freight & import duty calculation. Payment term favourable for buyer.\n\n2) S07 \u2014 Hanil Kitchen (Busan, South Korea)\n- Reference basket price: 40.00 USD per basket, FOB Busan.\n- Trade terms: FOB Busan; payment: 60 days after delivery for approved accounts.\n- Lead time: 35 days.\n- MOQ: 500 units per product line.\n- Shipping port: Busan.\n- Production sites: 1 factory.\n- Certifications / quality: LFGB, BSCI, FDA food contact. Steel traceability; accelerated wear tests; strong QA claims.\n- Sustainability / packaging: Plastic-free packaging; sustainability reporting, energy tracking.\n- Notes / risk: Very low quoted basket price (USD 40) \u2014 verify specification match (materials, coatings, knife quality) as it\u2019s markedly lower than others. Single factory could limit capacity/flexibility.\n\n3) S08 \u2014 Lumen Homeware (Leixoes/Porto, Portugal)\n- Reference basket price: 47.00 EUR per basket, FOB Leixoes.\n- Trade terms: FOB Leixoes; payment: letter of credit.\n- Lead time: 16 days (shortest).\n- MOQ: 300 units per product line (lowest MOQ).\n- Shipping port: Leixoes.\n- Production sites: 1 factory.\n- Certifications / quality: LFGB, FDA, SEDEX member. Hand-checked flatness/coating; private-label capability.\n- Sustainability / packaging: Plastic-free packaging; recycled cartons; annual sustainability report; energy tracking.\n- Notes / risk: Close to UK \u2192 lower freight time/cost and easier compliance checks; higher unit cost in EUR but potentially lower landed cost and faster replenishment. Requires L/C payment (less favourable than credit terms).\n\n4) S09 \u2014 Ganges Steel Craft (Mundra, India)\n- Reference basket price: 3,900.00 INR per basket, FOB Mundra (~ convert when evaluating).\n- Trade terms: FOB Mundra; payment: letter of credit.\n- Lead time: 21 days.\n- MOQ: 500 units per product line.\n- Shipping port: Mundra.\n- Production sites: 2 factories.\n- Certifications / quality: FDA, LFGB, ISO 9001. QA lab testing to EU/UK food-contact regs; consistent sample-to-production match claimed.\n- Sustainability / packaging: Plastic-free packaging; design for durability/repair.\n- Notes / risk: Low quoted currency (INR) \u2014 convert to GBP for direct comparison. L/C payment and transit times from India to UK may add to cashflow and lead time risk.\n\n5) S12 \u2014 Atlas Kitchen Trading (Valencia, Spain)\n- Reference basket price: 39.90 GBP per basket, DDP to UK warehouse (landed, duties & VAT included).\n- Trade terms: DDP to buyer\u2019s UK warehouse; payment: letter of credit.\n- Lead time: 24 days.\n- MOQ: 400 units per product line.\n- Shipping port: UK warehouse (supplier manages logistics).\n- Production sites: 2 factories.\n- Certifications / quality: BSCI, ISO 14001, FDA food contact. Private-label capabilities; strong packaging and shipping documentation reputation.\n- Sustainability / packaging: Steel traceability; sustainability reporting; plastic-free packaging.\n- Notes / risk: DDP priced in GBP gives clear landed cost and simplifies procurement budgeting. Payment by L/C, mid-range lead time. Good option for low complexity supply chain and compliance.\n\n6) S19 \u2014 Bosphorus Housewares (Istanbul, Turkey)\n- Reference basket price: 1,850.00 TRY per basket, FOB Istanbul.\n- Trade terms: FOB Istanbul; payment: 30% deposit, 70% before shipping.\n- Lead time: 12 days (shortest production lead time).\n- MOQ: 500 units per product line.\n- Shipping port: Istanbul.\n- Production sites: 1 factory.\n- Certifications / quality: BSCI, SEDEX member, LFGB tested. Hand checks on flatness/coating.\n- Sustainability / packaging: Annual sustainability report; plastic-free packaging.\n- Notes / risk: Very short lead time and geographically nearer to UK (shorter sea transit). Payment term requires large pre-shipment payment \u2014 higher cashflow requirement and risk. Convert TRY to GBP for price comparison; exchange-rate volatility may impact landed cost.\n\nComparison notes (commercial/practical):\n- Lowest quoted basket prices (supplier currency): S07 (USD 40) and S12 (39.90 GBP DDP). S07\u2019s USD quote is suspiciously low vs peers \u2014 confirm spec. S12\u2019s DDP GBP quote is attractive because it includes landed cost to UK.\n- Shortest production lead times: S19 (12 days), S08 (16 days), S03 (20 days), S09 (21 days), S12 (24 days), S07 (35 days).\n- Best for fast replenishment / proximity to UK: S08 (Portugal) and S19 (Turkey) \u2014 shorter transit and simpler customs; S12 (Spain) offers DDP (simplest for budgeting).\n- Best QA / certifications: Most suppliers claim LFGB/FDA/ISO/BSCI/SEDEX coverage; verify certificates and recent audit/expiry dates during due diligence.\n- Payment flexibility: S03 & S07 offer 60 days after delivery for approved accounts (best buyer cashflow). Others require L/C or deposit/70% before shipment (worse for cashflow).\n- MOQ: Lowest is S08 at 300 units; helpful for seasonal colours/private-label testing. Others commonly 400\u2013500.\n\nRisks & recommended due diligence actions:\n- Verify specification match to quoted basket for S07 and S09 (their quoted currencies/levels differ widely). Request full product spec sheets and production samples.\n- Ask for digital copies of current certificates (LFGB, FDA, ISO, BSCI/SEDEX) and recent audit reports for all suppliers.\n- Confirm steel traceability documentation, test reports for coatings (accelerated wear, heavy metals), and EU/UK food-contact compliance letters for each production batch.\n- For FOB suppliers, obtain shipping quotes (freight and transit days) to UK ports and calculate landed cost including duties/VAT \u2014 recommended to compare against S12\u2019s DDP GBP quote.\n- For S19 (Turkey) and S08 (Portugal), confirm transit days and costs; consider them for faster replenishment and lower inventory buffers.\n- For S12 (DDP), confirm exact services included (warehousing, delivery to which UK locations) and any surcharges.\n\nShortlist recommendation (initial):\n1. S12 \u2014 Atlas Kitchen Trading (Spain) \u2014 DDP to UK at 39.90 GBP gives immediate clarity on landed cost and simplifies logistics. Good certifications and private-label support. Recommended for core private-label SKUs where predictable landed cost and simple supply chain matters.\n2. S08 \u2014 Lumen Homeware (Portugal) \u2014 short lead time (16 days) and low MOQ (300). Good for seasonals / quicker turnarounds and lower freight/transit risk.\n3. S03 \u2014 Sun Harbour (China) \u2014 competitive lead time (20 days), multiple factories (capacity), good certifications and 60-day payment terms if account approved \u2014 strong option for volume lines where unit price/gross margin matters.\n4. S19 \u2014 Bosphorus (Turkey) \u2014 very short lead time (12 days) and proximity; consider for fast-replenish lines but negotiate payment terms (reduce pre-shipment payment).\n5. S09 \u2014 Ganges (India) \u2014 check converted landed cost; capable supplier with solid QA claims \u2014 consider for price-sensitive bulk ranges.\n6. S07 \u2014 Hanil (Korea) \u2014 investigate the very low USD 40 quote; ensure spec parity. If spec matches, could be high-value low-cost source but the long lead time (35 days) and single factory capacity should be checked.\n\nNext recommended steps (I can run these if you want):\n- Convert all quoted basket prices to GBP at current rates and present landed cost estimates (FOB + freight + duty + VAT) for direct comparison vs S12 DDP.\n- Request / collate copies of certificates and recent audit reports for prioritized suppliers.\n- Get freight/transit estimates to UK for Ningbo, Busan, Leixoes, Mundra, Istanbul and compute days-in-transit and per-basket freight (I can call shipping_lookup per port).\n- Request samples/spec confirmations from S07, S09 and S03 to resolve price/spec anomalies.\n\nTell me which follow-up you want first (price conversions + landed cost, shipping lookup to UK, or certificate/audit requests).",
+   "json_format": false,
+   "took_over": false
+  },
+  {
+   "cond": "brief",
+   "run": 2,
+   "rows": {
+    "S03": {
+     "cost": true,
+     "days": true,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": 32.99,
+      "delivery_days": 54,
+      "verdict": "reject"
+     },
+     "eligible": false,
+     "graded_by": "code"
+    },
+    "S07": {
+     "cost": true,
+     "days": true,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": 34.75,
+      "delivery_days": 75,
+      "verdict": "reject"
+     },
+     "eligible": false,
+     "graded_by": "code"
+    },
+    "S08": {
+     "cost": true,
+     "days": true,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": 41.05,
+      "delivery_days": 21,
+      "verdict": "accept"
+     },
+     "eligible": true,
+     "graded_by": "code"
+    },
+    "S09": {
+     "cost": true,
+     "days": true,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": 39.72,
+      "delivery_days": 49,
+      "verdict": "accept"
+     },
+     "eligible": true,
+     "graded_by": "code"
+    },
+    "S12": {
+     "cost": true,
+     "days": true,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": 39.9,
+      "delivery_days": 25,
+      "verdict": "accept"
+     },
+     "eligible": true,
+     "graded_by": "code"
+    },
+    "S19": {
+     "cost": true,
+     "days": true,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": 43.93,
+      "delivery_days": 24,
+      "verdict": "reject"
+     },
+     "eligible": false,
+     "graded_by": "code"
+    }
+   },
+   "n": {
+    "cost": 3,
+    "days": 3,
+    "verdict": 6,
+    "facts": 12
+   },
+   "total": {
+    "calls": 14,
+    "input": 69110,
+    "output": 2272,
+    "reasoning": 1024,
+    "tool_calls": 18,
+    "peak_context": 6232,
+    "usd": 0.0218215
+   },
+   "seconds": 25.150869846343994,
+   "report": "{\n  \"suppliers\": [\n    {\n      \"id\": \"S03\",\n      \"currency\": \"CNY\",\n      \"basket_price\": 270.00,\n      \"incoterm\": \"FOB\",\n      \"landed_cost_gbp\": 32.99,\n      \"delivery_days\": 54,\n      \"moq\": 500,\n      \"verdict\": \"reject\",\n      \"reason\": \"Open product safety recall (non-stick pans) reported for Sun Harbour Kitchen \u2014 per rules, open safety recall = reject.\",\n      \"risks\": \"Open recall for 28 cm non-stick pans (coating flaking). If recall is not resolved, serious product / reputational risk; supply continuity uncertain.\"\n    },\n    {\n      \"id\": \"S07\",\n      \"currency\": \"USD\",\n      \"basket_price\": 40.00,\n      \"incoterm\": \"FOB\",\n      \"landed_cost_gbp\": 34.75,\n      \"delivery_days\": 75,\n      \"moq\": 500,\n      \"verdict\": \"reject\",\n      \"reason\": \"Delivery days exceed 60 (production 35 + transit 40 = 75) \u2014 per rules, reject.\",\n      \"risks\": \"Long lead / transit time (reported night shift added but lead still ~35 days). Potential stockouts and slow replenishment.\"\n    },\n    {\n      \"id\": \"S08\",\n      \"currency\": \"EUR\",\n      \"basket_price\": 47.00,\n      \"incoterm\": \"FOB\",\n      \"landed_cost_gbp\": 41.05,\n      \"delivery_days\": 21,\n      \"moq\": 300,\n      \"verdict\": \"accept\",\n      \"reason\": \"Meets rules: landed cost calculated (EU supplier \u2014 no import duty), delivery days 21 \u2264 60, MOQ \u2264 1000.\",\n      \"risks\": \"Name similarity with a US company that has an open kettle recall; news search shows that recall is unrelated to this Portuguese company. Minor risk of name confusion in media/retailer checks.\"\n    },\n    {\n      \"id\": \"S09\",\n      \"currency\": \"INR\",\n      \"basket_price\": 3900.00,\n      \"incoterm\": \"FOB\",\n      \"landed_cost_gbp\": 39.72,\n      \"delivery_days\": 49,\n      \"moq\": 500,\n      \"verdict\": \"accept\",\n      \"reason\": \"Meets rules: landed cost includes freight and 4% duty (outside EU/UK), delivery days 49 \u2264 60, MOQ \u2264 1000.\",\n      \"risks\": \"Closed recall in 2025 for chef's knives (loose handles) \u2014 corrective actions completed and recall closed, but past safety issue should be monitored.\"\n    },\n    {\n      \"id\": \"S12\",\n      \"currency\": \"GBP\",\n      \"basket_price\": 39.90,\n      \"incoterm\": \"DDP\",\n      \"landed_cost_gbp\": 39.90,\n      \"delivery_days\": 25,\n      \"moq\": 400,\n      \"verdict\": \"accept\",\n      \"reason\": \"DDP quoted \u2014 converted price is landed cost. Delivery days 25 \u2264 60, MOQ \u2264 1000.\",\n      \"risks\": \"None identified in safety/ethical news. Note: company opened a UK bonded warehouse (news) \u2014 positive for lead times and import handling.\"\n    },\n    {\n      \"id\": \"S19\",\n      \"currency\": \"TRY\",\n      \"basket_price\": 1850.00,\n      \"incoterm\": \"FOB\",\n      \"landed_cost_gbp\": 43.93,\n      \"delivery_days\": 24,\n      \"moq\": 500,\n      \"verdict\": \"reject\",\n      \"reason\": \"Independent auditor suspended the ethical audit (excessive overtime) \u2014 per rules, suspended ethical audit = reject.\",\n      \"risks\": \"Suspended ethical audit; supplier may face remediation requirements and reputational/operational disruptions until re-audit passes.\"\n    }\n  ]\n}",
+   "json_format": true,
+   "took_over": false
+  },
+  {
+   "cond": "history",
+   "run": 2,
+   "rows": {
+    "S03": {
+     "cost": false,
+     "days": false,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": null,
+      "delivery_days": null,
+      "verdict": "reject"
+     },
+     "eligible": false,
+     "graded_by": "code"
+    },
+    "S07": {
+     "cost": false,
+     "days": false,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": null,
+      "delivery_days": null,
+      "verdict": "reject"
+     },
+     "eligible": false,
+     "graded_by": "code"
+    },
+    "S08": {
+     "cost": true,
+     "days": true,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": 41.05,
+      "delivery_days": 21,
+      "verdict": "accept"
+     },
+     "eligible": true,
+     "graded_by": "code"
+    },
+    "S09": {
+     "cost": true,
+     "days": true,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": 39.72,
+      "delivery_days": 49,
+      "verdict": "accept"
+     },
+     "eligible": true,
+     "graded_by": "code"
+    },
+    "S12": {
+     "cost": true,
+     "days": true,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": 39.9,
+      "delivery_days": 25,
+      "verdict": "accept"
+     },
+     "eligible": true,
+     "graded_by": "code"
+    },
+    "S19": {
+     "cost": false,
+     "days": false,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": null,
+      "delivery_days": null,
+      "verdict": "reject"
+     },
+     "eligible": false,
+     "graded_by": "code"
+    }
+   },
+   "n": {
+    "cost": 3,
+    "days": 3,
+    "verdict": 6,
+    "facts": 12
+   },
+   "total": {
+    "calls": 6,
+    "input": 31040,
+    "output": 3351,
+    "reasoning": 2752,
+    "tool_calls": 16,
+    "peak_context": 6199,
+    "usd": 0.014462
+   },
+   "seconds": 47.75531816482544,
+   "report": "{\"picks\":[{\"id\":\"S09\",\"name\":\"Ganges Steel Craft\",\"landed_cost_gbp\":39.72,\"delivery_days\":49,\"risks\":\"Closed knife-handle recall in 2025 (resolved) \u2014 report for traceability; standard L/C payment terms; medium country transit risk (India).\"},{\"id\":\"S12\",\"name\":\"Atlas Kitchen Trading\",\"landed_cost_gbp\":39.90,\"delivery_days\":25,\"risks\":\"DDP via their UK bonded warehouse reduces import/duty risk; sources from contract factories (supply-chain complexity risk); payment by letter of credit.\"},{\"id\":\"S08\",\"name\":\"Lumen Homeware\",\"landed_cost_gbp\":41.05,\"delivery_days\":21,\"risks\":\"EU production \u2014 low import duty risk; payment by letter of credit may slow onboarding; no open safety/ethical issues found.\"}],\"rejected\":[{\"id\":\"S03\",\"reason\":\"Open product safety recall (non-stick coating flaking) \u2014 rule 6 requires rejection.\"},{\"id\":\"S07\",\"reason\":\"Delivery days 75 > 60 (production 35 + transit 40) \u2014 rule 4 rejects supplier.\"},{\"id\":\"S19\",\"reason\":\"Ethical audit suspended (independent auditor suspension) \u2014 rule 6 requires rejection.\"}]}",
+   "json_format": false,
+   "took_over": true
+  },
+  {
+   "cond": "thin",
+   "run": 3,
+   "rows": {
+    "S03": {
+     "cost": false,
+     "days": false,
+     "verdict": false,
+     "said": {
+      "landed_cost_gbp": null,
+      "delivery_days": 20,
+      "verdict": "accept"
+     },
+     "eligible": false,
+     "graded_by": "extractor"
+    },
+    "S07": {
+     "cost": false,
+     "days": false,
+     "verdict": false,
+     "said": {
+      "landed_cost_gbp": null,
+      "delivery_days": 35,
+      "verdict": "accept"
+     },
+     "eligible": false,
+     "graded_by": "extractor"
+    },
+    "S08": {
+     "cost": false,
+     "days": false,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": null,
+      "delivery_days": 16,
+      "verdict": "accept"
+     },
+     "eligible": true,
+     "graded_by": "extractor"
+    },
+    "S09": {
+     "cost": false,
+     "days": false,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": null,
+      "delivery_days": 21,
+      "verdict": "accept"
+     },
+     "eligible": true,
+     "graded_by": "extractor"
+    },
+    "S12": {
+     "cost": true,
+     "days": false,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": 39.9,
+      "delivery_days": 24,
+      "verdict": "accept"
+     },
+     "eligible": true,
+     "graded_by": "extractor"
+    },
+    "S19": {
+     "cost": false,
+     "days": false,
+     "verdict": false,
+     "said": {
+      "landed_cost_gbp": null,
+      "delivery_days": 12,
+      "verdict": "accept"
+     },
+     "eligible": false,
+     "graded_by": "extractor"
+    }
+   },
+   "n": {
+    "cost": 1,
+    "days": 0,
+    "verdict": 3,
+    "facts": 4
+   },
+   "total": {
+    "calls": 2,
+    "input": 4561,
+    "output": 2190,
+    "reasoning": 256,
+    "tool_calls": 6,
+    "peak_context": 4268,
+    "usd": 0.00552025
+   },
+   "seconds": 21.1828830242157,
+   "report": "Here are concise supplier profiles and sourcing recommendations for Northwind Home\u2019s 2027 kitchenware programme (suppliers S03, S07, S08, S09, S12, S19). Each profile highlights the commercial terms, quality/certification, sustainability, strengths, risks, and a recommendation for use (private label, seasonal ranges, sample order).\n\n1) S03 \u2014 Sun Harbour Kitchen (Ningbo, China)\n- Commercial: Reference basket 270.00 CNY (~\u00a330) FOB Ningbo; lead time 20 days; MOQ 500 units per product; payment: 60 days after delivery for approved accounts; production sites: 3.\n- Certifications / QC: ISO 9001, BSCI, SEDEX member; batch steel traceability; in\u2011house lab testing to EU/UK food-contact rules; hand checks for flatness/coating thickness.\n- Sustainability / packing: plastic\u2011free packaging, vegetable inks, recycled outer cartons; repairable design focus.\n- Strengths: short lead time, multi\u2011site capacity (reduces single\u2011site risk), strong traceability and QC, rapid sample turnaround (within a week).\n- Risks: FOB China \u2014 freight/time exposure; MOQ 500 may be high for small SKUs; currency/pricing expressed in CNY (monitor FX).\n- Recommendation: Good primary Asian supplier for core ranges and private\u2011label steel/aluminium cookware. Place a sample order + pilot MOQ for one core frying pan and knife set. Consider for higher-volume SKUs where quick turnaround is valuable.\n\n2) S07 \u2014 Hanil Kitchen (Busan, South Korea)\n- Commercial: Reference basket USD 40.00 FOB Busan; lead time 35 days; MOQ 500 units; payment: 60 days after delivery; 1 factory.\n- Certifications / QC: LFGB tested, BSCI, FDA food contact; traceable steel; accelerated wear testing.\n- Sustainability / packing: plastic\u2011free packaging, recycled cartons; annual sustainability report.\n- Strengths: strong food-contact certifications (LFGB), good lab testing, likely higher perceived quality (Korean manufacture), competitive USD basket price.\n- Risks: longer lead time (35 days) and single factory increases supply disruption risk; FOB Busan \u2014 freight/time and potential higher freight relative to China; 500 MOQ.\n- Recommendation: Good for higher\u2011spec or premium lines where LFGB/FDA is important. Recommend trial order for premium enamel or non-stick line; evaluate landed cost and delivery reliability vs Europe/China alternatives.\n\n3) S08 \u2014 Lumen Homeware (Leixoes/Porto, Portugal)\n- Commercial: Reference basket \u20ac47.00 FOB Leixoes; lead time 16 days; MOQ 300 units; payment by letter of credit; 1 factory.\n- Certifications / QC: LFGB, FDA, SEDEX member; hand checks on each pan.\n- Sustainability / packing: plastic\u2011free packaging, recycled cartons; private\u2011label allowed above MOQ.\n- Strengths: shortest lead time (16 days), lower MOQs (300), EU manufacturing simplifies compliance and reduces transit time to UK, easier DCL/import processes and perceived provenance value.\n- Risks: higher unit cost (EUR pricing) \u2014 landed cost vs FOB to UK needs calculation; single factory capacity constraint.\n- Recommendation: Strong candidate for \"Made in Europe\" or premium lines, seasonal colour launches and smaller test SKUs. Recommend small private\u2011label pilot (300 MOQ) for a curated kitchenware capsule to test UK retail positioning.\n\n4) S09 \u2014 Ganges Steel Craft (Mundra/India)\n- Commercial: Reference basket 3,900.00 INR (~\u00a337) FOB Mundra; lead time 21 days; MOQ 500 units; payment: letter of credit; 2 factories.\n- Certifications / QC: FDA, LFGB tested, ISO 9001; claims of good sample/production match; in\u2011house lab testing.\n- Sustainability / packing: plastic\u2011free packaging, recycled cartons; private\u2011label available.\n- Strengths: competitive unit pricing in INR, two factories (some redundancy), established exporter with long history.\n- Risks: longer transit times from India to UK than Europe; customs/commodity checks; FOB port Mundra \u2014 need to model freight and duties; MOQ 500.\n- Recommendation: Useful alternative low\u2011cost source for core SKUs where price is a priority. Recommend pilot PO for commodity cookware and a freight/lead\u2011time comparison against China/Turkey.\n\n5) S12 \u2014 Atlas Kitchen Trading (Valencia, Spain)\n- Commercial: Reference basket \u00a339.90 DDP to UK warehouse (landed price); lead time 24 days; MOQ 400 units; payment by letter of credit; production in Spain (2 factories).\n- Certifications / QC: BSCI, ISO 14001, FDA food contact; strong traceability and QC claims.\n- Sustainability / packing: traceable steel, sustainability reporting, plastic\u2011free packaging.\n- Strengths: DDP to UK warehouse simplifies buying (single landed price) \u2014 removes freight/import admin; EU manufacturing and 2 factories improve reliability; reasonable MOQ (400).\n- Risks: lead time longer than Portugal but shorter than Korea; higher unit cost than some Asian suppliers \u2014 but DDP arguably offsets some hidden costs.\n- Recommendation: Highly attractive for Northwind because of DDP pricing (easy landed cost), EU origin (marketing benefit), and dual-factory capacity. Recommend trial order (MOQ 400) for core private\u2011label ranges and request a breakdown (FOB + freight + duty) to validate DDP competitiveness.\n\n6) S19 \u2014 Bosphorus Housewares (Istanbul, Turkey)\n- Commercial: Reference basket 1,850.00 TRY (~\u00a350) FOB Istanbul; lead time 12 days; MOQ 500 units; payment: 30% deposit, 70% before shipping; 1 factory.\n- Certifications / QC: BSCI, SEDEX member, LFGB tested; hand checks and sustainability reporting.\n- Sustainability / packing: plastic\u2011free packaging, recycled cartons.\n- Strengths: shortest lead time (12 days) and Turkey \u2192 UK transit short; strong certifications; private\u2011label options; competitive regional proximity (reduced transit/time\u2011in\u2011chain).\n- Risks: currency volatility (TRY); FOB Istanbul \u2014 need freight to UK and customs; single factory.\n- Recommendation: Strong candidate for fast replenishment SKUs or seasonal lines needing short lead-time response. Recommend a small pilot order (MOQ 500) and negotiate payment terms closer to other suppliers (30/70 is more cash\u2011intensive). Model landed cost from Istanbul to UK and assess FX hedging.\n\nOverall recommendations & next steps\n- Shortlist for immediate pilots:\n  - European/near\u2011EU: S12 (Atlas, Spain) for DDP simplicity and S08 (Portugal) for fast small\u2011batch runs and \"Made in EU\" positioning.\n  - Near\u2011market fast replenishment: S19 (Turkey) for the shortest lead time to UK.\n  - Asian cost alternatives: S03 (China) and S09 (India) for lower unit cost on high\u2011volume core SKUs; S07 (Korea) for premium/LFGB\u2011spec items.\n- Actions to run now (priority):\n  1. Request full landed cost comparisons to Northwind\u2019s UK warehouse for each supplier (FOB + freight + insurance + duty + VAT). For S12 DDP, request detailed breakdown.\n  2. Place sample/pilot orders: propose pilot quantities = MOQ or supplier minimum (S08: 300; S12: 400; S03/S07/S09/S19: 500) for one representative product each (28 cm frying pan + 20 cm knife) to test QC and production-to-sample consistency.\n  3. For S19, negotiate payment terms (reduce pre-shipment balance) and request binding lead-time/penalty clauses.\n  4. Ask each supplier for a full compliance pack (test certificates: LFGB/FDA/EN71/REACH where relevant), mill steel certificates, and COAs for the sample batch.\n  5. Run a freight time quote: I can lookup transit days & freight per basket from each supplier port to UK \u2014 tell me if you want transit days + GBP freight per basket for Ningbo, Busan, Leixoes, Mundra, Leixoes (Portugal already), Istanbul, and Valencia.\n\nIf you want, I\u2019ll:\n- produce a 12\u2011month sourcing plan allocating SKUs to shortlisted suppliers with forecasted volumes and estimated total landed costs; or\n- run shipping_lookup calls now to give transit days and estimated freight-per-basket for each supplier port to a UK warehouse.\n\nWhich next step do you want me to run?",
+   "json_format": false,
+   "took_over": false
+  },
+  {
+   "cond": "brief",
+   "run": 3,
+   "rows": {
+    "S03": {
+     "cost": true,
+     "days": true,
+     "verdict": false,
+     "said": {
+      "landed_cost_gbp": 32.99,
+      "delivery_days": 54,
+      "verdict": "accept"
+     },
+     "eligible": false,
+     "graded_by": "code"
+    },
+    "S07": {
+     "cost": true,
+     "days": true,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": 34.75,
+      "delivery_days": 75,
+      "verdict": "reject"
+     },
+     "eligible": false,
+     "graded_by": "code"
+    },
+    "S08": {
+     "cost": true,
+     "days": true,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": 41.05,
+      "delivery_days": 21,
+      "verdict": "accept"
+     },
+     "eligible": true,
+     "graded_by": "code"
+    },
+    "S09": {
+     "cost": true,
+     "days": true,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": 39.72,
+      "delivery_days": 49,
+      "verdict": "accept"
+     },
+     "eligible": true,
+     "graded_by": "code"
+    },
+    "S12": {
+     "cost": true,
+     "days": true,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": 39.9,
+      "delivery_days": 25,
+      "verdict": "accept"
+     },
+     "eligible": true,
+     "graded_by": "code"
+    },
+    "S19": {
+     "cost": true,
+     "days": true,
+     "verdict": false,
+     "said": {
+      "landed_cost_gbp": 43.93,
+      "delivery_days": 24,
+      "verdict": "accept"
+     },
+     "eligible": false,
+     "graded_by": "code"
+    }
+   },
+   "n": {
+    "cost": 3,
+    "days": 3,
+    "verdict": 4,
+    "facts": 10
+   },
+   "total": {
+    "calls": 3,
+    "input": 11669,
+    "output": 2051,
+    "reasoning": 768,
+    "tool_calls": 24,
+    "peak_context": 5601,
+    "usd": 0.0070192499999999994
+   },
+   "seconds": 20.784321069717407,
+   "report": "{\n  \"suppliers\": [\n    {\n      \"id\": \"S03\",\n      \"currency\": \"CNY\",\n      \"basket_price\": 270.00,\n      \"incoterm\": \"FOB\",\n      \"landed_cost_gbp\": 32.99,\n      \"delivery_days\": 54,\n      \"moq\": 500,\n      \"verdict\": \"accept\",\n      \"reason\": \"Meets rules: landed cost calculated from reference basket (CNY->GBP), freight and 4% import duty applied; delivery days (20+34=54) <= 60; MOQ 500 <= 1000.\",\n      \"risks\": \"No open recalls or suspended audits found in news search.\"\n    },\n    {\n      \"id\": \"S07\",\n      \"currency\": \"USD\",\n      \"basket_price\": 40.00,\n      \"incoterm\": \"FOB\",\n      \"landed_cost_gbp\": 34.75,\n      \"delivery_days\": 75,\n      \"moq\": 500,\n      \"verdict\": \"reject\",\n      \"reason\": \"Delivery days exceed 60 (production 35 + transit 40 = 75). Other criteria (landed cost, MOQ) acceptable but rejected per delivery-time rule.\",\n      \"risks\": \"No open recalls or suspended audits found in news search.\"\n    },\n    {\n      \"id\": \"S08\",\n      \"currency\": \"EUR\",\n      \"basket_price\": 47.00,\n      \"incoterm\": \"FOB\",\n      \"landed_cost_gbp\": 41.05,\n      \"delivery_days\": 21,\n      \"moq\": 300,\n      \"verdict\": \"accept\",\n      \"reason\": \"Meets rules: converted reference price (EUR->GBP) + freight (EU supplier so no 4% import duty); delivery days (16+5=21) <= 60; MOQ 300 <= 1000.\",\n      \"risks\": \"No open recalls or suspended audits found in news search.\"\n    },\n    {\n      \"id\": \"S09\",\n      \"currency\": \"INR\",\n      \"basket_price\": 3900.00,\n      \"incoterm\": \"FOB\",\n      \"landed_cost_gbp\": 39.72,\n      \"delivery_days\": 49,\n      \"moq\": 500,\n      \"verdict\": \"accept\",\n      \"reason\": \"Meets rules: converted reference price (INR->GBP) + freight + 4% import duty applied; delivery days (21+28=49) <= 60; MOQ 500 <= 1000.\",\n      \"risks\": \"No open recalls or suspended audits found in news search.\"\n    },\n    {\n      \"id\": \"S12\",\n      \"currency\": \"GBP\",\n      \"basket_price\": 39.90,\n      \"incoterm\": \"DDP\",\n      \"landed_cost_gbp\": 39.90,\n      \"delivery_days\": 25,\n      \"moq\": 400,\n      \"verdict\": \"accept\",\n      \"reason\": \"Meets rules: DDP so converted price is landed cost; delivery days (24+1=25) <= 60; MOQ 400 <= 1000.\",\n      \"risks\": \"No open recalls or suspended audits found in news search.\"\n    },\n    {\n      \"id\": \"S19\",\n      \"currency\": \"TRY\",\n      \"basket_price\": 1850.00,\n      \"incoterm\": \"FOB\",\n      \"landed_cost_gbp\": 43.93,\n      \"delivery_days\": 24,\n      \"moq\": 500,\n      \"verdict\": \"accept\",\n      \"reason\": \"Meets rules: converted reference price (TRY->GBP) + freight + 4% import duty applied; delivery days (12+12=24) <= 60; MOQ 500 <= 1000.\",\n      \"risks\": \"No open recalls or suspended audits found in news search.\"\n    }\n  ]\n}",
+   "json_format": true,
+   "took_over": false
+  },
+  {
+   "cond": "history",
+   "run": 3,
+   "rows": {
+    "S03": {
+     "cost": false,
+     "days": false,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": null,
+      "delivery_days": null,
+      "verdict": "reject"
+     },
+     "eligible": false,
+     "graded_by": "code"
+    },
+    "S07": {
+     "cost": false,
+     "days": false,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": null,
+      "delivery_days": null,
+      "verdict": "reject"
+     },
+     "eligible": false,
+     "graded_by": "code"
+    },
+    "S08": {
+     "cost": true,
+     "days": true,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": 41.05,
+      "delivery_days": 21,
+      "verdict": "accept"
+     },
+     "eligible": true,
+     "graded_by": "code"
+    },
+    "S09": {
+     "cost": true,
+     "days": true,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": 39.72,
+      "delivery_days": 49,
+      "verdict": "accept"
+     },
+     "eligible": true,
+     "graded_by": "code"
+    },
+    "S12": {
+     "cost": true,
+     "days": false,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": 39.9,
+      "delivery_days": 24,
+      "verdict": "accept"
+     },
+     "eligible": true,
+     "graded_by": "code"
+    },
+    "S19": {
+     "cost": false,
+     "days": false,
+     "verdict": true,
+     "said": {
+      "landed_cost_gbp": null,
+      "delivery_days": null,
+      "verdict": "reject"
+     },
+     "eligible": false,
+     "graded_by": "code"
+    }
+   },
+   "n": {
+    "cost": 3,
+    "days": 2,
+    "verdict": 6,
+    "facts": 11
+   },
+   "total": {
+    "calls": 4,
+    "input": 25108,
+    "output": 3043,
+    "reasoning": 2368,
+    "tool_calls": 20,
+    "peak_context": 7992,
+    "usd": 0.012362999999999999
+   },
+   "seconds": 38.120081186294556,
+   "report": "{\"picks\":[{\"id\":\"S09\",\"name\":\"Ganges Steel Craft\",\"landed_cost_gbp\":39.72,\"delivery_days\":49,\"risks\":\"Closed knife-handle recall in 2025 (corrective action taken) \u2014 monitor quality controls; sourcing from India adds longer lead/transit exposure.\"},{\"id\":\"S12\",\"name\":\"Atlas Kitchen Trading\",\"landed_cost_gbp\":39.90,\"delivery_days\":24,\"risks\":\"DDP via UK warehouse reduces import risk but sources from contract factories in Spain/Portugal \u2014 verify factory-level quality and traceability; monitor lead time adherence.\"},{\"id\":\"S08\",\"name\":\"Lumen Homeware\",\"landed_cost_gbp\":41.05,\"delivery_days\":21,\"risks\":\"Name confusion with an unrelated US company that has an open kettle recall (reputational risk); payment via letter of credit may slow cash flow.\"}],\"rejected\":[{\"id\":\"S03\",\"reason\":\"Open product safety recall (non-stick coating flaking) reported in the news \u2014 rule 6 mandates rejection.\"},{\"id\":\"S07\",\"reason\":\"Delivery days exceed 60 (35 days production + 40 days transit = 75) \u2014 rule 4 mandates rejection.\"},{\"id\":\"S19\",\"reason\":\"Ethical audit suspended (excessive overtime) per news feed \u2014 rule 6 mandates rejection.\"}]}",
+   "json_format": false,
+   "took_over": true
+  }
+ ],
+ "spend": 0.09113824999999999,
+ "group": [
+  "S03",
+  "S07",
+  "S08",
+  "S09",
+  "S12",
+  "S19"
+ ],
+ "thin": "Research suppliers S03, S07, S08, S09, S12, S19 for Northwind Home's 2027 kitchenware sourcing.",
+ "full": "Objective: check six candidate kitchenware suppliers for Northwind Home (a UK shop) and report the facts the lead needs to choose\nthree suppliers for 2027. Your suppliers: S03, S07, S08, S09, S12, S19. Do not research any other supplier.\n\nRules to apply (from Northwind's buying rules; apply them exactly):\n1. Use the \"reference basket price\" on each supplier page.\n2. Convert to GBP with these fixed planning rates, not market rates: 1 EUR = 0.85, 1 USD = 0.78, 1 CNY = 0.11, 1 INR = 0.0092,\n   1 TRY = 0.022, 1 PLN = 0.20 GBP.\n3. Landed cost per basket: if the price is FOB, add the freight per basket for the supplier's port (shipping_lookup), and add 4% of the\n   converted price as import duty if the supplier is outside the EU and the UK. If the price is DDP, the converted price is the landed cost.\n4. Delivery days = production lead time (supplier page) + transit days for its port (shipping_lookup). Reject if above 60.\n5. Reject if the minimum order quantity is above 1,000 units.\n6. Search the news for each supplier by name. Reject for an OPEN safety recall or a suspended ethical audit. A closed recall is not a\n   reason to reject, but report it as a risk. Check that a news item is about the same company: similar names can be different companies.\n\nTools: read_supplier for each page, shipping_lookup for each port, search_news with each supplier's name. Use at most 25 tool calls.\n\nOutput: JSON only, one object per supplier:\n{\"suppliers\": [{\"id\": \"S..\", \"currency\": \"...\", \"basket_price\": 0.0, \"incoterm\": \"FOB or DDP\", \"landed_cost_gbp\": 0.00,\n\"delivery_days\": 0, \"moq\": 0, \"verdict\": \"accept or reject\", \"reason\": \"...\", \"risks\": \"...\"}]}",
+ "plan": "Plan: 24 suppliers is too many for one context, so I will split them into four groups of six and start four subagents in parallel. Each subagent checks its suppliers against rules 1 to 6; I will rank the accepted suppliers by landed cost and choose three. Group 2 is S03, S07, S08, S09, S12, S19."
+}

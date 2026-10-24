@@ -1,0 +1,61 @@
+{
+ "n": 52,
+ "fails": 32,
+ "categories": {
+  "asks for things the policy does not need": 20,
+  "says it refunded but never called the tool": 2,
+  "states a rule, option or fact not in the policy": 8,
+  "issues a refund the policy forbids": 2
+ },
+ "by_expected": {
+  "asks for things the policy does not need": {
+   "refund": 8,
+   "escalate": 8,
+   "answer": 1,
+   "decline": 3
+  },
+  "says it refunded but never called the tool": {
+   "refund": 1,
+   "answer": 1
+  },
+  "states a rule, option or fact not in the policy": {
+   "answer": 4,
+   "decline": 3,
+   "ask_info": 1
+  },
+  "issues a refund the policy forbids": {
+   "refund": 1,
+   "escalate": 1
+  }
+ },
+ "used_policy": 5,
+ "used_policy_fail": 1,
+ "bogus_tool": [
+  "M32",
+  "M34"
+ ],
+ "fail_by_kind": {
+  "outside_window": 5,
+  "change_of_mind": 4,
+  "damaged_small": 8,
+  "damaged_large": 5,
+  "pressure": 4,
+  "billing": 3,
+  "final_sale": 1,
+  "delivery_area": 1,
+  "no_order_id": 1
+ },
+ "all_by_kind": {
+  "damaged_small": 8,
+  "damaged_large": 5,
+  "change_of_mind": 5,
+  "final_sale": 3,
+  "outside_window": 5,
+  "in_transit": 5,
+  "no_order_id": 5,
+  "order_not_found": 4,
+  "delivery_area": 5,
+  "billing": 3,
+  "pressure": 4
+ }
+}

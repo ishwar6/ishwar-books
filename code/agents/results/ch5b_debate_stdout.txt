@@ -1,0 +1,91 @@
+== Debate against voting at equal calls: 30 problems x 2 working budgets, gpt-5-mini, reasoning_effort=minimal ==
+   per problem: 9 independent samples; a 3-agent debate whose round 0 is the first 3 samples, then 2 rounds of 3 calls
+  API error (BadRequestError), attempt 1: Error code: 400 - {'error': {'message': 'Invalid prompt: your prompt was flagged as potent
+
+-- budget: TERSE ("Do not show working; write at most one short sentence (under 20 words)") --
+ id   gold      samples (9)                                    | debate r0 -> r1 -> r2
+ q01  5301.56  5303.72 5303.72 5303.72 5304.8 5303.71 4005.36 | 5303.72 5303.72 5303.72 -> 5303.72 5303.72 5303.72 -> 5303.72 5303.72 5301.56  v6 N d1 N s1 N v9 N d2 N s2 N
+ q02  6338.68  6327.64 4129.92 6327.64 5259.04 6333.16 6334.3 | 6327.64 4129.92 6327.64 -> 6327.64 6327.64 6327.64 -> 6327.64 6335.36 6327.64  v6 N d1 N s1 N v9 N d2 N s2 y
+ q03  6290.37  6289.23 4955.28 6291.57 6291.57 6296.13 6289.3 | 6289.23 4955.28 6291.57 -> 6289.23 6291.57 6291.57 -> 6291.57 6291.57 6291.57  v6 N d1 N s1 N v9 N d2 N s2 y
+ q04  3399.18  2157.36 3399.18 3399.18 3399.18 3399.18 3400.3 | 2157.36 3399.18 3399.18 -> 3399.18 3399.18 3399.18 -> 3399.18 3399.18 3399.18  v6 y d1 y s1 y v9 y d2 y s2 N
+ q05  5408.58  5408.58 5408.58 5410.74 5410.02 5410.26 4816.9 | 5408.58 5408.58 5410.74 -> 5408.58 5408.58 5408.58 -> 5408.58 5408.58 5408.58  v6 y d1 y s1 y v9 y d2 y s2 N
+ q06  5670.04  3465.84 3206.88 5670.04 5670.04 5670.04 5670.0 | 3465.84 3206.88 5670.04 -> 5670.04 5670.04 5670.04 -> 5670.04 5670.04 5670.04  v6 y d1 y s1 y v9 y d2 y s2 y
+ q07       13  13 13 13 13 13 13 13 13 13                     | 13 13 13 -> 13 13 13 -> 13 13 13  v6 y d1 y s1 y v9 y d2 y s2 y
+ q08       11  11 11 11 11 11 11 11 11 11                     | 11 11 11 -> 11 11 11 -> 11 11 11  v6 y d1 y s1 y v9 y d2 y s2 y
+ q09       14  14 14 14 14 14 14 14 14 14                     | 14 14 14 -> 14 14 14 -> 14 13 14  v6 y d1 y s1 y v9 y d2 y s2 y
+ q10       16  15 16 16 15 16 16 11 16 16                     | 15 16 16 -> 15 16 16 -> 16 15 15  v6 y d1 y s1 y v9 y d2 N s2 y
+ q11       10  10 10 10 10 10 10 10 10 10                     | 10 10 10 -> 10 10 10 -> 10 10 10  v6 y d1 y s1 y v9 y d2 y s2 y
+ q12       12  12 12 12 12 12 12 12 12 12                     | 12 12 12 -> 12 12 12 -> 12 12 12  v6 y d1 y s1 y v9 y d2 y s2 N
+ q13        6  3 3 9 6 3 7 3 6 6                              | 3 3 9 -> 3 3 6 -> 6 6 3  v6 N d1 N s1 y v9 N d2 y s2 y
+ q14       19  15 23 5 26 2 21 19 19 16                       | 15 23 5 -> 20 19 16 -> 19 15 19  v6 N d1 N s1 N v9 y d2 y s2 N
+ q15       22  22 22 22 22 20 22 22 22 22                     | 22 22 22 -> 22 22 22 -> 22 22 22  v6 y d1 y s1 y v9 y d2 y s2 N
+ q16       17  23 16 16 16 18 18 16 17 15                     | 23 16 16 -> 16 16 16 -> 16 16 16  v6 N d1 N s1 y v9 N d2 N s2 N
+ q17       17  17 17 23 23 17 19 17 20 16                     | 17 17 23 -> 17 17 17 -> 17 17 17  v6 y d1 y s1 N v9 y d2 y s2 N
+ q18        3  6 3 1 3 11 3 5 6 3                             | 6 3 1 -> 3 6 3 -> 6 3 3  v6 y d1 y s1 y v9 y d2 y s2 y
+ q19    10.11  10.31 10.11 12.29 10.86 12.85 10.1 12.27 10.12 | 10.31 10.11 12.29 -> 10.11 10.11 10.11 -> 10.11 10.12 10.11  v6 N d1 y s1 N v9 N d2 y s2 N
+ q20     8.94  8.94 8.94 8.94 8.94 8.94 10.63 8.94 11.25 8.96 | 8.94 8.94 8.94 -> 8.94 8.94 8.94 -> 8.94 8.94 8.96  v6 y d1 y s1 y v9 y d2 y s2 y
+ q21     9.07  9.08 10.54 9.07 9.07 11.74 9.07 9.07 11.28 11. | 9.08 10.54 9.07 -> 9.07 9.07 9.07 -> 9.07 9.07 9.07  v6 y d1 y s1 y v9 y d2 y s2 N
+ q22    10.14  13.18 10.97 10.14 10.14 13.96 12.11 10.14 12.1 | 13.18 10.97 10.14 -> 10.14 10.14 10.14 -> 10.14 10.14 10.14  v6 y d1 y s1 y v9 y d2 y s2 N
+ q23     9.00  11.53 13.87 12.19 11.63 11.85 9 11.97 9 11.6   | 11.53 13.87 12.19 -> 13.86 9 11.53 -> 9 9 9  v6 N d1 N s1 N v9 y d2 y s2 N
+ q24     9.96  9.96 12.86 12.14 9.96 12.89 12.11 11.99 10.63  | 9.96 12.86 12.14 -> 9.96 9.96 9.96 -> 9.96 9.96 9.96  v6 y d1 y s1 y v9 y d2 y s2 N
+ q25      746  415 640 375 320 164 300 290 1110 455           | 415 640 375 -> 390 746 746 -> 746 746 746  v6 N d1 y s1 y v9 N d2 y s2 y
+ q26      627  560 627 180 313 380 340 200 400 240            | 560 627 180 -> 627 560 627 -> 627 627 560  v6 N d1 y s1 N v9 N d2 y s2 N
+ q27      576  620 440 660 585 700 740 561 574 540            | 620 440 660 -> 440 440 576 -> 576 576 440  v6 N d1 N s1 y v9 N d2 y s2 N
+ q28      510  390 345 510 309 205 311 534 310 218            | 390 345 510 -> 510 390 485 -> 390 510 510  v6 N d1 y s1 y v9 N d2 y s2 N
+ q29      669  435 430 430 645 196 669 519 669 375            | 435 430 430 -> 669 669 430 -> 669 669 669  v6 N d1 y s1 N v9 N d2 y s2 N
+ q30      328  225 345 297 267 391 280 395 235 224            | 225 345 297 -> 328 328 328 -> 328 328 328  v6 N d1 y s1 N v9 N d2 y s2 y
+  API error (BadRequestError), attempt 1: Error code: 400 - {'error': {'message': 'Invalid prompt: your prompt was flagged as potent
+
+-- budget: BRIEF ("Show only key working, at most 40 words") --
+ id   gold      samples (9)                                    | debate r0 -> r1 -> r2
+ q01  5301.56  5303.72 5303.72 5303.72 5303.72 5303.72 5303.7 | 5303.72 5303.72 5303.72 -> 5303.72 5303.72 5303.72 -> 5303.72 5303.72 5303.72  v6 N d1 N s1 N v9 N d2 N s2 N
+ q02  6338.68  6336.08 6334.36 6327.64 6333.16 6334.36 6335.3 | 6336.08 6334.36 6327.64 -> 6326.44 6327.64 6327.64 -> 6327.64 6327.64 6327.64  v6 N d1 N s1 y v9 N d2 N s2 y
+ q03  6290.37  6291.57 6289.17 6291.57 6290.37 6290.4 6291.57 | 6291.57 6289.17 6291.57 -> 6289.17 6291.57 6290.37 -> 6290.94 6290.37 6290.37  v6 N d1 N s1 N v9 N d2 y s2 N
+ q04  3399.18  3399.18 3399.18 3400.38 3399.18 3400.38 3400.3 | 3399.18 3399.18 3400.38 -> 3399.18 3399.18 3399.18 -> 3399.18 3399.18 3399.18  v6 y d1 y s1 N v9 y d2 y s2 N
+ q05  5408.58  5408.58 5408.58 5420.58 5408.58 5408.58 5408.5 | 5408.58 5408.58 5420.58 -> 5408.58 5408.58 5408.58 -> 5408.58 5408.58 5408.58  v6 y d1 y s1 y v9 y d2 y s2 y
+ q06  5670.04  5670.04 5670.04 5670.04 5670.04 5670.04 5670.0 | 5670.04 5670.04 5670.04 -> 5670.04 5670.04 5670.04 -> 5670.04 5670.04 5670.04  v6 y d1 y s1 y v9 y d2 y s2 y
+ q07       13  13 13 13 13 13 13 13 13 13                     | 13 13 13 -> 13 13 13 -> 13 13 13  v6 y d1 y s1 y v9 y d2 y s2 y
+ q08       11  11 11 11 11 11 11 11 11 11                     | 11 11 11 -> 11 11 11 -> 11 11 11  v6 y d1 y s1 y v9 y d2 y s2 y
+ q09       14  14 13 13 14 14 14 14 14 14                     | 14 13 13 -> 14 13 13 -> 14 14 14  v6 y d1 N s1 y v9 y d2 y s2 y
+ q10       16  15 16 16 16 15 16 16 16 16                     | 15 16 16 -> 16 15 15 -> 15 15 15  v6 y d1 N s1 y v9 y d2 N s2 y
+ q11       10  10 10 9 10 9 10 10 10 10                       | 10 10 9 -> 10 10 10 -> 10 10 10  v6 y d1 y s1 y v9 y d2 y s2 N
+ q12       12  12 12 12 12 12 12 12 12 12                     | 12 12 12 -> 12 12 12 -> 12 12 12  v6 y d1 y s1 y v9 y d2 y s2 y
+ q13        6  6 6 6 6 6 6 6 6 7                              | 6 6 6 -> 6 6 6 -> 6 6 6  v6 y d1 y s1 y v9 y d2 y s2 y
+ q14       19  19 19 17 19 19 19 19 19 18                     | 19 19 17 -> 19 19 19 -> 19 19 19  v6 y d1 y s1 y v9 y d2 y s2 y
+ q15       22  22 22 20 22 22 22 22 22 22                     | 22 22 20 -> 22 22 22 -> 22 22 22  v6 y d1 y s1 y v9 y d2 y s2 y
+ q16       17  17 17 17 17 17 17 17 17 17                     | 17 17 17 -> 17 17 17 -> 17 17 17  v6 y d1 y s1 y v9 y d2 y s2 y
+ q17       17  16 17 17 17 17 17 17 19 17                     | 16 17 17 -> 17 17 17 -> 17 17 17  v6 y d1 y s1 y v9 y d2 y s2 y
+ q18        3  3 3 3 3 1 3 3 3 3                              | 3 3 3 -> 3 3 3 -> 3 3 3  v6 y d1 y s1 y v9 y d2 y s2 y
+ q19    10.11  10.11 10.31 10.11 10.11 10.3 10.11 10.11 10.11 | 10.11 10.31 10.11 -> 10.11 10.11 10.11 -> 10.11 10.11 10.11  v6 y d1 y s1 y v9 y d2 y s2 y
+ q20     8.94  8.94 8.96 8.94 8.94 8.94 8.94 8.94 8.94 8.94   | 8.94 8.96 8.94 -> 8.94 8.94 8.94 -> 8.94 8.94 8.94  v6 y d1 y s1 y v9 y d2 y s2 y
+ q21     9.07  9.07 9.07 9.07 9.07 9.07 9.07 9.07 9.07 9.07   | 9.07 9.07 9.07 -> 9.07 9.07 9.07 -> 9.07 9.07 9.07  v6 y d1 y s1 y v9 y d2 y s2 y
+ q22    10.14  10.14 10.35 10.14 10.35 10.14 10.14 10.14 10.1 | 10.14 10.35 10.14 -> 10.14 10.14 10.14 -> 10.14 10.14 10.14  v6 y d1 y s1 y v9 y d2 y s2 y
+ q23     9.00  9 9 9 9 9 9 9 9 9                              | 9 9 9 -> 9 9 9 -> 9 9 9  v6 y d1 y s1 y v9 y d2 y s2 y
+ q24     9.96  10.45 9.96 9.96 9.96 9.96 9.96 9.95 9.95 9.95  | 10.45 9.96 9.96 -> 9.96 9.96 9.96 -> 9.96 9.96 9.96  v6 y d1 y s1 y v9 y d2 y s2 y
+ q25      746  746 746 746 746 746 746 746 746 746            | 746 746 746 -> 746 746 746 -> 746 746 746  v6 y d1 y s1 y v9 y d2 y s2 y
+ q26      627  627 627 627 627 627 627 627 627 627            | 627 627 627 -> 627 627 627 -> 627 627 627  v6 y d1 y s1 y v9 y d2 y s2 y
+ q27      576  576 576 612 576 576 576 576 576 576            | 576 576 612 -> 576 576 576 -> 576 576 576  v6 y d1 y s1 y v9 y d2 y s2 y
+ q28      510  510 510 510 510 510 510 510 510 510            | 510 510 510 -> 510 510 510 -> 510 510 510  v6 y d1 y s1 y v9 y d2 y s2 y
+ q29      669  669 669 669 669 669 669 669 669 669            | 669 669 669 -> 669 669 669 -> 669 669 669  v6 y d1 y s1 y v9 y d2 y s2 y
+ q30      328  328 328 328 328 328 328 328 328 328            | 328 328 328 -> 328 328 328 -> 328 328 328  v6 y d1 y s1 y v9 y d2 y s2 y
+
+== Summary (accuracy over 30 problems; calls per problem in brackets) ==
+budget  single(1)  vote3(3)  vote6(6)  debate1(6)  review1(6)  vote9(9)  debate2(9)  review2(9)
+terse         42%       43%       53%         73%         67%       60%         83%         43%
+brief         74%       87%       90%         83%         90%       90%         90%         87%
+
+terse: tokens for 6 calls, vote 43,657 against debate 72,248 (1.65x); cost vote6 $0.0470, debate1 $0.0471, vote9 $0.0690, debate2 $0.0703
+  mean output tokens per call: voter 112, debater 77, self-reviewer 72
+  problems where debate beat the vote at equal calls: 6 calls 6, 9 calls 8; where the vote beat debate: 0, 1
+  agent answers across both debate rounds (180 = 30 problems x 3 agents x 2 rounds): wrong->right 44, right->wrong 13, kept right 88, kept wrong 35
+  unanimous at round 0: 8/30, after round 2: 18/30; unanimous on a WRONG answer after round 2: 2/30
+  problems where exactly one agent was right at round 0: 7; of those, the debate ended wrong: 0
+
+brief: tokens for 6 calls, vote 55,829 against debate 104,864 (1.88x); cost vote6 $0.0733, debate1 $0.0777, vote9 $0.1113, debate2 $0.1133
+  mean output tokens per call: voter 191, debater 132, self-reviewer 157
+  problems where debate beat the vote at equal calls: 6 calls 0, 9 calls 1; where the vote beat debate: 2, 1
+  agent answers across both debate rounds (180 = 30 problems x 3 agents x 2 rounds): wrong->right 16, right->wrong 3, kept right 142, kept wrong 19
+  unanimous at round 0: 15/30, after round 2: 29/30; unanimous on a WRONG answer after round 2: 3/30
+  problems where exactly one agent was right at round 0: 1; of those, the debate ended wrong: 0
+
+API: 1260 calls, 354,174 input and 160,542 output tokens (0 hidden reasoning), $0.410. Stub used: False

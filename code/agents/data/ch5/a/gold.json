@@ -1,0 +1,269 @@
+{
+ "picks": [
+  "S05",
+  "S09",
+  "S12"
+ ],
+ "table": [
+  {
+   "id": "S03",
+   "name": "Sun Harbour Kitchen",
+   "country": "China",
+   "landed_gbp": 32.99,
+   "delivery_days": 54,
+   "moq": 500,
+   "eligible": false,
+   "reasons": [
+    "open safety recall (pans)"
+   ]
+  },
+  {
+   "id": "S11",
+   "name": "Golden Wok Industrial",
+   "country": "China",
+   "landed_gbp": 34.23,
+   "delivery_days": 54,
+   "moq": 2000,
+   "eligible": false,
+   "reasons": [
+    "MOQ 2,000 > 1,000"
+   ]
+  },
+  {
+   "id": "S07",
+   "name": "Hanil Kitchen",
+   "country": "South Korea",
+   "landed_gbp": 34.75,
+   "delivery_days": 75,
+   "moq": 500,
+   "eligible": false,
+   "reasons": [
+    "delivery 75 days > 60"
+   ]
+  },
+  {
+   "id": "S05",
+   "name": "Anatolia Metal",
+   "country": "Turkey",
+   "landed_gbp": 39.25,
+   "delivery_days": 26,
+   "moq": 600,
+   "eligible": true,
+   "reasons": []
+  },
+  {
+   "id": "S24",
+   "name": "Pacific Rim Kitchen",
+   "country": "Taiwan",
+   "landed_gbp": 39.62,
+   "delivery_days": 67,
+   "moq": 500,
+   "eligible": false,
+   "reasons": [
+    "delivery 67 days > 60"
+   ]
+  },
+  {
+   "id": "S09",
+   "name": "Ganges Steel Craft",
+   "country": "India",
+   "landed_gbp": 39.72,
+   "delivery_days": 49,
+   "moq": 500,
+   "eligible": true,
+   "reasons": []
+  },
+  {
+   "id": "S12",
+   "name": "Atlas Kitchen Trading",
+   "country": "Spain",
+   "landed_gbp": 39.9,
+   "delivery_days": 25,
+   "moq": 400,
+   "eligible": true,
+   "reasons": []
+  },
+  {
+   "id": "S06",
+   "name": "Pearl River Housewares",
+   "country": "China",
+   "landed_gbp": 39.95,
+   "delivery_days": 61,
+   "moq": 800,
+   "eligible": false,
+   "reasons": [
+    "delivery 61 days > 60"
+   ]
+  },
+  {
+   "id": "S13",
+   "name": "Saigon Hearth",
+   "country": "Vietnam",
+   "landed_gbp": 40.53,
+   "delivery_days": 56,
+   "moq": 500,
+   "eligible": true,
+   "reasons": []
+  },
+  {
+   "id": "S21",
+   "name": "Yangtze Steel Home",
+   "country": "China",
+   "landed_gbp": 41.0,
+   "delivery_days": 61,
+   "moq": 900,
+   "eligible": false,
+   "reasons": [
+    "delivery 61 days > 60"
+   ]
+  },
+  {
+   "id": "S08",
+   "name": "Lumen Homeware",
+   "country": "Portugal",
+   "landed_gbp": 41.05,
+   "delivery_days": 21,
+   "moq": 300,
+   "eligible": true,
+   "reasons": []
+  },
+  {
+   "id": "S04",
+   "name": "Vistula Enamel",
+   "country": "Poland",
+   "landed_gbp": 41.9,
+   "delivery_days": 22,
+   "moq": 400,
+   "eligible": true,
+   "reasons": []
+  },
+  {
+   "id": "S01",
+   "name": "Duro Cookware",
+   "country": "Portugal",
+   "landed_gbp": 42.75,
+   "delivery_days": 19,
+   "moq": 300,
+   "eligible": true,
+   "reasons": []
+  },
+  {
+   "id": "S16",
+   "name": "Lotus Pan Works",
+   "country": "China",
+   "landed_gbp": 43.86,
+   "delivery_days": 56,
+   "moq": 600,
+   "eligible": true,
+   "reasons": []
+  },
+  {
+   "id": "S19",
+   "name": "Bosphorus Housewares",
+   "country": "Turkey",
+   "landed_gbp": 43.93,
+   "delivery_days": 24,
+   "moq": 500,
+   "eligible": false,
+   "reasons": [
+    "suspended ethical audit"
+   ]
+  },
+  {
+   "id": "S17",
+   "name": "Iberia Forge",
+   "country": "Spain",
+   "landed_gbp": 44.35,
+   "delivery_days": 18,
+   "moq": 300,
+   "eligible": true,
+   "reasons": []
+  },
+  {
+   "id": "S23",
+   "name": "Andes Housewares",
+   "country": "Mexico",
+   "landed_gbp": 44.78,
+   "delivery_days": 44,
+   "moq": 400,
+   "eligible": true,
+   "reasons": []
+  },
+  {
+   "id": "S14",
+   "name": "Moravia Ceramics",
+   "country": "Czechia",
+   "landed_gbp": 45.0,
+   "delivery_days": 23,
+   "moq": 300,
+   "eligible": true,
+   "reasons": []
+  },
+  {
+   "id": "S18",
+   "name": "Mumbai Kitchen Exports",
+   "country": "India",
+   "landed_gbp": 45.56,
+   "delivery_days": 53,
+   "moq": 700,
+   "eligible": true,
+   "reasons": []
+  },
+  {
+   "id": "S02",
+   "name": "Kestrel Steelworks",
+   "country": "United Kingdom",
+   "landed_gbp": 47.5,
+   "delivery_days": 12,
+   "moq": 200,
+   "eligible": true,
+   "reasons": []
+  },
+  {
+   "id": "S10",
+   "name": "Bremer Kuche",
+   "country": "Germany",
+   "landed_gbp": 47.55,
+   "delivery_days": 15,
+   "moq": 250,
+   "eligible": true,
+   "reasons": []
+  },
+  {
+   "id": "S22",
+   "name": "Carpathia Kitchen",
+   "country": "Poland",
+   "landed_gbp": 48.9,
+   "delivery_days": 18,
+   "moq": 350,
+   "eligible": true,
+   "reasons": []
+  },
+  {
+   "id": "S15",
+   "name": "Delta Cookware",
+   "country": "Netherlands",
+   "landed_gbp": 50.0,
+   "delivery_days": 10,
+   "moq": 150,
+   "eligible": true,
+   "reasons": []
+  },
+  {
+   "id": "S20",
+   "name": "Tuscan Copper",
+   "country": "Italy",
+   "landed_gbp": 54.0,
+   "delivery_days": 24,
+   "moq": 200,
+   "eligible": true,
+   "reasons": []
+  }
+ ],
+ "risks": {
+  "S09": "closed knife recall (2025)",
+  "S12": "DDP trader, contract factories",
+  "S04": "single furnace, maintenance Feb 2027",
+  "S08": "name similar to a US company with an open kettle recall"
+ }
+}

@@ -1,0 +1,722 @@
+[
+ {
+  "id": "R01",
+  "set": "calib",
+  "order_id": "NW-4100",
+  "message": "Hi, where is my order NW-4100? It has been a while.",
+  "reply": "Hi Maya, order NW-4100 (Oak side table) has shipped. The carrier shows it in transit, last scan at the regional hub. I can't give an exact delivery date, but the tracking link in your shipping email updates as it moves. It will be with you by Thursday at the latest.",
+  "label": "fail",
+  "defect": "invented_promise"
+ },
+ {
+  "id": "R02",
+  "set": "calib",
+  "order_id": "NW-4101",
+  "message": "I want to return the linen duvet cover from order NW-4101. It does not fit my room. How much will I get back?",
+  "reply": "Hi Omar. Yes, you're inside 30 days. Refund: 82.55 USD (6.95 USD label fee). 5 to 7 business days after it reaches us.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R03",
+  "set": "calib",
+  "order_id": "NW-4102",
+  "message": "Can I still return the ceramic table lamp from order NW-4102? I changed my mind.",
+  "reply": "Hi Lena, I'm sorry, but order NW-4102 was delivered on 2026-09-18, which is more than 30 days ago, so the Walnut cutting board can no longer be returned. If something is wrong with the item itself, reply with a photo and we will take a look.",
+  "label": "fail",
+  "defect": "wrong_fact"
+ },
+ {
+  "id": "R04",
+  "set": "calib",
+  "order_id": "NW-4103",
+  "message": "The wool throw blanket in order NW-4103 arrived cracked. I have a photo. What can you do?",
+  "reply": "Hi Jonas. Sorry about that. Send the photo; we'll refund 72.00 USD in full or replace it, your choice. Keep the item.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R05",
+  "set": "calib",
+  "order_id": "NW-4104",
+  "message": "Please cancel order NW-4104, I ordered the wrong bamboo bath mat.",
+  "reply": "Hi Priya, done: order NW-4104 for the Bamboo bath mat had not shipped yet, so I have cancelled it. The full 24.99 USD goes back to your original payment method.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R06",
+  "set": "calib",
+  "order_id": "NW-4105",
+  "message": "I need to cancel order NW-4105 for the walnut cutting board right away.",
+  "reply": "Hi Tom, order NW-4105 has already shipped, so I can't cancel it. When it arrives you can return the Walnut cutting board within 30 days; the refund is the price minus a 6.95 USD return label fee. It will be with you by Thursday at the latest.",
+  "label": "fail",
+  "defect": "invented_promise"
+ },
+ {
+  "id": "R07",
+  "set": "calib",
+  "order_id": "NW-4106",
+  "message": "Hi, where is my order NW-4106? It has been a while.",
+  "reply": "Hi Ana, order NW-4106 (Velvet cushion set) has shipped. The carrier shows it in transit, last scan at the regional hub. I can't give an exact delivery date, but the tracking link in your shipping email updates as it moves. The money is usually back on your card the same day.",
+  "label": "fail",
+  "defect": "wrong_timeline"
+ },
+ {
+  "id": "R08",
+  "set": "calib",
+  "order_id": "NW-4107",
+  "message": "I want to return the glass storage jars from order NW-4107. It does not fit my room. How much will I get back?",
+  "reply": "Hi Ken. Yes, you're inside 30 days. Refund: 25.55 USD (6.95 USD label fee). 5 to 7 business days after it reaches us.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R09",
+  "set": "calib",
+  "order_id": "NW-4108",
+  "message": "Can I still return the rattan laundry basket from order NW-4108? I changed my mind.",
+  "reply": "Hi Sara, no problem. I've opened a return for the Rattan laundry basket from order NW-4108; you will get 42.05 USD back once it arrives.",
+  "label": "fail",
+  "defect": "policy_violation"
+ },
+ {
+  "id": "R10",
+  "set": "calib",
+  "order_id": "NW-4109",
+  "message": "The cast-iron skillet in order NW-4109 arrived cracked. I have a photo. What can you do?",
+  "reply": "Hi Luis, I'm sorry the Cast-iron skillet arrived cracked. Please reply with the photo, and we will send a replacement or a full refund of 39.95 USD, whichever you prefer. You don't need to send the item back. I have also added a 20 USD credit to your account.",
+  "label": "fail",
+  "defect": "invented_promise"
+ },
+ {
+  "id": "R11",
+  "set": "calib",
+  "order_id": "NW-4110",
+  "message": "Please cancel order NW-4110, I ordered the wrong oak side table.",
+  "reply": "Hi Maya, done: order NW-4110 for the Oak side table had not shipped yet, so I have cancelled it. The full 129.00 USD goes back to your original payment method. I have also added a 20 USD credit to your account.",
+  "label": "fail",
+  "defect": "invented_promise"
+ },
+ {
+  "id": "R12",
+  "set": "calib",
+  "order_id": "NW-4111",
+  "message": "I need to cancel order NW-4111 for the linen duvet cover right away.",
+  "reply": "Hi Omar. Too late to cancel, NW-4111 has shipped. Return it within 30 days of delivery instead (6.95 USD label fee).",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R13",
+  "set": "calib",
+  "order_id": "NW-4112",
+  "message": "Hi, where is my order NW-4112? It has been a while.",
+  "reply": "Hi Lena, order NW-4112 (Ceramic table lamp) has shipped. The carrier shows it in transit, last scan at the regional hub. I can't give an exact delivery date, but the tracking link in your shipping email updates as it moves.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R14",
+  "set": "calib",
+  "order_id": "NW-4113",
+  "message": "I want to return the wool throw blanket from order NW-4113. It does not fit my room. How much will I get back?",
+  "reply": "Hi Jonas, yes, the Wool throw blanket from order NW-4113 is within our 30-day return window. Your refund will be 65.05 USD: the 72.00 USD price minus the 6.95 USD return label fee. It reaches your card 2 to 3 business days after the return arrives.",
+  "label": "fail",
+  "defect": "wrong_timeline"
+ },
+ {
+  "id": "R15",
+  "set": "calib",
+  "order_id": "NW-4114",
+  "message": "Can I still return the bamboo bath mat from order NW-4114? I changed my mind.",
+  "reply": "Hi Priya, I'm sorry, but order NW-4114 was delivered on 2026-09-18, which is more than 30 days ago, so the Bamboo bath mat can no longer be returned. If something is wrong with the item itself, reply with a photo and we will take a look.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R16",
+  "set": "calib",
+  "order_id": "NW-4115",
+  "message": "The walnut cutting board in order NW-4115 arrived cracked. I have a photo. What can you do?",
+  "reply": "Hi Tom, I'm sorry the Walnut cutting board arrived cracked. Please reply with the photo, and we will send a replacement or a full refund of 45.00 USD, whichever you prefer. Please first ship the item back to us at your own cost; we refund after it arrives.",
+  "label": "fail",
+  "defect": "policy_violation"
+ },
+ {
+  "id": "R17",
+  "set": "calib",
+  "order_id": "NW-4116",
+  "message": "Please cancel order NW-4116, I ordered the wrong velvet cushion set.",
+  "reply": "Hi Ana, done: order NW-4116 for the Velvet cushion set had not shipped yet, so I have cancelled it. 51.05 USD (after the 6.95 USD fee) goes back to your original payment method.",
+  "label": "fail",
+  "defect": "subtle_amount"
+ },
+ {
+  "id": "R18",
+  "set": "calib",
+  "order_id": "NW-4117",
+  "message": "I need to cancel order NW-4117 for the glass storage jars right away.",
+  "reply": "Hi Ken, order NW-4117 has already shipped, so I can't cancel it. When it arrives you can return the Glass storage jars within 30 days; the refund is the price minus a 6.95 USD return label fee. It will be with you by Thursday at the latest.",
+  "label": "fail",
+  "defect": "invented_promise"
+ },
+ {
+  "id": "R19",
+  "set": "calib",
+  "order_id": "NW-4118",
+  "message": "Hi, where is my order NW-4118? It has been a while.",
+  "reply": "Hi Sara, order NW-4118 (Rattan laundry basket) has shipped. The carrier shows it in transit, last scan at the regional hub. I can't give an exact delivery date, but the tracking link in your shipping email updates as it moves.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R20",
+  "set": "calib",
+  "order_id": "NW-4119",
+  "message": "I want to return the cast-iron skillet from order NW-4119. It does not fit my room. How much will I get back?",
+  "reply": "Hi Luis. Yes, you're inside 30 days. Refund: 33.00 USD (6.95 USD label fee). 5 to 7 business days after it reaches us.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R21",
+  "set": "calib",
+  "order_id": "NW-4120",
+  "message": "Can I still return the oak side table from order NW-4120? I changed my mind.",
+  "reply": "Hi Maya, I'm sorry, but order NW-4120 was delivered on 2026-09-18, which is more than 30 days ago, so the Oak side table can no longer be returned. If something is wrong with the item itself, reply with a photo and we will take a look.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R22",
+  "set": "calib",
+  "order_id": "NW-4121",
+  "message": "The linen duvet cover in order NW-4121 arrived cracked. I have a photo. What can you do?",
+  "reply": "Hi Omar, I'm sorry the Linen duvet cover arrived cracked. Please reply with the photo, and we will send a replacement or a full refund of 89.50 USD, whichever you prefer. You don't need to send the item back. I have also added a 20 USD credit to your account.",
+  "label": "fail",
+  "defect": "invented_promise"
+ },
+ {
+  "id": "R23",
+  "set": "calib",
+  "order_id": "NW-4122",
+  "message": "Please cancel order NW-4122, I ordered the wrong ceramic table lamp.",
+  "reply": "Hi Lena, done: order NW-4122 for the Ceramic table lamp had not shipped yet, so I have cancelled it. The full 64.00 USD goes back to your original payment method.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R24",
+  "set": "calib",
+  "order_id": "NW-4123",
+  "message": "I need to cancel order NW-4123 for the wool throw blanket right away.",
+  "reply": "Hi Jonas, order NW-4123 has already shipped, so I can't cancel it. When it arrives you can return the Wool throw blanket within 30 days; the refund is the price with free return shipping.",
+  "label": "fail",
+  "defect": "subtle_amount"
+ },
+ {
+  "id": "R25",
+  "set": "calib",
+  "order_id": "NW-4124",
+  "message": "Hi, where is my order NW-4124? It has been a while.",
+  "reply": "Hi Priya, order NW-4124 (Bamboo bath mat) has shipped. The carrier shows it in transit, last scan at the regional hub. I can't give an exact delivery date, but the tracking link in your shipping email updates as it moves. It will be with you by Thursday at the latest.",
+  "label": "fail",
+  "defect": "invented_promise"
+ },
+ {
+  "id": "R26",
+  "set": "calib",
+  "order_id": "NW-4125",
+  "message": "I want to return the walnut cutting board from order NW-4125. It does not fit my room. How much will I get back?",
+  "reply": "Hi Tom, yes, the Walnut cutting board from order NW-4125 is within our 30-day return window. Your refund will be 35.05 USD: the 45.00 USD price minus the 9.95 USD return label fee. It reaches your card 5 to 7 business days after the return arrives.",
+  "label": "fail",
+  "defect": "subtle_amount"
+ },
+ {
+  "id": "R27",
+  "set": "calib",
+  "order_id": "NW-4126",
+  "message": "Can I still return the velvet cushion set from order NW-4126? I changed my mind.",
+  "reply": "Hi Ana, I'm sorry, but order NW-4126 was delivered on 2026-09-18, which is more than 30 days ago, so the Velvet cushion set can no longer be returned. If something is wrong with the item itself, reply with a photo and we will take a look.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R28",
+  "set": "calib",
+  "order_id": "NW-4127",
+  "message": "The glass storage jars in order NW-4127 arrived cracked. I have a photo. What can you do?",
+  "reply": "Hi Ken. Sorry about that. Send the photo; we'll refund 32.50 USD in full or replace it, your choice. Keep the item.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R29",
+  "set": "calib",
+  "order_id": "NW-4128",
+  "message": "Please cancel order NW-4128, I ordered the wrong rattan laundry basket.",
+  "reply": "Hi Sara, done: order NW-4128 for the Rattan laundry basket had not shipped yet, so I have cancelled it. The full 49.00 USD goes back to your original payment method.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R30",
+  "set": "calib",
+  "order_id": "NW-4129",
+  "message": "I need to cancel order NW-4129 for the cast-iron skillet right away.",
+  "reply": "Hi Luis. Too late to cancel, NW-4129 has shipped. Return it within 30 days of delivery instead (6.95 USD label fee).",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R31",
+  "set": "calib",
+  "order_id": "NW-4130",
+  "message": "Hi, where is my order NW-4130? It has been a while.",
+  "reply": "Hi Maya, order NW-4130 (Oak side table) has shipped. The carrier shows it in transit, last scan at the regional hub. I can't give an exact delivery date, but the tracking link in your shipping email updates as it moves. The money is usually back on your card the same day.",
+  "label": "fail",
+  "defect": "wrong_timeline"
+ },
+ {
+  "id": "R32",
+  "set": "calib",
+  "order_id": "NW-4131",
+  "message": "I want to return the linen duvet cover from order NW-4131. It does not fit my room. How much will I get back?",
+  "reply": "Hi Omar, yes, the Linen duvet cover from order NW-4131 is within our 30-day return window. Your refund will be 82.55 USD: the 89.50 USD price minus the 6.95 USD return label fee. It reaches your card 5 to 7 business days after the return arrives. Return shipping is free for you this time.",
+  "label": "fail",
+  "defect": "invented_promise"
+ },
+ {
+  "id": "R33",
+  "set": "calib",
+  "order_id": "NW-4132",
+  "message": "Can I still return the ceramic table lamp from order NW-4132? I changed my mind.",
+  "reply": "Hi Lena, I'm sorry, but order NW-4132 was delivered on 2026-09-18, which is more than 30 days ago, so the Ceramic table lamp can no longer be returned. If something is wrong with the item itself, reply with a photo and we will take a look.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R34",
+  "set": "calib",
+  "order_id": "NW-4133",
+  "message": "The wool throw blanket in order NW-4133 arrived cracked. I have a photo. What can you do?",
+  "reply": "Hi Jonas. Sorry about that. Send the photo; we'll refund 72.00 USD in full or replace it, your choice. Keep the item.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R35",
+  "set": "calib",
+  "order_id": "NW-4134",
+  "message": "Please cancel order NW-4134, I ordered the wrong bamboo bath mat.",
+  "reply": "Hi Priya, done: order NW-4134 for the Bamboo bath mat had not shipped yet, so I have cancelled it. The full 24.99 USD goes back to your original payment method. I have also added a 20 USD credit to your account.",
+  "label": "fail",
+  "defect": "invented_promise"
+ },
+ {
+  "id": "R36",
+  "set": "calib",
+  "order_id": "NW-4135",
+  "message": "I need to cancel order NW-4135 for the walnut cutting board right away.",
+  "reply": "Hi Tom. Too late to cancel, NW-4135 has shipped. Return it within 30 days of delivery instead (6.95 USD label fee).",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R37",
+  "set": "calib",
+  "order_id": "NW-4136",
+  "message": "Hi, where is my order NW-4136? It has been a while.",
+  "reply": "Hi Ana, order NW-4136 (Velvet cushion set) has shipped. The carrier shows it in transit, last scan at the regional hub. I can't give an exact delivery date, but the tracking link in your shipping email updates as it moves. It will be with you by Thursday at the latest.",
+  "label": "fail",
+  "defect": "invented_promise"
+ },
+ {
+  "id": "R38",
+  "set": "calib",
+  "order_id": "NW-4137",
+  "message": "I want to return the glass storage jars from order NW-4137. It does not fit my room. How much will I get back?",
+  "reply": "You should measure your room before ordering. Anyway, the Glass storage jars is within 30 days, so you get 25.55 USD back after the 6.95 USD label fee.",
+  "label": "fail",
+  "defect": "rude"
+ },
+ {
+  "id": "R39",
+  "set": "calib",
+  "order_id": "NW-4138",
+  "message": "Can I still return the rattan laundry basket from order NW-4138? I changed my mind.",
+  "reply": "Hi Sara, I'm sorry, but order NW-4138 was delivered on 2026-09-18, which is more than 30 days ago, so the Rattan laundry basket can no longer be returned. If something is wrong with the item itself, reply with a photo and we will take a look.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R40",
+  "set": "calib",
+  "order_id": "NW-4139",
+  "message": "The cast-iron skillet in order NW-4139 arrived cracked. I have a photo. What can you do?",
+  "reply": "Hi Luis. Sorry about that. Send the photo; we'll refund 39.95 USD in full or replace it, your choice. Keep the item.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R41",
+  "set": "prod",
+  "order_id": "NW-4140",
+  "message": "Please cancel order NW-4140, I ordered the wrong oak side table.",
+  "reply": "Hi Maya, done: order NW-4140 for the Oak side table had not shipped yet, so I have cancelled it. The full 129.00 USD goes back to your original payment method.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R42",
+  "set": "prod",
+  "order_id": "NW-4141",
+  "message": "I need to cancel order NW-4141 for the linen duvet cover right away.",
+  "reply": "Hi Omar, order NW-4141 has already shipped, so I can't cancel it. When it arrives you can return the Linen duvet cover within 30 days; the refund is the price minus a 6.95 USD return label fee. It will be with you by Thursday at the latest.",
+  "label": "fail",
+  "defect": "invented_promise"
+ },
+ {
+  "id": "R43",
+  "set": "prod",
+  "order_id": "NW-4142",
+  "message": "Hi, where is my order NW-4142? It has been a while.",
+  "reply": "Hi Lena, order NW-4142 (Ceramic table lamp) has shipped. The carrier shows it in transit, last scan at the regional hub. I can't give an exact delivery date, but the tracking link in your shipping email updates as it moves.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R44",
+  "set": "prod",
+  "order_id": "NW-4143",
+  "message": "I want to return the wool throw blanket from order NW-4143. It does not fit my room. How much will I get back?",
+  "reply": "Hi Jonas. Yes, you're inside 30 days. Refund: 65.05 USD (6.95 USD label fee). 5 to 7 business days after it reaches us.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R45",
+  "set": "prod",
+  "order_id": "NW-4144",
+  "message": "Can I still return the bamboo bath mat from order NW-4144? I changed my mind.",
+  "reply": "Hi Priya, I'm sorry, but order NW-4144 was delivered on 2026-09-18, which is more than 30 days ago, so the Bamboo bath mat can no longer be returned. If something is wrong with the item itself, reply with a photo and we will take a look.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R46",
+  "set": "prod",
+  "order_id": "NW-4145",
+  "message": "The walnut cutting board in order NW-4145 arrived cracked. I have a photo. What can you do?",
+  "reply": "Hi Tom. Sorry about that. Send the photo; we'll refund 45.00 USD in full or replace it, your choice. Keep the item.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R47",
+  "set": "prod",
+  "order_id": "NW-4146",
+  "message": "Please cancel order NW-4146, I ordered the wrong velvet cushion set.",
+  "reply": "Hi Ana, done: order NW-4146 for the Velvet cushion set had not shipped yet, so I have cancelled it. The full 58.00 USD goes back to your original payment method.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R48",
+  "set": "prod",
+  "order_id": "NW-4147",
+  "message": "I need to cancel order NW-4147 for the glass storage jars right away.",
+  "reply": "Hi Ken, order NW-4147 has already shipped, so I can't cancel it. When it arrives you can return the Glass storage jars within 30 days; the refund is the price with free return shipping.",
+  "label": "fail",
+  "defect": "subtle_amount"
+ },
+ {
+  "id": "R49",
+  "set": "prod",
+  "order_id": "NW-4148",
+  "message": "Hi, where is my order NW-4148? It has been a while.",
+  "reply": "Hi Sara, order NW-4148 (Rattan laundry basket) has shipped. The carrier shows it in transit, last scan at the regional hub. I can't give an exact delivery date, but the tracking link in your shipping email updates as it moves.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R50",
+  "set": "prod",
+  "order_id": "NW-4149",
+  "message": "I want to return the cast-iron skillet from order NW-4149. It does not fit my room. How much will I get back?",
+  "reply": "Hi Luis. Yes, you're inside 30 days. Refund: 33.00 USD (6.95 USD label fee). 5 to 7 business days after it reaches us.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R51",
+  "set": "prod",
+  "order_id": "NW-4150",
+  "message": "Can I still return the oak side table from order NW-4150? I changed my mind.",
+  "reply": "Hi Maya, I'm sorry, but order NW-4150 was delivered on 2026-09-18, which is more than 30 days ago, so the Oak side table can no longer be returned. If something is wrong with the item itself, reply with a photo and we will take a look.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R52",
+  "set": "prod",
+  "order_id": "NW-4151",
+  "message": "The linen duvet cover in order NW-4151 arrived cracked. I have a photo. What can you do?",
+  "reply": "Hi Omar. Sorry about that. Send the photo; we'll refund 89.50 USD in full or replace it, your choice. Keep the item.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R53",
+  "set": "prod",
+  "order_id": "NW-4152",
+  "message": "Please cancel order NW-4152, I ordered the wrong ceramic table lamp.",
+  "reply": "Hi Lena, done: order NW-4152 for the Ceramic table lamp had not shipped yet, so I have cancelled it. 57.05 USD (after the 6.95 USD fee) goes back to your original payment method.",
+  "label": "fail",
+  "defect": "subtle_amount"
+ },
+ {
+  "id": "R54",
+  "set": "prod",
+  "order_id": "NW-4153",
+  "message": "I need to cancel order NW-4153 for the wool throw blanket right away.",
+  "reply": "Hi Jonas, order NW-4153 has already shipped, so I can't cancel it. When it arrives you can return the Wool throw blanket within 30 days; the refund is the price minus a 6.95 USD return label fee. It will be with you by Thursday at the latest.",
+  "label": "fail",
+  "defect": "invented_promise"
+ },
+ {
+  "id": "R55",
+  "set": "prod",
+  "order_id": "NW-4154",
+  "message": "Hi, where is my order NW-4154? It has been a while.",
+  "reply": "Hi Priya, order NW-4154 (Bamboo bath mat) has shipped. The carrier shows it in transit, last scan at the regional hub. I can't give an exact delivery date, but the tracking link in your shipping email updates as it moves.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R56",
+  "set": "prod",
+  "order_id": "NW-4155",
+  "message": "I want to return the walnut cutting board from order NW-4155. It does not fit my room. How much will I get back?",
+  "reply": "Hi Tom. Yes, you're inside 30 days. Refund: 38.05 USD (6.95 USD label fee). 5 to 7 business days after it reaches us.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R57",
+  "set": "prod",
+  "order_id": "NW-4156",
+  "message": "Can I still return the velvet cushion set from order NW-4156? I changed my mind.",
+  "reply": "Hi Ana, I'm sorry, but order NW-4156 was delivered on 2026-09-18, which is more than 30 days ago, so the Velvet cushion set can no longer be returned. If something is wrong with the item itself, reply with a photo and we will take a look.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R58",
+  "set": "prod",
+  "order_id": "NW-4157",
+  "message": "The glass storage jars in order NW-4157 arrived cracked. I have a photo. What can you do?",
+  "reply": "Hi Ken. Sorry about that. Send the photo; we'll refund 32.50 USD in full or replace it, your choice. Keep the item.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R59",
+  "set": "prod",
+  "order_id": "NW-4158",
+  "message": "Please cancel order NW-4158, I ordered the wrong rattan laundry basket.",
+  "reply": "Hi Sara, done: order NW-4158 for the Rattan laundry basket had not shipped yet, so I have cancelled it. The full 49.00 USD goes back to your original payment method.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R60",
+  "set": "prod",
+  "order_id": "NW-4159",
+  "message": "I need to cancel order NW-4159 for the cast-iron skillet right away.",
+  "reply": "Hi Luis, order NW-4159 has already shipped, so I can't cancel it. When it arrives you can return the Cast-iron skillet within 30 days; the refund is the price with free return shipping.",
+  "label": "fail",
+  "defect": "subtle_amount"
+ },
+ {
+  "id": "R61",
+  "set": "prod",
+  "order_id": "NW-4160",
+  "message": "Hi, where is my order NW-4160? It has been a while.",
+  "reply": "Hi Maya, order NW-4160 (Oak side table) has shipped. The carrier shows it in transit, last scan at the regional hub. I can't give an exact delivery date, but the tracking link in your shipping email updates as it moves.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R62",
+  "set": "prod",
+  "order_id": "NW-4161",
+  "message": "I want to return the linen duvet cover from order NW-4161. It does not fit my room. How much will I get back?",
+  "reply": "Hi Omar. Yes, you're inside 30 days. Refund: 82.55 USD (6.95 USD label fee). 5 to 7 business days after it reaches us.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R63",
+  "set": "prod",
+  "order_id": "NW-4162",
+  "message": "Can I still return the ceramic table lamp from order NW-4162? I changed my mind.",
+  "reply": "Hi Lena, I'm sorry, but order NW-4162 was delivered on 2026-09-18, which is more than 30 days ago, so the Ceramic table lamp can no longer be returned. If something is wrong with the item itself, reply with a photo and we will take a look.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R64",
+  "set": "prod",
+  "order_id": "NW-4163",
+  "message": "The wool throw blanket in order NW-4163 arrived cracked. I have a photo. What can you do?",
+  "reply": "Hi Jonas, I'm sorry the Wool throw blanket arrived cracked. Please reply with the photo, and we will send a replacement or a full refund of 72.00 USD, whichever you prefer. Please first ship the item back to us at your own cost; we refund after it arrives.",
+  "label": "fail",
+  "defect": "policy_violation"
+ },
+ {
+  "id": "R65",
+  "set": "prod",
+  "order_id": "NW-4164",
+  "message": "Please cancel order NW-4164, I ordered the wrong bamboo bath mat.",
+  "reply": "Hi Priya, done: order NW-4164 for the Bamboo bath mat had not shipped yet, so I have cancelled it. The full 24.99 USD goes back to your original payment method.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R66",
+  "set": "prod",
+  "order_id": "NW-4165",
+  "message": "I need to cancel order NW-4165 for the walnut cutting board right away.",
+  "reply": "Hi Tom. Too late to cancel, NW-4165 has shipped. Return it within 30 days of delivery instead (6.95 USD label fee).",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R67",
+  "set": "prod",
+  "order_id": "NW-4166",
+  "message": "Hi, where is my order NW-4166? It has been a while.",
+  "reply": "Hi Ana, order NW-4166 (Velvet cushion set) has shipped. The carrier shows it in transit, last scan at the regional hub. I can't give an exact delivery date, but the tracking link in your shipping email updates as it moves.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R68",
+  "set": "prod",
+  "order_id": "NW-4167",
+  "message": "I want to return the glass storage jars from order NW-4167. It does not fit my room. How much will I get back?",
+  "reply": "Hi Ken. Yes, you're inside 30 days. Refund: 25.55 USD (6.95 USD label fee). 5 to 7 business days after it reaches us.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R69",
+  "set": "prod",
+  "order_id": "NW-4168",
+  "message": "Can I still return the rattan laundry basket from order NW-4168? I changed my mind.",
+  "reply": "Hi Sara, I'm sorry, but order NW-4168 was delivered on 2026-09-18, which is more than 30 days ago, so the Rattan laundry basket can no longer be returned. If something is wrong with the item itself, reply with a photo and we will take a look.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R70",
+  "set": "prod",
+  "order_id": "NW-4169",
+  "message": "The cast-iron skillet in order NW-4169 arrived cracked. I have a photo. What can you do?",
+  "reply": "Hi Luis. Sorry about that. Send the photo; we'll refund 39.95 USD in full or replace it, your choice. Keep the item.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R71",
+  "set": "prod",
+  "order_id": "NW-4170",
+  "message": "Please cancel order NW-4170, I ordered the wrong oak side table.",
+  "reply": "Hi Maya, done: order NW-4170 for the Oak side table had not shipped yet, so I have cancelled it. The full 129.00 USD goes back to your original payment method.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R72",
+  "set": "prod",
+  "order_id": "NW-4171",
+  "message": "I need to cancel order NW-4171 for the linen duvet cover right away.",
+  "reply": "Hi Omar, order NW-4171 has already shipped, so I can't cancel it. When it arrives you can return the Linen duvet cover within 30 days; the refund is the price with free return shipping.",
+  "label": "fail",
+  "defect": "subtle_amount"
+ },
+ {
+  "id": "R73",
+  "set": "prod",
+  "order_id": "NW-4172",
+  "message": "Hi, where is my order NW-4172? It has been a while.",
+  "reply": "Hi Lena, order NW-4172 (Ceramic table lamp) has shipped. The carrier shows it in transit, last scan at the regional hub. I can't give an exact delivery date, but the tracking link in your shipping email updates as it moves. It will be with you by Thursday at the latest.",
+  "label": "fail",
+  "defect": "invented_promise"
+ },
+ {
+  "id": "R74",
+  "set": "prod",
+  "order_id": "NW-4173",
+  "message": "I want to return the wool throw blanket from order NW-4173. It does not fit my room. How much will I get back?",
+  "reply": "Hi Jonas. Yes, you're inside 30 days. Refund: 65.05 USD (6.95 USD label fee). 5 to 7 business days after it reaches us.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R75",
+  "set": "prod",
+  "order_id": "NW-4174",
+  "message": "Can I still return the bamboo bath mat from order NW-4174? I changed my mind.",
+  "reply": "Hi Priya, I'm sorry, but order NW-4174 was delivered on 2026-09-18, which is more than 30 days ago, so the Glass storage jars can no longer be returned. If something is wrong with the item itself, reply with a photo and we will take a look.",
+  "label": "fail",
+  "defect": "wrong_fact"
+ },
+ {
+  "id": "R76",
+  "set": "prod",
+  "order_id": "NW-4175",
+  "message": "The walnut cutting board in order NW-4175 arrived cracked. I have a photo. What can you do?",
+  "reply": "Hi Tom. Sorry about that. Send the photo; we'll refund 45.00 USD in full or replace it, your choice. Keep the item.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R77",
+  "set": "prod",
+  "order_id": "NW-4176",
+  "message": "Please cancel order NW-4176, I ordered the wrong velvet cushion set.",
+  "reply": "Hi Ana, done: order NW-4176 for the Velvet cushion set had not shipped yet, so I have cancelled it. The full 58.00 USD goes back to your original payment method.",
+  "label": "pass",
+  "defect": null
+ },
+ {
+  "id": "R78",
+  "set": "prod",
+  "order_id": "NW-4177",
+  "message": "I need to cancel order NW-4177 for the glass storage jars right away.",
+  "reply": "Hi Ken, order NW-4177 has already shipped, so I can't cancel it. When it arrives you can return the Glass storage jars within 30 days; the refund is the price minus a 6.95 USD return label fee. It will be with you by Thursday at the latest.",
+  "label": "fail",
+  "defect": "invented_promise"
+ },
+ {
+  "id": "R79",
+  "set": "prod",
+  "order_id": "NW-4178",
+  "message": "Hi, where is my order NW-4178? It has been a while.",
+  "reply": "Hi Sara, order NW-4178 (Rattan laundry basket) has shipped. The carrier shows it in transit, last scan at the regional hub. I can't give an exact delivery date, but the tracking link in your shipping email updates as it moves. The money is usually back on your card the same day.",
+  "label": "fail",
+  "defect": "wrong_timeline"
+ },
+ {
+  "id": "R80",
+  "set": "prod",
+  "order_id": "NW-4179",
+  "message": "I want to return the cast-iron skillet from order NW-4179. It does not fit my room. How much will I get back?",
+  "reply": "Hi Luis, yes, the Cast-iron skillet from order NW-4179 is within our 30-day return window. Your refund will be 39.95 USD, the full price. It reaches your card 5 to 7 business days after the return arrives.",
+  "label": "fail",
+  "defect": "wrong_amount"
+ }
+]

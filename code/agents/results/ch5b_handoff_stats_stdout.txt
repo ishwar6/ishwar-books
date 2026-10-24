@@ -1,0 +1,29 @@
+== Share of the 6 suppliers whose exact figure appears somewhere in the hop's text (mean of 3 runs) ==
+condition   fact     researcher     analyst  risk revie      writer      editor
+free        price          100%        100%          6%          6%          6%
+free        days           100%        100%         44%         44%         39%
+free        moq            100%         83%         39%         39%         33%
+free+ver    price          100%         94%        100%         67%        100%
+free+ver    days           100%        100%        100%         67%         94%
+free+ver    moq            100%        100%        100%         67%         50%
+schema      price          100%        100%        100%        100%        100%
+schema      days           100%        100%        100%        100%        100%
+schema      moq            100%        100%        100%        100%        100%
+schema+ver  price          100%        100%        100%        100%        100%
+schema+ver  days            67%         67%         67%         83%         83%
+schema+ver  moq            100%        100%        100%        100%        100%
+
+== Editor word counts (limit 250) ==
+  free        whole hand-off [264, 615, 437] words
+  free+ver    whole hand-off [413, 528, 340] words
+  schema      whole hand-off [396, 382, 372] words; memo field alone [190, 193, 177] words
+  schema+ver  whole hand-off [625, 388, 671] words; memo field alone [207, 198, 180] words
+
+== Verifier flags ==
+  free+ver    202 problems flagged over 15 hops (15 hops redone); 25 flags call the item correct or not an error
+    e.g. "Kestrel Cookware: Missing that samples are sent free only for orders above the minimum (hand-off states sample..."
+  schema+ver  212 problems flagged over 15 hops (14 hops redone); 0 flags call the item correct or not an error
+
+== Schema drift: hops whose supplier table no longer has plain numbers in the three numeric fields ==
+  schema      0 of 15 hops
+  schema+ver  5 of 15 hops (first: run 3, researcher)

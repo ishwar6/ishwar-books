@@ -1,0 +1,48 @@
+Model gpt-5-mini, reasoning effort low. Gold picks: S05, S09, S12. 5 runs per arm.
+
+single run 1: pages read 24/24, picks S05,S09,S12    gold 3/3  rule-breaking 0  numbers ok 3/3  missed traps: S19 audit
+               25 model calls,  47 tool calls, input 394,683 tok, output  9,442 tok, peak context 18,483 tok,   109 s, $0.118
+seq    run 1: pages read  4/24, picks S04,S01,S02    gold 0/3  rule-breaking 0  numbers ok 3/3  missed traps: S08 not wrongly rejected
+               15 model calls,  14 tool calls, input  48,195 tok, output  2,231 tok, peak context  5,627 tok,    30 s, $0.017
+multi  run 1: pages read 24/24, picks S05,S09,S12    gold 3/3  rule-breaking 0  numbers ok 3/3  missed traps: none
+               65 model calls,  75 tool calls, input 390,893 tok, output 15,412 tok, peak context 10,000 tok,    89 s, $0.129
+              4 subagents in parallel, each 32 to 37 s; the lead waits for the slowest
+single run 2: pages read  5/24, picks S05,S04,S01    gold 1/3  rule-breaking 0  numbers ok 3/3  missed traps: S11 MOQ, S07 delivery, S19 audit
+               18 model calls,  17 tool calls, input  68,020 tok, output  1,413 tok, peak context  6,728 tok,    39 s, $0.020
+seq    run 2: pages read  4/24, picks S04,S01,S02    gold 0/3  rule-breaking 0  numbers ok 3/3  missed traps: S11 MOQ, S07 delivery, S19 audit
+               15 model calls,  14 tool calls, input  54,539 tok, output  1,868 tok, peak context  5,700 tok,    26 s, $0.017
+multi  run 2: pages read 24/24, picks -              gold 0/3  rule-breaking 0  numbers ok 0/3  missed traps: S08 not wrongly rejected
+               41 model calls,  75 tool calls, input 236,755 tok, output  9,403 tok, peak context  8,609 tok,    65 s, $0.078
+              4 subagents in parallel, each 18 to 23 s; the lead waits for the slowest
+single run 3: pages read  7/24, picks S05,S04,S01    gold 1/3  rule-breaking 0  numbers ok 3/3  missed traps: S11 MOQ
+               19 model calls,  23 tool calls, input  93,541 tok, output  2,822 tok, peak context  8,878 tok,    42 s, $0.029
+seq    run 3: pages read  5/24, picks S04,S01,S02    gold 0/3  rule-breaking 0  numbers ok 3/3  missed traps: S11 MOQ, S07 delivery, S19 audit
+               18 model calls,  17 tool calls, input  67,837 tok, output  2,444 tok, peak context  6,696 tok,    31 s, $0.022
+multi  run 3: pages read 24/24, picks S05,S09,S12    gold 3/3  rule-breaking 0  numbers ok 3/3  missed traps: none
+               55 model calls,  70 tool calls, input 324,015 tok, output 13,546 tok, peak context  8,584 tok,    77 s, $0.108
+              4 subagents in parallel, each 29 to 35 s; the lead waits for the slowest
+single run 4: pages read 12/24, picks S05,S09,S12    gold 3/3  rule-breaking 0  numbers ok 2/3  missed traps: S19 audit, S08 not wrongly rejected
+               23 model calls,  29 tool calls, input 132,729 tok, output  4,110 tok, peak context 11,643 tok,    68 s, $0.041
+seq    run 4: pages read  5/24, picks S05,S04,S01    gold 1/3  rule-breaking 0  numbers ok 3/3  missed traps: S11 MOQ, S07 delivery, S19 audit
+               18 model calls,  17 tool calls, input  77,537 tok, output  2,190 tok, peak context  6,725 tok,    37 s, $0.024
+multi  run 4: pages read 24/24, picks S05,S09,S12    gold 3/3  rule-breaking 0  numbers ok 3/3  missed traps: none
+               55 model calls,  70 tool calls, input 283,537 tok, output 14,641 tok, peak context  8,190 tok,    67 s, $0.100
+              4 subagents in parallel, each 26 to 33 s; the lead waits for the slowest
+single run 5: pages read 24/24, picks -              gold 0/3  rule-breaking 0  numbers ok 0/3  missed traps: S03 open recall, S11 MOQ, S07 delivery, S19 audit
+                6 model calls,  44 tool calls, input  55,684 tok, output  3,645 tok, peak context 18,101 tok,    43 s, $0.021
+seq    run 5: pages read  5/24, picks S04,S01,S02    gold 0/3  rule-breaking 0  numbers ok 3/3  missed traps: S11 MOQ, S07 delivery, S19 audit
+               18 model calls,  17 tool calls, input  67,520 tok, output  2,055 tok, peak context  6,709 tok,    32 s, $0.021
+multi  run 5: pages read 24/24, picks S05,S09,S12    gold 3/3  rule-breaking 0  numbers ok 3/3  missed traps: S08 not wrongly rejected
+               47 model calls,  62 tool calls, input 222,170 tok, output 15,542 tok, peak context  9,429 tok,    83 s, $0.087
+              4 subagents in parallel, each 16 to 33 s; the lead waits for the slowest
+
+Averages over runs (mean; min to max):
+single pages read 14.4/24 (5 to 24), gold picks 1.6/3 (0 to 3), numbers ok 2.2/3, rule-breaking picks 0.0
+       input 148,931 tok (55,684 to 394,683), output 4,286 tok, 18 calls, peak context 12,767 tok, 60 s (39 to 109), $0.046 per run
+seq    pages read 4.6/24 (4 to 5), gold picks 0.2/3 (0 to 1), numbers ok 3.0/3, rule-breaking picks 0.0
+       input 63,126 tok (48,195 to 77,537), output 2,158 tok, 17 calls, peak context 6,291 tok, 31 s (26 to 37), $0.020 per run
+multi  pages read 24.0/24 (24 to 24), gold picks 2.4/3 (0 to 3), numbers ok 2.4/3, rule-breaking picks 0.0
+       input 291,474 tok (222,170 to 390,893), output 13,709 tok, 53 calls, peak context 8,962 tok, 76 s (65 to 89), $0.100 per run
+multi / single: total tokens x1.99, time x1.26, cost x2.19
+multi / seq: total tokens x4.67, time x2.44, cost x4.99
+Total API spend for this script: $0.83

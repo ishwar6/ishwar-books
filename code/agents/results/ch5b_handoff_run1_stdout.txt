@@ -1,0 +1,23 @@
+== The telephone game: 5 agents in a chain, 30 gold facts, gpt-5-mini, reasoning_effort=minimal ==
+probe calibration on the source pages themselves: kept 30/30, lost 0, distorted 0 []
+
+-- free, run 1: 10 calls, 37,290 tokens, $0.0333 --
+  researcher     1874 words  kept 30/30  lost  0  distorted 0
+  analyst        1583 words  kept 29/30  lost  1  distorted 0
+  risk reviewer  1746 words  kept 13/30  lost 17  distorted 0
+  writer         2020 words  kept 15/30  lost 15  distorted 0
+  editor          264 words  kept 11/30  lost 19  distorted 0
+
+-- free+ver, run 1: 20 calls, 90,982 tokens, $0.0764 --
+  researcher     1646 words  kept 30/30  lost  0  distorted 0  verifier flagged 11
+  analyst        2018 words  kept 30/30  lost  0  distorted 0  verifier flagged 19
+  risk reviewer  2056 words  kept 30/30  lost  0  distorted 0  verifier flagged 6
+  writer         2292 words  kept 29/30  lost  1  distorted 0  verifier flagged 20
+  editor          413 words  kept 27/30  lost  3  distorted 0  verifier flagged 19
+
+-- schema, run 1: 10 calls, 17,840 tokens, $0.0168 --
+  researcher      368 words  kept 30/30  lost  0  distorted 0
+  analyst         428 words  kept 30/30  lost  0  distorted 0
+  risk reviewer   402 words  kept 30/30  lost  0  distorted 0
+  writer          430 words  kept 30/30  lost  0  distorted 0
+  editor          396 words  kept 30/30  lost  0  distorted 0

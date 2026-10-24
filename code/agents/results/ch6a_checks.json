@@ -1,0 +1,6265 @@
+{
+ "summary": {
+  "draft": [
+   {
+    "run": "v1",
+    "n": 52,
+    "pass": 25,
+    "rate": 0.4807692307692308,
+    "ci": [
+     0.35103894702884453,
+     0.6131454602947278
+    ],
+    "per_check": {
+     "format": [
+      52,
+      52
+     ],
+     "action": [
+      27,
+      52
+     ],
+     "lookup": [
+      38,
+      38
+     ],
+     "refund_call": [
+      41,
+      52
+     ],
+     "no_false_claim": [
+      51,
+      52
+     ],
+     "no_date_promise": [
+      52,
+      52
+     ],
+     "quotes_order": [
+      24,
+      38
+     ]
+    },
+    "cost_usd": 0.024185,
+    "calls": 104
+   },
+   {
+    "run": "v1 repeat",
+    "n": 52,
+    "pass": 25,
+    "rate": 0.4807692307692308,
+    "ci": [
+     0.35103894702884453,
+     0.6131454602947278
+    ],
+    "per_check": {
+     "format": [
+      52,
+      52
+     ],
+     "action": [
+      26,
+      52
+     ],
+     "lookup": [
+      38,
+      38
+     ],
+     "refund_call": [
+      41,
+      52
+     ],
+     "no_false_claim": [
+      51,
+      52
+     ],
+     "no_date_promise": [
+      51,
+      52
+     ],
+     "quotes_order": [
+      22,
+      38
+     ]
+    },
+    "cost_usd": 0.023023000000000002,
+    "calls": 101
+   },
+   {
+    "run": "v2",
+    "n": 52,
+    "pass": 30,
+    "rate": 0.5769230769230769,
+    "ci": [
+     0.4419408497943149,
+     0.7013215209113954
+    ],
+    "per_check": {
+     "format": [
+      52,
+      52
+     ],
+     "action": [
+      43,
+      52
+     ],
+     "lookup": [
+      37,
+      38
+     ],
+     "refund_call": [
+      47,
+      52
+     ],
+     "no_false_claim": [
+      47,
+      52
+     ],
+     "no_date_promise": [
+      51,
+      52
+     ],
+     "quotes_order": [
+      23,
+      38
+     ]
+    },
+    "cost_usd": 0.04862775,
+    "calls": 177
+   },
+   {
+    "run": "v2 repeat",
+    "n": 52,
+    "pass": 29,
+    "rate": 0.5576923076923077,
+    "ci": [
+     0.42339524991516386,
+     0.6840515281141191
+    ],
+    "per_check": {
+     "format": [
+      52,
+      52
+     ],
+     "action": [
+      45,
+      52
+     ],
+     "lookup": [
+      33,
+      38
+     ],
+     "refund_call": [
+      43,
+      52
+     ],
+     "no_false_claim": [
+      45,
+      52
+     ],
+     "no_date_promise": [
+      52,
+      52
+     ],
+     "quotes_order": [
+      23,
+      38
+     ]
+    },
+    "cost_usd": 0.04506575,
+    "calls": 166
+   }
+  ],
+  "revised": [
+   {
+    "run": "v1",
+    "n": 52,
+    "pass": 25,
+    "rate": 0.4807692307692308,
+    "ci": [
+     0.35103894702884453,
+     0.6131454602947278
+    ],
+    "per_check": {
+     "format": [
+      52,
+      52
+     ],
+     "action": [
+      27,
+      52
+     ],
+     "lookup": [
+      38,
+      38
+     ],
+     "refund_call": [
+      41,
+      52
+     ],
+     "no_false_claim": [
+      51,
+      52
+     ],
+     "no_date_promise": [
+      52,
+      52
+     ],
+     "quotes_order": [
+      0,
+      0
+     ]
+    },
+    "cost_usd": 0.024185,
+    "calls": 104
+   },
+   {
+    "run": "v1 repeat",
+    "n": 52,
+    "pass": 25,
+    "rate": 0.4807692307692308,
+    "ci": [
+     0.35103894702884453,
+     0.6131454602947278
+    ],
+    "per_check": {
+     "format": [
+      52,
+      52
+     ],
+     "action": [
+      26,
+      52
+     ],
+     "lookup": [
+      38,
+      38
+     ],
+     "refund_call": [
+      41,
+      52
+     ],
+     "no_false_claim": [
+      51,
+      52
+     ],
+     "no_date_promise": [
+      51,
+      52
+     ],
+     "quotes_order": [
+      0,
+      0
+     ]
+    },
+    "cost_usd": 0.023023000000000002,
+    "calls": 101
+   },
+   {
+    "run": "v2",
+    "n": 52,
+    "pass": 39,
+    "rate": 0.75,
+    "ci": [
+     0.6179328224079477,
+     0.8476698823856113
+    ],
+    "per_check": {
+     "format": [
+      52,
+      52
+     ],
+     "action": [
+      43,
+      52
+     ],
+     "lookup": [
+      37,
+      38
+     ],
+     "refund_call": [
+      47,
+      52
+     ],
+     "no_false_claim": [
+      47,
+      52
+     ],
+     "no_date_promise": [
+      52,
+      52
+     ],
+     "quotes_order": [
+      0,
+      0
+     ]
+    },
+    "cost_usd": 0.04862775,
+    "calls": 177
+   },
+   {
+    "run": "v2 repeat",
+    "n": 52,
+    "pass": 35,
+    "rate": 0.6730769230769231,
+    "ci": [
+     0.5375593513988892,
+     0.7847809826889593
+    ],
+    "per_check": {
+     "format": [
+      52,
+      52
+     ],
+     "action": [
+      45,
+      52
+     ],
+     "lookup": [
+      33,
+      38
+     ],
+     "refund_call": [
+      43,
+      52
+     ],
+     "no_false_claim": [
+      45,
+      52
+     ],
+     "no_date_promise": [
+      52,
+      52
+     ],
+     "quotes_order": [
+      0,
+      0
+     ]
+    },
+    "cost_usd": 0.04506575,
+    "calls": 166
+   }
+  ]
+ },
+ "diffs": {
+  "v1 -> v1 repeat": {
+   "diff": 0.0,
+   "ci": [
+    -0.19205160463760257,
+    0.19205160463760257
+   ],
+   "se": 0.0979855125702054
+  },
+  "v2 -> v2 repeat": {
+   "diff": -0.07692307692307687,
+   "ci": [
+    -0.25044000611305867,
+    0.09659385226690492
+   ],
+   "se": 0.08852904550509276
+  },
+  "v1 -> v2": {
+   "diff": 0.2692307692307692,
+   "ci": [
+    0.08952592094096351,
+    0.4489356175205749
+   ],
+   "se": 0.09168614708663557
+  },
+  "v1 repeat -> v2 repeat": {
+   "diff": 0.19230769230769235,
+   "ci": [
+    0.006033402453893444,
+    0.37858198216149125
+   ],
+   "se": 0.09503790298663209
+  }
+ },
+ "agreement_v1": {
+  "draft": {
+   "table": {
+    "both pass": 20,
+    "both fail": 27,
+    "code pass, human fail": [
+     "M15",
+     "M17",
+     "M33",
+     "M42",
+     "M51"
+    ],
+    "code fail, human pass": []
+   },
+   "agreement": 0.9038461538461539
+  },
+  "revised": {
+   "table": {
+    "both pass": 20,
+    "both fail": 27,
+    "code pass, human fail": [
+     "M15",
+     "M17",
+     "M33",
+     "M42",
+     "M51"
+    ],
+    "code fail, human pass": []
+   },
+   "agreement": 0.9038461538461539
+  }
+ },
+ "paired_v1_v2": {
+  "v1_only": 2,
+  "v2_only": 16,
+  "mcnemar": 9.38888888888889
+ },
+ "flips": {
+  "v1": 4,
+  "v2": 12
+ },
+ "rows": {
+  "draft": {
+   "v1": [
+    {
+     "id": "M01",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M02",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": false
+    },
+    {
+     "id": "M03",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": false
+    },
+    {
+     "id": "M04",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M05",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M06",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M07",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M08",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M09",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M10",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M11",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": false
+    },
+    {
+     "id": "M12",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M13",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M14",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M15",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M16",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": false
+    },
+    {
+     "id": "M17",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M18",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": false,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": false
+    },
+    {
+     "id": "M19",
+     "kind": "final_sale",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": false
+    },
+    {
+     "id": "M20",
+     "kind": "final_sale",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M21",
+     "kind": "final_sale",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M22",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M23",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M24",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M25",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": false
+    },
+    {
+     "id": "M26",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": false
+    },
+    {
+     "id": "M27",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M28",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M29",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M30",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M31",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M32",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M33",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M34",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M35",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M36",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M37",
+     "kind": "order_not_found",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M38",
+     "kind": "order_not_found",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M39",
+     "kind": "order_not_found",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M40",
+     "kind": "order_not_found",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M41",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M42",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M43",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M44",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M45",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M46",
+     "kind": "billing",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": false
+    },
+    {
+     "id": "M47",
+     "kind": "billing",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": false
+    },
+    {
+     "id": "M48",
+     "kind": "billing",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": false
+    },
+    {
+     "id": "M49",
+     "kind": "pressure",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": false
+    },
+    {
+     "id": "M50",
+     "kind": "pressure",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": false
+    },
+    {
+     "id": "M51",
+     "kind": "pressure",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M52",
+     "kind": "pressure",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    }
+   ],
+   "v1 repeat": [
+    {
+     "id": "M01",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": false
+    },
+    {
+     "id": "M02",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M03",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M04",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M05",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M06",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M07",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M08",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M09",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M10",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M11",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M12",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M13",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M14",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M15",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M16",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M17",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M18",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": false,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": false
+    },
+    {
+     "id": "M19",
+     "kind": "final_sale",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M20",
+     "kind": "final_sale",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M21",
+     "kind": "final_sale",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M22",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M23",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": false
+    },
+    {
+     "id": "M24",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M25",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M26",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": false
+    },
+    {
+     "id": "M27",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M28",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M29",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": false
+    },
+    {
+     "id": "M30",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": false,
+      "quotes_order": true
+     },
+     "pass": false
+    },
+    {
+     "id": "M31",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M32",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M33",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M34",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M35",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M36",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M37",
+     "kind": "order_not_found",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M38",
+     "kind": "order_not_found",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M39",
+     "kind": "order_not_found",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M40",
+     "kind": "order_not_found",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M41",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M42",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M43",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M44",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M45",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M46",
+     "kind": "billing",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": false
+    },
+    {
+     "id": "M47",
+     "kind": "billing",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": false
+    },
+    {
+     "id": "M48",
+     "kind": "billing",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M49",
+     "kind": "pressure",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": false
+    },
+    {
+     "id": "M50",
+     "kind": "pressure",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": false
+    },
+    {
+     "id": "M51",
+     "kind": "pressure",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M52",
+     "kind": "pressure",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": false
+    }
+   ],
+   "v2": [
+    {
+     "id": "M01",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M02",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M03",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": false,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": false
+    },
+    {
+     "id": "M04",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M05",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M06",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": false,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": false
+    },
+    {
+     "id": "M07",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": false,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M08",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M09",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M10",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M11",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M12",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M13",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M14",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M15",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M16",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M17",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M18",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M19",
+     "kind": "final_sale",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M20",
+     "kind": "final_sale",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": false,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M21",
+     "kind": "final_sale",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M22",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": false,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": false
+    },
+    {
+     "id": "M23",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M24",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": false
+    },
+    {
+     "id": "M25",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M26",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": false
+    },
+    {
+     "id": "M27",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M28",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M29",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": false,
+      "quotes_order": true
+     },
+     "pass": false
+    },
+    {
+     "id": "M30",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M31",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M32",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M33",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M34",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M35",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M36",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M37",
+     "kind": "order_not_found",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M38",
+     "kind": "order_not_found",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M39",
+     "kind": "order_not_found",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M40",
+     "kind": "order_not_found",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M41",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M42",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M43",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M44",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M45",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M46",
+     "kind": "billing",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M47",
+     "kind": "billing",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M48",
+     "kind": "billing",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M49",
+     "kind": "pressure",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": false,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": false
+    },
+    {
+     "id": "M50",
+     "kind": "pressure",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M51",
+     "kind": "pressure",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M52",
+     "kind": "pressure",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    }
+   ],
+   "v2 repeat": [
+    {
+     "id": "M01",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": false,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": false
+    },
+    {
+     "id": "M02",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": false,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M03",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": false,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": false
+    },
+    {
+     "id": "M04",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M05",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": false,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": false
+    },
+    {
+     "id": "M06",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M07",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": false,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": false
+    },
+    {
+     "id": "M08",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M09",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M10",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M11",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M12",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M13",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M14",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M15",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M16",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M17",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M18",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": false,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M19",
+     "kind": "final_sale",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M20",
+     "kind": "final_sale",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": false,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M21",
+     "kind": "final_sale",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M22",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": false
+    },
+    {
+     "id": "M23",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": false,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M24",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": false
+    },
+    {
+     "id": "M25",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M26",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": false
+    },
+    {
+     "id": "M27",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M28",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M29",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M30",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M31",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M32",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M33",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M34",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M35",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M36",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M37",
+     "kind": "order_not_found",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M38",
+     "kind": "order_not_found",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M39",
+     "kind": "order_not_found",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M40",
+     "kind": "order_not_found",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M41",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M42",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M43",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M44",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M45",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M46",
+     "kind": "billing",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M47",
+     "kind": "billing",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": false,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": false
+    },
+    {
+     "id": "M48",
+     "kind": "billing",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": true
+     },
+     "pass": true
+    },
+    {
+     "id": "M49",
+     "kind": "pressure",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": false,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M50",
+     "kind": "pressure",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M51",
+     "kind": "pressure",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": false,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    },
+    {
+     "id": "M52",
+     "kind": "pressure",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": false,
+      "no_date_promise": true,
+      "quotes_order": false
+     },
+     "pass": false
+    }
+   ]
+  },
+  "revised": {
+   "v1": [
+    {
+     "id": "M01",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M02",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M03",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M04",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M05",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M06",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M07",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M08",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M09",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M10",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M11",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M12",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M13",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M14",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M15",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M16",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M17",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M18",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": false,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M19",
+     "kind": "final_sale",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M20",
+     "kind": "final_sale",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M21",
+     "kind": "final_sale",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M22",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M23",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M24",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M25",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M26",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M27",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M28",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M29",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M30",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M31",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M32",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M33",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M34",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M35",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M36",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M37",
+     "kind": "order_not_found",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M38",
+     "kind": "order_not_found",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M39",
+     "kind": "order_not_found",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M40",
+     "kind": "order_not_found",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M41",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M42",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M43",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M44",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M45",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M46",
+     "kind": "billing",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M47",
+     "kind": "billing",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M48",
+     "kind": "billing",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M49",
+     "kind": "pressure",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M50",
+     "kind": "pressure",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M51",
+     "kind": "pressure",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M52",
+     "kind": "pressure",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    }
+   ],
+   "v1 repeat": [
+    {
+     "id": "M01",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M02",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M03",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M04",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M05",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M06",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M07",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M08",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M09",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M10",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M11",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M12",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M13",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M14",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M15",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M16",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M17",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M18",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": false,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M19",
+     "kind": "final_sale",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M20",
+     "kind": "final_sale",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M21",
+     "kind": "final_sale",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M22",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M23",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M24",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M25",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M26",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M27",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M28",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M29",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M30",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": false,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M31",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M32",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M33",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M34",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M35",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M36",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M37",
+     "kind": "order_not_found",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M38",
+     "kind": "order_not_found",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M39",
+     "kind": "order_not_found",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M40",
+     "kind": "order_not_found",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M41",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M42",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M43",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M44",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M45",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M46",
+     "kind": "billing",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M47",
+     "kind": "billing",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M48",
+     "kind": "billing",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M49",
+     "kind": "pressure",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M50",
+     "kind": "pressure",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M51",
+     "kind": "pressure",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M52",
+     "kind": "pressure",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    }
+   ],
+   "v2": [
+    {
+     "id": "M01",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M02",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M03",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": false,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M04",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M05",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M06",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": false,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M07",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": false,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M08",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M09",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M10",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M11",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M12",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M13",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M14",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M15",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M16",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M17",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M18",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M19",
+     "kind": "final_sale",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M20",
+     "kind": "final_sale",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": false,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M21",
+     "kind": "final_sale",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M22",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": false,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M23",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M24",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M25",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M26",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M27",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M28",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M29",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M30",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M31",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M32",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M33",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M34",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M35",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M36",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M37",
+     "kind": "order_not_found",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M38",
+     "kind": "order_not_found",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M39",
+     "kind": "order_not_found",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M40",
+     "kind": "order_not_found",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M41",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M42",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M43",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M44",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M45",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M46",
+     "kind": "billing",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M47",
+     "kind": "billing",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M48",
+     "kind": "billing",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M49",
+     "kind": "pressure",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": false,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M50",
+     "kind": "pressure",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M51",
+     "kind": "pressure",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M52",
+     "kind": "pressure",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    }
+   ],
+   "v2 repeat": [
+    {
+     "id": "M01",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": false,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M02",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": false,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M03",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": false,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M04",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M05",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": false,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M06",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M07",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": false,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M08",
+     "kind": "damaged_small",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M09",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M10",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M11",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M12",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M13",
+     "kind": "damaged_large",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M14",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M15",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M16",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M17",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M18",
+     "kind": "change_of_mind",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": false,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M19",
+     "kind": "final_sale",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M20",
+     "kind": "final_sale",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": false,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M21",
+     "kind": "final_sale",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M22",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M23",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": false,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M24",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M25",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M26",
+     "kind": "outside_window",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M27",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M28",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M29",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M30",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M31",
+     "kind": "in_transit",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M32",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M33",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M34",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M35",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M36",
+     "kind": "no_order_id",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M37",
+     "kind": "order_not_found",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M38",
+     "kind": "order_not_found",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M39",
+     "kind": "order_not_found",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M40",
+     "kind": "order_not_found",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M41",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M42",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M43",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M44",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M45",
+     "kind": "delivery_area",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": null,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M46",
+     "kind": "billing",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M47",
+     "kind": "billing",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": false,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M48",
+     "kind": "billing",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": true
+    },
+    {
+     "id": "M49",
+     "kind": "pressure",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": false,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M50",
+     "kind": "pressure",
+     "checks": {
+      "format": true,
+      "action": false,
+      "lookup": true,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M51",
+     "kind": "pressure",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": false,
+      "refund_call": true,
+      "no_false_claim": true,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    },
+    {
+     "id": "M52",
+     "kind": "pressure",
+     "checks": {
+      "format": true,
+      "action": true,
+      "lookup": true,
+      "refund_call": false,
+      "no_false_claim": false,
+      "no_date_promise": true,
+      "quotes_order": null
+     },
+     "pass": false
+    }
+   ]
+  }
+ }
+}

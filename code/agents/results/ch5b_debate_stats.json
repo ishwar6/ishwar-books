@@ -1,0 +1,78 @@
+{
+ "terse": {
+  "debate1_vs_vote6": {
+   "wins_a": 6,
+   "wins_b": 0,
+   "p": 0.03125
+  },
+  "debate2_vs_vote9": {
+   "wins_a": 8,
+   "wins_b": 1,
+   "p": 0.0390625
+  },
+  "debate1_vs_review1": {
+   "wins_a": 5,
+   "wins_b": 3,
+   "p": 0.7265625
+  },
+  "debate2_vs_review2": {
+   "wins_a": 15,
+   "wins_b": 3,
+   "p": 0.007537841796875
+  },
+  "flips_debate": {
+   "kept_wrong": 35,
+   "wrong_to_right": 44,
+   "kept_right": 88,
+   "right_to_wrong": 13
+  },
+  "flips_self-review": {
+   "kept_wrong": 72,
+   "wrong_to_right": 23,
+   "kept_right": 61,
+   "right_to_wrong": 24
+  },
+  "minority_right": 0,
+  "minority_conformed": 0,
+  "minority_wrong": 5,
+  "minority_wrong_fixed": 4
+ },
+ "brief": {
+  "debate1_vs_vote6": {
+   "wins_a": 0,
+   "wins_b": 2,
+   "p": 0.5
+  },
+  "debate2_vs_vote9": {
+   "wins_a": 1,
+   "wins_b": 1,
+   "p": 1.0
+  },
+  "debate1_vs_review1": {
+   "wins_a": 1,
+   "wins_b": 3,
+   "p": 0.625
+  },
+  "debate2_vs_review2": {
+   "wins_a": 3,
+   "wins_b": 2,
+   "p": 1.0
+  },
+  "flips_debate": {
+   "kept_wrong": 19,
+   "wrong_to_right": 16,
+   "kept_right": 142,
+   "right_to_wrong": 3
+  },
+  "flips_self-review": {
+   "kept_wrong": 32,
+   "wrong_to_right": 10,
+   "kept_right": 135,
+   "right_to_wrong": 3
+  },
+  "minority_right": 1,
+  "minority_conformed": 0,
+  "minority_wrong": 12,
+  "minority_wrong_fixed": 12
+ }
+}

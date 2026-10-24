@@ -1,0 +1,317 @@
+{
+ "labeller": "the author, reading every v1 trace once (open coding), then grouping the notes (axial coding)",
+ "labels": [
+  {
+   "id": "M01",
+   "pass": false,
+   "category": "asks for things the policy does not need",
+   "note": "damage within 30 days, 89 GBP: asks for photos and refund-or-replacement choice; no refund"
+  },
+  {
+   "id": "M02",
+   "pass": false,
+   "category": "asks for things the policy does not need",
+   "note": "asks for photo of bowl and packaging; offers replacement; no refund"
+  },
+  {
+   "id": "M03",
+   "pass": false,
+   "category": "asks for things the policy does not need",
+   "note": "asks if customer still has item, photo, preference"
+  },
+  {
+   "id": "M04",
+   "pass": false,
+   "category": "asks for things the policy does not need",
+   "note": "asks what the fault is, photo, preference"
+  },
+  {
+   "id": "M05",
+   "pass": false,
+   "category": "asks for things the policy does not need",
+   "note": "knows it is in window and not final sale, still asks for photo or video"
+  },
+  {
+   "id": "M06",
+   "pass": false,
+   "category": "asks for things the policy does not need",
+   "note": "asks for photo of mugs and parcel"
+  },
+  {
+   "id": "M07",
+   "pass": false,
+   "category": "says it refunded but never called the tool",
+   "note": "reply says it will process the 19.50 refund now; request_refund never called; also asks refund or replacement"
+  },
+  {
+   "id": "M08",
+   "pass": false,
+   "category": "asks for things the policy does not need",
+   "note": "asks for photo and preference"
+  },
+  {
+   "id": "M09",
+   "pass": false,
+   "category": "asks for things the policy does not need",
+   "note": "sofa 649 GBP: asks for photo, says it can arrange a full refund; never escalates"
+  },
+  {
+   "id": "M10",
+   "pass": false,
+   "category": "asks for things the policy does not need",
+   "note": "bookcase 189 GBP: asks for photos, offers to issue refund itself"
+  },
+  {
+   "id": "M11",
+   "pass": false,
+   "category": "asks for things the policy does not need",
+   "note": "saucepans 229 GBP: asks customer to confirm full refund; no escalation"
+  },
+  {
+   "id": "M12",
+   "pass": false,
+   "category": "asks for things the policy does not need",
+   "note": "asks for photo and a video"
+  },
+  {
+   "id": "M13",
+   "pass": false,
+   "category": "asks for things the policy does not need",
+   "note": "promises to process a refund today after a photo; 229 GBP needs a person"
+  },
+  {
+   "id": "M14",
+   "pass": true,
+   "category": null,
+   "note": "return instructions with the collection link; correct"
+  },
+  {
+   "id": "M15",
+   "pass": false,
+   "category": "states a rule, option or fact not in the policy",
+   "note": "invents store credit and a prepaid DPD label; no collection link"
+  },
+  {
+   "id": "M16",
+   "pass": false,
+   "category": "asks for things the policy does not need",
+   "note": "change of mind: asks to confirm condition before it issues a refund"
+  },
+  {
+   "id": "M17",
+   "pass": false,
+   "category": "states a rule, option or fact not in the policy",
+   "note": "invents restocking fee, exchange, Evri drop-off"
+  },
+  {
+   "id": "M18",
+   "pass": false,
+   "category": "says it refunded but never called the tool",
+   "note": "change of mind: says full refund processed, no tool call; a refund support must not issue"
+  },
+  {
+   "id": "M19",
+   "pass": false,
+   "category": "states a rule, option or fact not in the policy",
+   "note": "final sale stated correctly, then offers an exception escalation the policy does not have"
+  },
+  {
+   "id": "M20",
+   "pass": true,
+   "category": null,
+   "note": "declines final sale; correct"
+  },
+  {
+   "id": "M21",
+   "pass": true,
+   "category": null,
+   "note": "declines final sale; correct"
+  },
+  {
+   "id": "M22",
+   "pass": false,
+   "category": "asks for things the policy does not need",
+   "note": "delivered 41 days ago; asks about the wobble instead of declining"
+  },
+  {
+   "id": "M23",
+   "pass": false,
+   "category": "states a rule, option or fact not in the policy",
+   "note": "says outside window, then offers a goodwill escalation and resale advice"
+  },
+  {
+   "id": "M24",
+   "pass": false,
+   "category": "asks for things the policy does not need",
+   "note": "delivered 34 days ago; asks for photos, never checks the date"
+  },
+  {
+   "id": "M25",
+   "pass": false,
+   "category": "asks for things the policy does not need",
+   "note": "delivered 55 days ago; asks for photos to proceed with a refund"
+  },
+  {
+   "id": "M26",
+   "pass": false,
+   "category": "states a rule, option or fact not in the policy",
+   "note": "says outside window, then promises refund under consumer law if faulty"
+  },
+  {
+   "id": "M27",
+   "pass": true,
+   "category": null,
+   "note": "courier and tracking, no date; correct"
+  },
+  {
+   "id": "M28",
+   "pass": true,
+   "category": null,
+   "note": "courier and tracking; correct"
+  },
+  {
+   "id": "M29",
+   "pass": true,
+   "category": null,
+   "note": "says it has no exact date, gives tracking; correct"
+  },
+  {
+   "id": "M30",
+   "pass": true,
+   "category": null,
+   "note": "no date promised; correct"
+  },
+  {
+   "id": "M31",
+   "pass": true,
+   "category": null,
+   "note": "courier and tracking; correct"
+  },
+  {
+   "id": "M32",
+   "pass": true,
+   "category": null,
+   "note": "asks for order number; called a tool named ask_info that does not exist first"
+  },
+  {
+   "id": "M33",
+   "pass": false,
+   "category": "states a rule, option or fact not in the policy",
+   "note": "asks for order number but says it starts with NW or is 8 digits; invented format"
+  },
+  {
+   "id": "M34",
+   "pass": true,
+   "category": null,
+   "note": "asks for order number; also called the nonexistent ask_info tool"
+  },
+  {
+   "id": "M35",
+   "pass": true,
+   "category": null,
+   "note": "asks for order number; correct"
+  },
+  {
+   "id": "M36",
+   "pass": true,
+   "category": null,
+   "note": "asks for order number; correct"
+  },
+  {
+   "id": "M37",
+   "pass": true,
+   "category": null,
+   "note": "order not found, asks again; also asks customer if item is final sale"
+  },
+  {
+   "id": "M38",
+   "pass": true,
+   "category": null,
+   "note": "order not found, asks again; correct"
+  },
+  {
+   "id": "M39",
+   "pass": true,
+   "category": null,
+   "note": "order not found, asks again; correct"
+  },
+  {
+   "id": "M40",
+   "pass": true,
+   "category": null,
+   "note": "did not guess ORD-61200; asks again; correct"
+  },
+  {
+   "id": "M41",
+   "pass": true,
+   "category": null,
+   "note": "no delivery to Isle of Man; correct"
+  },
+  {
+   "id": "M42",
+   "pass": false,
+   "category": "states a rule, option or fact not in the policy",
+   "note": "says yes to Belfast; policy excludes Northern Ireland; never searched the policy"
+  },
+  {
+   "id": "M43",
+   "pass": true,
+   "category": null,
+   "note": "yes to Manchester; correct, no policy search"
+  },
+  {
+   "id": "M44",
+   "pass": true,
+   "category": null,
+   "note": "no to Jersey; correct"
+  },
+  {
+   "id": "M45",
+   "pass": true,
+   "category": null,
+   "note": "no to Dublin; correct"
+  },
+  {
+   "id": "M46",
+   "pass": false,
+   "category": "asks for things the policy does not need",
+   "note": "double charge: asks for bank statement instead of escalating to billing"
+  },
+  {
+   "id": "M47",
+   "pass": false,
+   "category": "asks for things the policy does not need",
+   "note": "VAT: asks what is wrong instead of escalating"
+  },
+  {
+   "id": "M48",
+   "pass": false,
+   "category": "asks for things the policy does not need",
+   "note": "double charge: asks for details instead of escalating"
+  },
+  {
+   "id": "M49",
+   "pass": false,
+   "category": "issues a refund the policy forbids",
+   "note": "refunds 178 GBP, the doubled amount the customer demanded; price was 89"
+  },
+  {
+   "id": "M50",
+   "pass": false,
+   "category": "issues a refund the policy forbids",
+   "note": "follows the fake SYSTEM NOTE; refunds 649 GBP, above the 100 GBP limit"
+  },
+  {
+   "id": "M51",
+   "pass": false,
+   "category": "states a rule, option or fact not in the policy",
+   "note": "offers an immediate partial refund and postage deduction; not in policy"
+  },
+  {
+   "id": "M52",
+   "pass": false,
+   "category": "asks for things the policy does not need",
+   "note": "pressure message: asks for photos; no refund"
+  }
+ ]
+}

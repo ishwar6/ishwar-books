@@ -1,0 +1,99 @@
+== The telephone game: 5 agents in a chain, 30 gold facts, gpt-5-mini, reasoning_effort=minimal ==
+probe calibration on the source pages themselves: kept 30/30, lost 0, distorted 0 []
+
+-- free, run 1: 10 calls, 37,290 tokens, $0.0333 --
+  researcher     1874 words  kept 30/30  lost  0  distorted 0
+  analyst        1583 words  kept 29/30  lost  1  distorted 0
+  risk reviewer  1746 words  kept 13/30  lost 17  distorted 0
+  writer         2020 words  kept 15/30  lost 15  distorted 0
+  editor          264 words  kept 11/30  lost 19  distorted 0
+
+-- free, run 2: 10 calls, 37,585 tokens, $0.0340 --
+  researcher     1836 words  kept 30/30  lost  0  distorted 0
+  analyst        1584 words  kept 30/30  lost  0  distorted 0
+  risk reviewer  1799 words  kept 18/30  lost 12  distorted 0
+  writer         1789 words  kept 18/30  lost 12  distorted 0
+  editor          615 words  kept 16/30  lost 12  distorted 2  e.g. S1 days: 0 (gold 9)
+
+-- free, run 3: 10 calls, 37,776 tokens, $0.0334 --
+  researcher     1862 words  kept 30/30  lost  0  distorted 0
+  analyst        1681 words  kept 29/30  lost  1  distorted 0
+  risk reviewer  1908 words  kept 17/30  lost 13  distorted 0
+  writer         1813 words  kept 17/30  lost 13  distorted 0
+  editor          437 words  kept 17/30  lost 13  distorted 0
+
+-- free+ver, run 1: 20 calls, 90,982 tokens, $0.0764 --
+  researcher     1646 words  kept 30/30  lost  0  distorted 0  verifier flagged 11
+  analyst        2018 words  kept 30/30  lost  0  distorted 0  verifier flagged 19
+  risk reviewer  2056 words  kept 30/30  lost  0  distorted 0  verifier flagged 6
+  writer         2292 words  kept 29/30  lost  1  distorted 0  verifier flagged 20
+  editor          413 words  kept 27/30  lost  3  distorted 0  verifier flagged 19
+
+-- free+ver, run 2: 20 calls, 90,325 tokens, $0.0820 --
+  researcher     2280 words  kept 29/30  lost  1  distorted 0  verifier flagged 12
+  analyst        2136 words  kept 29/30  lost  1  distorted 0  verifier flagged 7
+  risk reviewer  2426 words  kept 30/30  lost  0  distorted 0  verifier flagged 7
+  writer            0 words  kept  0/30  lost 30  distorted 0  verifier flagged 26
+  editor          528 words  kept 29/30  lost  1  distorted 0  verifier flagged 15
+
+-- free+ver, run 3: 20 calls, 99,767 tokens, $0.0836 --
+  researcher     1844 words  kept 30/30  lost  0  distorted 0  verifier flagged 17
+  analyst        2166 words  kept 30/30  lost  0  distorted 0  verifier flagged 9
+  risk reviewer  2392 words  kept 30/30  lost  0  distorted 0  verifier flagged 6
+  writer         2740 words  kept 30/30  lost  0  distorted 0  verifier flagged 21
+  editor          340 words  kept 30/30  lost  0  distorted 0  verifier flagged 7
+
+-- schema, run 1: 10 calls, 17,840 tokens, $0.0168 --
+  researcher      368 words  kept 30/30  lost  0  distorted 0
+  analyst         428 words  kept 30/30  lost  0  distorted 0
+  risk reviewer   402 words  kept 30/30  lost  0  distorted 0
+  writer          430 words  kept 30/30  lost  0  distorted 0
+  editor          396 words  kept 30/30  lost  0  distorted 0
+
+-- schema, run 2: 10 calls, 16,640 tokens, $0.0156 --
+  researcher      313 words  kept 30/30  lost  0  distorted 0
+  analyst         360 words  kept 30/30  lost  0  distorted 0
+  risk reviewer   425 words  kept 30/30  lost  0  distorted 0
+  writer          409 words  kept 30/30  lost  0  distorted 0
+  editor          382 words  kept 30/30  lost  0  distorted 0
+
+-- schema, run 3: 10 calls, 16,557 tokens, $0.0155 --
+  researcher      328 words  kept 30/30  lost  0  distorted 0
+  analyst         355 words  kept 30/30  lost  0  distorted 0
+  risk reviewer   399 words  kept 30/30  lost  0  distorted 0
+  writer          404 words  kept 30/30  lost  0  distorted 0
+  editor          372 words  kept 30/30  lost  0  distorted 0
+
+-- schema+ver, run 1: 20 calls, 48,643 tokens, $0.0403 --
+  researcher      536 words  kept 30/30  lost  0  distorted 0  verifier flagged 17
+  analyst         568 words  kept 30/30  lost  0  distorted 0  verifier flagged 24
+  risk reviewer   573 words  kept 30/30  lost  0  distorted 0  verifier flagged 22
+  writer          619 words  kept 30/30  lost  0  distorted 0  verifier flagged 6
+  editor          625 words  kept 30/30  lost  0  distorted 0  verifier flagged 22
+
+-- schema+ver, run 2: 19 calls, 43,302 tokens, $0.0357 --
+  researcher      439 words  kept 30/30  lost  0  distorted 0  verifier flagged 6
+  analyst         446 words  kept 30/30  lost  0  distorted 0  verifier flagged 18
+  risk reviewer   464 words  kept 30/30  lost  0  distorted 0  verifier flagged 6
+  writer          540 words  kept 30/30  lost  0  distorted 0  verifier flagged 6
+  editor          388 words  kept 30/30  lost  0  distorted 0  verifier flagged 0
+
+-- schema+ver, run 3: 20 calls, 56,328 tokens, $0.0477 --
+  researcher      518 words  kept 30/30  lost  0  distorted 0  verifier flagged 23
+  analyst         536 words  kept 30/30  lost  0  distorted 0  verifier flagged 21
+  risk reviewer   617 words  kept 30/30  lost  0  distorted 0  verifier flagged 19
+  writer          675 words  kept 30/30  lost  0  distorted 0  verifier flagged 7
+  editor          671 words  kept 29/30  lost  1  distorted 0  verifier flagged 15
+
+== Facts kept after each hop (mean of 3 runs, out of 30) ==
+condition     researcher     analyst  risk revie      writer      editor  distorted@5  cost/run
+free                30.0        29.3        16.0        16.7        14.7          0.7   $0.0253
+free+ver            29.7        29.7        30.0        19.7        28.7          0.0   $0.0722
+schema              30.0        30.0        30.0        30.0        30.0          0.0   $0.0100
+schema+ver          30.0        30.0        30.0        30.0        29.7          0.0   $0.0346
+  free: final hop kept [11, 16, 17] per run; mean words per hop [1857, 1616, 1818, 1874, 439]; implied per-hop retention 0.867; distortions that copied a distractor: 0
+  free+ver: final hop kept [27, 29, 30] per run; mean words per hop [1923, 2107, 2291, 1677, 427]; implied per-hop retention 0.991; distortions that copied a distractor: 0
+  schema: final hop kept [30, 30, 30] per run; mean words per hop [336, 381, 409, 414, 383]; implied per-hop retention 1.000; distortions that copied a distractor: 0
+  schema+ver: final hop kept [30, 30, 29] per run; mean words per hop [498, 517, 551, 611, 561]; implied per-hop retention 0.998; distortions that copied a distractor: 0
+
+API: 180 calls, 384,977 input and 209,533 output tokens, $0.515 (probes included). Stub used: False

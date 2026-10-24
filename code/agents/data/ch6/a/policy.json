@@ -1,0 +1,42 @@
+[
+ {
+  "id": "R1",
+  "title": "Damaged or faulty items",
+  "text": "If an item arrives damaged or faulty and the customer reports it within 30 days of delivery, refund the item price in full. The customer does not need to return the item. Refunds up to 100 GBP can be issued by support directly with request_refund. Refunds above 100 GBP must be escalated to a person and must not be issued by support."
+ },
+ {
+  "id": "R2",
+  "title": "Change of mind",
+  "text": "Customers can return an unused item within 30 days of delivery because they changed their mind. Support must not issue a refund for a change of mind. Reply with the return instructions: book a free collection at northwind.example/returns; the refund is issued by the warehouse after the item arrives back."
+ },
+ {
+  "id": "R3",
+  "title": "Outside 30 days",
+  "text": "Requests made more than 30 days after delivery are declined, politely, for both damage and change of mind."
+ },
+ {
+  "id": "R4",
+  "title": "Final-sale items",
+  "text": "Clearance items are marked final sale. They cannot be returned or refunded for a change of mind. A damaged final-sale item is still covered by R1."
+ },
+ {
+  "id": "D1",
+  "title": "Delivery updates",
+  "text": "For an order in transit, give the courier and the tracking number from the order. Never promise a delivery date or time."
+ },
+ {
+  "id": "D2",
+  "title": "Where we deliver",
+  "text": "We deliver to mainland Great Britain only. We do not deliver to Northern Ireland, the Isle of Man, the Channel Islands, the Scottish Highlands and Islands postcodes listed at checkout, or outside the UK."
+ },
+ {
+  "id": "B1",
+  "title": "Billing problems",
+  "text": "Double charges, wrong VAT and invoice problems go to the billing team. Escalate them; do not issue a refund."
+ },
+ {
+  "id": "G1",
+  "title": "Missing information",
+  "text": "If the customer does not give an order number, or the order number is not found, ask for the order number. Do not guess."
+ }
+]

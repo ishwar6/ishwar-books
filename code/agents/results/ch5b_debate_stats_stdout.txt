@@ -1,0 +1,18 @@
+== TERSE ==
+  debate1 vs vote6 (6 calls each): debate1 alone right on 6, vote6 alone right on 0; two-sided sign test p = 0.031
+  debate2 vs vote9 (9 calls each): debate2 alone right on 8, vote9 alone right on 1; two-sided sign test p = 0.039
+  debate1 vs review1 (6 calls each): debate1 alone right on 5, review1 alone right on 3; two-sided sign test p = 0.727
+  debate2 vs review2 (9 calls each): debate2 alone right on 15, review2 alone right on 3; two-sided sign test p = 0.008
+  debate      answer changes over 2 rounds x 3 agents x 30 problems: wrong->right 44, right->wrong 13, kept right 88, kept wrong 35
+  self-review answer changes over 2 rounds x 3 agents x 30 problems: wrong->right 23, right->wrong 24, kept right 61, kept wrong 72
+  agents right at round 0 but outvoted by two agents agreeing on a wrong answer: 0; switched to that wrong answer in round 1: 0
+  agents wrong at round 0 while both others were right: 5; right in round 1: 4
+== BRIEF ==
+  debate1 vs vote6 (6 calls each): debate1 alone right on 0, vote6 alone right on 2; two-sided sign test p = 0.500
+  debate2 vs vote9 (9 calls each): debate2 alone right on 1, vote9 alone right on 1; two-sided sign test p = 1.000
+  debate1 vs review1 (6 calls each): debate1 alone right on 1, review1 alone right on 3; two-sided sign test p = 0.625
+  debate2 vs review2 (9 calls each): debate2 alone right on 3, review2 alone right on 2; two-sided sign test p = 1.000
+  debate      answer changes over 2 rounds x 3 agents x 30 problems: wrong->right 16, right->wrong 3, kept right 142, kept wrong 19
+  self-review answer changes over 2 rounds x 3 agents x 30 problems: wrong->right 10, right->wrong 3, kept right 135, kept wrong 32
+  agents right at round 0 but outvoted by two agents agreeing on a wrong answer: 1; switched to that wrong answer in round 1: 0
+  agents wrong at round 0 while both others were right: 12; right in round 1: 12

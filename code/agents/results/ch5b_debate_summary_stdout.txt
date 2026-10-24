@@ -1,0 +1,27 @@
+== Debate against voting at equal calls: 30 problems x 2 working budgets, gpt-5-mini, reasoning_effort=minimal ==
+   per problem: 9 independent samples; a 3-agent debate whose round 0 is the first 3 samples, then 2 rounds of 3 calls
+...
+== Summary (accuracy over 30 problems; calls per problem in brackets) ==
+budget  single(1)  vote3(3)  vote6(6)  debate1(6)  review1(6)  vote9(9)  debate2(9)  review2(9)
+terse         42%       43%       53%         73%         67%       60%         83%         43%
+brief         74%       87%       90%         83%         90%       90%         90%         87%
+
+terse: tokens for 6 calls, vote 43,657 against debate 72,248 (1.65x); cost vote6 $0.0470, debate1 $0.0471, vote9 $0.0690,
+      debate2 $0.0703
+  mean output tokens per call: voter 112, debater 77, self-reviewer 72
+  problems where debate beat the vote at equal calls: 6 calls 6, 9 calls 8; where the vote beat debate: 0, 1
+  agent answers across both debate rounds (180 = 30 problems x 3 agents x 2 rounds): wrong->right 44, right->wrong 13, kept
+      right 88, kept wrong 35
+  unanimous at round 0: 8/30, after round 2: 18/30; unanimous on a WRONG answer after round 2: 2/30
+  problems where exactly one agent was right at round 0: 7; of those, the debate ended wrong: 0
+
+brief: tokens for 6 calls, vote 55,829 against debate 104,864 (1.88x); cost vote6 $0.0733, debate1 $0.0777, vote9 $0.1113,
+      debate2 $0.1133
+  mean output tokens per call: voter 191, debater 132, self-reviewer 157
+  problems where debate beat the vote at equal calls: 6 calls 0, 9 calls 1; where the vote beat debate: 2, 1
+  agent answers across both debate rounds (180 = 30 problems x 3 agents x 2 rounds): wrong->right 16, right->wrong 3, kept
+      right 142, kept wrong 19
+  unanimous at round 0: 15/30, after round 2: 29/30; unanimous on a WRONG answer after round 2: 3/30
+  problems where exactly one agent was right at round 0: 1; of those, the debate ended wrong: 0
+
+API: 1260 calls, 354,174 input and 160,542 output tokens (0 hidden reasoning), $0.410. Stub used: False

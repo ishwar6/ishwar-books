@@ -1,0 +1,39 @@
+$ python ch6b_trajectory.py
+model gpt-5-mini, native tool calling, reasoning effort minimal; 5 tasks x 4 trials
+== every run: tool path, then the checks (1 = pass)
+task                   tr  end_state     exact  in_order any_order      args lookup_fi one_write    output  extra  path
+T1 return in window     1          1         0         1         1         1         1         1         1     +1  lookup > policy > create_return
+T1 return in window     2          0         0         0         0         0         1         1         1     +0  lookup > policy
+T1 return in window     3          0         0         0         0         0         1         1         1     +0  lookup > policy
+T1 return in window     4          0         0         0         0         0         1         1         1     +0  lookup > policy
+T2 damaged item         1          0         0         0         0         0         1         1         1     +1  lookup > policy > create_return
+T2 damaged item         2          0         0         0         0         0         1         1         0     +1  lookup > policy > create_return
+T2 damaged item         3          0         0         0         0         0         1         1         1     +0  lookup > policy
+T2 damaged item         4          1         0         1         1         1         1         1         1     +1  lookup > policy > issue_refund
+T3 cancel before ship   1          1         0         1         1         1         1         1         1     +1  lookup > policy > cancel_order
+T3 cancel before ship   2          1         1         1         1         1         1         1         1     +0  lookup > cancel_order
+T3 cancel before ship   3          1         1         1         1         1         1         1         1     +0  lookup > cancel_order
+T3 cancel before ship   4          1         0         1         1         1         1         1         1     +1  lookup > policy > cancel_order
+T4 cancel after ship    1          1         0         1         1         1         1         1         1     +1  lookup > policy
+T4 cancel after ship    2          1         0         1         1         1         1         1         1     +1  lookup > policy
+T4 cancel after ship    3          1         0         1         1         1         1         1         1     +1  lookup > policy
+T4 cancel after ship    4          1         0         1         1         1         1         1         1     +1  lookup > policy
+T5 return too late      1          1         0         1         1         1         1         1         1     +1  lookup > policy
+T5 return too late      2          1         0         1         1         1         1         1         1     +1  lookup > policy
+T5 return too late      3          1         0         1         1         1         1         1         1     +1  lookup > policy
+T5 return too late      4          0         0         1         1         0         1         1         1     +2  lookup > policy > create_return
+== pass rate of each check over 20 runs
+  end_state 65%   exact 10%   in_order 70%   any_order 70%   args 65%   lookup_first 100%   one_write 100%   output 95%
+== end-state success per task: pass@k and pass^k (n = 4 trials)
+  T1 return in window    1/4 succeeded   pass^k k=1..4: 0.25 0.00 0.00 0.00   pass@k: 0.25 0.50 0.75 1.00
+  T2 damaged item        1/4 succeeded   pass^k k=1..4: 0.25 0.00 0.00 0.00   pass@k: 0.25 0.50 0.75 1.00
+  T3 cancel before ship  4/4 succeeded   pass^k k=1..4: 1.00 1.00 1.00 1.00   pass@k: 1.00 1.00 1.00 1.00
+  T4 cancel after ship   4/4 succeeded   pass^k k=1..4: 1.00 1.00 1.00 1.00   pass@k: 1.00 1.00 1.00 1.00
+  T5 return too late     3/4 succeeded   pass^k k=1..4: 0.75 0.50 0.25 0.00   pass@k: 0.75 1.00 1.00 1.00
+  average over tasks   pass^k: 0.65 0.50 0.45 0.40   pass@k: 0.65 0.80 0.90 1.00
+== planted trajectories: does each check catch the failure it is built for?
+  refund before lookup       end_state=1 exact=0 in_order=0 any_order=1 args=1 lookup_first=0 one_write=1 output=1
+  full price, fee missed     end_state=0 exact=1 in_order=1 any_order=1 args=0 lookup_first=1 one_write=1 output=0
+  two returns opened         end_state=0 exact=0 in_order=1 any_order=1 args=0 lookup_first=1 one_write=0 output=1
+  right action, wrong words  end_state=1 exact=1 in_order=1 any_order=1 args=1 lookup_first=1 one_write=1 output=0
+== usage: 67 calls, 31671 input tokens, 3465 output tokens; cost 0.0148 USD

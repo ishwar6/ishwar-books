@@ -1,0 +1,152 @@
+[
+ {
+  "id": "q01",
+  "q": "A supplier prices frying pans in tiers: the first 200 pans cost \u00a34.80 each, the next 300 cost \u00a34.60 each, and every pan beyond 500 costs \u00a33.05. A 10% discount applies only to the pans in the top tier (beyond 500). Northwind orders 1257 pans, and 20% VAT is added to the discounted total. What does Northwind pay in pounds, to the nearest penny?",
+  "gold": "5301.56"
+ },
+ {
+  "id": "q02",
+  "q": "A supplier prices frying pans in tiers: the first 200 pans cost \u00a36.40 each, the next 300 cost \u00a34.60 each, and every pan beyond 500 costs \u00a33.25. A 8% discount applies only to the pans in the top tier (beyond 500). Northwind orders 1377 pans, and 20% VAT is added to the discounted total. What does Northwind pay in pounds, to the nearest penny?",
+  "gold": "6338.68"
+ },
+ {
+  "id": "q03",
+  "q": "A supplier prices frying pans in tiers: the first 200 pans cost \u00a35.20 each, the next 300 cost \u00a34.60 each, and every pan beyond 500 costs \u00a33.25. A 5% discount applies only to the pans in the top tier (beyond 500). Northwind orders 1414 pans, and 20% VAT is added to the discounted total. What does Northwind pay in pounds, to the nearest penny?",
+  "gold": "6290.37"
+ },
+ {
+  "id": "q04",
+  "q": "A supplier prices frying pans in tiers: the first 200 pans cost \u00a34.80 each, the next 300 cost \u00a33.90 each, and every pan beyond 500 costs \u00a33.25. A 8% discount applies only to the pans in the top tier (beyond 500). Northwind orders 735 pans, and 20% VAT is added to the discounted total. What does Northwind pay in pounds, to the nearest penny?",
+  "gold": "3399.18"
+ },
+ {
+  "id": "q05",
+  "q": "A supplier prices frying pans in tiers: the first 200 pans cost \u00a35.20 each, the next 300 cost \u00a34.60 each, and every pan beyond 500 costs \u00a33.25. A 5% discount applies only to the pans in the top tier (beyond 500). Northwind orders 1176 pans, and 20% VAT is added to the discounted total. What does Northwind pay in pounds, to the nearest penny?",
+  "gold": "5408.58"
+ },
+ {
+  "id": "q06",
+  "q": "A supplier prices frying pans in tiers: the first 200 pans cost \u00a35.20 each, the next 300 cost \u00a33.90 each, and every pan beyond 500 costs \u00a33.05. A 5% discount applies only to the pans in the top tier (beyond 500). Northwind orders 1368 pans, and 20% VAT is added to the discounted total. What does Northwind pay in pounds, to the nearest penny?",
+  "gold": "5670.04"
+ },
+ {
+  "id": "q07",
+  "q": "Northwind has 1369 mixing bowls in stock and sells 159 every week. At the end of week 3 a delivery of 600 bowls arrives, but 5% of that delivery is damaged and cannot be sold. Sales happen before the delivery in the week it arrives. In which week does Northwind first fail to meet the full weekly demand? Answer with the week number.",
+  "gold": "13"
+ },
+ {
+  "id": "q08",
+  "q": "Northwind has 1216 mixing bowls in stock and sells 189 every week. At the end of week 3 a delivery of 800 bowls arrives, but 5% of that delivery is damaged and cannot be sold. Sales happen before the delivery in the week it arrives. In which week does Northwind first fail to meet the full weekly demand? Answer with the week number.",
+  "gold": "11"
+ },
+ {
+  "id": "q09",
+  "q": "Northwind has 900 mixing bowls in stock and sells 110 every week. At the end of week 3 a delivery of 600 bowls arrives, but 5% of that delivery is damaged and cannot be sold. Sales happen before the delivery in the week it arrives. In which week does Northwind first fail to meet the full weekly demand? Answer with the week number.",
+  "gold": "14"
+ },
+ {
+  "id": "q10",
+  "q": "Northwind has 1346 mixing bowls in stock and sells 131 every week. At the end of week 3 a delivery of 800 bowls arrives, but 8% of that delivery is damaged and cannot be sold. Sales happen before the delivery in the week it arrives. In which week does Northwind first fail to meet the full weekly demand? Answer with the week number.",
+  "gold": "16"
+ },
+ {
+  "id": "q11",
+  "q": "Northwind has 1176 mixing bowls in stock and sells 190 every week. At the end of week 5 a delivery of 600 bowls arrives, but 5% of that delivery is damaged and cannot be sold. Sales happen before the delivery in the week it arrives. In which week does Northwind first fail to meet the full weekly demand? Answer with the week number.",
+  "gold": "10"
+ },
+ {
+  "id": "q12",
+  "q": "Northwind has 1000 mixing bowls in stock and sells 159 every week. At the end of week 4 a delivery of 800 bowls arrives, but 5% of that delivery is damaged and cannot be sold. Sales happen before the delivery in the week it arrives. In which week does Northwind first fail to meet the full weekly demand? Answer with the week number.",
+  "gold": "12"
+ },
+ {
+  "id": "q13",
+  "q": "A container leaves the port on Saturday 6 November 2027. The sea crossing takes 22 calendar days. Customs clearance then takes 5 working days, counted from the day after it lands. Working days are Monday to Friday, and Wednesday 1 December is a public holiday. On what date is it cleared? Answer with the day of the month only.",
+  "gold": "6"
+ },
+ {
+  "id": "q14",
+  "q": "A container leaves the port on Thursday 11 March 2027. The sea crossing takes 27 calendar days. Customs clearance then takes 7 working days, counted from the day after it lands. Working days are Monday to Friday, and Wednesday 14 April is a public holiday. On what date is it cleared? Answer with the day of the month only.",
+  "gold": "19"
+ },
+ {
+  "id": "q15",
+  "q": "A container leaves the port on Saturday 20 March 2027. The sea crossing takes 28 calendar days. Customs clearance then takes 3 working days, counted from the day after it lands. Working days are Monday to Friday, and Wednesday 21 April is a public holiday. On what date is it cleared? Answer with the day of the month only.",
+  "gold": "22"
+ },
+ {
+  "id": "q16",
+  "q": "A container leaves the port on Monday 12 July 2027. The sea crossing takes 27 calendar days. Customs clearance then takes 6 working days, counted from the day after it lands. Working days are Monday to Friday, and Wednesday 11 August is a public holiday. On what date is it cleared? Answer with the day of the month only.",
+  "gold": "17"
+ },
+ {
+  "id": "q17",
+  "q": "A container leaves the port on Tuesday 6 July 2027. The sea crossing takes 33 calendar days. Customs clearance then takes 6 working days, counted from the day after it lands. Working days are Monday to Friday, and Wednesday 11 August is a public holiday. On what date is it cleared? Answer with the day of the month only.",
+  "gold": "17"
+ },
+ {
+  "id": "q18",
+  "q": "A container leaves the port on Friday 2 April 2027. The sea crossing takes 26 calendar days. Customs clearance then takes 3 working days, counted from the day after it lands. Working days are Monday to Friday, and Wednesday 5 May is a public holiday. On what date is it cleared? Answer with the day of the month only.",
+  "gold": "3"
+ },
+ {
+  "id": "q19",
+  "q": "One shipment holds 800 whisks quoted at $5.60 each (0.8 kg each) and 300 casserole dishes quoted at $9.90 each (2 kg each). Convert at $ 1.28 to \u00a31. Import duty is 12% of the converted goods value. Freight is \u00a3900 for the shipment, carries no duty, and is shared between the items by weight. What is the landed cost of one casserole dish in pounds, to the nearest penny?",
+  "gold": "10.11"
+ },
+ {
+  "id": "q20",
+  "q": "One shipment holds 500 whisks quoted at $2.40 each (0.4 kg each) and 600 casserole dishes quoted at $9.90 each (2.5 kg each). Convert at $ 1.25 to \u00a31. Import duty is 4% of the converted goods value. Freight is \u00a3480 for the shipment, carries no duty, and is shared between the items by weight. What is the landed cost of one casserole dish in pounds, to the nearest penny?",
+  "gold": "8.94"
+ },
+ {
+  "id": "q21",
+  "q": "One shipment holds 1200 whisks quoted at $3.15 each (0.8 kg each) and 400 casserole dishes quoted at $9.90 each (2 kg each). Convert at $ 1.28 to \u00a31. Import duty is 4% of the converted goods value. Freight is \u00a3900 for the shipment, carries no duty, and is shared between the items by weight. What is the landed cost of one casserole dish in pounds, to the nearest penny?",
+  "gold": "9.07"
+ },
+ {
+  "id": "q22",
+  "q": "One shipment holds 800 whisks quoted at $5.60 each (0.5 kg each) and 300 casserole dishes quoted at $9.90 each (1.5 kg each). Convert at $ 1.25 to \u00a31. Import duty is 8% of the converted goods value. Freight is \u00a3900 for the shipment, carries no duty, and is shared between the items by weight. What is the landed cost of one casserole dish in pounds, to the nearest penny?",
+  "gold": "10.14"
+ },
+ {
+  "id": "q23",
+  "q": "One shipment holds 500 whisks quoted at $5.60 each (0.5 kg each) and 400 casserole dishes quoted at $9.90 each (2.5 kg each). Convert at $ 1.32 to \u00a31. Import duty is 4% of the converted goods value. Freight is \u00a3600 for the shipment, carries no duty, and is shared between the items by weight. What is the landed cost of one casserole dish in pounds, to the nearest penny?",
+  "gold": "9.00"
+ },
+ {
+  "id": "q24",
+  "q": "One shipment holds 800 whisks quoted at $5.60 each (0.4 kg each) and 300 casserole dishes quoted at $9.90 each (2.5 kg each). Convert at $ 1.25 to \u00a31. Import duty is 8% of the converted goods value. Freight is \u00a3600 for the shipment, carries no duty, and is shared between the items by weight. What is the landed cost of one casserole dish in pounds, to the nearest penny?",
+  "gold": "9.96"
+ },
+ {
+  "id": "q25",
+  "q": "Packer A packs 45 parcels an hour and packer B packs 30 an hour. A starts alone at 08:00; B joins 20 minutes later. A takes a 30-minute break starting at 10:00 while B keeps working. They stop when all 900 parcels are packed. How many minutes after 08:00 do they finish? Round to the nearest minute.",
+  "gold": "746"
+ },
+ {
+  "id": "q26",
+  "q": "Packer A packs 60 parcels an hour and packer B packs 30 an hour. A starts alone at 08:00; B joins 20 minutes later. A takes a 30-minute break starting at 10:00 while B keeps working. They stop when all 900 parcels are packed. How many minutes after 08:00 do they finish? Round to the nearest minute.",
+  "gold": "627"
+ },
+ {
+  "id": "q27",
+  "q": "Packer A packs 48 parcels an hour and packer B packs 50 an hour. A starts alone at 08:00; B joins 30 minutes later. A takes a 20-minute break starting at 10:00 while B keeps working. They stop when all 900 parcels are packed. How many minutes after 08:00 do they finish? Round to the nearest minute.",
+  "gold": "576"
+ },
+ {
+  "id": "q28",
+  "q": "Packer A packs 45 parcels an hour and packer B packs 30 an hour. A starts alone at 08:00; B joins 45 minutes later. A takes a 20-minute break starting at 10:00 while B keeps working. They stop when all 600 parcels are packed. How many minutes after 08:00 do they finish? Round to the nearest minute.",
+  "gold": "510"
+ },
+ {
+  "id": "q29",
+  "q": "Packer A packs 48 parcels an hour and packer B packs 36 an hour. A starts alone at 08:00; B joins 20 minutes later. A takes a 30-minute break starting at 10:00 while B keeps working. They stop when all 900 parcels are packed. How many minutes after 08:00 do they finish? Round to the nearest minute.",
+  "gold": "669"
+ },
+ {
+  "id": "q30",
+  "q": "Packer A packs 45 parcels an hour and packer B packs 72 an hour. A starts alone at 08:00; B joins 20 minutes later. A takes a 20-minute break starting at 10:00 while B keeps working. They stop when all 600 parcels are packed. How many minutes after 08:00 do they finish? Round to the nearest minute.",
+  "gold": "328"
+ }
+]

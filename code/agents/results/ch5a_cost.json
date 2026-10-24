@@ -1,0 +1,64 @@
+{
+ "page_tokens": 700,
+ "n": 24,
+ "P": 1500,
+ "t_call": 6.0,
+ "rows": [
+  {
+   "design": "one agent, 1 tool call per turn",
+   "input": 337500,
+   "calls": 25,
+   "chain": 25,
+   "seconds": 150.0
+  },
+  {
+   "design": "one agent, 6 tool calls per turn",
+   "input": 67500,
+   "calls": 5,
+   "chain": 5,
+   "seconds": 30.0
+  },
+  {
+   "design": "one agent, 24 tool calls per turn",
+   "input": 27000,
+   "calls": 2,
+   "chain": 2,
+   "seconds": 12.0
+  },
+  {
+   "design": "lead + 2 subagents (1 call per turn)",
+   "input": 214700,
+   "calls": 29,
+   "chain": 16,
+   "seconds": 96.0
+  },
+  {
+   "design": "lead + 4 subagents (1 call per turn)",
+   "input": 148900,
+   "calls": 31,
+   "chain": 10,
+   "seconds": 60.0
+  },
+  {
+   "design": "lead + 6 subagents (1 call per turn)",
+   "input": 131100,
+   "calls": 33,
+   "chain": 8,
+   "seconds": 48.0
+  },
+  {
+   "design": "lead + 8 subagents (1 call per turn)",
+   "input": 125300,
+   "calls": 35,
+   "chain": 7,
+   "seconds": 42.0
+  },
+  {
+   "design": "lead + 4 subagents (6 per turn)",
+   "input": 48900,
+   "calls": 11,
+   "chain": 5,
+   "seconds": 30.0
+  }
+ ]
+}

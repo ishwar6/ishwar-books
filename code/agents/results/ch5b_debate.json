@@ -1,0 +1,4576 @@
+{
+ "summary": {
+  "terse": {
+   "single": 0.4222222222222222,
+   "vote3": 0.43333333333333335,
+   "vote6": 0.5333333333333333,
+   "debate1": 0.7333333333333333,
+   "review1": 0.6666666666666666,
+   "vote9": 0.6,
+   "debate2": 0.8333333333333334,
+   "review2": 0.43333333333333335,
+   "out_vote": 111.85925925925926,
+   "out_debate": 76.98333333333333,
+   "out_review": 71.74444444444445,
+   "tok_vote6": 43657,
+   "tok_debate1": 72248,
+   "cost_vote6": 0.0470465,
+   "cost_debate1": 0.04712775,
+   "cost_vote9": 0.06903275,
+   "cost_debate2": 0.070269,
+   "flips": {
+    "kept_wrong": 35,
+    "wrong_to_right": 44,
+    "kept_right": 88,
+    "right_to_wrong": 13
+   },
+   "unanimous0": 8,
+   "unanimous2": 18,
+   "converged_wrong": 2,
+   "lone_right_lost": 0,
+   "lone_right": 7,
+   "debate1_wins": 6,
+   "vote6_wins": 0,
+   "debate2_wins": 8,
+   "vote9_wins": 1
+  },
+  "brief": {
+   "single": 0.7444444444444444,
+   "vote3": 0.8666666666666667,
+   "vote6": 0.9,
+   "debate1": 0.8333333333333334,
+   "review1": 0.9,
+   "vote9": 0.9,
+   "debate2": 0.9,
+   "review2": 0.8666666666666667,
+   "out_vote": 190.84444444444443,
+   "out_debate": 132.21666666666667,
+   "out_review": 156.9,
+   "tok_vote6": 55829,
+   "tok_debate1": 104864,
+   "cost_vote6": 0.0732805,
+   "cost_debate1": 0.07766775,
+   "cost_vote9": 0.11127975,
+   "cost_debate2": 0.11329125,
+   "flips": {
+    "kept_wrong": 19,
+    "wrong_to_right": 16,
+    "kept_right": 142,
+    "right_to_wrong": 3
+   },
+   "unanimous0": 15,
+   "unanimous2": 29,
+   "converged_wrong": 3,
+   "lone_right_lost": 0,
+   "lone_right": 1,
+   "debate1_wins": 0,
+   "vote6_wins": 2,
+   "debate2_wins": 1,
+   "vote9_wins": 1
+  }
+ },
+ "rows": {
+  "terse": [
+   {
+    "srounds": [
+     [
+      "5303.72",
+      "5303.72",
+      "5303.72"
+     ],
+     [
+      "5303.72",
+      "5303.72",
+      "5303.72"
+     ],
+     [
+      "5079.36",
+      "5566.32",
+      "5302.64"
+     ]
+    ],
+    "review1": false,
+    "review2": false,
+    "out_vote": 151.0,
+    "out_debate": 62.0,
+    "out_review": 57.333333333333336,
+    "id": "q01",
+    "gold": "5301.56",
+    "mode": "terse",
+    "samples": [
+     "5303.72",
+     "5303.72",
+     "5303.72",
+     "5304.80",
+     "5303.71",
+     "4005.36",
+     "5303.72",
+     "5303.72",
+     "5301.56"
+    ],
+    "rounds": [
+     [
+      "5303.72",
+      "5303.72",
+      "5303.72"
+     ],
+     [
+      "5303.72",
+      "5303.72",
+      "5303.72"
+     ],
+     [
+      "5303.72",
+      "5303.72",
+      "5301.56"
+     ]
+    ],
+    "single": 0.0,
+    "vote3": false,
+    "vote6": false,
+    "vote9": false,
+    "debate1": false,
+    "debate2": false,
+    "tok_vote6": 1619,
+    "tok_debate1": 2815,
+    "cost_vote6": 0.001789,
+    "cost_debate1": 0.001661,
+    "cost_vote9": 0.0030285,
+    "cost_debate2": 0.00241525,
+    "flips": {
+     "kept_wrong": 5,
+     "wrong_to_right": 1
+    },
+    "unanimous0": true,
+    "unanimous2": false,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "6327.64",
+      "4129.92",
+      "6327.64"
+     ],
+     [
+      "6327.64",
+      "4129.92",
+      "6327.64"
+     ],
+     [
+      "6333.16",
+      "6338.68",
+      "6338.68"
+     ]
+    ],
+    "review1": false,
+    "review2": true,
+    "out_vote": 109.66666666666667,
+    "out_debate": 50.833333333333336,
+    "out_review": 118.33333333333333,
+    "id": "q02",
+    "gold": "6338.68",
+    "mode": "terse",
+    "samples": [
+     "6327.64",
+     "4129.92",
+     "6327.64",
+     "5259.04",
+     "6333.16",
+     "6334.36",
+     "6335.12",
+     "4966.86",
+     "6338.68"
+    ],
+    "rounds": [
+     [
+      "6327.64",
+      "4129.92",
+      "6327.64"
+     ],
+     [
+      "6327.64",
+      "6327.64",
+      "6327.64"
+     ],
+     [
+      "6327.64",
+      "6335.36",
+      "6327.64"
+     ]
+    ],
+    "single": 0.0,
+    "vote3": false,
+    "vote6": false,
+    "vote9": false,
+    "debate1": false,
+    "debate2": false,
+    "tok_vote6": 1554,
+    "tok_debate1": 2548,
+    "cost_vote6": 0.001659,
+    "cost_debate1": 0.001505,
+    "cost_vote9": 0.0022845,
+    "cost_debate2": 0.002099,
+    "flips": {
+     "kept_wrong": 6
+    },
+    "unanimous0": false,
+    "unanimous2": false,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "6289.23",
+      "4955.28",
+      "6291.57"
+     ],
+     [
+      "6289.23",
+      "6290.37",
+      "6291.57"
+     ],
+     [
+      "7088.64",
+      "6290.37",
+      "6290.37"
+     ]
+    ],
+    "review1": false,
+    "review2": true,
+    "out_vote": 121.33333333333333,
+    "out_debate": 94.5,
+    "out_review": 79.83333333333333,
+    "id": "q03",
+    "gold": "6290.37",
+    "mode": "terse",
+    "samples": [
+     "6289.23",
+     "4955.28",
+     "6291.57",
+     "6291.57",
+     "6296.13",
+     "6289.37",
+     "6290.37",
+     "5873.84",
+     "3835.96"
+    ],
+    "rounds": [
+     [
+      "6289.23",
+      "4955.28",
+      "6291.57"
+     ],
+     [
+      "6289.23",
+      "6291.57",
+      "6291.57"
+     ],
+     [
+      "6291.57",
+      "6291.57",
+      "6291.57"
+     ]
+    ],
+    "single": 0.0,
+    "vote3": false,
+    "vote6": false,
+    "vote9": false,
+    "debate1": false,
+    "debate2": false,
+    "tok_vote6": 1613,
+    "tok_debate1": 2396,
+    "cost_vote6": 0.001777,
+    "cost_debate1": 0.001495,
+    "cost_vote9": 0.0024945,
+    "cost_debate2": 0.0025235,
+    "flips": {
+     "kept_wrong": 6
+    },
+    "unanimous0": false,
+    "unanimous2": true,
+    "converged_wrong": true,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "2157.36",
+      "3399.18",
+      "3399.18"
+     ],
+     [
+      "2148.24",
+      "3399.18",
+      "3399.18"
+     ],
+     [
+      "2148.24",
+      "3415.68",
+      "3399.18"
+     ]
+    ],
+    "review1": true,
+    "review2": false,
+    "out_vote": 119.22222222222223,
+    "out_debate": 46.833333333333336,
+    "out_review": 53.5,
+    "id": "q04",
+    "gold": "3399.18",
+    "mode": "terse",
+    "samples": [
+     "2157.36",
+     "3399.18",
+     "3399.18",
+     "3399.18",
+     "3399.18",
+     "3400.38",
+     "3399.18",
+     "3399.18",
+     "3400.38"
+    ],
+    "rounds": [
+     [
+      "2157.36",
+      "3399.18",
+      "3399.18"
+     ],
+     [
+      "3399.18",
+      "3399.18",
+      "3399.18"
+     ],
+     [
+      "3399.18",
+      "3399.18",
+      "3399.18"
+     ]
+    ],
+    "single": 0.6666666666666666,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 1521,
+    "tok_debate1": 2134,
+    "cost_vote6": 0.0016035,
+    "cost_debate1": 0.0012965000000000001,
+    "cost_vote9": 0.00245425,
+    "cost_debate2": 0.00177175,
+    "flips": {
+     "wrong_to_right": 1,
+     "kept_right": 5
+    },
+    "unanimous0": false,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "5408.58",
+      "5408.58",
+      "5410.74"
+     ],
+     [
+      "5408.58",
+      "5408.58",
+      "5410.74"
+     ],
+     [
+      "5254.08",
+      "5408.58",
+      "5410.74"
+     ]
+    ],
+    "review1": true,
+    "review2": false,
+    "out_vote": 134.88888888888889,
+    "out_debate": 64.66666666666667,
+    "out_review": 41.333333333333336,
+    "id": "q05",
+    "gold": "5408.58",
+    "mode": "terse",
+    "samples": [
+     "5408.58",
+     "5408.58",
+     "5410.74",
+     "5410.02",
+     "5410.26",
+     "4816.92",
+     "5408.58",
+     "5408.58",
+     "5408.58"
+    ],
+    "rounds": [
+     [
+      "5408.58",
+      "5408.58",
+      "5410.74"
+     ],
+     [
+      "5408.58",
+      "5408.58",
+      "5408.58"
+     ],
+     [
+      "5408.58",
+      "5408.58",
+      "5408.58"
+     ]
+    ],
+    "single": 0.6666666666666666,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 1511,
+    "tok_debate1": 2762,
+    "cost_vote6": 0.0015730000000000002,
+    "cost_debate1": 0.001639,
+    "cost_vote9": 0.0027385,
+    "cost_debate2": 0.0024115,
+    "flips": {
+     "kept_right": 5,
+     "wrong_to_right": 1
+    },
+    "unanimous0": false,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "3465.84",
+      "3206.88",
+      "5670.04"
+     ],
+     [
+      "5670.04",
+      "5668.84",
+      "5670.04"
+     ],
+     [
+      "5670.04",
+      "5668.84",
+      "5200.32"
+     ]
+    ],
+    "review1": true,
+    "review2": true,
+    "out_vote": 108.88888888888889,
+    "out_debate": 71.83333333333333,
+    "out_review": 81.66666666666667,
+    "id": "q06",
+    "gold": "5670.04",
+    "mode": "terse",
+    "samples": [
+     "3465.84",
+     "3206.88",
+     "5670.04",
+     "5670.04",
+     "5670.04",
+     "5670.04",
+     "5670.04",
+     "4284.32",
+     "3859.44"
+    ],
+    "rounds": [
+     [
+      "3465.84",
+      "3206.88",
+      "5670.04"
+     ],
+     [
+      "5670.04",
+      "5670.04",
+      "5670.04"
+     ],
+     [
+      "5670.04",
+      "5670.04",
+      "5670.04"
+     ]
+    ],
+    "single": 0.3333333333333333,
+    "vote3": false,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 1561,
+    "tok_debate1": 2211,
+    "cost_vote6": 0.001673,
+    "cost_debate1": 0.00156075,
+    "cost_vote9": 0.0022705,
+    "cost_debate2": 0.002134,
+    "flips": {
+     "wrong_to_right": 2,
+     "kept_right": 4
+    },
+    "unanimous0": false,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "13.00",
+      "13.00",
+      "13.00"
+     ],
+     [
+      "13.00",
+      "13.00",
+      "13.00"
+     ],
+     [
+      "13.00",
+      "13.00",
+      "13.00"
+     ]
+    ],
+    "review1": true,
+    "review2": true,
+    "out_vote": 215.66666666666666,
+    "out_debate": 108.16666666666667,
+    "out_review": 132.5,
+    "id": "q07",
+    "gold": "13",
+    "mode": "terse",
+    "samples": [
+     "13.00",
+     "13.00",
+     "13.00",
+     "13.00",
+     "13.00",
+     "13.00",
+     "13.00",
+     "13.00",
+     "13.00"
+    ],
+    "rounds": [
+     [
+      "13.00",
+      "13.00",
+      "13.00"
+     ],
+     [
+      "13.00",
+      "13.00",
+      "13.00"
+     ],
+     [
+      "13.00",
+      "13.00",
+      "13.00"
+     ]
+    ],
+    "single": 1.0,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 2030,
+    "tok_debate1": 3165,
+    "cost_vote6": 0.0028,
+    "cost_debate1": 0.001962,
+    "cost_vote9": 0.004152,
+    "cost_debate2": 0.00324425,
+    "flips": {
+     "kept_right": 6
+    },
+    "unanimous0": true,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "11.00",
+      "11.00",
+      "11.00"
+     ],
+     [
+      "11.00",
+      "11.00",
+      "11.00"
+     ],
+     [
+      "11.00",
+      "11.00",
+      "10.00"
+     ]
+    ],
+    "review1": true,
+    "review2": true,
+    "out_vote": 189.11111111111111,
+    "out_debate": 87.66666666666667,
+    "out_review": 92.83333333333333,
+    "id": "q08",
+    "gold": "11",
+    "mode": "terse",
+    "samples": [
+     "11.00",
+     "11.00",
+     "11.00",
+     "11.00",
+     "11.00",
+     "11.00",
+     "11.00",
+     "11.00",
+     "11.00"
+    ],
+    "rounds": [
+     [
+      "11.00",
+      "11.00",
+      "11.00"
+     ],
+     [
+      "11.00",
+      "11.00",
+      "11.00"
+     ],
+     [
+      "11.00",
+      "11.00",
+      "11.00"
+     ]
+    ],
+    "single": 1.0,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 1824,
+    "tok_debate1": 3188,
+    "cost_vote6": 0.0023880000000000004,
+    "cost_debate1": 0.00197125,
+    "cost_vote9": 0.003674,
+    "cost_debate2": 0.00301375,
+    "flips": {
+     "kept_right": 6
+    },
+    "unanimous0": true,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "14.00",
+      "14.00",
+      "14.00"
+     ],
+     [
+      "14.00",
+      "14.00",
+      "14.00"
+     ],
+     [
+      "18.00",
+      "14.00",
+      "14.00"
+     ]
+    ],
+    "review1": true,
+    "review2": true,
+    "out_vote": 173.88888888888889,
+    "out_debate": 77.5,
+    "out_review": 81.16666666666667,
+    "id": "q09",
+    "gold": "14",
+    "mode": "terse",
+    "samples": [
+     "14.00",
+     "14.00",
+     "14.00",
+     "14.00",
+     "14.00",
+     "14.00",
+     "14.00",
+     "14.00",
+     "14.00"
+    ],
+    "rounds": [
+     [
+      "14.00",
+      "14.00",
+      "14.00"
+     ],
+     [
+      "14.00",
+      "14.00",
+      "14.00"
+     ],
+     [
+      "14.00",
+      "13.00",
+      "14.00"
+     ]
+    ],
+    "single": 1.0,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 1793,
+    "tok_debate1": 3331,
+    "cost_vote6": 0.0023365,
+    "cost_debate1": 0.00206825,
+    "cost_vote9": 0.0033977499999999997,
+    "cost_debate2": 0.00299175,
+    "flips": {
+     "kept_right": 5,
+     "right_to_wrong": 1
+    },
+    "unanimous0": true,
+    "unanimous2": false,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "15.00",
+      "16.00",
+      "16.00"
+     ],
+     [
+      "15.00",
+      "16.00",
+      "16.00"
+     ],
+     [
+      "15.00",
+      "16.00",
+      "16.00"
+     ]
+    ],
+    "review1": true,
+    "review2": true,
+    "out_vote": 216.88888888888889,
+    "out_debate": 101.83333333333333,
+    "out_review": 84.0,
+    "id": "q10",
+    "gold": "16",
+    "mode": "terse",
+    "samples": [
+     "15.00",
+     "16.00",
+     "16.00",
+     "15.00",
+     "16.00",
+     "16.00",
+     "11.00",
+     "16.00",
+     "16.00"
+    ],
+    "rounds": [
+     [
+      "15.00",
+      "16.00",
+      "16.00"
+     ],
+     [
+      "15.00",
+      "16.00",
+      "16.00"
+     ],
+     [
+      "16.00",
+      "15.00",
+      "15.00"
+     ]
+    ],
+    "single": 0.6666666666666666,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": false,
+    "tok_vote6": 2245,
+    "tok_debate1": 4009,
+    "cost_vote6": 0.00323,
+    "cost_debate1": 0.002642,
+    "cost_vote9": 0.004174,
+    "cost_debate2": 0.00375325,
+    "flips": {
+     "kept_wrong": 1,
+     "kept_right": 2,
+     "wrong_to_right": 1,
+     "right_to_wrong": 2
+    },
+    "unanimous0": false,
+    "unanimous2": false,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "10.00",
+      "10.00",
+      "10.00"
+     ],
+     [
+      "10.00",
+      "10.00",
+      "10.00"
+     ],
+     [
+      "10.00",
+      "10.00",
+      "10.00"
+     ]
+    ],
+    "review1": true,
+    "review2": true,
+    "out_vote": 156.55555555555554,
+    "out_debate": 94.16666666666667,
+    "out_review": 102.33333333333333,
+    "id": "q11",
+    "gold": "10",
+    "mode": "terse",
+    "samples": [
+     "10.00",
+     "10.00",
+     "10.00",
+     "10.00",
+     "10.00",
+     "10.00",
+     "10.00",
+     "10.00",
+     "10.00"
+    ],
+    "rounds": [
+     [
+      "10.00",
+      "10.00",
+      "10.00"
+     ],
+     [
+      "10.00",
+      "10.00",
+      "10.00"
+     ],
+     [
+      "10.00",
+      "10.00",
+      "10.00"
+     ]
+    ],
+    "single": 1.0,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 1652,
+    "tok_debate1": 2710,
+    "cost_vote6": 0.0020440000000000002,
+    "cost_debate1": 0.00163475,
+    "cost_vote9": 0.003088,
+    "cost_debate2": 0.00276275,
+    "flips": {
+     "kept_right": 6
+    },
+    "unanimous0": true,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "12.00",
+      "12.00",
+      "12.00"
+     ],
+     [
+      "12.00",
+      "12.00",
+      "12.00"
+     ],
+     [
+      "11.00",
+      "11.00",
+      "12.00"
+     ]
+    ],
+    "review1": true,
+    "review2": false,
+    "out_vote": 189.88888888888889,
+    "out_debate": 91.16666666666667,
+    "out_review": 86.0,
+    "id": "q12",
+    "gold": "12",
+    "mode": "terse",
+    "samples": [
+     "12.00",
+     "12.00",
+     "12.00",
+     "12.00",
+     "12.00",
+     "12.00",
+     "12.00",
+     "12.00",
+     "12.00"
+    ],
+    "rounds": [
+     [
+      "12.00",
+      "12.00",
+      "12.00"
+     ],
+     [
+      "12.00",
+      "12.00",
+      "12.00"
+     ],
+     [
+      "12.00",
+      "12.00",
+      "12.00"
+     ]
+    ],
+    "single": 1.0,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 1743,
+    "tok_debate1": 2796,
+    "cost_vote6": 0.002226,
+    "cost_debate1": 0.0016965,
+    "cost_vote9": 0.0036880000000000003,
+    "cost_debate2": 0.0027860000000000003,
+    "flips": {
+     "kept_right": 6
+    },
+    "unanimous0": true,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "3.00",
+      "3.00",
+      "9.00"
+     ],
+     [
+      "6.00",
+      "6.00",
+      "3.00"
+     ],
+     [
+      "6.00",
+      "3.00",
+      "7.00"
+     ]
+    ],
+    "review1": true,
+    "review2": true,
+    "out_vote": 61.333333333333336,
+    "out_debate": 63.5,
+    "out_review": 52.333333333333336,
+    "id": "q13",
+    "gold": "6",
+    "mode": "terse",
+    "samples": [
+     "3.00",
+     "3.00",
+     "9.00",
+     "6.00",
+     "3.00",
+     "7.00",
+     "3.00",
+     "6.00",
+     "6.00"
+    ],
+    "rounds": [
+     [
+      "3.00",
+      "3.00",
+      "9.00"
+     ],
+     [
+      "3.00",
+      "3.00",
+      "6.00"
+     ],
+     [
+      "6.00",
+      "6.00",
+      "3.00"
+     ]
+    ],
+    "single": 0.0,
+    "vote3": false,
+    "vote6": false,
+    "vote9": false,
+    "debate1": false,
+    "debate2": true,
+    "tok_vote6": 944,
+    "tok_debate1": 1315,
+    "cost_vote6": 0.0006805,
+    "cost_debate1": 0.00085375,
+    "cost_vote9": 0.00136275,
+    "cost_debate2": 0.00145375,
+    "flips": {
+     "kept_wrong": 2,
+     "wrong_to_right": 3,
+     "right_to_wrong": 1
+    },
+    "unanimous0": false,
+    "unanimous2": false,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "15.00",
+      "23.00",
+      "5.00"
+     ],
+     [
+      "16.00",
+      "16.00",
+      "5.00"
+     ],
+     [
+      "16.00",
+      "19.00",
+      "16.00"
+     ]
+    ],
+    "review1": false,
+    "review2": false,
+    "out_vote": 50.666666666666664,
+    "out_debate": 60.666666666666664,
+    "out_review": 51.666666666666664,
+    "id": "q14",
+    "gold": "19",
+    "mode": "terse",
+    "samples": [
+     "15.00",
+     "23.00",
+     "5.00",
+     "26.00",
+     "2.00",
+     "21.00",
+     "19.00",
+     "19.00",
+     "16.00"
+    ],
+    "rounds": [
+     [
+      "15.00",
+      "23.00",
+      "5.00"
+     ],
+     [
+      "20.00",
+      "19.00",
+      "16.00"
+     ],
+     [
+      "19.00",
+      "15.00",
+      "19.00"
+     ]
+    ],
+    "single": 0.0,
+    "vote3": false,
+    "vote6": false,
+    "vote9": true,
+    "debate1": false,
+    "debate2": true,
+    "tok_vote6": 969,
+    "tok_debate1": 1495,
+    "cost_vote6": 0.0007305,
+    "cost_debate1": 0.00100025,
+    "cost_vote9": 0.00117075,
+    "cost_debate2": 0.00154375,
+    "flips": {
+     "kept_wrong": 2,
+     "wrong_to_right": 3,
+     "right_to_wrong": 1
+    },
+    "unanimous0": false,
+    "unanimous2": false,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "22.00",
+      "22.00",
+      "22.00"
+     ],
+     [
+      "20.00",
+      "22.00",
+      "22.00"
+     ],
+     [
+      "20.00",
+      "23.00",
+      "22.00"
+     ]
+    ],
+    "review1": true,
+    "review2": false,
+    "out_vote": 73.77777777777777,
+    "out_debate": 30.833333333333332,
+    "out_review": 66.0,
+    "id": "q15",
+    "gold": "22",
+    "mode": "terse",
+    "samples": [
+     "22.00",
+     "22.00",
+     "22.00",
+     "22.00",
+     "20.00",
+     "22.00",
+     "22.00",
+     "22.00",
+     "22.00"
+    ],
+    "rounds": [
+     [
+      "22.00",
+      "22.00",
+      "22.00"
+     ],
+     [
+      "22.00",
+      "22.00",
+      "22.00"
+     ],
+     [
+      "22.00",
+      "22.00",
+      "22.00"
+     ]
+    ],
+    "single": 1.0,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 1175,
+    "tok_debate1": 1667,
+    "cost_vote6": 0.0011424999999999999,
+    "cost_debate1": 0.00094525,
+    "cost_vote9": 0.00158675,
+    "cost_debate2": 0.00129575,
+    "flips": {
+     "kept_right": 6
+    },
+    "unanimous0": true,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "23.00",
+      "16.00",
+      "16.00"
+     ],
+     [
+      "17.00",
+      "20.00",
+      "15.00"
+     ],
+     [
+      "18.00",
+      "26.00",
+      "16.00"
+     ]
+    ],
+    "review1": true,
+    "review2": false,
+    "out_vote": 50.333333333333336,
+    "out_debate": 47.333333333333336,
+    "out_review": 40.833333333333336,
+    "id": "q16",
+    "gold": "17",
+    "mode": "terse",
+    "samples": [
+     "23.00",
+     "16.00",
+     "16.00",
+     "16.00",
+     "18.00",
+     "18.00",
+     "16.00",
+     "17.00",
+     "15.00"
+    ],
+    "rounds": [
+     [
+      "23.00",
+      "16.00",
+      "16.00"
+     ],
+     [
+      "16.00",
+      "16.00",
+      "16.00"
+     ],
+     [
+      "16.00",
+      "16.00",
+      "16.00"
+     ]
+    ],
+    "single": 0.0,
+    "vote3": false,
+    "vote6": false,
+    "vote9": false,
+    "debate1": false,
+    "debate2": false,
+    "tok_vote6": 955,
+    "tok_debate1": 1419,
+    "cost_vote6": 0.0007025,
+    "cost_debate1": 0.0008535,
+    "cost_vote9": 0.00116475,
+    "cost_debate2": 0.001327,
+    "flips": {
+     "kept_wrong": 6
+    },
+    "unanimous0": false,
+    "unanimous2": true,
+    "converged_wrong": true,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "17.00",
+      "17.00",
+      "23.00"
+     ],
+     [
+      "17.00",
+      "18.00",
+      "18.00"
+     ],
+     [
+      "18.00",
+      "17.00",
+      "19.00"
+     ]
+    ],
+    "review1": false,
+    "review2": false,
+    "out_vote": 74.55555555555556,
+    "out_debate": 34.0,
+    "out_review": 62.0,
+    "id": "q17",
+    "gold": "17",
+    "mode": "terse",
+    "samples": [
+     "17.00",
+     "17.00",
+     "23.00",
+     "23.00",
+     "17.00",
+     "19.00",
+     "17.00",
+     "20.00",
+     "16.00"
+    ],
+    "rounds": [
+     [
+      "17.00",
+      "17.00",
+      "23.00"
+     ],
+     [
+      "17.00",
+      "17.00",
+      "17.00"
+     ],
+     [
+      "17.00",
+      "17.00",
+      "17.00"
+     ]
+    ],
+    "single": 0.6666666666666666,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 1222,
+    "tok_debate1": 2219,
+    "cost_vote6": 0.0012365,
+    "cost_debate1": 0.00134575,
+    "cost_vote9": 0.00160075,
+    "cost_debate2": 0.00171425,
+    "flips": {
+     "kept_right": 5,
+     "wrong_to_right": 1
+    },
+    "unanimous0": false,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "6.00",
+      "3.00",
+      "1.00"
+     ],
+     [
+      "5.00",
+      "3.00",
+      "3.00"
+     ],
+     [
+      "3.00",
+      "3.00",
+      "3.00"
+     ]
+    ],
+    "review1": true,
+    "review2": true,
+    "out_vote": 64.88888888888889,
+    "out_debate": 54.166666666666664,
+    "out_review": 68.16666666666667,
+    "id": "q18",
+    "gold": "3",
+    "mode": "terse",
+    "samples": [
+     "6.00",
+     "3.00",
+     "1.00",
+     "3.00",
+     "11.00",
+     "3.00",
+     "5.00",
+     "6.00",
+     "3.00"
+    ],
+    "rounds": [
+     [
+      "6.00",
+      "3.00",
+      "1.00"
+     ],
+     [
+      "3.00",
+      "6.00",
+      "3.00"
+     ],
+     [
+      "6.00",
+      "3.00",
+      "3.00"
+     ]
+    ],
+    "single": 0.3333333333333333,
+    "vote3": false,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 987,
+    "tok_debate1": 1649,
+    "cost_vote6": 0.0007665,
+    "cost_debate1": 0.0010195,
+    "cost_vote9": 0.00142675,
+    "cost_debate2": 0.001567,
+    "flips": {
+     "wrong_to_right": 3,
+     "right_to_wrong": 2,
+     "kept_right": 1
+    },
+    "unanimous0": false,
+    "unanimous2": false,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "10.31",
+      "10.11",
+      "12.29"
+     ],
+     [
+      "10.31",
+      "10.11",
+      "12.27"
+     ],
+     [
+      "10.31",
+      "10.22",
+      "12.13"
+     ]
+    ],
+    "review1": false,
+    "review2": false,
+    "out_vote": 165.33333333333334,
+    "out_debate": 112.5,
+    "out_review": 60.666666666666664,
+    "id": "q19",
+    "gold": "10.11",
+    "mode": "terse",
+    "samples": [
+     "10.31",
+     "10.11",
+     "12.29",
+     "10.86",
+     "12.85",
+     "10.10",
+     "12.27",
+     "10.12",
+     "12.05"
+    ],
+    "rounds": [
+     [
+      "10.31",
+      "10.11",
+      "12.29"
+     ],
+     [
+      "10.11",
+      "10.11",
+      "10.11"
+     ],
+     [
+      "10.11",
+      "10.12",
+      "10.11"
+     ]
+    ],
+    "single": 0.3333333333333333,
+    "vote3": false,
+    "vote6": false,
+    "vote9": false,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 1980,
+    "tok_debate1": 3599,
+    "cost_vote6": 0.0024690000000000003,
+    "cost_debate1": 0.0022525,
+    "cost_vote9": 0.0032955000000000003,
+    "cost_debate2": 0.0035557500000000003,
+    "flips": {
+     "wrong_to_right": 2,
+     "kept_right": 4
+    },
+    "unanimous0": false,
+    "unanimous2": false,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "8.94",
+      "8.94",
+      "8.94"
+     ],
+     [
+      "8.94",
+      "8.94",
+      "8.94"
+     ],
+     [
+      "8.94",
+      "9.00",
+      "9.03"
+     ]
+    ],
+    "review1": true,
+    "review2": true,
+    "out_vote": 213.22222222222223,
+    "out_debate": 69.0,
+    "out_review": 26.166666666666668,
+    "id": "q20",
+    "gold": "8.94",
+    "mode": "terse",
+    "samples": [
+     "8.94",
+     "8.94",
+     "8.94",
+     "8.94",
+     "8.94",
+     "10.63",
+     "8.94",
+     "11.25",
+     "8.96"
+    ],
+    "rounds": [
+     [
+      "8.94",
+      "8.94",
+      "8.94"
+     ],
+     [
+      "8.94",
+      "8.94",
+      "8.94"
+     ],
+     [
+      "8.94",
+      "8.94",
+      "8.96"
+     ]
+    ],
+    "single": 1.0,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 2317,
+    "tok_debate1": 4552,
+    "cost_vote6": 0.003122,
+    "cost_debate1": 0.002846,
+    "cost_vote9": 0.004162,
+    "cost_debate2": 0.0036825,
+    "flips": {
+     "kept_right": 5,
+     "right_to_wrong": 1
+    },
+    "unanimous0": true,
+    "unanimous2": false,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "9.08",
+      "10.54",
+      "9.07"
+     ],
+     [
+      "9.08",
+      "10.49",
+      "9.07"
+     ],
+     [
+      "11.33",
+      "10.42",
+      "10.02"
+     ]
+    ],
+    "review1": true,
+    "review2": false,
+    "out_vote": 175.55555555555554,
+    "out_debate": 61.333333333333336,
+    "out_review": 29.5,
+    "id": "q21",
+    "gold": "9.07",
+    "mode": "terse",
+    "samples": [
+     "9.08",
+     "10.54",
+     "9.07",
+     "9.07",
+     "11.74",
+     "9.07",
+     "9.07",
+     "11.28",
+     "11.21"
+    ],
+    "rounds": [
+     [
+      "9.08",
+      "10.54",
+      "9.07"
+     ],
+     [
+      "9.07",
+      "9.07",
+      "9.07"
+     ],
+     [
+      "9.07",
+      "9.07",
+      "9.07"
+     ]
+    ],
+    "single": 0.6666666666666666,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 2056,
+    "tok_debate1": 3398,
+    "cost_vote6": 0.0026105,
+    "cost_debate1": 0.00230725,
+    "cost_vote9": 0.0034817499999999996,
+    "cost_debate2": 0.002811,
+    "flips": {
+     "kept_right": 5,
+     "wrong_to_right": 1
+    },
+    "unanimous0": false,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "13.18",
+      "10.97",
+      "10.14"
+     ],
+     [
+      "13.22",
+      "10.14",
+      "10.14"
+     ],
+     [
+      "13.14",
+      "10.14",
+      "11.42"
+     ]
+    ],
+    "review1": true,
+    "review2": false,
+    "out_vote": 120.44444444444444,
+    "out_debate": 63.833333333333336,
+    "out_review": 83.66666666666667,
+    "id": "q22",
+    "gold": "10.14",
+    "mode": "terse",
+    "samples": [
+     "13.18",
+     "10.97",
+     "10.14",
+     "10.14",
+     "13.96",
+     "12.11",
+     "10.14",
+     "12.15",
+     "12.51"
+    ],
+    "rounds": [
+     [
+      "13.18",
+      "10.97",
+      "10.14"
+     ],
+     [
+      "10.14",
+      "10.14",
+      "10.14"
+     ],
+     [
+      "10.14",
+      "10.14",
+      "10.14"
+     ]
+    ],
+    "single": 0.3333333333333333,
+    "vote3": false,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 1616,
+    "tok_debate1": 2286,
+    "cost_vote6": 0.00172,
+    "cost_debate1": 0.00155325,
+    "cost_vote9": 0.002492,
+    "cost_debate2": 0.00207525,
+    "flips": {
+     "wrong_to_right": 2,
+     "kept_right": 4
+    },
+    "unanimous0": false,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "11.53",
+      "13.87",
+      "12.19"
+     ],
+     [
+      "12.34",
+      "13.86",
+      "9.00"
+     ],
+     [
+      "12.33",
+      "14.18",
+      "9.00"
+     ]
+    ],
+    "review1": false,
+    "review2": false,
+    "out_vote": 82.33333333333333,
+    "out_debate": 103.66666666666667,
+    "out_review": 90.16666666666667,
+    "id": "q23",
+    "gold": "9.00",
+    "mode": "terse",
+    "samples": [
+     "11.53",
+     "13.87",
+     "12.19",
+     "11.63",
+     "11.85",
+     "9.00",
+     "11.97",
+     "9.00",
+     "11.60"
+    ],
+    "rounds": [
+     [
+      "11.53",
+      "13.87",
+      "12.19"
+     ],
+     [
+      "13.86",
+      "9.00",
+      "11.53"
+     ],
+     [
+      "9.00",
+      "9.00",
+      "9.00"
+     ]
+    ],
+    "single": 0.0,
+    "vote3": false,
+    "vote6": false,
+    "vote9": true,
+    "debate1": false,
+    "debate2": true,
+    "tok_vote6": 1332,
+    "tok_debate1": 1533,
+    "cost_vote6": 0.001152,
+    "cost_debate1": 0.00113925,
+    "cost_vote9": 0.001806,
+    "cost_debate2": 0.0020405,
+    "flips": {
+     "kept_wrong": 2,
+     "wrong_to_right": 3,
+     "kept_right": 1
+    },
+    "unanimous0": false,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "9.96",
+      "12.86",
+      "12.14"
+     ],
+     [
+      "9.96",
+      "13.17",
+      "12.04"
+     ],
+     [
+      "11.04",
+      "13.19",
+      "12.06"
+     ]
+    ],
+    "review1": true,
+    "review2": false,
+    "out_vote": 73.33333333333333,
+    "out_debate": 92.83333333333333,
+    "out_review": 30.833333333333332,
+    "id": "q24",
+    "gold": "9.96",
+    "mode": "terse",
+    "samples": [
+     "9.96",
+     "12.86",
+     "12.14",
+     "9.96",
+     "12.89",
+     "12.11",
+     "11.99",
+     "10.63",
+     "11.85"
+    ],
+    "rounds": [
+     [
+      "9.96",
+      "12.86",
+      "12.14"
+     ],
+     [
+      "9.96",
+      "9.96",
+      "9.96"
+     ],
+     [
+      "9.96",
+      "9.96",
+      "9.96"
+     ]
+    ],
+    "single": 0.3333333333333333,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 1454,
+    "tok_debate1": 2644,
+    "cost_vote6": 0.001396,
+    "cost_debate1": 0.00202775,
+    "cost_vote9": 0.001644,
+    "cost_debate2": 0.00268025,
+    "flips": {
+     "kept_right": 4,
+     "wrong_to_right": 2
+    },
+    "unanimous0": false,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "415.00",
+      "640.00",
+      "375.00"
+     ],
+     [
+      "420.00",
+      "746.00",
+      "746.00"
+     ],
+     [
+      "435.00",
+      "746.00",
+      "746.00"
+     ]
+    ],
+    "review1": true,
+    "review2": true,
+    "out_vote": 25.88888888888889,
+    "out_debate": 96.0,
+    "out_review": 91.66666666666667,
+    "id": "q25",
+    "gold": "746",
+    "mode": "terse",
+    "samples": [
+     "415.00",
+     "640.00",
+     "375.00",
+     "320.00",
+     "164.00",
+     "300.00",
+     "290.00",
+     "1110.00",
+     "455.00"
+    ],
+    "rounds": [
+     [
+      "415.00",
+      "640.00",
+      "375.00"
+     ],
+     [
+      "390.00",
+      "746.00",
+      "746.00"
+     ],
+     [
+      "746.00",
+      "746.00",
+      "746.00"
+     ]
+    ],
+    "single": 0.0,
+    "vote3": false,
+    "vote6": false,
+    "vote9": false,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 888,
+    "tok_debate1": 1507,
+    "cost_vote6": 0.00048450000000000007,
+    "cost_debate1": 0.001229,
+    "cost_vote9": 0.00074275,
+    "cost_debate2": 0.0019725,
+    "flips": {
+     "kept_wrong": 1,
+     "wrong_to_right": 3,
+     "kept_right": 2
+    },
+    "unanimous0": false,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "560.00",
+      "627.00",
+      "180.00"
+     ],
+     [
+      "515.00",
+      "583.00",
+      "160.00"
+     ],
+     [
+      "500.00",
+      "560.00",
+      "160.00"
+     ]
+    ],
+    "review1": false,
+    "review2": false,
+    "out_vote": 46.44444444444444,
+    "out_debate": 87.0,
+    "out_review": 25.0,
+    "id": "q26",
+    "gold": "627",
+    "mode": "terse",
+    "samples": [
+     "560.00",
+     "627.00",
+     "180.00",
+     "313.00",
+     "380.00",
+     "340.00",
+     "200.00",
+     "400.00",
+     "240.00"
+    ],
+    "rounds": [
+     [
+      "560.00",
+      "627.00",
+      "180.00"
+     ],
+     [
+      "627.00",
+      "560.00",
+      "627.00"
+     ],
+     [
+      "627.00",
+      "627.00",
+      "560.00"
+     ]
+    ],
+    "single": 0.3333333333333333,
+    "vote3": false,
+    "vote6": false,
+    "vote9": false,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 1079,
+    "tok_debate1": 1941,
+    "cost_vote6": 0.0008665000000000001,
+    "cost_debate1": 0.0010995,
+    "cost_vote9": 0.00111275,
+    "cost_debate2": 0.0021425,
+    "flips": {
+     "wrong_to_right": 3,
+     "right_to_wrong": 2,
+     "kept_right": 1
+    },
+    "unanimous0": false,
+    "unanimous2": false,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "620.00",
+      "440.00",
+      "660.00"
+     ],
+     [
+      "576.00",
+      "436.00",
+      "615.00"
+     ],
+     [
+      "287.00",
+      "436.00",
+      "576.00"
+     ]
+    ],
+    "review1": true,
+    "review2": false,
+    "out_vote": 25.666666666666668,
+    "out_debate": 50.833333333333336,
+    "out_review": 135.83333333333334,
+    "id": "q27",
+    "gold": "576",
+    "mode": "terse",
+    "samples": [
+     "620.00",
+     "440.00",
+     "660.00",
+     "585.00",
+     "700.00",
+     "740.00",
+     "561.00",
+     "574.00",
+     "540.00"
+    ],
+    "rounds": [
+     [
+      "620.00",
+      "440.00",
+      "660.00"
+     ],
+     [
+      "440.00",
+      "440.00",
+      "576.00"
+     ],
+     [
+      "576.00",
+      "576.00",
+      "440.00"
+     ]
+    ],
+    "single": 0.0,
+    "vote3": false,
+    "vote6": false,
+    "vote9": false,
+    "debate1": false,
+    "debate2": true,
+    "tok_vote6": 894,
+    "tok_debate1": 1335,
+    "cost_vote6": 0.0004965,
+    "cost_debate1": 0.0008745000000000001,
+    "cost_vote9": 0.00073875,
+    "cost_debate2": 0.001301,
+    "flips": {
+     "kept_wrong": 2,
+     "wrong_to_right": 3,
+     "right_to_wrong": 1
+    },
+    "unanimous0": false,
+    "unanimous2": false,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "390.00",
+      "345.00",
+      "510.00"
+     ],
+     [
+      "510.00",
+      "341.00",
+      "420.00"
+     ],
+     [
+      "370.00",
+      "283.00",
+      "510.00"
+     ]
+    ],
+    "review1": true,
+    "review2": false,
+    "out_vote": 52.888888888888886,
+    "out_debate": 106.16666666666667,
+    "out_review": 80.66666666666667,
+    "id": "q28",
+    "gold": "510",
+    "mode": "terse",
+    "samples": [
+     "390.00",
+     "345.00",
+     "510.00",
+     "309.00",
+     "205.00",
+     "311.00",
+     "534.00",
+     "310.00",
+     "218.00"
+    ],
+    "rounds": [
+     [
+      "390.00",
+      "345.00",
+      "510.00"
+     ],
+     [
+      "510.00",
+      "390.00",
+      "485.00"
+     ],
+     [
+      "390.00",
+      "510.00",
+      "510.00"
+     ]
+    ],
+    "single": 0.3333333333333333,
+    "vote3": false,
+    "vote6": false,
+    "vote9": false,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 1121,
+    "tok_debate1": 2309,
+    "cost_vote6": 0.0009505,
+    "cost_debate1": 0.00162025,
+    "cost_vote9": 0.00122875,
+    "cost_debate2": 0.00263825,
+    "flips": {
+     "wrong_to_right": 3,
+     "kept_wrong": 1,
+     "right_to_wrong": 2
+    },
+    "unanimous0": false,
+    "unanimous2": false,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "435.00",
+      "430.00",
+      "430.00"
+     ],
+     [
+      "430.00",
+      "669.00",
+      "445.00"
+     ],
+     [
+      "430.00",
+      "669.00",
+      "475.00"
+     ]
+    ],
+    "review1": false,
+    "review2": false,
+    "out_vote": 86.0,
+    "out_debate": 98.0,
+    "out_review": 56.666666666666664,
+    "id": "q29",
+    "gold": "669",
+    "mode": "terse",
+    "samples": [
+     "435.00",
+     "430.00",
+     "430.00",
+     "645.00",
+     "196.00",
+     "669.00",
+     "519.00",
+     "669.00",
+     "375.00"
+    ],
+    "rounds": [
+     [
+      "435.00",
+      "430.00",
+      "430.00"
+     ],
+     [
+      "669.00",
+      "669.00",
+      "430.00"
+     ],
+     [
+      "669.00",
+      "669.00",
+      "669.00"
+     ]
+    ],
+    "single": 0.0,
+    "vote3": false,
+    "vote6": false,
+    "vote9": false,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 1106,
+    "tok_debate1": 1532,
+    "cost_vote6": 0.0009205,
+    "cost_debate1": 0.0012685,
+    "cost_vote9": 0.00182475,
+    "cost_debate2": 0.00201475,
+    "flips": {
+     "wrong_to_right": 3,
+     "kept_wrong": 1,
+     "kept_right": 2
+    },
+    "unanimous0": false,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "225.00",
+      "345.00",
+      "297.00"
+     ],
+     [
+      "213.00",
+      "338.00",
+      "289.00"
+     ],
+     [
+      "220.00",
+      "328.00",
+      "328.00"
+     ]
+    ],
+    "review1": false,
+    "review2": true,
+    "out_vote": 26.11111111111111,
+    "out_debate": 126.66666666666667,
+    "out_review": 89.66666666666667,
+    "id": "q30",
+    "gold": "328",
+    "mode": "terse",
+    "samples": [
+     "225.00",
+     "345.00",
+     "297.00",
+     "267.00",
+     "391.00",
+     "280.00",
+     "395.00",
+     "235.00",
+     "224.00"
+    ],
+    "rounds": [
+     [
+      "225.00",
+      "345.00",
+      "297.00"
+     ],
+     [
+      "328.00",
+      "328.00",
+      "328.00"
+     ],
+     [
+      "328.00",
+      "328.00",
+      "328.00"
+     ]
+    ],
+    "single": 0.0,
+    "vote3": false,
+    "vote6": false,
+    "vote9": false,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 896,
+    "tok_debate1": 1783,
+    "cost_vote6": 0.0005005000000000001,
+    "cost_debate1": 0.00176,
+    "cost_vote9": 0.00074675,
+    "cost_debate2": 0.0025465,
+    "flips": {
+     "wrong_to_right": 3,
+     "kept_right": 3
+    },
+    "unanimous0": false,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   }
+  ],
+  "brief": [
+   {
+    "srounds": [
+     [
+      "5303.72",
+      "5303.72",
+      "5303.72"
+     ],
+     [
+      "5306.96",
+      "5305.88",
+      "5303.72"
+     ],
+     [
+      "5306.96",
+      "5305.88",
+      "5303.72"
+     ]
+    ],
+    "review1": false,
+    "review2": false,
+    "out_vote": 147.77777777777777,
+    "out_debate": 117.16666666666667,
+    "out_review": 140.83333333333334,
+    "id": "q01",
+    "gold": "5301.56",
+    "mode": "brief",
+    "samples": [
+     "5303.72",
+     "5303.72",
+     "5303.72",
+     "5303.72",
+     "5303.72",
+     "5303.72",
+     "5303.72",
+     "5301.56",
+     "5303.72"
+    ],
+    "rounds": [
+     [
+      "5303.72",
+      "5303.72",
+      "5303.72"
+     ],
+     [
+      "5303.72",
+      "5303.72",
+      "5303.72"
+     ],
+     [
+      "5303.72",
+      "5303.72",
+      "5303.72"
+     ]
+    ],
+    "single": 0.0,
+    "vote3": false,
+    "vote6": false,
+    "vote9": false,
+    "debate1": false,
+    "debate2": false,
+    "tok_vote6": 1666,
+    "tok_debate1": 3055,
+    "cost_vote6": 0.0019459999999999998,
+    "cost_debate1": 0.002204,
+    "cost_vote9": 0.002957,
+    "cost_debate2": 0.00327225,
+    "flips": {
+     "kept_wrong": 6
+    },
+    "unanimous0": true,
+    "unanimous2": true,
+    "converged_wrong": true,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "6336.08",
+      "6334.36",
+      "6327.64"
+     ],
+     [
+      "6338.68",
+      "6334.36",
+      "6327.64"
+     ],
+     [
+      "6338.68",
+      "6338.68",
+      "6327.64"
+     ]
+    ],
+    "review1": true,
+    "review2": true,
+    "out_vote": 150.66666666666666,
+    "out_debate": 139.33333333333334,
+    "out_review": 148.16666666666666,
+    "id": "q02",
+    "gold": "6338.68",
+    "mode": "brief",
+    "samples": [
+     "6336.08",
+     "6334.36",
+     "6327.64",
+     "6333.16",
+     "6334.36",
+     "6335.36",
+     "6326.44",
+     "6336.08",
+     "6327.64"
+    ],
+    "rounds": [
+     [
+      "6336.08",
+      "6334.36",
+      "6327.64"
+     ],
+     [
+      "6326.44",
+      "6327.64",
+      "6327.64"
+     ],
+     [
+      "6327.64",
+      "6327.64",
+      "6327.64"
+     ]
+    ],
+    "single": 0.0,
+    "vote3": false,
+    "vote6": false,
+    "vote9": false,
+    "debate1": false,
+    "debate2": false,
+    "tok_vote6": 1714,
+    "tok_debate1": 2950,
+    "cost_vote6": 0.002042,
+    "cost_debate1": 0.002204,
+    "cost_vote9": 0.003009,
+    "cost_debate2": 0.003469,
+    "flips": {
+     "kept_wrong": 6
+    },
+    "unanimous0": false,
+    "unanimous2": true,
+    "converged_wrong": true,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "6291.57",
+      "6289.17",
+      "6291.57"
+     ],
+     [
+      "6291.57",
+      "6289.17",
+      "6291.57"
+     ],
+     [
+      "6291.57",
+      "6290.40",
+      "6290.37"
+     ]
+    ],
+    "review1": false,
+    "review2": false,
+    "out_vote": 148.44444444444446,
+    "out_debate": 132.16666666666666,
+    "out_review": 141.66666666666666,
+    "id": "q03",
+    "gold": "6290.37",
+    "mode": "brief",
+    "samples": [
+     "6291.57",
+     "6289.17",
+     "6291.57",
+     "6290.37",
+     "6290.40",
+     "6291.57",
+     "6296.07",
+     "6289.23",
+     "6291.57"
+    ],
+    "rounds": [
+     [
+      "6291.57",
+      "6289.17",
+      "6291.57"
+     ],
+     [
+      "6289.17",
+      "6291.57",
+      "6290.37"
+     ],
+     [
+      "6290.94",
+      "6290.37",
+      "6290.37"
+     ]
+    ],
+    "single": 0.0,
+    "vote3": false,
+    "vote6": false,
+    "vote9": false,
+    "debate1": false,
+    "debate2": true,
+    "tok_vote6": 1729,
+    "tok_debate1": 3259,
+    "cost_vote6": 0.002072,
+    "cost_debate1": 0.0023704999999999998,
+    "cost_vote9": 0.002969,
+    "cost_debate2": 0.00359275,
+    "flips": {
+     "kept_wrong": 3,
+     "wrong_to_right": 2,
+     "kept_right": 1
+    },
+    "unanimous0": false,
+    "unanimous2": false,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "3399.18",
+      "3399.18",
+      "3400.38"
+     ],
+     [
+      "3399.18",
+      "3400.38",
+      "3400.38"
+     ],
+     [
+      "3399.18",
+      "3400.38",
+      "3400.38"
+     ]
+    ],
+    "review1": false,
+    "review2": false,
+    "out_vote": 134.88888888888889,
+    "out_debate": 118.83333333333333,
+    "out_review": 127.33333333333333,
+    "id": "q04",
+    "gold": "3399.18",
+    "mode": "brief",
+    "samples": [
+     "3399.18",
+     "3399.18",
+     "3400.38",
+     "3399.18",
+     "3400.38",
+     "3400.38",
+     "3399.18",
+     "3400.38",
+     "3399.18"
+    ],
+    "rounds": [
+     [
+      "3399.18",
+      "3399.18",
+      "3400.38"
+     ],
+     [
+      "3399.18",
+      "3399.18",
+      "3399.18"
+     ],
+     [
+      "3399.18",
+      "3399.18",
+      "3399.18"
+     ]
+    ],
+    "single": 0.6666666666666666,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 1600,
+    "tok_debate1": 2931,
+    "cost_vote6": 0.0018245,
+    "cost_debate1": 0.0021502500000000003,
+    "cost_vote9": 0.00272275,
+    "cost_debate2": 0.00320925,
+    "flips": {
+     "kept_right": 5,
+     "wrong_to_right": 1
+    },
+    "unanimous0": false,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "5408.58",
+      "5408.58",
+      "5420.58"
+     ],
+     [
+      "5408.58",
+      "5408.58",
+      "5420.58"
+     ],
+     [
+      "5408.58",
+      "5408.58",
+      "5420.58"
+     ]
+    ],
+    "review1": true,
+    "review2": true,
+    "out_vote": 138.22222222222223,
+    "out_debate": 128.33333333333334,
+    "out_review": 132.33333333333334,
+    "id": "q05",
+    "gold": "5408.58",
+    "mode": "brief",
+    "samples": [
+     "5408.58",
+     "5408.58",
+     "5420.58",
+     "5408.58",
+     "5408.58",
+     "5408.58",
+     "5420.58",
+     "5408.58",
+     "5408.58"
+    ],
+    "rounds": [
+     [
+      "5408.58",
+      "5408.58",
+      "5420.58"
+     ],
+     [
+      "5408.58",
+      "5408.58",
+      "5408.58"
+     ],
+     [
+      "5408.58",
+      "5408.58",
+      "5408.58"
+     ]
+    ],
+    "single": 0.6666666666666666,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 1629,
+    "tok_debate1": 2966,
+    "cost_vote6": 0.001872,
+    "cost_debate1": 0.0022045,
+    "cost_vote9": 0.0027849999999999997,
+    "cost_debate2": 0.003347,
+    "flips": {
+     "kept_right": 5,
+     "wrong_to_right": 1
+    },
+    "unanimous0": false,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "5670.04",
+      "5670.04",
+      "5670.04"
+     ],
+     [
+      "5670.04",
+      "5670.04",
+      "5670.04"
+     ],
+     [
+      "5670.04",
+      "5670.04",
+      "5670.04"
+     ]
+    ],
+    "review1": true,
+    "review2": true,
+    "out_vote": 139.77777777777777,
+    "out_debate": 120.16666666666667,
+    "out_review": 147.66666666666666,
+    "id": "q06",
+    "gold": "5670.04",
+    "mode": "brief",
+    "samples": [
+     "5670.04",
+     "5670.04",
+     "5670.04",
+     "5670.04",
+     "5670.04",
+     "5670.04",
+     "5670.04",
+     "5670.04",
+     "5670.04"
+    ],
+    "rounds": [
+     [
+      "5670.04",
+      "5670.04",
+      "5670.04"
+     ],
+     [
+      "5670.04",
+      "5670.04",
+      "5670.04"
+     ],
+     [
+      "5670.04",
+      "5670.04",
+      "5670.04"
+     ]
+    ],
+    "single": 1.0,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 1651,
+    "tok_debate1": 2869,
+    "cost_vote6": 0.001916,
+    "cost_debate1": 0.00207,
+    "cost_vote9": 0.002813,
+    "cost_debate2": 0.00317925,
+    "flips": {
+     "kept_right": 6
+    },
+    "unanimous0": true,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "13.00",
+      "13.00",
+      "13.00"
+     ],
+     [
+      "13.00",
+      "13.00",
+      "13.00"
+     ],
+     [
+      "13.00",
+      "13.00",
+      "13.00"
+     ]
+    ],
+    "review1": true,
+    "review2": true,
+    "out_vote": 202.77777777777777,
+    "out_debate": 104.33333333333333,
+    "out_review": 137.16666666666666,
+    "id": "q07",
+    "gold": "13",
+    "mode": "brief",
+    "samples": [
+     "13.00",
+     "13.00",
+     "13.00",
+     "13.00",
+     "13.00",
+     "13.00",
+     "13.00",
+     "13.00",
+     "13.00"
+    ],
+    "rounds": [
+     [
+      "13.00",
+      "13.00",
+      "13.00"
+     ],
+     [
+      "13.00",
+      "13.00",
+      "13.00"
+     ],
+     [
+      "13.00",
+      "13.00",
+      "13.00"
+     ]
+    ],
+    "single": 1.0,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 1928,
+    "tok_debate1": 3543,
+    "cost_vote6": 0.002659,
+    "cost_debate1": 0.00249225,
+    "cost_vote9": 0.0039065,
+    "cost_debate2": 0.0034825,
+    "flips": {
+     "kept_right": 6
+    },
+    "unanimous0": true,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "11.00",
+      "11.00",
+      "11.00"
+     ],
+     [
+      "11.00",
+      "11.00",
+      "11.00"
+     ],
+     [
+      "11.00",
+      "11.00",
+      "11.00"
+     ]
+    ],
+    "review1": true,
+    "review2": true,
+    "out_vote": 184.22222222222223,
+    "out_debate": 113.66666666666667,
+    "out_review": 153.83333333333334,
+    "id": "q08",
+    "gold": "11",
+    "mode": "brief",
+    "samples": [
+     "11.00",
+     "11.00",
+     "11.00",
+     "11.00",
+     "11.00",
+     "11.00",
+     "11.00",
+     "11.00",
+     "11.00"
+    ],
+    "rounds": [
+     [
+      "11.00",
+      "11.00",
+      "11.00"
+     ],
+     [
+      "11.00",
+      "11.00",
+      "11.00"
+     ],
+     [
+      "11.00",
+      "11.00",
+      "11.00"
+     ]
+    ],
+    "single": 1.0,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 1790,
+    "tok_debate1": 3222,
+    "cost_vote6": 0.0023829999999999997,
+    "cost_debate1": 0.00230175,
+    "cost_vote9": 0.0035724999999999997,
+    "cost_debate2": 0.00337475,
+    "flips": {
+     "kept_right": 6
+    },
+    "unanimous0": true,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "14.00",
+      "13.00",
+      "13.00"
+     ],
+     [
+      "14.00",
+      "14.00",
+      "14.00"
+     ],
+     [
+      "14.00",
+      "14.00",
+      "14.00"
+     ]
+    ],
+    "review1": true,
+    "review2": true,
+    "out_vote": 188.66666666666666,
+    "out_debate": 95.83333333333333,
+    "out_review": 166.33333333333334,
+    "id": "q09",
+    "gold": "14",
+    "mode": "brief",
+    "samples": [
+     "14.00",
+     "13.00",
+     "13.00",
+     "14.00",
+     "14.00",
+     "14.00",
+     "14.00",
+     "14.00",
+     "14.00"
+    ],
+    "rounds": [
+     [
+      "14.00",
+      "13.00",
+      "13.00"
+     ],
+     [
+      "14.00",
+      "13.00",
+      "13.00"
+     ],
+     [
+      "14.00",
+      "14.00",
+      "14.00"
+     ]
+    ],
+    "single": 0.3333333333333333,
+    "vote3": false,
+    "vote6": true,
+    "vote9": true,
+    "debate1": false,
+    "debate2": true,
+    "tok_vote6": 1813,
+    "tok_debate1": 3141,
+    "cost_vote6": 0.0024395,
+    "cost_debate1": 0.0021869999999999997,
+    "cost_vote9": 0.00365025,
+    "cost_debate2": 0.0031035,
+    "flips": {
+     "kept_right": 2,
+     "kept_wrong": 2,
+     "wrong_to_right": 2
+    },
+    "unanimous0": false,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "15.00",
+      "16.00",
+      "16.00"
+     ],
+     [
+      "15.00",
+      "16.00",
+      "16.00"
+     ],
+     [
+      "16.00",
+      "16.00",
+      "16.00"
+     ]
+    ],
+    "review1": true,
+    "review2": true,
+    "out_vote": 230.44444444444446,
+    "out_debate": 126.0,
+    "out_review": 158.0,
+    "id": "q10",
+    "gold": "16",
+    "mode": "brief",
+    "samples": [
+     "15.00",
+     "16.00",
+     "16.00",
+     "16.00",
+     "15.00",
+     "16.00",
+     "16.00",
+     "16.00",
+     "16.00"
+    ],
+    "rounds": [
+     [
+      "15.00",
+      "16.00",
+      "16.00"
+     ],
+     [
+      "16.00",
+      "15.00",
+      "15.00"
+     ],
+     [
+      "15.00",
+      "15.00",
+      "15.00"
+     ]
+    ],
+    "single": 0.6666666666666666,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": false,
+    "debate2": false,
+    "tok_vote6": 2025,
+    "tok_debate1": 4294,
+    "cost_vote6": 0.002853,
+    "cost_debate1": 0.0032907500000000003,
+    "cost_vote9": 0.0044044999999999996,
+    "cost_debate2": 0.00427125,
+    "flips": {
+     "wrong_to_right": 1,
+     "right_to_wrong": 3,
+     "kept_wrong": 2
+    },
+    "unanimous0": false,
+    "unanimous2": true,
+    "converged_wrong": true,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "10.00",
+      "10.00",
+      "9.00"
+     ],
+     [
+      "10.00",
+      "10.00",
+      "9.00"
+     ],
+     [
+      "10.00",
+      "9.00",
+      "9.00"
+     ]
+    ],
+    "review1": true,
+    "review2": false,
+    "out_vote": 161.88888888888889,
+    "out_debate": 94.33333333333333,
+    "out_review": 113.66666666666667,
+    "id": "q11",
+    "gold": "10",
+    "mode": "brief",
+    "samples": [
+     "10.00",
+     "10.00",
+     "9.00",
+     "10.00",
+     "9.00",
+     "10.00",
+     "10.00",
+     "10.00",
+     "10.00"
+    ],
+    "rounds": [
+     [
+      "10.00",
+      "10.00",
+      "9.00"
+     ],
+     [
+      "10.00",
+      "10.00",
+      "10.00"
+     ],
+     [
+      "10.00",
+      "10.00",
+      "10.00"
+     ]
+    ],
+    "single": 0.6666666666666666,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 1689,
+    "tok_debate1": 3127,
+    "cost_vote6": 0.0021809999999999998,
+    "cost_debate1": 0.00222725,
+    "cost_vote9": 0.0031704999999999997,
+    "cost_debate2": 0.003077,
+    "flips": {
+     "kept_right": 5,
+     "wrong_to_right": 1
+    },
+    "unanimous0": false,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "12.00",
+      "12.00",
+      "12.00"
+     ],
+     [
+      "12.00",
+      "12.00",
+      "12.00"
+     ],
+     [
+      "12.00",
+      "12.00",
+      "12.00"
+     ]
+    ],
+    "review1": true,
+    "review2": true,
+    "out_vote": 178.11111111111111,
+    "out_debate": 108.16666666666667,
+    "out_review": 146.66666666666666,
+    "id": "q12",
+    "gold": "12",
+    "mode": "brief",
+    "samples": [
+     "12.00",
+     "12.00",
+     "12.00",
+     "12.00",
+     "12.00",
+     "12.00",
+     "12.00",
+     "12.00",
+     "12.00"
+    ],
+    "rounds": [
+     [
+      "12.00",
+      "12.00",
+      "12.00"
+     ],
+     [
+      "12.00",
+      "12.00",
+      "12.00"
+     ],
+     [
+      "12.00",
+      "12.00",
+      "12.00"
+     ]
+    ],
+    "single": 1.0,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 1710,
+    "tok_debate1": 3173,
+    "cost_vote6": 0.0022229999999999997,
+    "cost_debate1": 0.00223525,
+    "cost_vote9": 0.0034625,
+    "cost_debate2": 0.0032735,
+    "flips": {
+     "kept_right": 6
+    },
+    "unanimous0": true,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "6.00",
+      "6.00",
+      "6.00"
+     ],
+     [
+      "6.00",
+      "6.00",
+      "6.00"
+     ],
+     [
+      "6.00",
+      "6.00",
+      "7.00"
+     ]
+    ],
+    "review1": true,
+    "review2": true,
+    "out_vote": 140.44444444444446,
+    "out_debate": 96.0,
+    "out_review": 114.83333333333333,
+    "id": "q13",
+    "gold": "6",
+    "mode": "brief",
+    "samples": [
+     "6.00",
+     "6.00",
+     "6.00",
+     "6.00",
+     "6.00",
+     "6.00",
+     "6.00",
+     "6.00",
+     "7.00"
+    ],
+    "rounds": [
+     [
+      "6.00",
+      "6.00",
+      "6.00"
+     ],
+     [
+      "6.00",
+      "6.00",
+      "6.00"
+     ],
+     [
+      "6.00",
+      "6.00",
+      "6.00"
+     ]
+    ],
+    "single": 1.0,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 1425,
+    "tok_debate1": 2559,
+    "cost_vote6": 0.0017055,
+    "cost_debate1": 0.0018,
+    "cost_vote9": 0.00277325,
+    "cost_debate2": 0.0027140000000000003,
+    "flips": {
+     "kept_right": 6
+    },
+    "unanimous0": true,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "19.00",
+      "19.00",
+      "17.00"
+     ],
+     [
+      "19.00",
+      "19.00",
+      "19.00"
+     ],
+     [
+      "19.00",
+      "19.00",
+      "19.00"
+     ]
+    ],
+    "review1": true,
+    "review2": true,
+    "out_vote": 171.0,
+    "out_debate": 155.66666666666666,
+    "out_review": 143.33333333333334,
+    "id": "q14",
+    "gold": "19",
+    "mode": "brief",
+    "samples": [
+     "19.00",
+     "19.00",
+     "17.00",
+     "19.00",
+     "19.00",
+     "19.00",
+     "19.00",
+     "19.00",
+     "18.00"
+    ],
+    "rounds": [
+     [
+      "19.00",
+      "19.00",
+      "17.00"
+     ],
+     [
+      "19.00",
+      "19.00",
+      "19.00"
+     ],
+     [
+      "19.00",
+      "19.00",
+      "19.00"
+     ]
+    ],
+    "single": 0.6666666666666666,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 1726,
+    "tok_debate1": 3035,
+    "cost_vote6": 0.0023075,
+    "cost_debate1": 0.002668,
+    "cost_vote9": 0.00332325,
+    "cost_debate2": 0.0037819999999999998,
+    "flips": {
+     "kept_right": 5,
+     "wrong_to_right": 1
+    },
+    "unanimous0": false,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "22.00",
+      "22.00",
+      "20.00"
+     ],
+     [
+      "22.00",
+      "22.00",
+      "20.00"
+     ],
+     [
+      "22.00",
+      "22.00",
+      "22.00"
+     ]
+    ],
+    "review1": true,
+    "review2": true,
+    "out_vote": 133.66666666666666,
+    "out_debate": 92.0,
+    "out_review": 100.33333333333333,
+    "id": "q15",
+    "gold": "22",
+    "mode": "brief",
+    "samples": [
+     "22.00",
+     "22.00",
+     "20.00",
+     "22.00",
+     "22.00",
+     "22.00",
+     "22.00",
+     "22.00",
+     "22.00"
+    ],
+    "rounds": [
+     [
+      "22.00",
+      "22.00",
+      "20.00"
+     ],
+     [
+      "22.00",
+      "22.00",
+      "22.00"
+     ],
+     [
+      "22.00",
+      "22.00",
+      "22.00"
+     ]
+    ],
+    "single": 0.6666666666666666,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 1395,
+    "tok_debate1": 2426,
+    "cost_vote6": 0.0016455,
+    "cost_debate1": 0.001765,
+    "cost_vote9": 0.00265125,
+    "cost_debate2": 0.00257675,
+    "flips": {
+     "kept_right": 5,
+     "wrong_to_right": 1
+    },
+    "unanimous0": false,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "17.00",
+      "17.00",
+      "17.00"
+     ],
+     [
+      "17.00",
+      "17.00",
+      "17.00"
+     ],
+     [
+      "17.00",
+      "17.00",
+      "17.00"
+     ]
+    ],
+    "review1": true,
+    "review2": true,
+    "out_vote": 194.0,
+    "out_debate": 83.83333333333333,
+    "out_review": 118.66666666666667,
+    "id": "q16",
+    "gold": "17",
+    "mode": "brief",
+    "samples": [
+     "17.00",
+     "17.00",
+     "17.00",
+     "17.00",
+     "17.00",
+     "17.00",
+     "17.00",
+     "17.00",
+     "17.00"
+    ],
+    "rounds": [
+     [
+      "17.00",
+      "17.00",
+      "17.00"
+     ],
+     [
+      "17.00",
+      "17.00",
+      "17.00"
+     ],
+     [
+      "17.00",
+      "17.00",
+      "17.00"
+     ]
+    ],
+    "single": 1.0,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 1540,
+    "tok_debate1": 2555,
+    "cost_vote6": 0.0019355,
+    "cost_debate1": 0.00177625,
+    "cost_vote9": 0.00373725,
+    "cost_debate2": 0.00256425,
+    "flips": {
+     "kept_right": 6
+    },
+    "unanimous0": true,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "16.00",
+      "17.00",
+      "17.00"
+     ],
+     [
+      "17.00",
+      "17.00",
+      "17.00"
+     ],
+     [
+      "17.00",
+      "17.00",
+      "17.00"
+     ]
+    ],
+    "review1": true,
+    "review2": true,
+    "out_vote": 190.55555555555554,
+    "out_debate": 101.66666666666667,
+    "out_review": 110.5,
+    "id": "q17",
+    "gold": "17",
+    "mode": "brief",
+    "samples": [
+     "16.00",
+     "17.00",
+     "17.00",
+     "17.00",
+     "17.00",
+     "17.00",
+     "17.00",
+     "19.00",
+     "17.00"
+    ],
+    "rounds": [
+     [
+      "16.00",
+      "17.00",
+      "17.00"
+     ],
+     [
+      "17.00",
+      "17.00",
+      "17.00"
+     ],
+     [
+      "17.00",
+      "17.00",
+      "17.00"
+     ]
+    ],
+    "single": 0.6666666666666666,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 1801,
+    "tok_debate1": 3827,
+    "cost_vote6": 0.0024575,
+    "cost_debate1": 0.00275575,
+    "cost_vote9": 0.00367525,
+    "cost_debate2": 0.00365775,
+    "flips": {
+     "wrong_to_right": 1,
+     "kept_right": 5
+    },
+    "unanimous0": false,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "3.00",
+      "3.00",
+      "3.00"
+     ],
+     [
+      "3.00",
+      "3.00",
+      "3.00"
+     ],
+     [
+      "3.00",
+      "3.00",
+      "3.00"
+     ]
+    ],
+    "review1": true,
+    "review2": true,
+    "out_vote": 137.44444444444446,
+    "out_debate": 74.83333333333333,
+    "out_review": 87.33333333333333,
+    "id": "q18",
+    "gold": "3",
+    "mode": "brief",
+    "samples": [
+     "3.00",
+     "3.00",
+     "3.00",
+     "3.00",
+     "1.00",
+     "3.00",
+     "3.00",
+     "3.00",
+     "3.00"
+    ],
+    "rounds": [
+     [
+      "3.00",
+      "3.00",
+      "3.00"
+     ],
+     [
+      "3.00",
+      "3.00",
+      "3.00"
+     ],
+     [
+      "3.00",
+      "3.00",
+      "3.00"
+     ]
+    ],
+    "single": 1.0,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 1410,
+    "tok_debate1": 2776,
+    "cost_vote6": 0.0016755,
+    "cost_debate1": 0.00189275,
+    "cost_vote9": 0.00271925,
+    "cost_debate2": 0.0026065,
+    "flips": {
+     "kept_right": 6
+    },
+    "unanimous0": true,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "10.11",
+      "10.31",
+      "10.11"
+     ],
+     [
+      "10.11",
+      "10.31",
+      "10.11"
+     ],
+     [
+      "10.11",
+      "10.31",
+      "10.11"
+     ]
+    ],
+    "review1": true,
+    "review2": true,
+    "out_vote": 262.55555555555554,
+    "out_debate": 203.5,
+    "out_review": 236.83333333333334,
+    "id": "q19",
+    "gold": "10.11",
+    "mode": "brief",
+    "samples": [
+     "10.11",
+     "10.31",
+     "10.11",
+     "10.11",
+     "10.30",
+     "10.11",
+     "10.11",
+     "10.11",
+     "10.12"
+    ],
+    "rounds": [
+     [
+      "10.11",
+      "10.31",
+      "10.11"
+     ],
+     [
+      "10.11",
+      "10.11",
+      "10.11"
+     ],
+     [
+      "10.11",
+      "10.11",
+      "10.11"
+     ]
+    ],
+    "single": 0.6666666666666666,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 2405,
+    "tok_debate1": 4805,
+    "cost_vote6": 0.0033819999999999996,
+    "cost_debate1": 0.00369325,
+    "cost_vote9": 0.005032,
+    "cost_debate2": 0.0055165,
+    "flips": {
+     "kept_right": 5,
+     "wrong_to_right": 1
+    },
+    "unanimous0": false,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "8.94",
+      "8.96",
+      "8.94"
+     ],
+     [
+      "8.94",
+      "8.96",
+      "8.94"
+     ],
+     [
+      "8.94",
+      "8.96",
+      "8.94"
+     ]
+    ],
+    "review1": true,
+    "review2": true,
+    "out_vote": 261.0,
+    "out_debate": 135.83333333333334,
+    "out_review": 194.83333333333334,
+    "id": "q20",
+    "gold": "8.94",
+    "mode": "brief",
+    "samples": [
+     "8.94",
+     "8.96",
+     "8.94",
+     "8.94",
+     "8.94",
+     "8.94",
+     "8.94",
+     "8.94",
+     "8.94"
+    ],
+    "rounds": [
+     [
+      "8.94",
+      "8.96",
+      "8.94"
+     ],
+     [
+      "8.94",
+      "8.94",
+      "8.94"
+     ],
+     [
+      "8.94",
+      "8.94",
+      "8.94"
+     ]
+    ],
+    "single": 0.6666666666666666,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 2499,
+    "tok_debate1": 4718,
+    "cost_vote6": 0.003549,
+    "cost_debate1": 0.0033565,
+    "cost_vote9": 0.0050085,
+    "cost_debate2": 0.004628,
+    "flips": {
+     "kept_right": 5,
+     "wrong_to_right": 1
+    },
+    "unanimous0": false,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "9.07",
+      "9.07",
+      "9.07"
+     ],
+     [
+      "9.07",
+      "9.07",
+      "9.07"
+     ],
+     [
+      "9.07",
+      "9.07",
+      "9.07"
+     ]
+    ],
+    "review1": true,
+    "review2": true,
+    "out_vote": 253.44444444444446,
+    "out_debate": 198.66666666666666,
+    "out_review": 223.16666666666666,
+    "id": "q21",
+    "gold": "9.07",
+    "mode": "brief",
+    "samples": [
+     "9.07",
+     "9.07",
+     "9.07",
+     "9.07",
+     "9.07",
+     "9.07",
+     "9.07",
+     "9.07",
+     "9.07"
+    ],
+    "rounds": [
+     [
+      "9.07",
+      "9.07",
+      "9.07"
+     ],
+     [
+      "9.07",
+      "9.07",
+      "9.07"
+     ],
+     [
+      "9.07",
+      "9.07",
+      "9.07"
+     ]
+    ],
+    "single": 1.0,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 2340,
+    "tok_debate1": 4577,
+    "cost_vote6": 0.0032415,
+    "cost_debate1": 0.0034367499999999997,
+    "cost_vote9": 0.00487025,
+    "cost_debate2": 0.00529525,
+    "flips": {
+     "kept_right": 6
+    },
+    "unanimous0": true,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "10.14",
+      "10.35",
+      "10.14"
+     ],
+     [
+      "10.14",
+      "10.35",
+      "10.14"
+     ],
+     [
+      "10.14",
+      "10.35",
+      "10.14"
+     ]
+    ],
+    "review1": true,
+    "review2": true,
+    "out_vote": 258.22222222222223,
+    "out_debate": 170.83333333333334,
+    "out_review": 206.16666666666666,
+    "id": "q22",
+    "gold": "10.14",
+    "mode": "brief",
+    "samples": [
+     "10.14",
+     "10.35",
+     "10.14",
+     "10.35",
+     "10.14",
+     "10.14",
+     "10.14",
+     "10.14",
+     "10.14"
+    ],
+    "rounds": [
+     [
+      "10.14",
+      "10.35",
+      "10.14"
+     ],
+     [
+      "10.14",
+      "10.14",
+      "10.14"
+     ],
+     [
+      "10.14",
+      "10.14",
+      "10.14"
+     ]
+    ],
+    "single": 0.6666666666666666,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 2290,
+    "tok_debate1": 4304,
+    "cost_vote6": 0.003131,
+    "cost_debate1": 0.003211,
+    "cost_vote9": 0.0049585,
+    "cost_debate2": 0.00477,
+    "flips": {
+     "kept_right": 5,
+     "wrong_to_right": 1
+    },
+    "unanimous0": false,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "9.00",
+      "9.00",
+      "9.00"
+     ],
+     [
+      "9.00",
+      "9.00",
+      "9.00"
+     ],
+     [
+      "9.00",
+      "9.00",
+      "9.00"
+     ]
+    ],
+    "review1": true,
+    "review2": true,
+    "out_vote": 240.44444444444446,
+    "out_debate": 129.16666666666666,
+    "out_review": 178.66666666666666,
+    "id": "q23",
+    "gold": "9.00",
+    "mode": "brief",
+    "samples": [
+     "9.00",
+     "9.00",
+     "9.00",
+     "9.00",
+     "9.00",
+     "9.00",
+     "9.00",
+     "9.00",
+     "9.00"
+    ],
+    "rounds": [
+     [
+      "9.00",
+      "9.00",
+      "9.00"
+     ],
+     [
+      "9.00",
+      "9.00",
+      "9.00"
+     ],
+     [
+      "9.00",
+      "9.00",
+      "9.00"
+     ]
+    ],
+    "single": 1.0,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 2221,
+    "tok_debate1": 4029,
+    "cost_vote6": 0.002993,
+    "cost_debate1": 0.00284475,
+    "cost_vote9": 0.0046385,
+    "cost_debate2": 0.004073,
+    "flips": {
+     "kept_right": 6
+    },
+    "unanimous0": true,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "10.45",
+      "9.96",
+      "9.96"
+     ],
+     [
+      "10.45",
+      "9.96",
+      "9.96"
+     ],
+     [
+      "9.97",
+      "9.96",
+      "9.96"
+     ]
+    ],
+    "review1": true,
+    "review2": true,
+    "out_vote": 256.55555555555554,
+    "out_debate": 174.66666666666666,
+    "out_review": 232.33333333333334,
+    "id": "q24",
+    "gold": "9.96",
+    "mode": "brief",
+    "samples": [
+     "10.45",
+     "9.96",
+     "9.96",
+     "9.96",
+     "9.96",
+     "9.96",
+     "9.95",
+     "9.95",
+     "9.95"
+    ],
+    "rounds": [
+     [
+      "10.45",
+      "9.96",
+      "9.96"
+     ],
+     [
+      "9.96",
+      "9.96",
+      "9.96"
+     ],
+     [
+      "9.96",
+      "9.96",
+      "9.96"
+     ]
+    ],
+    "single": 0.6666666666666666,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 2306,
+    "tok_debate1": 4508,
+    "cost_vote6": 0.003163,
+    "cost_debate1": 0.0033565,
+    "cost_vote9": 0.004928500000000001,
+    "cost_debate2": 0.0049565,
+    "flips": {
+     "wrong_to_right": 1,
+     "kept_right": 5
+    },
+    "unanimous0": false,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "746.00",
+      "746.00",
+      "746.00"
+     ],
+     [
+      "746.00",
+      "746.00",
+      "746.00"
+     ],
+     [
+      "746.00",
+      "746.00",
+      "746.00"
+     ]
+    ],
+    "review1": true,
+    "review2": true,
+    "out_vote": 178.66666666666666,
+    "out_debate": 143.33333333333334,
+    "out_review": 150.33333333333334,
+    "id": "q25",
+    "gold": "746",
+    "mode": "brief",
+    "samples": [
+     "746.00",
+     "746.00",
+     "746.00",
+     "746.00",
+     "746.00",
+     "746.00",
+     "746.00",
+     "746.00",
+     "746.00"
+    ],
+    "rounds": [
+     [
+      "746.00",
+      "746.00",
+      "746.00"
+     ],
+     [
+      "746.00",
+      "746.00",
+      "746.00"
+     ],
+     [
+      "746.00",
+      "746.00",
+      "746.00"
+     ]
+    ],
+    "single": 1.0,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 1806,
+    "tok_debate1": 3260,
+    "cost_vote6": 0.0023835,
+    "cost_debate1": 0.002467,
+    "cost_vote9": 0.0034792499999999997,
+    "cost_debate2": 0.00375875,
+    "flips": {
+     "kept_right": 6
+    },
+    "unanimous0": true,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "627.00",
+      "627.00",
+      "627.00"
+     ],
+     [
+      "627.00",
+      "627.00",
+      "627.00"
+     ],
+     [
+      "627.00",
+      "627.00",
+      "627.00"
+     ]
+    ],
+    "review1": true,
+    "review2": true,
+    "out_vote": 188.44444444444446,
+    "out_debate": 139.66666666666666,
+    "out_review": 160.5,
+    "id": "q26",
+    "gold": "627",
+    "mode": "brief",
+    "samples": [
+     "627.00",
+     "627.00",
+     "627.00",
+     "627.00",
+     "627.00",
+     "627.00",
+     "627.00",
+     "627.00",
+     "627.00"
+    ],
+    "rounds": [
+     [
+      "627.00",
+      "627.00",
+      "627.00"
+     ],
+     [
+      "627.00",
+      "627.00",
+      "627.00"
+     ],
+     [
+      "627.00",
+      "627.00",
+      "627.00"
+     ]
+    ],
+    "single": 1.0,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 1834,
+    "tok_debate1": 3551,
+    "cost_vote6": 0.0024395,
+    "cost_debate1": 0.0026885,
+    "cost_vote9": 0.0036552499999999996,
+    "cost_debate2": 0.0039145,
+    "flips": {
+     "kept_right": 6
+    },
+    "unanimous0": true,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "576.00",
+      "576.00",
+      "612.00"
+     ],
+     [
+      "576.00",
+      "576.00",
+      "612.00"
+     ],
+     [
+      "576.00",
+      "576.00",
+      "612.00"
+     ]
+    ],
+    "review1": true,
+    "review2": true,
+    "out_vote": 213.77777777777777,
+    "out_debate": 202.33333333333334,
+    "out_review": 194.5,
+    "id": "q27",
+    "gold": "576",
+    "mode": "brief",
+    "samples": [
+     "576.00",
+     "576.00",
+     "612.00",
+     "576.00",
+     "576.00",
+     "576.00",
+     "576.00",
+     "576.00",
+     "576.00"
+    ],
+    "rounds": [
+     [
+      "576.00",
+      "576.00",
+      "612.00"
+     ],
+     [
+      "576.00",
+      "576.00",
+      "576.00"
+     ],
+     [
+      "576.00",
+      "576.00",
+      "576.00"
+     ]
+    ],
+    "single": 0.6666666666666666,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 2009,
+    "tok_debate1": 4147,
+    "cost_vote6": 0.0027895,
+    "cost_debate1": 0.00337475,
+    "cost_vote9": 0.0041112499999999995,
+    "cost_debate2": 0.00508975,
+    "flips": {
+     "kept_right": 5,
+     "wrong_to_right": 1
+    },
+    "unanimous0": false,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "510.00",
+      "510.00",
+      "510.00"
+     ],
+     [
+      "510.00",
+      "510.00",
+      "510.00"
+     ],
+     [
+      "510.00",
+      "510.00",
+      "510.00"
+     ]
+    ],
+    "review1": true,
+    "review2": true,
+    "out_vote": 235.77777777777777,
+    "out_debate": 163.83333333333334,
+    "out_review": 190.66666666666666,
+    "id": "q28",
+    "gold": "510",
+    "mode": "brief",
+    "samples": [
+     "510.00",
+     "510.00",
+     "510.00",
+     "510.00",
+     "510.00",
+     "510.00",
+     "510.00",
+     "510.00",
+     "510.00"
+    ],
+    "rounds": [
+     [
+      "510.00",
+      "510.00",
+      "510.00"
+     ],
+     [
+      "510.00",
+      "510.00",
+      "510.00"
+     ],
+     [
+      "510.00",
+      "510.00",
+      "510.00"
+     ]
+    ],
+    "single": 1.0,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 2082,
+    "tok_debate1": 4211,
+    "cost_vote6": 0.0029355,
+    "cost_debate1": 0.003214,
+    "cost_vote9": 0.00450725,
+    "cost_debate2": 0.00466325,
+    "flips": {
+     "kept_right": 6
+    },
+    "unanimous0": true,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "669.00",
+      "669.00",
+      "669.00"
+     ],
+     [
+      "669.00",
+      "669.00",
+      "669.00"
+     ],
+     [
+      "669.00",
+      "669.00",
+      "669.00"
+     ]
+    ],
+    "review1": true,
+    "review2": true,
+    "out_vote": 210.22222222222223,
+    "out_debate": 167.83333333333334,
+    "out_review": 174.16666666666666,
+    "id": "q29",
+    "gold": "669",
+    "mode": "brief",
+    "samples": [
+     "669.00",
+     "669.00",
+     "669.00",
+     "669.00",
+     "669.00",
+     "669.00",
+     "669.00",
+     "669.00",
+     "669.00"
+    ],
+    "rounds": [
+     [
+      "669.00",
+      "669.00",
+      "669.00"
+     ],
+     [
+      "669.00",
+      "669.00",
+      "669.00"
+     ],
+     [
+      "669.00",
+      "669.00",
+      "669.00"
+     ]
+    ],
+    "single": 1.0,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 1929,
+    "tok_debate1": 3670,
+    "cost_vote6": 0.0026295,
+    "cost_debate1": 0.002888,
+    "cost_vote9": 0.00404725,
+    "cost_debate2": 0.00434025,
+    "flips": {
+     "kept_right": 6
+    },
+    "unanimous0": true,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   },
+   {
+    "srounds": [
+     [
+      "328.00",
+      "328.00",
+      "328.00"
+     ],
+     [
+      "328.00",
+      "328.00",
+      "328.00"
+     ],
+     [
+      "328.00",
+      "328.00",
+      "328.00"
+     ]
+    ],
+    "review1": true,
+    "review2": true,
+    "out_vote": 193.22222222222223,
+    "out_debate": 134.5,
+    "out_review": 176.16666666666666,
+    "id": "q30",
+    "gold": "328",
+    "mode": "brief",
+    "samples": [
+     "328.00",
+     "328.00",
+     "328.00",
+     "328.00",
+     "328.00",
+     "328.00",
+     "328.00",
+     "328.00",
+     "328.00"
+    ],
+    "rounds": [
+     [
+      "328.00",
+      "328.00",
+      "328.00"
+     ],
+     [
+      "328.00",
+      "328.00",
+      "328.00"
+     ],
+     [
+      "328.00",
+      "328.00",
+      "328.00"
+     ]
+    ],
+    "single": 1.0,
+    "vote3": true,
+    "vote6": true,
+    "vote9": true,
+    "debate1": true,
+    "debate2": true,
+    "tok_vote6": 1867,
+    "tok_debate1": 3376,
+    "cost_vote6": 0.0025055,
+    "cost_debate1": 0.0025415,
+    "cost_vote9": 0.00374125,
+    "cost_debate2": 0.00373225,
+    "flips": {
+     "kept_right": 6
+    },
+    "unanimous0": true,
+    "unanimous2": true,
+    "converged_wrong": false,
+    "lone_right_lost": false
+   }
+  ]
+ },
+ "usage": {
+  "input": 354174,
+  "output": 160542,
+  "reasoning": 0,
+  "calls": 1260
+ },
+ "cost": 0.4096275,
+ "model": "gpt-5-mini"
+}

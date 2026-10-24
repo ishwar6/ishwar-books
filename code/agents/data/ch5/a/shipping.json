@@ -1,0 +1,78 @@
+{
+ "Leixoes": {
+  "transit_days": 5,
+  "freight_gbp_per_basket": 1.1
+ },
+ "UK road": {
+  "transit_days": 2,
+  "freight_gbp_per_basket": 0.0
+ },
+ "Ningbo": {
+  "transit_days": 34,
+  "freight_gbp_per_basket": 2.1
+ },
+ "Gdansk": {
+  "transit_days": 4,
+  "freight_gbp_per_basket": 0.9
+ },
+ "Izmir": {
+  "transit_days": 11,
+  "freight_gbp_per_basket": 1.5
+ },
+ "Yantian": {
+  "transit_days": 36,
+  "freight_gbp_per_basket": 2.2
+ },
+ "Busan": {
+  "transit_days": 40,
+  "freight_gbp_per_basket": 2.3
+ },
+ "Mundra": {
+  "transit_days": 28,
+  "freight_gbp_per_basket": 2.4
+ },
+ "Hamburg": {
+  "transit_days": 3,
+  "freight_gbp_per_basket": 0.8
+ },
+ "UK warehouse": {
+  "transit_days": 1,
+  "freight_gbp_per_basket": 0.0
+ },
+ "Ho Chi Minh": {
+  "transit_days": 38,
+  "freight_gbp_per_basket": 2.4
+ },
+ "Rotterdam": {
+  "transit_days": 2,
+  "freight_gbp_per_basket": 0.7
+ },
+ "Bilbao": {
+  "transit_days": 4,
+  "freight_gbp_per_basket": 1.0
+ },
+ "Nhava Sheva": {
+  "transit_days": 29,
+  "freight_gbp_per_basket": 2.5
+ },
+ "Istanbul": {
+  "transit_days": 12,
+  "freight_gbp_per_basket": 1.6
+ },
+ "Livorno": {
+  "transit_days": 9,
+  "freight_gbp_per_basket": 1.3
+ },
+ "Shanghai": {
+  "transit_days": 35,
+  "freight_gbp_per_basket": 2.1
+ },
+ "Altamira": {
+  "transit_days": 24,
+  "freight_gbp_per_basket": 2.6
+ },
+ "Kaohsiung": {
+  "transit_days": 37,
+  "freight_gbp_per_basket": 2.3
+ }
+}

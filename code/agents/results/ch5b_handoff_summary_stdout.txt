@@ -1,0 +1,19 @@
+== The telephone game: 5 agents in a chain, 30 gold facts, gpt-5-mini, reasoning_effort=minimal ==
+probe calibration on the source pages themselves: kept 30/30, lost 0, distorted 0 []
+...
+== Facts kept after each hop (mean of 3 runs, out of 30) ==
+condition     researcher     analyst  risk revie      writer      editor  distorted@5  cost/run
+free                30.0        29.3        16.0        16.7        14.7          0.7   $0.0253
+free+ver            29.7        29.7        30.0        19.7        28.7          0.0   $0.0722
+schema              30.0        30.0        30.0        30.0        30.0          0.0   $0.0100
+schema+ver          30.0        30.0        30.0        30.0        29.7          0.0   $0.0346
+  free: final hop kept [11, 16, 17] per run; mean words per hop [1857, 1616, 1818, 1874, 439]; implied per-hop retention
+      0.867; distortions that copied a distractor: 0
+  free+ver: final hop kept [27, 29, 30] per run; mean words per hop [1923, 2107, 2291, 1677, 427]; implied per-hop
+      retention 0.991; distortions that copied a distractor: 0
+  schema: final hop kept [30, 30, 30] per run; mean words per hop [336, 381, 409, 414, 383]; implied per-hop retention
+      1.000; distortions that copied a distractor: 0
+  schema+ver: final hop kept [30, 30, 29] per run; mean words per hop [498, 517, 551, 611, 561]; implied per-hop retention
+      0.998; distortions that copied a distractor: 0
+
+API: 180 calls, 384,977 input and 209,533 output tokens, $0.515 (probes included). Stub used: False

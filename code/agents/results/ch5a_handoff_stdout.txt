@@ -1,0 +1,32 @@
+Model gpt-5-mini, reasoning effort low. Suppliers handed off: S03, S07, S08, S09, S12, S19. 3 runs per condition.
+Known answer: S03 32.99 GBP, 54 d, reject; S07 34.75 GBP, 75 d, reject; S09 39.72 GBP, 49 d, accept; S12 39.90 GBP, 25 d, accept; S08 41.05 GBP, 21 d, accept; S19 43.93 GBP, 24 d, reject
+Size of what is handed over: thin 14 words, full brief 282 words, history 591 words.
+
+thin    run 1: facts right 4/12 (verdicts 3/6, landed cost 1/3, delivery days 0/3); lead's JSON format: no; acted as the lead: no
+               2 calls, 6 tool calls, input 4,561 tok, output 2,144 tok, 25 s, $0.0054; wrong verdicts: S03: said accept, S07: said accept, S19: said accept
+brief   run 1: facts right 12/12 (verdicts 6/6, landed cost 3/3, delivery days 3/3); lead's JSON format: yes; acted as the lead: no
+               3 calls, 18 tool calls, input 11,489 tok, output 1,990 tok, 16 s, $0.0069
+history run 1: facts right 10/12 (verdicts 5/6, landed cost 3/3, delivery days 2/3); lead's JSON format: no; acted as the lead: YES
+               4 calls, 12 tool calls, input 17,895 tok, output 2,085 tok, 22 s, $0.0086; wrong verdicts: S19: said None
+thin    run 2: facts right 3/12 (verdicts 2/6, landed cost 1/3, delivery days 0/3); lead's JSON format: no; acted as the lead: no
+               2 calls, 6 tool calls, input 4,561 tok, output 2,534 tok, 27 s, $0.0062; wrong verdicts: S03: said accept, S07: said unclear, S09: said unclear, S19: said accept
+brief   run 2: facts right 12/12 (verdicts 6/6, landed cost 3/3, delivery days 3/3); lead's JSON format: yes; acted as the lead: no
+               14 calls, 18 tool calls, input 69,110 tok, output 2,272 tok, 25 s, $0.0218
+history run 2: facts right 12/12 (verdicts 6/6, landed cost 3/3, delivery days 3/3); lead's JSON format: no; acted as the lead: YES
+               6 calls, 16 tool calls, input 31,040 tok, output 3,351 tok, 48 s, $0.0145
+thin    run 3: facts right 4/12 (verdicts 3/6, landed cost 1/3, delivery days 0/3); lead's JSON format: no; acted as the lead: no
+               2 calls, 6 tool calls, input 4,561 tok, output 2,190 tok, 21 s, $0.0055; wrong verdicts: S03: said accept, S07: said accept, S19: said accept
+brief   run 3: facts right 10/12 (verdicts 4/6, landed cost 3/3, delivery days 3/3); lead's JSON format: yes; acted as the lead: no
+               3 calls, 24 tool calls, input 11,669 tok, output 2,051 tok, 21 s, $0.0070; wrong verdicts: S03: said accept, S19: said accept
+history run 3: facts right 11/12 (verdicts 6/6, landed cost 3/3, delivery days 2/3); lead's JSON format: no; acted as the lead: YES
+               4 calls, 20 tool calls, input 25,108 tok, output 3,043 tok, 38 s, $0.0124
+
+Means over runs:
+thin    facts right 3.7/12 (runs: 4, 3, 4), verdicts 2.7/6, costs 1.0/3, days 0.0/3; JSON format 0/3, acted as lead 0/3
+        input 4,561 tok, output 2,289 tok, 2.0 calls, 24 s, $0.0057
+brief   facts right 11.3/12 (runs: 12, 12, 10), verdicts 5.3/6, costs 3.0/3, days 3.0/3; JSON format 3/3, acted as lead 0/3
+        input 30,756 tok, output 2,104 tok, 6.7 calls, 21 s, $0.0119
+history facts right 11.0/12 (runs: 10, 12, 11), verdicts 5.7/6, costs 3.0/3, days 2.3/3; JSON format 0/3, acted as lead 3/3
+        input 24,681 tok, output 2,826 tok, 4.7 calls, 36 s, $0.0118
+Extractor (grading only): 6,031 input and 656 output tokens.
+Total API spend for this script: $0.09
