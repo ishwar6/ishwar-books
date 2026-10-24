@@ -1,0 +1,96 @@
+== 1. Figure 6: the block table of request A, step by step (block size 4, real OPT-125M)
+prompt: 7 tokens ['Four', 'score', 'and', 'seven', 'years', 'ago', 'our']; we then feed the outputs "fathers", "brought", "forth"
+prefill  (7 tokens): logical 0 -> physical 7 (4 filled)  logical 1 -> physical 1 (3 filled)
+          model's top next token: ' team'
+decode 1 ('fathers'): logical 0 -> physical 7 (4 filled)  logical 1 -> physical 1 (4 filled)
+decode 2 ('brought'): logical 0 -> physical 7 (4 filled)  logical 1 -> physical 1 (4 filled)  logical 2 -> physical 3 (1 filled)
+decode 3 (  'forth'): logical 0 -> physical 7 (4 filled)  logical 1 -> physical 1 (4 filled)  logical 2 -> physical 3 (2 filled)
+physical blocks now (9 blocks of 4 slots; "." = free slot, "-" = free block):
+  block 0:        -
+  block 1:    years      ago      our  fathers
+  block 2:        -
+  block 3:  brought    forth        .        .
+  block 4:        -
+  block 5:        -
+  block 6:        -
+  block 7:     Four    score      and    seven
+  block 8:        -
+
+== 2. Eq. 4: the query of "forth" against KV blocks 0, 1 and 2 (layer 6, mean over the 12 heads)
+block 0 (physical 7): Four 0.731, score 0.013, and 0.009, seven 0.012   block total 0.765
+block 1 (physical 1): years 0.020, ago 0.024, our 0.032, fathers 0.041   block total 0.118
+block 2 (physical 3): brought 0.074, forth 0.044   block total 0.118
+all ten weights add up to 1.000000
+a softmax inside block 0 alone would give 0.948, 0.022, 0.013, 0.017: the denominator must run over every block
+
+== 3. The same attention with the library: past_key_values + torch scaled_dot_product_attention
+attention output of "forth", paged (Method 1) against SDPA on the contiguous cache (Method 2), 12 layers:
+  max difference 7.7e-07 (layer 10), smallest 9.5e-08
+logits after "forth": our paged engine against the library, max difference 1.8e-05; same top token: True
+
+== 4. Greedy generation of 48 tokens, our paged engine against model.generate (random free-block order)
+prompt 10 tokens; library text: " to learn a new language.\nI'm not sure if you're being sarcastic or no"...
+B =  1: 57 blocks, first physical blocks [25, 61, 35, 9, 2, 5]; same 48 tokens: True; max logit difference 1.6e-05
+B =  4: 15 blocks, first physical blocks [16, 5, 14, 13, 11, 10]; same 48 tokens: True; max logit difference 1.6e-05
+B = 16:  4 blocks, first physical blocks [4, 1, 0, 7]; same 48 tokens: True; max logit difference 1.6e-05
+
+== 5. Figure 7: requests A and B share one pool of 9 physical blocks (block size 4)
+iteration 1 (both prefills): A: logical 0 -> physical 7 (4 filled)  logical 1 -> physical 1 (3 filled)
+                             B: logical 0 -> physical 5 (4 filled)
+iteration 2 (A writes 'fathers', B writes 'of'): A: [7, 1], B: [5, 2]
+iteration 3 (A writes 'brought', B writes 'times'): A: [7, 1, 3], B: [5, 2]
+physical blocks:
+  block 0:    -
+  block 1: A     years      ago      our  fathers
+  block 2: B        of    times        .        .
+  block 3: A   brought        .        .        .
+  block 4:    -
+  block 5: B        It      was      the     best
+  block 6:    -
+  block 7: A      Four    score      and    seven
+  block 8:    -
+each request against the library run alone: A max difference 1.7e-05, B max difference 1.5e-05
+free list before A ends: [0, 4, 6, 8]
+A ends; its blocks go back. free list now: [0, 4, 6, 8, 7, 1, 3]
+a new request C of 9 tokens takes physical blocks [0, 4, 6]
+
+== 6. Waste per request at the end of generation, 2,000 Alpaca requests (prompt + answer, OPT tokenizer)
+lengths: mean 76.3, shortest 8, longest 513 tokens; 152,590 tokens in all
+block size max waste bound B-1 mean waste slots held  in use  methods agree
+         1         0         0        0.0    152,590  100.0%  True
+         2         1         1        0.5    153,576   99.4%  True
+         4         3         3        1.5    155,568   98.1%  True
+         8         7         7        3.4    159,480   95.7%  True
+        16        15        15        7.4    167,424   91.1%  True
+        32        31        31       14.8    182,240   83.7%  True
+        64        63        63       32.2    216,960   70.3%  True
+       128       127       127       72.1    296,704   51.4%  True
+contiguous      2040               1971.7  4,096,000    3.7%  (one chunk of 2,048 slots per request)
+OPT-13B with 12 GB of KV cache = 14,648 slots: chunks of 2,048 fit 7 requests; blocks of 16 fit 175 requests of these lengths, even at their full length
+
+== 7. Block size against speed: our block-by-block attention, one query, a 2,048-token cache, one layer (CPU)
+B =   1: 2048 blocks,   91.29 ms; max difference from SDPA 1.6e-07
+B =   4:  512 blocks,   25.11 ms; max difference from SDPA 1.2e-07
+B =  16:  128 blocks,    8.33 ms; max difference from SDPA 8.9e-08
+B =  64:   32 blocks,    2.85 ms; max difference from SDPA 6.0e-08
+B = 256:    8 blocks,    0.99 ms; max difference from SDPA 5.2e-08
+contiguous SDPA, one call: 0.10 ms
+fewer, larger blocks mean fewer separate fetches; but the last block of each request wastes up to B - 1 slots
+
+== 8. Finding a token through the block table, like an address through a page table
+the operating system (Background page): page size 4,096 bytes, page table [5, 2, 7, 0]
+  address 10,000 -> page 2, offset 1,808 -> frame 7 -> physical address 30,480
+vLLM (request A of Figure 6): block size 4, block table [7, 1, 3]
+  token 0     'Four' -> logical block 0, offset 0 -> physical block 7 -> slot 28 of the pool
+  token 4    'years' -> logical block 1, offset 0 -> physical block 1 -> slot  4 of the pool
+  token 7  'fathers' -> logical block 1, offset 3 -> physical block 1 -> slot  7 of the pool
+  token 8  'brought' -> logical block 2, offset 0 -> physical block 3 -> slot 12 of the pool
+  token 9    'forth' -> logical block 2, offset 1 -> physical block 3 -> slot 13 of the pool
+keys and values found this way against the library's contiguous cache, 10 tokens x 12 layers: max difference 8.6e-06
+
+== 9. Eq. 4 by hand: the Background example (query (1, 0), three tokens) in blocks of 2
+block 1: scores 0.707, 0.000; exp 2.028, 1.000; block sum 3.028; weights 0.401, 0.198; adds (0.401, 0.198)
+block 2: scores 0.707; exp 2.028; block sum 2.028; weights 0.401; adds (0.401, 0.401)
+shared denominator 3.028 + 2.028 = 5.056; output (0.802, 0.599); torch softmax over all three tokens: (0.802, 0.599)
+blocks finished one at a time and merged at the end, query of "forth", 12 layers of OPT-125M:
+  merged against SDPA on the contiguous cache: max difference 7.2e-07

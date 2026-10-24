@@ -34,10 +34,10 @@ This paper shows that the serving systems of 2023 wasted most of that memory. Th
 
 1. **[The Big Idea](part-1-the-big-idea.md)**: the title, the abstract, Figures 1 and 2, and §1. Where the memory of a GPU goes, and why most of the KV cache memory was wasted.
 2. **[Why Memory Is the Bottleneck](part-2-why-memory-is-the-bottleneck.md)**: §2 and §3, Figure 3. The two phases of generation, batching, and the three kinds of waste.
-3. **PagedAttention** (coming soon): §4.1 to §4.3, Figures 4 to 7. Attention over blocks, the block table, and the KV cache manager.
-4. **Sharing, Scheduling and Many GPUs** (coming soon): §4.4 to §4.6 and §5, Figures 8 to 10. Copy-on-write, beam search, preemption and swapping, and distributed execution.
-5. **The Experiments** (coming soon): §6 to §10. Throughput against latency, sharing, the ablations, and the limits.
-6. **Build It from Scratch** (coming soon): a small paged KV cache and serving loop in Python, checked against a library model.
+3. **[PagedAttention](part-3-pagedattention.md)**: §4.1 to §4.3, Figures 4 to 7. Attention over blocks, the block table, and the KV cache manager.
+4. **[Sharing, Scheduling and Many GPUs](part-4-sharing-scheduling-and-many-gpus.md)**: §4.4 to §4.6 and §5, Figures 8 to 10. Copy-on-write, beam search, preemption and swapping, and distributed execution.
+5. **[The Experiments](part-5-the-experiments.md)**: §6 to §10. Throughput against latency, sharing, the ablations, and the limits.
+6. **[Build It from Scratch](part-6-build-it-from-scratch.md)**: a small paged KV cache and serving loop in Python, checked against a library model.
 
 ## How to read the boxes
 

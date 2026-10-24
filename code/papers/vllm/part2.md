@@ -14,6 +14,12 @@ Each piece below shows the exact lines of the paper, then explains them.
 > [!DEFINITION] Definition boxes
 > A yellow box like this explains one technical word, the first time that the word occurs. If you know the word, skip the box.
 
+Here is the whole vLLM system first, so that you can see where this part fits.
+
+{{FIG:p2_arch|The vLLM system, redrawn from the paper's Figure 4. Requests come in on the left. The scheduler, highlighted, picks the requests that run together in each step. Its KV cache manager decides where each request's memory lives. The workers run the model on the GPUs.}}
+
+This part explains why the scheduler wants many requests in every step, and why memory stops it. Part 3 opens the box inside it, the KV cache manager.
+
 ## How a language model scores a sentence {§2.1}
 
 A language model does one job. It reads some text and says how likely each possible next word is. Everything else, from chat to code completion, is built on that one job. The paper starts there, because the way the model does this job decides how much memory it needs later.
@@ -223,7 +229,30 @@ The two copies of "the" in one sentence have clearly different keys, even in the
 > [!DEFINITION] Matrix-vector and matrix-matrix multiplication
 > Multiplying a matrix by one vector gives one vector. Multiplying it by a matrix of many vectors side by side gives many vectors in one operation. The second does the work of many of the first, but it reads the big matrix only once.
 
-Why is one vector at a time so wasteful? A GPU can do arithmetic much faster than it can read memory. What counts is how much arithmetic you do for each byte you read. This ratio is called the **arithmetic intensity**:
+> [!DEFINITION] Latency
+> The time a user waits for an answer, from sending the request to getting the last token.
+
+Follow one request through both phases. Its prompt is the 7 tokens "Four score and seven years ago our". The first pass of the model reads all 7 tokens together. It stores their 7 keys and values in the KV cache, and it writes "fathers".
+
+Now the generation phase starts. The second pass feeds in only "fathers". It computes one new key and value, reads the 7 stored ones, and writes "brought". The third pass does the same for "brought" and writes "forth". The fourth writes `<eos>`, and the request ends.
+
+{{FIG:p2_life|The life of one request. The prompt phase computes the keys and values of all 7 prompt tokens in one pass. Each generation pass computes one new slot, reads every earlier slot from the KV cache, and writes one token.}}
+
+The prompt phase is one wide pass. The generation phase is a stack of thin passes, one per output token, each reading the whole cache. A real answer has hundreds of them, so they set the latency.
+
+> [!NOTE] Where this idea comes from: the memory wall
+> For decades, processors got faster at arithmetic more quickly than memory got faster at delivering data. Computer architects call this gap the "memory wall". A processor that waits for data sits idle, however fast its arithmetic is.
+>
+> In 2009, Williams, Waterman and Patterson gave a simple way to reason about it, the roofline model. A program that does little arithmetic per byte it reads is limited by memory speed. A program that does a lot is limited by arithmetic speed. A GPU has the same two limits, only larger.
+>
+> Think of a cook whose recipe book sits in the basement. If she cooks one dish per trip downstairs, most of her time goes on the stairs. If she cooks eight dishes from the same page per trip, the stairs cost the same, and she does eight times the work.
+
+> [!DEFINITION] Memory bandwidth
+> The number of bytes per second that memory can deliver to the processor. Arithmetic speed is counted in FLOPs per second, memory speed in bytes per second.
+
+{{FIG:p2_mv|Matrix-vector against matrix-matrix work. In both cases the GPU reads the big weight matrix W once from memory. With one token, that read buys one output. With a batch of 8 tokens, the same read buys 8 outputs.}}
+
+In the generation phase, the weight matrix is the recipe book and each token is a dish. Why is one vector at a time so wasteful? A GPU can do arithmetic much faster than it can read memory. What counts is how much arithmetic you do for each byte you read. This ratio is called the **arithmetic intensity**:
 
 $$
 \text{intensity} = \frac{\text{FLOPs}}{\text{bytes moved}} = \frac{2 d^2 n}{2\,(d^2 + 2 d n)} \approx n \quad \text{when } n \ll d
@@ -268,9 +297,16 @@ from 1 to 64 tokens: time x1.2 for 64x the work; from 1 to 512: time x9.1 for 51
 
 This table is the heart of §2. One token takes 0.196 ms. Sixty-four tokens take 0.233 ms, only 1.2 times longer for 64 times the work. In that range the GPU waits for the matrix to arrive from memory, and the arithmetic is almost free. Above 128 tokens the time starts to grow, because now the arithmetic is the limit. (At 512 the speed drops again; a laptop GPU is not tuned for every size, and timings on a shared laptop are noisy.)
 
+In roofline words, the time stops being flat between 64 and 256 tokens, where the intensity is between 62.4 and 232.7 FLOPs per byte. In that range, this GPU's arithmetic catches up with its memory.
+
 So the generation phase, with $$n = 1$$, runs this GPU at 0.27 TFLOP/s, while it can reach 24.7. It uses about 1% of the speed it has. The obvious fix is to give the matrix more tokens per pass. If one request can give only one token per step, then many requests must share each step.
 
 ## Batching, and why it is hard {§2.3}
+
+> [!NOTE] Where this idea comes from: batching
+> Batching is older than computers. A bank collects the day's cheques and sends one van to the city, not one van per cheque.
+>
+> Model servers used the same idea before large language models. A server waits a short time, collects the requests that came in, and runs them through the model as one batch. The paper's first baseline works this way. FasterTransformer has no scheduler, so the authors add one like that of NVIDIA's Triton server. It takes up to $$B$$ of the earliest requests and runs them together (§6.1). This is **request-level batching**: a batch is formed once and stays the same until it is done.
 
 > [!PAPER] · §2.3 · page 3
 > [![The paragraph on batching, with amortized across the requests in a batch, arrive at different times, queueing delays, pad the inputs and wasting highlighted](/img/papers/vllm/p2-batching.png)](/img/papers/vllm/p2-batching.png)
@@ -302,6 +338,22 @@ So the generation phase, with $$n = 1$$, runs this GPU at 0.27 TFLOP/s, while it
 
 > [!DEFINITION] Iteration
 > One step of the generation phase: one pass of the model that writes one new token for every request in the batch.
+
+> [!DEFINITION] GPU kernel
+> One program that runs on the GPU, started by the CPU, such as "multiply these two matrices" or "compute attention". A model step runs many kernels, one after another.
+
+> [!NOTE] Where this idea comes from: Orca
+> Cellular batching came first, in 2018, for recurrent neural networks, which also run one step at a time. Orca (OSDI 2022) brought the idea to Transformer language models and called it iteration-level scheduling.
+>
+> Orca had to solve one problem to make it work. Requests in a batch have different lengths, so their attention cannot run as one rectangular matrix product. Orca's answer, **selective batching**, uses the fact from the position-wise box above. It joins the tokens of all requests for the position-wise layers, and runs attention for each request on its own. The vLLM system batches in the same way, and builds its memory system under it.
+
+Before the real simulation, here is a tiny one you can check by hand. Two slots, four requests. A needs 2 steps and B needs 5; both arrive at step 0. C needs 2 steps and arrives at step 1. D needs 3 steps and arrives at step 2.
+
+{{FIG:p2_batch_toy|Four requests on a server with two slots. Top: request-level batching keeps A's slot as padding until B ends, so C and D wait until step 5. Bottom: iteration-level batching gives A's slot to C at step 2 and to D at step 4, and finishes one step sooner.}}
+
+With request-level batching, A and B start together, and the batch lasts as long as B, 5 steps. A is done after 2 steps, so its slot is padding for 3 steps. C and D wait until step 5, then run as the next batch for 3 steps. That is 8 steps in all.
+
+With iteration-level batching, A's slot goes to C at step 2, the step after A ends. When C ends, D takes the slot at step 4. There is no padding, C waits 1 step instead of 4, and the work ends at step 7. The same rules, applied to 300 real requests, give the simulation below.
 
 We simulate both methods with real answer lengths. We take 300 answers from the Alpaca dataset of instructions and count their tokens with the OPT tokenizer. One request arrives every 12 steps, at a server with room for 8 requests at once. The simulation counts steps, not seconds:
 
@@ -377,6 +429,9 @@ The demand is light, too: on average only about 4.3 of the 8 slots are needed (5
 > Iteration-level batching removed padding, so the next limit shows. Each running request keeps its KV cache in GPU memory. A ninth request can join the batch only if its cache fits too. So the batch size is set by memory, and the batch size sets the throughput.
 >
 > Note that "memory-bound" has a second meaning here. In §2 it meant that one step waits on reading memory. Here it means that the amount of memory limits how many requests run. The fix for the first, bigger batches, runs straight into the second.
+
+> [!DEFINITION] Throughput
+> The number of requests, or tokens, that a server finishes per second. A server with high throughput serves many users with the same GPUs.
 
 The paper then lists three challenges. We take them in order.
 
@@ -502,6 +557,15 @@ The same question gives answers from 2 to 200 tokens, and three answers hit the 
 > [!DEFINITION] Tensor and contiguous memory
 > A **tensor** is an array of numbers with any number of dimensions. An example is the keys of one layer, with shape (batch, heads, tokens, head size). **Contiguous** means that its numbers fill one unbroken run of addresses in memory, with no gaps.
 
+> [!NOTE] Where this idea comes from: allocators and fragmentation
+> Operating systems faced this problem long before GPUs. Programs ask for memory of different sizes, at different times, and give it back in a different order. The part of the system that hands out memory is the **allocator**; in C it is behind `malloc`. Once programs of mixed sizes come and go, free memory breaks into gaps between the chunks still in use.
+>
+> Kenneth Knowlton described the buddy system in 1965. It rounds every request up to a power of two, which makes free pieces easy to find and to merge. The Linux kernel still uses a buddy allocator for its pages. The price is the space lost by rounding up. Think of parking cars of mixed lengths along a kerb: when some leave, the gaps rarely fit the next car.
+
+{{FIG:p2_alloc|Fragmentation on a memory of 16 units. After B and D leave, 7 units are free, but no gap holds the 5 units that E needs in a row: external fragmentation. A buddy allocator rounds E's 5 units up to 8, and 3 units sit unused inside the chunk: internal fragmentation.}}
+
+The [Background page](background-the-kv-cache-and-paging.md) runs a first-fit allocator and a buddy allocator on real request sizes. Here it is enough to see the two kinds of waste. The KV cache of earlier serving systems got both, and one more.
+
 ## Figure 3: three kinds of waste {§Figure 3}
 
 > [!PAPER] · Figure 3 · page 4
@@ -586,6 +650,10 @@ Part 1's budget for a 13B model on a 40 GB card was 12 GB of KV cache. At 132.7 
 ## What this part sets up
 
 §2 and §3 build one chain of reasons. Writing text is one token at a time, so a single request leaves the GPU idle. Batching many requests fixes that, and iteration-level batching makes batching flexible. Then the KV cache limits the batch size. The cache is large, it could be shared but is not, and it grows to a length nobody knows. Earlier systems answered with one big chunk per request, and most of that memory sat empty.
+
+{{FIG:p2_before_after|Before and with vLLM, on a toy memory of 40 slots. Top: each request books one chunk of 12 slots at the start, so most slots are reserved or never used, and small gaps stay useless. Bottom: each request takes blocks of 4 slots only when it needs them, so 24 slots stay free for new requests.}}
+
+Both rows hold the same 12 tokens. Before vLLM, they lock up all 40 slots, and a fourth request cannot start. With blocks of 4, the only waste is the empty end of each last block, and six blocks stay free.
 
 Part 3 gives the paper's answer. PagedAttention computes Eq. 3 over keys and values stored in small blocks that can sit anywhere in memory. A block table per request, like an operating system's page table, keeps track of where they are.
 

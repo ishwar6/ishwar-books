@@ -1,0 +1,68 @@
+== 1. Parallel sampling (Figure 8): 4 samples share the blocks of one prompt, block size 4
+prompt of 7 tokens (with the start token </s>) in 2 blocks: </s> Four score and | seven years ago
+after fork: every sample maps blocks [370, 26]; reference counts {370: 4, 26: 4}
+after the first new token: block tables [[370, 153], [370, 116], [370, 366], [370, 26]]; copy-on-write copies: 3
+  sample 1: ', as the Los Angeles Dodgers amassed a 54-55 record, the question was: Will the Dodgers compete for the National'
+  sample 2: ' this song crossed your mind...I just jokingly said (again) it had the power to be the best instrumental your'
+  sample 3: ', Dave wanted the quintessential "I am her Unicorns" phase, but he had to think ahead.\nLast'
+  sample 4: ", Bellus had a massive eye tear on one of Justin Matthews' passing screens. Being in the 80s, the"
+Method 1 (paged, shared prompt) and Method 2 (model.generate, same seed): same 96 tokens: True
+max difference of the logits against one plain pass per sample: 2.2e-05
+at the end: 29 physical blocks with sharing, 32 without; copy-on-write copies in total: 3
+
+== 2. Beam search (Figure 9): 4 beams fork, append and free blocks at every step, block size 4
+  beam 1: ', I was in my early 20s.\nI was in my early 20s.\nI was in my early'
+  beam 2: ', I was in my early 20s.\n\nI was in my early 20s.\n\nI was in'
+  beam 3: ', I was in my early 20s.\nI was in my early 20s.\nI was in my late'
+  beam 4: ', I was in my early 20s.\nI was in my early 20s.\nI was in my mid'
+Method 1 (paged beam search) and Method 2 (model.generate, num_beams=4): same 96 tokens: True
+final block tables: [[782, 921, 628, 975, 950, 147, 92, 201], [782, 921, 628, 975, 904, 521, 772, 907], [782, 921, 628, 975, 950, 147, 92, 201], [782, 921, 628, 975, 950, 147, 92, 201]]
+blocks mapped by all 4 beams: [782, 921, 628, 975]; physical blocks in use 14, without sharing 32
+copied during the search: 22 blocks by copy-on-write = 88 token slots; a contiguous cache that keeps beam i in slot i copies 1029 token slots
+
+== 3. Memory saved by sharing blocks, block size 16 (the vLLM default), prompt of the Figure 10 prefix
+prompt of 41 tokens, 48 new tokens; saving = blocks saved by sharing / blocks without sharing, averaged over the steps
+parallel sampling, 2 / 4 / 6 samples: 23.1% / 34.7% / 38.5%
+beam search, width 2 / 4 / 6:          31.9% / 43.8% / 48.2%
+
+== 4. Shared prefix (Figure 10): the prefix is computed once and two requests map its blocks
+  'cheese =>': 3 task tokens computed instead of 44; maps 10 prefix blocks, owns 3; greedy output ' pouvoir\npouv'; same as model.generate on the full prompt: True
+  'I love you =>': 4 task tokens computed instead of 45; maps 10 prefix blocks, owns 4; greedy output ' le le le le le le le le'; same as model.generate on the full prompt: True
+prefix of 41 tokens in 11 blocks; its last block is partly full, so each request copied it once: 2 copy-on-write copies
+
+== 5. First-come-first-served scheduling with preemption (simulation in steps, Alpaca request lengths)
+200 requests, one per step; prompt mean 19.9 tokens, output mean 53.8; GPU memory: 64 blocks of 16 tokens
+swap     : 873 steps, mean batch 12.3, 356 preemptions; every request got all its tokens: True
+recompute: 873 steps, mean batch 12.3, 356 preemptions; every request got all its tokens: True
+swap     : 705 blocks out, 705 in; at most 24 blocks in CPU memory (never more than the 64 GPU blocks: True)
+           bytes moved, OPT-13B: 18.48 GB; OPT-125M: 831.7 MB
+recompute: 9,115 tokens computed again, in 356 prompt passes
+
+== 6. Swapping against recomputation on the real model (OPT-125M)
+a request with a 14-token prompt and 200 written tokens: 213 tokens of KV cache
+recomputed in one pass against built one token at a time: max difference 1.8e-05; next token after recomputation the same: True
+laptop GPU (mps), FP16, fastest of several runs; 213 tokens = 7.85 MB of KV cache
+  building it the first time, one pass per token:  1342.8 ms
+  recomputation, one prompt pass:                     9.5 ms
+  swap out + swap in, blocks of 16 tokens:            5.9 ms; round trip exact: True
+  recomputation took 142 times less time than building the cache one token at a time
+swap time against block size (the same 213 tokens; one copy per block):
+  block size      1      2      4      8     16     32     64    128    256
+  out ms      40.14  21.50   9.65   4.81   2.77   1.48   1.02   0.52   0.33
+  in ms       46.75  19.37   9.18   4.99   2.84   1.49   0.92   0.52   0.33
+  recompute    9.45 ms at every block size (it does not read the blocks)
+  block size 1 means 213 copies each way: 0.19 ms per copy out; block size 256 means 1 copy
+
+== 7. Tensor parallelism (§4.6): one OPT-125M layer split over 2 simulated GPUs, 6 heads each
+11 tokens; GPU 0 has heads 0-5, GPU 1 has heads 6-11; each computes a partial output of shape (11, 768)
+all-reduce (sum of the 2 partial outputs) against the unsplit attention of the library: max difference 4.2e-07
+the whole layer (attention + feed-forward, 2 all-reduces) against the library layer: max difference 2.3e-05
+KV cache per GPU: keys of shape (6, 11, 64) (6 heads, all 11 positions); the two halves together equal the full keys: True
+per GPU and per token: 18,432 bytes of KV cache instead of 36,864 (FP16); the same block table serves both
+data sent by each all-reduce: 11 x 768 numbers; 2 all-reduces per layer, 24 per pass
+
+== 8. Kernels of §5.1 in PyTorch, on the laptop GPU (FP16, one layer's key cache: blocks x 16 x 12 x 64)
+block write of 256 new tokens: one copy per token 62.15 ms (256 launches), one scatter 0.155 ms (1 launch); same cache: True; 401x
+copy-on-write of 128 scattered blocks: one copy per block 1.10 ms, one batched copy 0.405 ms; same result: True; 2.7x
+
+timings on a shared laptop are noisy; each is the fastest of several runs

@@ -1,6 +1,6 @@
 ---
 title: "The Big Idea: Memory, Not Arithmetic, Limits LLM Serving"
-description: "Why a GPU that serves a language model runs out of memory before it runs out of speed, and the paper's fix: store each request's memory in small pages. We read the title, the abstract, Figures 1 and 2 and §1, and we measure the KV cache of a real model."
+description: "How a chat server answers many users at once, why its GPU runs out of memory before it runs out of speed, and the paper's fix: store each request's memory in small pages. We read the title, the abstract, Figures 1 and 2 and §1, and we measure the KV cache of a real model."
 part: 1
 covers: "Title, Abstract, Figures 1 and 2, §1"
 date: 2026-10-19
@@ -33,6 +33,64 @@ Each piece below shows the exact lines of the paper, then explains them.
 > [!DEFINITION] LLM serving
 > Running a trained model as a service: users send **requests** (a prompt), and the system sends back the model's answer. A serving system decides which requests run together, where their data sits in memory, and when each one finishes.
 
+## How LLM serving works
+
+The abstract assumes that you know how a chat server works. So we first follow one request from start to end, then add many users, then look at the parts of vLLM.
+
+### One chat request
+
+You type "What is the capital of France?" and press Enter. The text goes to a server with a GPU, and the server cuts it into tokens. Say the prompt is 7 tokens. The model reads all 7 in one pass and writes the first token of the answer, "The". This first pass is the **prompt phase**.
+
+Then the model writes one token per pass: "capital", then "is", then "Paris", then ".". This is the **generation phase**. The server sends each new token back at once, which is why a chatbot's answer appears word by word. When the model writes a special end token, the request is done.
+
+During all of this, the model keeps a record of every token it has seen: the **KV cache**. After the prompt phase it holds 7 slots, one per prompt token. Each step of the generation phase adds one slot. When the request ends, the server frees the memory for the next request.
+
+{{FIG:p1_life|One chat request over time. The prompt phase reads 7 prompt tokens in one pass and writes the first answer token. Each later pass writes one more token, and the KV cache grows by one slot per step until the end token frees it.}}
+
+> [!DEFINITION] KV cache
+> The keys and values that the model computed for every earlier token of a request. They stay in GPU memory, so the model does not compute them again for each new token. "KV" stands for key and value, two vectors from the attention layers. The sections below show what they are and how large they get.
+
+> [!DEFINITION] Prompt phase and generation phase
+> The two phases of one request. In the **prompt phase**, the model reads all prompt tokens in one pass, because they are all known. In the **generation phase**, it writes one new token per pass, because each token depends on the one before it.
+
+Look at the bottom row of the picture. The cache grows by one slot at every step, and nobody knows when it will stop. The answer could be 5 tokens or 500. The whole paper is about this growing, unpredictable piece of memory.
+
+### Many users at once
+
+A server does not answer one user and then the next. Many requests run at the same time, and the server moves them forward together. At every step, it takes the requests that are running and runs one pass of the model for all of them. That group is a **batch**.
+
+Take four requests, A to D, that arrive at different times. In step 1 only A runs. In step 2, B arrives and joins, so the batch holds 2 requests. A ends after step 5 and leaves. D arrives later and joins in step 6. So the batch changes at every step:
+
+{{FIG:p1_users|Four requests over eight passes of the model. Each request starts with its prompt phase, then writes one token per pass. Requests join when they arrive and leave when they finish, so the batch size changes from step to step.}}
+
+> [!NOTE] Where this idea comes from: batching at every step
+> Batching is older than language models. In training, a GPU always processes many images or sentences in one pass. Text generation adds a problem: requests end at different times. Earlier servers formed a batch and kept it until every request in it was done. A short request finished early and its place stayed idle, while new requests waited outside.
+>
+> Orca (OSDI 2022) changed this. It schedules the batch again after every pass of the model: finished requests leave, and waiting requests join. The paper calls this **iteration-level scheduling**, and vLLM uses it too. Think of a lift that stops at every floor, against a bus that only opens its doors at the last stop.
+
+> [!DEFINITION] Batch and batch size
+> A **batch** is a group of requests that the GPU processes in the same pass. The **batch size** is how many requests are in it. A larger batch uses the GPU better, until memory runs out.
+
+> [!DEFINITION] Throughput
+> How much work a system finishes per second. Here it is requests or tokens per second. Higher throughput means each request costs less.
+
+Now connect the two pictures. Every request in the batch holds its own KV cache in GPU memory, for as long as it runs. A request can join the batch only if its cache fits. So memory sets the batch size, and the batch size sets the throughput. The rest of this part makes that chain exact.
+
+### The map of vLLM
+
+Here is the whole system that the paper builds, drawn from its Figure 4. Nothing on it is new yet. It is a map for the next parts, so you can see where each piece fits.
+
+{{FIG:p1_arch|The parts of vLLM. Requests enter the scheduler. Inside it, the KV cache manager keeps a block table per request and two allocators. Workers run the model on the GPUs. New tokens go back to the users and to the next step.}}
+
+Requests from users arrive on the left. In the centre, the **scheduler** decides which requests run in the next step, as in the grid above. Inside it, the **KV cache manager** decides where in memory each request's cache lives. It keeps a **block table** for each request. It also has two allocators: one hands out pieces of GPU memory, and one hands out CPU memory as an overflow area.
+
+On the right are the **workers**. Each worker drives one GPU. Its **cache engine** holds the KV cache memory on that GPU, and its **model shard** holds its part of the weights. After each step, the new tokens go back to the users and to the scheduler.
+
+This part explains why a KV cache manager is needed at all. Part 3 opens the block tables, the allocators and the attention kernel. Part 4 explains sharing, the scheduler's choices when memory runs out, and how the workers split a model across GPUs.
+
+> [!DEFINITION] Worker and model shard
+> A **worker** is the program that controls one GPU and runs the model on it. When a model is too large for one GPU, its weights are split into pieces, and each GPU holds one piece: a **shard**. With one GPU, there is one worker and the shard is the whole model.
+
 ## The abstract {§Abstract}
 
 > [!PAPER] · Abstract
@@ -42,20 +100,11 @@ Each piece below shows the exact lines of the paper, then explains them.
 >
 > **What it means:**
 >
-> Think of a bus. Driving the bus costs about the same with one passenger or with forty. A GPU that serves a language model is the same. One step of the model costs almost the same for one request or for many. So the system wants to run many requests together. That group is a **batch**.
+> Think of a bus. Driving the bus costs about the same with one passenger or with forty. A GPU that serves a language model is the same. One step of the model costs almost the same for one request or for many. So the system wants to run many requests together, in one batch.
 >
-> The seats on this bus are memory. Each request needs space for its **KV cache**, a record that the model keeps while it writes the answer. The cache is large, and it grows with every word. Nobody knows in advance how long the answer will be. If the system books seats badly, the bus leaves half empty, and fewer requests run together.
+> The seats on this bus are memory. Each request needs space for its KV cache. The cache is large, and it grows with every token. Nobody knows in advance how long the answer will be. If the system books seats badly, the bus leaves half empty, and fewer requests run together.
 >
 > The abstract names two ways to book seats badly. **Fragmentation** means free memory that is cut into pieces nobody can use. **Redundant duplication** means two copies of the same data, where one copy shared by both would do.
-
-> [!DEFINITION] Throughput
-> How much work a system finishes per second. Here it is requests or tokens per second. A **token** is a piece of text, often a word or part of a word. Higher throughput means each request costs less.
-
-> [!DEFINITION] Batch and batch size
-> A **batch** is a group of requests that the GPU processes in the same step. The **batch size** is how many requests are in it. A larger batch uses the GPU better, until memory runs out.
-
-> [!DEFINITION] KV cache
-> The keys and values that the model computed for every earlier token of a request. They stay in GPU memory, so the model does not compute them again for each new token. "KV" stands for key and value, two vectors from the attention layers. The next sections show what they are and how large they get.
 
 > [!PAPER] · Abstract
 > [![The middle of the abstract, with inspired by the classical virtual memory and paging techniques in operating systems, near-zero waste in KV cache memory, and flexible sharing of KV cache within and across requests highlighted](/img/papers/vllm/p1-abstract-2.png)](/img/papers/vllm/p1-abstract-2.png)
@@ -89,6 +138,11 @@ Each piece below shows the exact lines of the paper, then explains them.
 
 > [!DEFINITION] FasterTransformer and Orca
 > The two strongest serving systems of 2022. **FasterTransformer** is NVIDIA's fast inference library. **Orca** (OSDI 2022) added a better way to form batches. Orca's code was not public, so the authors built their own version, in three variants that reserve memory in different ways. Part 5 describes them.
+
+> [!NOTE] How serving systems are compared
+> A fair test works like a shop on a busy day. Requests arrive at a fixed rate, say a few per second, and the test measures the normalized latency of each one. At a low rate, latency stays flat, because the server keeps up. At some rate the server falls behind, a queue forms, and latency shoots up.
+>
+> The highest rate a system can serve before that jump is its throughput. So "2-4× with the same level of latency" means that vLLM's jump comes at a rate two to four times higher. Part 5 reads these curves for every model and dataset of the paper.
 
 ## Why serving is expensive {§1}
 
@@ -145,11 +199,18 @@ Each piece below shows the exact lines of the paper, then explains them.
 > [!DEFINITION] Memory-bound
 > A computation whose speed is set by how fast data moves from memory, not by how fast the processor computes. The opposite is **compute-bound**. Writing one token for one request is memory-bound on a GPU.
 
+{{FIG:p1_bound|Why serving is memory-bound. Each step reads every weight once, whatever the batch size. In our run, a batch of 1 takes 4.51 ms for 1 token, and a batch of 64 takes 10.01 ms for 64 tokens.}}
+
+> [!NOTE] Where this idea comes from: the memory wall
+> For decades, processors got faster much more quickly than memory did. In 1995, the computer architects William Wulf and Sally McKee called this gap the "memory wall". A GPU makes the gap extreme: thousands of arithmetic units wait on one memory.
+>
+> Think of a chef who can chop a carrot every second, with a helper who brings one carrot every ten seconds. The chef's speed does not matter; the helper's does. When a model writes one token for one request, it does about one multiply and one add for each weight it reads. With a batch of 64, it does 64 of them for the same read. That is why batching helps so much, and why the next limit is memory space.
+
 ### Why the KV cache exists, on a laptop
 
 Before we measure the cache, we check why it exists. The attention layers of the model compare the newest token with every earlier token. For that, each earlier token needs two vectors, its **key** and its **value**. Without a cache, the model would compute the keys and values of the whole text again at every step. With a cache, it computes them once and keeps them.
 
-We use OPT-125M, the smallest model of the OPT family that the paper serves, in FP16 on an Apple laptop GPU. We write greedy generation three ways: with no cache, with our own loop that keeps a cache, and with the library's `model.generate`. All three must give the same tokens:
+We use OPT-125M, the smallest model of the OPT family that the paper serves, in FP16 on an Apple laptop GPU. We write greedy generation three ways: with no cache, with our own loop that keeps a cache, and with the library's `model.generate`. All three must give the same tokens. In the output, look for two things: the word True on both checks, and the times.
 
 ```python
 @torch.no_grad()
@@ -258,7 +319,7 @@ Twelve gigabytes sounds large, but it holds only 14,648 tokens of OPT-13B. If ev
 
 ### The two phases, and what batching buys
 
-The paper's §2 splits generation into two phases. In the **prompt phase**, the model reads all prompt tokens in one pass, because they are all known. In the **generation phase**, it writes one token per pass. We time both on the same 400 tokens:
+The paper's §2 names the two phases that we met in the chat request above. The prompt phase reads all prompt tokens in one pass. The generation phase writes one token per pass. We time both on the same 400 tokens. If the GPU is starved of data, the second way should be far slower:
 
 ```text
 == 4. The prompt phase against the generation phase (OPT-125M, 400 tokens)
@@ -269,7 +330,7 @@ one pass is 169x faster for the same work
 
 The work is the same, but one pass is 169 times faster. In one pass, the GPU reads the weights once and uses them for 400 tokens. One at a time, it reads them 400 times. On our laptop, part of each step is also the fixed cost of a call from Python. So the exact factor is larger than on a server GPU. The direction is the paper's point: the generation phase wastes the GPU.
 
-Batching gives back what the generation phase loses. We run one decode step for 1 to 64 requests at once, each with 128 tokens of cache:
+Batching gives back what the generation phase loses. We run one decode step for 1 to 64 requests at once, each with 128 tokens of cache. The function below is one such step; after it, we cut the cache back, so every timed run does the same work. Watch the step time grow much more slowly than the batch:
 
 ```python
 def step():
@@ -314,6 +375,14 @@ Sixty-four requests take 2.2 times as long as one request, and they produce 64 t
 > [!DEFINITION] Contiguous memory
 > Memory addresses that follow each other without a gap, like seats in one row. A contiguous block cannot grow if the next seats are taken; it must move to a larger free row.
 
+> [!DEFINITION] Tensor
+> An array of numbers with any number of dimensions, the basic data type of PyTorch. A vector is a 1-D tensor and a matrix is a 2-D tensor. The KV cache of a request is stored as tensors.
+
+> [!NOTE] Where this comes from: why tensors are contiguous
+> A tensor library stores a matrix as one long row of numbers. To find the number in row i and column j, it computes one address: the start, plus i times the row length, plus j. No lookup is needed. GPU code is fast partly because of this. Threads that sit side by side read numbers that sit side by side, in one wide read.
+>
+> Think of a street where the house numbers run in order. You find number 40 without asking anyone. If the houses were scattered across town, you would need a directory first. PagedAttention accepts that small cost: Part 3 shows how its kernel reads a table first, then the keys and values.
+
 > [!PAPER] · §1
 > [![The paragraph about fragmentation, with pre-allocate a contiguous chunk, request's maximum length, internal fragmentation, other shorter requests cannot utilize any, external, and only 20.4% - 38.2% of the KV cache memory is used to store the actual token states highlighted](/img/papers/vllm/p1-intro-frag.png)](/img/papers/vllm/p1-intro-frag.png)
 >
@@ -329,6 +398,13 @@ Sixty-four requests take 2.2 times as long as one request, and they produce 64 t
 
 > [!DEFINITION] Internal and external fragmentation
 > **Internal fragmentation** is unused memory inside a block that has been given to someone. **External fragmentation** is free memory between blocks, split into gaps that are each too small to use. Both are old terms from operating systems.
+
+{{FIG:p1_paged|Contiguous chunks against blocks. Each request books one chunk for its longest possible answer, and gaps between chunks stay empty. With blocks, a request takes one small block at a time, wherever one is free.}}
+
+> [!NOTE] Where these words come from: memory allocators
+> Operating systems met this problem in the 1960s. Programs ask for pieces of memory of many sizes, and give them back in any order. The code that hands out the pieces is an **allocator**, and both kinds of fragmentation are its classic enemies.
+>
+> One old answer is to round every request up to a power of two. The **buddy allocator**, described by Kenneth Knowlton in 1965, keeps free memory in pieces of 2, 4, 8, 16 units and so on. Splitting and merging such pieces is fast. The price is internal fragmentation: a request for 17 units gets 32. Orca (Pow2) below books memory in the same way. The [Background page](background-the-kv-cache-and-paging.md) works through both kinds of waste with small numbers.
 
 > [!PAPER] · Figure 2
 > [![Figure 2 of the paper: stacked bars of KV cache usage for Orca (Max), Orca (Pow2), Orca (Oracle) and vLLM, split into token states, reservation, internal fragmentation, and external fragmentation and others; token states are 20.4, 26.8, 38.2 and 96.3 percent](/img/papers/vllm/p1-figure2.png)](/img/papers/vllm/p1-figure2.png)
@@ -400,7 +476,11 @@ The order is the paper's order: max, then power of two, then oracle, then paged.
 
 Our numbers differ from Figure 2, and the reasons are worth knowing. We place no chunks in a real address space, so we count no external fragmentation; that is why our oracle shows 56.8% instead of 38.2%. The paper's bars come from a running system with ShareGPT or Alpaca traffic, a scheduler and requests that arrive over time. Our paged share is below the paper's 96.3% because our requests are short. The half-empty last block of 16 slots is a larger part of each one. The lesson is the same: booking ahead is what wastes memory.
 
-{{FIG:p1_paged|Contiguous chunks against blocks. Each request books one chunk for its longest possible answer, and gaps between chunks stay empty. With blocks, a request takes one small block at a time, wherever one is free.}}
+Here is what those counts mean for one real card. We take Figure 1's budget, 12 GB of KV cache space, and fill it with requests under the first rule and under the paged rule:
+
+{{FIG:p1_before|The same 40 GB GPU in our simulation. Before vLLM, 12 GB of KV cache space holds 7.2 chunks of 2,048 slots, and only 3.6% of it holds a token. With blocks of 16 slots, it holds 181.5 requests on average, and 90.7% of it holds a token.}}
+
+The weights do not change, and neither does the card. Only the way the cache is booked changes, and the number of requests that fit grows from 7 to about 181. For these short Alpaca requests the gap is extreme. The paper's own measurement, with real traffic, is the 2 to 4 times of the abstract.
 
 ## The second problem: no sharing {§1}
 
@@ -415,6 +495,8 @@ Our numbers differ from Figure 2, and the reasons are worth knowing. We place no
 > A coding assistant often shows you three suggestions for the same line. All three start from the same prompt, so the keys and values of the prompt are identical in all three. Only the new tokens differ. In a contiguous design, each suggestion gets its own chunk, and the prompt's cache is copied three times. That is the "redundant duplication" of the abstract.
 >
 > Beam search shares even more. It keeps several candidate answers alive, and they share long common beginnings that change as the search goes on. With one chunk per candidate, the shared part cannot be stored once. The paper's §6.3 measures how much memory sharing saves: up to 55% with beam search.
+
+{{FIG:p1_share|Three suggestions for one prompt. Before, each answer has its own chunk with its own copy of the prompt's cache. With vLLM, the three block tables all point to one shared copy of the prompt blocks.}}
 
 > [!DEFINITION] Parallel sampling and beam search
 > Two **decoding algorithms**, ways to choose the output tokens. **Parallel sampling** draws several different answers to the same prompt. **Beam search** keeps the few most likely partial answers at every step and extends each of them, then returns the best complete one.
@@ -431,6 +513,13 @@ Our numbers differ from Figure 2, and the reasons are worth knowing. We place no
 > The analogy is exact, and it is worth reading slowly. In an operating system, a **process** (a running program) sees its memory as one long row of bytes. Behind the scenes the row is cut into pages, and the pages sit anywhere. In vLLM, a request sees its cache as one long row of tokens. Behind the scenes the row is cut into blocks, and the blocks sit anywhere.
 >
 > The hard part is in the name: Paged**Attention**. The attention computation must now read keys and values from blocks scattered across memory, not from one tidy tensor. The authors wrote a new GPU kernel that follows each request's block table while it computes attention. Part 3 opens that kernel.
+
+> [!NOTE] Where this idea comes from: paging
+> Around 1962, the Atlas computer at the University of Manchester had a small, fast core memory and a large, slow magnetic drum. Programs were larger than the fast memory. Atlas cut memory into pages of a fixed size and moved them between core and drum when needed. A table recorded where each page was, so a programmer could write as if all memory were one large, fast store.
+>
+> This is **virtual memory with paging**, and every laptop and phone uses it today. Think of a binder of loose pages. The pages of one chapter can sit anywhere, because the table of contents lists where each one is. The paper makes the same move with the KV cache:
+
+{{FIG:p1_os|Paging in an operating system and in vLLM. A program sees pages 0, 1 and 2 in order, and its page table maps them to scattered frames. A request sees blocks 0, 1 and 2, and its block table maps them to scattered GPU blocks.}}
 
 > [!DEFINITION] Process
 > A running program, as the operating system sees it. Each process has its own address space and its own page table.
@@ -449,6 +538,11 @@ Our numbers differ from Figure 2, and the reasons are worth knowing. We place no
 >
 > Sharing follows from the block table. Two tables can point to the same block. When one of the two sequences must write into a shared block, vLLM copies that one block first, a trick from operating systems called **copy-on-write**. Part 4 shows it at work.
 
+> [!NOTE] Where this idea comes from: copy-on-write
+> In Unix, the call `fork()` makes a copy of a running program. Copying all of its memory would be slow, and the copy often replaces itself with another program right away. So modern Unix systems let the two programs share every page, marked read-only. When one program writes to a page, the system copies that one page first.
+>
+> Think of two students who share one textbook. When one of them wants to write notes in a chapter, they photocopy that chapter only. The paper does the same with blocks. It counts how many tables point to each block, and copies a block only when a shared block must change.
+
 ## vLLM, and the claim {§1}
 
 > [!PAPER] · §1
@@ -463,9 +557,11 @@ Our numbers differ from Figure 2, and the reasons are worth knowing. We place no
 > "Without affecting the model accuracy at all" is an important promise. Many speed-ups for language models change the numbers: smaller number formats, pruned weights, approximate attention. PagedAttention changes only where the keys and values are stored. The attention result is mathematically the same, so the answers are the same. Our own check above showed the same idea on a small scale: a cache changes the time, never the tokens.
 
 > [!DEFINITION] Preemption
-> Stopping a running job before it finishes, to give its resources to another job, and resuming it later. Operating systems preempt programs many times per second.
+> Stopping a running job before it finishes, to give its resources to another job, and resuming it later. Operating systems preempt programs many times per second. When memory is short, they can also move a paused program's pages to disk and bring them back later; this is **swapping**. The paper can move blocks to CPU memory in the same way, with the CPU block allocator of the map above.
 
 ### The paper's numbers, checked
+
+The last section of our script turns Figure 2's percentages into ratios, so we can compare them with the claim of "2-4×". Look at the line that starts with "vLLM keeps":
 
 ```text
 == 7. The paper's headline numbers, checked
@@ -486,6 +582,7 @@ Our run measured the KV cache of a real model, checked the paper's formula to th
 Our Figure 2 is a count, not a measurement of a running server. It has no external fragmentation, no arrival times and no scheduler. Part 6 builds a small paged cache and a serving loop that do allocate real blocks, so we can see the block table at work.
 
 > [!TAKEAWAYS] Key takeaways
+> - **A serving step** runs one pass of the model for every running request. Requests join and leave the batch after every step, as in Orca's iteration-level scheduling.
 > - **Serving is memory-bound.** Each new token needs a pass over all the weights, so one request at a time leaves the GPU idle. Batching many requests fixes this, until memory runs out.
 > - **The KV cache** holds the keys and values of every earlier token. It costs 2 × hidden size × layers × 2 bytes per token: 800 KB for OPT-13B. In our run, the formula matched the real tensors to the byte.
 > - **On a 40 GB A100** with a 13B model, the weights take 26 GB (65%). About 12 GB is left for the cache, which is 14,648 tokens, or 7 requests if each books 2,048.
