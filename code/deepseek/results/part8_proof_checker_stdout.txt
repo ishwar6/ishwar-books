@@ -1,0 +1,19 @@
+--- a correct proof ---
+goal: -4*a*b + (a + b)**2 >= 0
+step 1: rewrite   a**2 - 2*a*b + b**2      OK    equal after expanding
+step 2: rewrite   (a - b)**2               OK    equal after expanding
+step 3: sq_nonneg (a - b)**2               OK    a square is never negative
+reward: 1
+
+--- a proof with one wrong step ---
+goal: -4*a*b + (a + b)**2 >= 0
+step 1: rewrite   a**2 - 4*a*b + b**2      FAIL  not equal: difference is 2*a*b
+reward: 0
+
+--- a sketch with a hole (sorry) ---
+goal: -4*a*b + (a + b)**2 >= 0
+step 1: sorry     a**2 - 2*a*b + b**2      HOLE  left as sorry: accepted for now, proof not finished
+step 2: rewrite   (a - b)**2               OK    equal after expanding
+step 3: sq_nonneg (a - b)**2               OK    a square is never negative
+reward: 0
+

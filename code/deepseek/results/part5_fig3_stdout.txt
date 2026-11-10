@@ -1,0 +1,8 @@
+prefill  V3.1-Terminus  corner points (token position, $ per 1M tokens): [(0, 0.0529), (131072, 0.6657)]
+prefill  V3.2           corner points (token position, $ per 1M tokens): [(0, 0.0611), (6746, 0.0999), (131072, 0.1871)]
+prefill  at 128K: Terminus $0.666, V3.2 $0.187, ratio 3.6x; curves cross near 10,688 tokens
+prefill  at 32K:  Terminus $0.206, V3.2 $0.118; at 64K: Terminus $0.359, V3.2 $0.141
+decode   V3.1-Terminus  corner points (token position, $ per 1M tokens): [(2, 0.0706), (131070, 2.1543)]
+decode   V3.2           corner points (token position, $ per 1M tokens): [(2, 0.0953), (2107, 0.1458), (104046, 0.2275), (131070, 0.2492)]
+decode   at 128K: Terminus $2.154, V3.2 $0.249, ratio 8.6x; curves cross near 4,928 tokens
+decode   at 32K:  Terminus $0.592, V3.2 $0.170; at 64K: Terminus $1.112, V3.2 $0.197

@@ -1,0 +1,26 @@
+1) tokenizer compression
+   raw IDs      : [0, 1, 2, 3, 4, 5, 2, 6, 7, 8, 9, 6, 10, 1, 2, 3]   (11 distinct)
+   canonical IDs: [0, 1, 2, 3, 4, 5, 2, 6, 7, 8, 2, 6, 9, 1, 2, 3]   (10 distinct; "The" and "the" now share one ID)
+
+2) lookups for the last tokens of "... obeyed Alexander the Great"
+   2-gram "the Great" -> canonical IDs [2, 3] -> rows [283, 142] in tables of size [1009, 1013]
+   3-gram "Alexander the Great" -> canonical IDs [1, 2, 3] -> rows [83, 847] in tables of size [1019, 1021]
+   memory vector e_t = concatenation of 4 rows x 4 = 16 numbers
+   "Alexander the Great" at position 3 and at the end give the same rows: [83, 847] and [83, 847]: same memory, both times
+
+3) 50,000 distinct 2-grams hashed into tables of 65,537 and 65,539 rows
+   share a row with another 2-gram in head 1: 53.3%   in head 2: 53.7%
+   share BOTH rows with the same other 2-gram:  0.000%
+
+4) gate alpha = sigmoid(RMSNorm(h) . RMSNorm(k) / sqrt(16))
+   hidden state agrees with the memory (h = k)   : alpha = 0.982
+   unrelated hidden state (random h)             : alpha = 0.451
+   hidden state contradicts the memory (h = -k)  : alpha = 0.018
+
+5) gather 8,192 rows of 64 FP16 numbers (CPU, best of 20 runs)
+   table of     1,000 rows (    0.1 MB): 0.113 ms
+   table of   100,000 rows (   12.8 MB): 0.118 ms
+   table of 4,000,000 rows (  512.0 MB): 0.080 ms
+
+   For contrast, a dense layer touches every weight: 2 FLOPs per weight per token.
+   196.6B dense weights would cost 393 GFLOPs per token; Engram reads 48 rows x 256 = 12,288 numbers.

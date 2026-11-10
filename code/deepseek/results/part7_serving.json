@@ -1,0 +1,53 @@
+{
+ "ceiling": [
+  {
+   "machine": "M3 Ultra, \"over 800GB/s\"",
+   "model": "V3/R1 Q4_K_M, 37B active",
+   "gb_per_token": 22.3,
+   "ceiling": 35.9
+  },
+  {
+   "machine": "M3 Ultra, \"over 800GB/s\"",
+   "model": "R1-Distill-Llama-70B Q4_K_M, 70.55B dense",
+   "gb_per_token": 42.5,
+   "ceiling": 18.8
+  },
+  {
+   "machine": "2 sockets x 8 ch DDR5-4800 (2 x 8 x 38.4 GB/s)",
+   "model": "V3/R1 Q4_K_M, 37B active",
+   "gb_per_token": 22.3,
+   "ceiling": 27.6
+  },
+  {
+   "machine": "2 sockets x 8 ch DDR5-4800 (2 x 8 x 38.4 GB/s)",
+   "model": "R1-Distill-Llama-70B Q4_K_M, 70.55B dense",
+   "gb_per_token": 42.5,
+   "ceiling": 14.5
+  }
+ ],
+ "isca": [
+  {
+   "net": "CX7 400Gbps InfiniBand, 50 GB/s",
+   "comm_us": 120.96,
+   "tpot_ms": 14.76,
+   "tps": 68
+  },
+  {
+   "net": "GB200 NVL72, 900 GB/s",
+   "comm_us": 6.72,
+   "tpot_ms": 0.82,
+   "tps": 1220
+  }
+ ],
+ "day6": {
+  "cost": 87072.0,
+  "revenue_recomputed": 562100,
+  "revenue_reported": 562027,
+  "margin": 5.455,
+  "per_gpu_decode": 1850.0,
+  "streams": [
+   673,
+   740
+  ]
+ }
+}

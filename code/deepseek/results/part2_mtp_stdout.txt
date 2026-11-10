@@ -1,0 +1,18 @@
+== Which token each depth predicts (T = 6 tokens, D = 1) ==
+  position 1 (The): main model predicts t2 = 'cat'  MTP module (also given the embedding of t2) predicts t3 = 'sat'
+  position 2 (cat): main model predicts t3 = 'sat'  MTP module (also given the embedding of t3) predicts t4 = 'on'
+  position 3 (sat): main model predicts t4 = 'on'   MTP module (also given the embedding of t4) predicts t5 = 'the'
+  position 4 ( on): main model predicts t5 = 'the'  MTP module (also given the embedding of t5) predicts t6 = 'mat'
+
+== Tokens per decoding step with one draft token ==
+  acceptance 85%: 1 + 0.85 = 1.85 tokens per step (upper bound on the speed-up)
+  acceptance 90%: 1 + 0.90 = 1.90 tokens per step (upper bound on the speed-up)
+  reported by DeepSeek: 1.8x tokens per second; the gap is the cost of running the MTP layer and verifying
+
+== What the MTP layer costs in memory ==
+  unique MTP parameters 11.61B = 1.7% of the 671B main model
+  as stored on Hugging Face (with its own embedding and head copies): 13.46B
+
+== The MTP loss weight over training (paper: lambda 0.3 for the first 10T tokens, 0.1 for the last 4.8T) ==
+  lambda 0.3: total loss = L_main + lambda * L_MTP = 2.0 + 0.3 x 2.6 = 2.78
+  lambda 0.1: total loss = L_main + lambda * L_MTP = 2.0 + 0.1 x 2.6 = 2.26

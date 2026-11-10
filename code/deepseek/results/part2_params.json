@@ -1,0 +1,39 @@
+{
+ "total": 671026419200,
+ "buckets": {
+  "embedding": 926679040,
+  "output head": 926679040,
+  "attention (MLA), all layers": 11413547008,
+  "dense FFN, first layers": 1189085184,
+  "routed experts": 653908770816,
+  "shared experts": 2554331136,
+  "routers (incl. bias)": 106445312,
+  "RMSNorm weights": 881664
+ },
+ "active": {
+  "embedding": 926679040,
+  "output head": 926679040,
+  "attention (MLA), all layers": 11413547008,
+  "dense FFN, first layers": 1189085184,
+  "routed experts": 20434649088,
+  "shared experts": 2554331136,
+  "routers (incl. bias)": 106445312,
+  "RMSNorm weights": 881664
+ },
+ "active_total": 37552297472,
+ "per": {
+  "attn": 187107328,
+  "dense_ffn": 396361728,
+  "expert": 44040192,
+  "router": 1835264,
+  "nd": 3,
+  "nm": 58
+ },
+ "library_total": 671026419200,
+ "mtp_unique": 11610068224,
+ "embedding": 926679040,
+ "checkpoint": 684489845504,
+ "v2_lite_total": 15706484224,
+ "v2_lite_active": 2661150208,
+ "v2_lite_library": 15706484224
+}

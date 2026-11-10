@@ -1,0 +1,9 @@
+23 candidate grids (cols x rows with cols * rows <= 9)
+image                         grid  tiles  vision tokens
+small square photo         1x1          2            421
+phone photo 3024 x 4032    3x3         10          2,017
+screenshot 1920 x 1080     4x2          9          1,807
+A4 scan at 150 dpi         3x3         10          2,017
+panorama 3000 x 1000       4x2          9          1,807
+
+Every tile is one 384 x 384 SigLIP pass: 729 outputs before the 2 x 2 squeeze, 196 after.

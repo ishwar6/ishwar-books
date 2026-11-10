@@ -1,0 +1,65 @@
+DeepInfer commit: a679bb86ce36e883a98a97733492b686e5b9a08e 2026-11-03T15:31:40+08:00
+
+313 source files, 53,260 non-blank lines (vendor/ submodules excluded)
+
+By language:
+  Python    47,761  (89.7%)
+  C++        5,153  ( 9.7%)
+  shell        346  ( 0.6%)
+
+By component:
+   20,997  deepinfer/.../tilelang_ops (TileLang kernels)
+    6,148  deepinfer/model_executor/models (V4.1 model)
+    5,045  deepinfer (other Python)
+    4,598  csrc/engine (C++ scheduler, block manager, input prep)
+    3,562  deepinfer/model_executor (other)
+    2,670  examples
+    2,528  tests
+    2,381  deepinfer/worker (cache, CUDA graphs, runner)
+    1,831  deepinfer/engine + entrypoints
+    1,463  eval
+      681  deepinfer/model_executor/eplb
+      555  csrc (other C++)
+      537  deep_cluster
+      169  scripts
+       75  setup.py
+       20  build.sh
+
+Files with the "Derived from vLLM; modified by DeepSeek." header: 23
+  deepinfer/config.py
+  deepinfer/distributed/shm_broadcast.py
+  deepinfer/engine/arg_utils.py
+  deepinfer/engine/llm_engine.py
+  deepinfer/entrypoints/llm.py
+  deepinfer/logger.py
+  deepinfer/model_executor/layers/layernorm.py
+  deepinfer/model_executor/layers/rotary_embedding.py
+  deepinfer/model_executor/layers/sampler.py
+  deepinfer/model_executor/layers/vocab_parallel_embedding.py
+  deepinfer/model_executor/model_loader.py
+  deepinfer/model_executor/models/__init__.py
+  deepinfer/model_executor/parallel_utils/communication_op.py
+  deepinfer/model_executor/utils.py
+  deepinfer/sampling_params.py
+  deepinfer/sequence.py
+  deepinfer/utils.py
+  deepinfer/worker/base.py
+  deepinfer/worker/cache_engine.py
+  deepinfer/worker/model_runner.py
+  deepinfer/worker/worker.py
+  setup.py
+  tests/distributed/test_shm_broadcast.py
+
+58 DEEPINFER_* environment knobs in deepinfer/environ.py; selected defaults:
+  DEEPINFER_USE_NEXTN_DECODE                     int default=5
+  DEEPINFER_ENABLE_MTP_VARLEN                    bool default=False/0
+  DEEPINFER_ZERO_OVERHEAD_SCHEDULING             bool default=False/0
+  DEEPINFER_PREFILL_ATTEMPT_INTERVAL             int default=70
+  DEEPINFER_PREFILL_ANY_ATTEMPT_INTERVAL         int default=100
+  DEEPINFER_EXPERT_COUNT_WINDOW_SIZE             int default=100
+  DEEPINFER_EXPERT_REARRANGEMENT_STEP_INTERVAL   int default=False/0
+  DEEPINFER_CUDAGRAPH_BATCH_SIZE_INTERVAL        int default=8
+  DEEPINFER_NUM_STATE_SLOTS_RATIO                float default=1.2
+  DEEPINFER_YOCO_PREFILL_TRUNCATION_MODE         choice default="off", choices=("off", "mask", "compact"
+  DEEPINFER_BATCH_INVARIANT                      bool default=False/0
+  DEEPINFER_NCCL_NUM_SMS                         int default=32

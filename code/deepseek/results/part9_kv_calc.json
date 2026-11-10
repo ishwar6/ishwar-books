@@ -1,0 +1,112 @@
+{
+ "block_tokens": 128,
+ "block_bytes": 113920,
+ "block_bytes_aligned": 114048,
+ "bytes_per_token": 890.0,
+ "owners": [
+  {
+   "layer": 2,
+   "ratio": 2,
+   "main": 18432,
+   "index": 4352,
+   "owner_main": 2,
+   "owner_index": 2
+  },
+  {
+   "layer": 8,
+   "ratio": 2,
+   "main": 18432,
+   "index": 4352,
+   "owner_main": 8,
+   "owner_index": 8
+  },
+  {
+   "layer": 14,
+   "ratio": 2,
+   "main": 18432,
+   "index": 4352,
+   "owner_main": 14,
+   "owner_index": 14
+  },
+  {
+   "layer": 20,
+   "ratio": 1,
+   "main": 36864,
+   "index": 8704,
+   "owner_main": 20,
+   "owner_index": 20
+  }
+ ],
+ "naive_bytes_per_token": 21120,
+ "state_bytes": 3139488,
+ "state_to_disk": 1415040,
+ "swa_layers": 43,
+ "swa_store": 20,
+ "swa_tokens": 134,
+ "comp_state": 96768,
+ "per_seq": [
+  {
+   "context": 8192,
+   "blocks_MiB": 6.9609375,
+   "state_MiB": 2.994049072265625
+  },
+  {
+   "context": 32768,
+   "blocks_MiB": 27.84375,
+   "state_MiB": 2.994049072265625
+  },
+  {
+   "context": 131072,
+   "blocks_MiB": 111.375,
+   "state_MiB": 2.994049072265625
+  },
+  {
+   "context": 1048576,
+   "blocks_MiB": 891.0,
+   "state_MiB": 2.994049072265625
+  }
+ ],
+ "n_prefill": 20,
+ "ratios": [
+  0,
+  0,
+  2,
+  2,
+  2,
+  2,
+  2,
+  2,
+  2,
+  2,
+  2,
+  2,
+  2,
+  2,
+  2,
+  2,
+  2,
+  2,
+  2,
+  2,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1,
+  1
+ ]
+}

@@ -1,0 +1,41 @@
+Global KV cache per token, rebuilt from config.json
+
+  67B: 95 layers x (2 x 8 KV heads x 128 dims x 2 B = 4,096 B)
+  V3: 61 layers x ((512 latent + 64 RoPE) x 2 B = 1,152 B)
+  V3.2: 61 layers x (656 B MLA in FP8 + 132 B indexer key = 788 B)  [index_topk 2048]
+  DeepSeek-V4-Flash: 43 layers = 2 sliding-window only + 21 CSA (ratio 4) + 20 HCA (ratio 128)
+     CSA: 21 x (584 + 68) B / 4  = 3,423.00 B
+     HCA: 20 x 584 B / 128       = 91.25 B
+  DeepSeek-V4-Pro: 61 layers = 0 sliding-window only + 30 CSA (ratio 4) + 31 HCA (ratio 128)
+     CSA: 30 x (584 + 68) B / 4  = 4,890.00 B
+     HCA: 31 x 584 B / 128       = 141.44 B
+  V4.1-Flash: 40 layers, compress ratios [0, 1, 2], KV stored only in layers [2, 8, 14, 20]
+     layer  2 (encoder, ratio 2): (288 + 68) B / 2 = 178.0 B
+     layer  8 (encoder, ratio 2): (288 + 68) B / 2 = 178.0 B
+     layer 14 (encoder, ratio 2): (288 + 68) B / 2 = 178.0 B
+     layer 20 (decoder, ratio 1): (288 + 68) B / 1 = 356.0 B
+
+model                  date      bytes/token   paper Fig 1b   x smaller   GB at 128K   GB at 1M
+DeepSeek LLM 67B       2023-11      389,120        389,120                   51.00     408.02
+DeepSeek-V3            2024-12       70,272              -        5.5x        9.21      73.69
+DeepSeek-V3.2          2025-12       48,068         48,068        1.5x        6.30      50.40
+DeepSeek-V4-Flash      2026-04        3,514          3,514       13.7x        0.46       3.68
+DeepSeek-V4.1-Flash    2026-09          890            890        3.9x        0.12       0.93
+
+V4-Pro (not in the chart): 5,031 B per token; V3.2 / V4-Pro = 9.55x, V3.2 / V4-Flash = 13.68x  (V4 paper Figure 1: "9.5x smaller", "13.7x smaller")
+67B / V3.2 = 8.1x  (V4.1 paper Figure 1b: "8.1x smaller")
+67B / V4.1-Flash = 437.2x  (V4.1 paper: "437-fold");  V4-Flash / V4.1-Flash = 3.95x  ("approximately 4-fold")
+V2-style check: 67B / V3 at the same BF16 precision = 5.54x
+V4-Flash: BF16 GQA8 baseline with 43 layers = 176,128 B per token; V4 / baseline = 2.0%  (paper: "approximately 2%")
+V4-Pro: BF16 GQA8 baseline with 61 layers = 249,856 B per token; V4 / baseline = 2.0%  (paper: "approximately 2%")
+V4-Flash sliding-window cache: 128 tokens x 43 layers x 584 B = 3,214,336 B = 3.2 MB per request, whatever the length
+
+Engram (V4.1-Flash): layers [1, 14], 3 n-gram orders x 8 hash heads per module
+  table rows  = 384,006,168 + 384,016,682 = 768,022,850
+  parameters  = 768,022,850 rows x 256 dims = 196.6B   (paper: "196B Engram parameters")
+  per table   = 16,000,476 rows on average   (paper: "approximately 16M entries")
+  read per token = 48 rows x 256 = 12,288 numbers = 12,288 bytes in FP8 (0.0000062% of the tables)
+
+V4-Flash routed experts: 43 layers x 256 x 3 x 4096 x 2048 = 277.0B parameters
+  in FP4 with one 1-byte scale per 32 values: 147.2 GB;  the other ~7B in FP8: ~7 GB;  estimate 154 GB  (published files: 159.6 GB)
+  the same 284B in BF16 would be 568 GB

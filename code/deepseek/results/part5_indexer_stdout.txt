@@ -1,0 +1,32 @@
+Setup: 4,096 cached tokens, 32 queries per sequence, 16 heads sharing one 32-dim latent, indexer 16 heads x 16 dims, keep k = 64 (1.56%)
+Dense attention: the best 64 tokens hold 90.1% of the head-summed attention on average
+
+warm-up step    1: KL loss 11.653 per query
+warm-up step   25: KL loss 4.727 per query
+warm-up step  100: KL loss 2.308 per query
+warm-up step  200: KL loss 1.855 per query
+warm-up step  400: KL loss 1.134 per query
+warm-up took 37 s on CPU
+
+selector                attention kept  recall of true top-k  output error
+random tokens                     1.5%                  1.6%         71.9%
+untrained indexer                 2.0%                  2.0%         74.1%
+trained indexer                  77.1%                 56.6%         17.2%
+oracle (true top-k)              90.1%                100.0%          5.0%
+
+k =    16 ( 0.39% of tokens): attention kept, trained indexer  52.9%, oracle  73.2%, random   0.4%
+k =    32 ( 0.78% of tokens): attention kept, trained indexer  65.6%, oracle  83.0%, random   0.8%
+k =    64 ( 1.56% of tokens): attention kept, trained indexer  77.1%, oracle  90.1%, random   1.6%
+k =   128 ( 3.12% of tokens): attention kept, trained indexer  86.2%, oracle  94.8%, random   3.1%
+k =   256 ( 6.25% of tokens): attention kept, trained indexer  92.8%, oracle  97.7%, random   6.2%
+k =   512 (12.50% of tokens): attention kept, trained indexer  97.0%, oracle  99.1%, random  12.5%
+k =  1024 (25.00% of tokens): attention kept, trained indexer  99.0%, oracle  99.8%, random  25.0%
+
+FP8 indexer (float8_e4m3fn q and k): 95.2% of the selected tokens are the same as in FP32
+Method 1 (gather 64 latents) vs Method 2 (SDPA with a mask over all 4,096): max difference 4.8e-06
+
+Multiply-adds per query token:
+  dense attention:          16 x (32+32) x 4,096 = 4,194,304
+  DSA indexer:              16 x 16 x 4,096      = 1,048,576
+  DSA main (top-64):        16 x (32+32) x 64     = 65,536
+  DSA total:                1,114,112  (3.8x fewer than dense)

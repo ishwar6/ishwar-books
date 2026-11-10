@@ -1,0 +1,15 @@
+== KV cache per token, 61 layers ==
+  MLA stores d_c + d_R = 512 + 64 = 576 numbers per layer; x 61 layers x 2 bytes = 70,272 bytes
+  MHA, V3 head shapes (K 192, V 128 per head)           4,997,120 B/token    4880.0 KiB   71.11x MLA   128K tokens:  610.00 GiB
+  MHA, textbook (2 x 128 heads x 128)                   3,997,696 B/token    3904.0 KiB   56.89x MLA   128K tokens:  488.00 GiB
+  GQA, 8 KV groups x 128                                  249,856 B/token     244.0 KiB    3.56x MLA   128K tokens:   30.50 GiB
+  MQA, 1 KV head x 128                                     31,232 B/token      30.5 KiB    0.44x MLA   128K tokens:    3.81 GiB
+  MLA, BF16 (512 latent + 64 RoPE key)                     70,272 B/token      68.6 KiB    1.00x MLA   128K tokens:    8.58 GiB
+  MLA, FP8 layout (512 B + 16 B scales + 128 B RoPE)       40,016 B/token      39.1 KiB    0.57x MLA   128K tokens:    4.88 GiB
+
+== MLA, naive vs absorbed, V3 shapes, random weights ==
+  cache: c_kv (64, 512) + k_r (64, 64) = 576 numbers per token
+  naive  : rebuilt keys + values hold 2,097,152 numbers for 64 tokens
+  absorbed: reads only the cache, 36,864 numbers for 64 tokens
+  largest score difference 4.9e-15; largest output difference (relative) 1.5e-15
+  multiply-adds per cached token per layer: naive 16,818,176, absorbed 139,264

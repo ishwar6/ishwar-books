@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inside an MoE Model</title>
+<style>
+:root{
+  --bg:#0e0f12; --panel:#16181d; --line:#2a2e36; --text:#e9eaee; --muted:#9aa0ab; --faint:#5d636e;
+  --never:#1d2027; --ssd:#4a505b; --ram:#9aa1ad; --gpu:#f2f3f5; --pick:#f5b942; --accent:#f5b942;
+  --ok:#6fcf97; --bad:#ef7d6b; --mono: ui-monospace, "SF Mono", Menlo, monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Inter",system-ui,sans-serif}
+main{max-width:1480px;margin:0 auto;padding:20px 22px 40px}
+h1{font-size:28px;margin:0;letter-spacing:-.02em}
+.sub{color:var(--muted);margin:4px 0 0}
+header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:16px}
+.badge{border:1.5px solid var(--line);padding:4px 10px;font-weight:700;letter-spacing:.12em;font-size:12px;color:var(--faint);border-radius:4px}
+.badge.live{border-color:var(--ok);color:var(--ok)}
+.note{font-size:12.5px;color:var(--muted);background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);padding:8px 12px;border-radius:6px;margin-bottom:14px}
+.tiers{display:grid;grid-template-columns:150px 1fr 230px;gap:8px 14px;align-items:center;margin-bottom:14px}
+.tname b{display:block;font-size:17px}.tname span{color:var(--muted);font-size:12.5px}
+.bar{height:38px;border:1px solid var(--line);border-radius:4px;display:flex;overflow:hidden;background:#0b0c0f}
+.seg{display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;padding:0 8px;transition:width .3s}
+.seg.ssd{background:var(--ssd)} .seg.ram{background:var(--ram);color:#111} .seg.gpu{background:var(--gpu);color:#111}
+.seg.fixed{background:repeating-linear-gradient(45deg,#c9ccd2 0 6px,#aeb2ba 6px 12px);color:#111}
+.seg.free{color:var(--muted)}
+.tside{font-size:12.5px;color:var(--muted)}
+.tside b{color:var(--text);font-size:15px}
+.controls{display:flex;flex-wrap:wrap;gap:18px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin-bottom:14px}
+.controls label{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.controls input[type=range]{width:140px;accent-color:var(--accent)}
+.controls output{color:var(--text);font-variant-numeric:tabular-nums;min-width:52px}
+.gridhead{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+.gridhead h2{font-size:17px;margin:0}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
+.legend i{display:inline-block;width:12px;height:12px;border:1px solid var(--line);vertical-align:-2px;margin-right:5px}
+.gridwrap{position:relative;display:grid;grid-template-columns:62px 1fr;gap:6px}
+.ylabels{position:relative;font-size:11.5px;color:var(--muted)}
+.ylabels span{position:absolute;right:0;transform:translateY(-50%)}
+canvas#grid{width:100%;display:block;background:#0b0c0f;border:1px solid var(--line);border-radius:4px;cursor:crosshair}
+.gridfoot{display:flex;justify-content:space-between;font-size:12px;color:var(--faint);margin:4px 0 16px 68px}
+#tip{position:fixed;pointer-events:none;background:#000;border:1px solid var(--line);padding:6px 9px;border-radius:5px;font-size:12px;display:none;z-index:5;max-width:260px}
+.cols{display:grid;grid-template-columns:1.35fr 1fr;gap:16px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+.ask{display:flex;gap:8px;margin-bottom:10px}
+.ask input{flex:1;background:#0b0c0f;border:1px solid var(--line);color:var(--text);border-radius:6px;padding:10px 12px;font-size:15px}
+button{background:#22252c;border:1px solid var(--line);color:var(--text);border-radius:6px;padding:9px 14px;font-weight:600;cursor:pointer;font-size:14px}
+button.primary{background:var(--accent);border-color:var(--accent);color:#111}
+button:disabled{opacity:.45;cursor:default}
+.status{font-size:12.5px;color:var(--muted);margin-bottom:8px}
+#answer{min-height:150px;max-height:300px;overflow:auto;font-size:15px;line-height:1.6;white-space:pre-wrap}
+#answer span.tk{cursor:pointer;border-radius:3px}
+#answer span.tk:hover{background:#2a2e36}
+#answer span.tk.sel{background:var(--accent);color:#111}
+#answer .prompt{color:var(--faint)}
+.kv{font-size:12px;letter-spacing:.12em;color:var(--muted);font-weight:700;text-transform:uppercase;margin:0 0 6px}
+.big{font-size:30px;font-weight:700;font-variant-numeric:tabular-nums}
+.big small{font-size:15px;font-weight:500;color:var(--muted)}
+.split{display:flex;height:26px;border:1px solid var(--line);border-radius:4px;overflow:hidden;margin:8px 0;font-size:12.5px;font-weight:700}
+.split div{display:flex;align-items:center;justify-content:center;overflow:hidden;white-space:nowrap;transition:width .2s}
+.line{font-variant-numeric:tabular-nums;color:var(--text)}
+.line.m{color:var(--muted);font-size:13px}
+hr{border:0;border-top:1px solid var(--line);margin:12px 0}
+.logs{margin-top:16px}
+.loghead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.loghead h2{font-size:17px;margin:0}
+.loghead label{font-size:12.5px;color:var(--muted);display:flex;gap:6px;align-items:center}
+#log{font:12px/1.55 var(--mono);background:#08090b;border:1px solid var(--line);border-radius:6px;padding:10px 12px;height:280px;overflow:auto;white-space:pre}
+#log .srv{color:#b9c2d0} #log .cache{color:#e7c27a} #log .det{color:#7d8696} #log .err{color:var(--bad)}
+@media (max-width:980px){.cols{grid-template-columns:1fr}.tiers{grid-template-columns:90px 1fr}.tside{grid-column:2}}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <div>
+    <h1 id="h1">Inside a mixture-of-experts model</h1>
+    <p class="sub" id="sub">loading model facts...</p>
+  </div>
+  <div class="badge" id="badge">IDLE</div>
+</header>
+
+<div class="note">
+  <b>What is real:</b> the model runs on this machine, and every expert choice, router weight and step time below comes from it.
+  <b>What is simulated:</b> the SSD, RAM and GPU rows. On this machine all weights sit in one memory. The page replays the real choices
+  through a pretend machine with the sizes you set, to show where each expert would have to come from.
+</div>
+
+<div class="tiers">
+  <div class="tname"><b>SSD</b><span>holds every expert</span></div>
+  <div class="bar"><div class="seg ssd" id="ssdSeg" style="width:100%">all experts</div></div>
+  <div class="tside" id="ssdSide"></div>
+  <div class="tname"><b>RAM</b><span id="ramName"></span></div>
+  <div class="bar"><div class="seg ram" id="ramSeg"></div><div class="seg free" id="ramFree">free</div></div>
+  <div class="tside">recently used experts the GPU does not hold, kept least-recently-used first out</div>
+  <div class="tname"><b>GPU</b><span id="gpuName"></span></div>
+  <div class="bar"><div class="seg gpu" id="gpuSeg"></div><div class="seg fixed" id="fixSeg"></div><div class="seg free" id="gpuFree"></div></div>
+  <div class="tside">the busiest experts so far, plus the weights every token uses (attention, shared experts, embeddings)</div>
+</div>
+
+<div class="controls">
+  <label>pretend GPU <input type="range" id="gpuGB" min="4" max="32" step="1" value="8"><output id="gpuGBo"></output></label>
+  <label>pretend RAM cache <input type="range" id="ramGB" min="0" max="24" step="1" value="4"><output id="ramGBo"></output></label>
+  <label>SSD speed <input type="range" id="ssdBW" min="1" max="14" step="0.5" value="7"><output id="ssdBWo"></output></label>
+  <label>max tokens <input type="range" id="maxNew" min="16" max="600" step="8" value="200"><output id="maxNewo"></output></label>
+  <label>temperature <input type="range" id="temp" min="0" max="1.2" step="0.1" value="0"><output id="tempo"></output></label>
+  <label><input type="checkbox" id="heat"> colour by how often used</label>
+</div>
+
+<div class="gridhead">
+  <h2 id="gridTitle">experts per layer</h2>
+  <div class="legend">
+    <span><i style="background:var(--never)"></i>not used yet</span>
+    <span><i style="background:var(--ssd)"></i>only on SSD</span>
+    <span><i style="background:var(--ram)"></i>in RAM cache</span>
+    <span><i style="background:var(--gpu)"></i>on GPU</span>
+    <span><i style="background:transparent;border:2px solid var(--pick)"></i>picked for this token</span>
+  </div>
+</div>
+<div class="gridwrap">
+  <div class="ylabels" id="ylabels"></div>
+  <canvas id="grid"></canvas>
+</div>
+<div class="gridfoot"><span>expert 0</span><span>each column is one expert, each row is one MoE layer; hover a cell for details</span><span id="lastCol"></span></div>
+
+<div class="cols">
+  <div class="panel">
+    <div class="ask">
+      <input id="prompt" value="Why do mixture-of-experts models use only some experts for each word?" autocomplete="off">
+      <button class="primary" id="go">Ask</button>
+      <button id="stop" disabled>Stop</button>
+      <button id="clear">Clear map</button>
+    </div>
+    <div class="status" id="status">waiting for the server...</div>
+    <div id="answer"></div>
+  </div>
+  <div class="panel">
+    <p class="kv" id="thisHead">This token</p>
+    <div class="big" id="tBig">-</div>
+    <div class="split" id="tSplit"></div>
+    <div class="line" id="tLine"></div>
+    <div class="line m" id="tLine2"></div>
+    <hr>
+    <p class="kv">Whole answer</p>
+    <div class="line" id="aLine"></div>
+    <div class="line" id="aLine2"></div>
+    <div class="line m" id="aLine3"></div>
+  </div>
+</div>
+
+<div class="logs">
+  <div class="loghead">
+    <h2>Under the hood</h2>
+    <div style="display:flex;gap:14px;flex-wrap:wrap">
+      <label><input type="checkbox" id="lgSrv" checked> server</label>
+      <label><input type="checkbox" id="lgCache" checked> cache</label>
+      <label><input type="checkbox" id="lgDet"> every layer's picks and weights</label>
+      <label><input type="checkbox" id="lgFollow" checked> follow</label>
+      <button id="lgClear">Clear log</button>
+    </div>
+  </div>
+  <div id="log"></div>
+</div>
+</main>
+<div id="tip"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+let INFO = null;
+const S = {                       // simulation state
+  L: 0, E: 0, K: 0, expertBytes: 0,
+  count: null,                    // how often each expert was picked (L*E)
+  where: null,                    // 0 never, 1 ssd only, 2 ram, 3 gpu
+  gpuSet: new Set(), ram: new Map(),   // ram: key -> true, insertion order = LRU order
+  cur: [],                        // picks of the shown token: [[layer, expert], ...]
+  tokens: [],                     // answer tokens with routes, for click-to-inspect
+  ans: null,
+};
+const GB = 1e9;
+const fmtB = b => b >= GB ? (b / GB).toFixed(2) + ' GB' : (b / 1e6).toFixed(0) + ' MB';
+
+// ------------------------------------------------------------------ log panel
+function addLog(text, cls) {
+  const filt = {srv: $('lgSrv').checked, cache: $('lgCache').checked, det: $('lgDet').checked, err: true};
+  if (!filt[cls]) return;
+  const el = $('log'), d = document.createElement('div');
+  d.className = cls; d.textContent = text; el.appendChild(d);
+  while (el.childNodes.length > 4000) el.removeChild(el.firstChild);
+  if ($('lgFollow').checked) el.scrollTop = el.scrollHeight;
+}
+const stamp = () => new Date().toTimeString().slice(0, 8);
+
+// ------------------------------------------------------------------ pretend machine
+function budget() {
+  const fixed = INFO.params_always_used * 2 + 1.0 * GB;   // always-used weights in bf16 + 1 GB for KV cache and work
+  const gpu = +$('gpuGB').value * GB, ram = +$('ramGB').value * GB;
+  return {fixed, gpu, ram, gpuSlots: Math.max(0, Math.floor((gpu - fixed) / S.expertBytes)),
+          ramSlots: Math.floor(ram / S.expertBytes), bw: +$('ssdBW').value * GB};
+}
+function repinGPU(reason) {
+  // the GPU tier holds the experts picked most often so far
+  const b = budget(), order = [...S.count.keys()].filter(k => S.count[k] > 0).sort((a, c) => S.count[c] - S.count[a]);
+  S.gpuSet = new Set(order.slice(0, b.gpuSlots));
+  for (const k of S.gpuSet) S.ram.delete(k);
+  while (S.ram.size > b.ramSlots) S.ram.delete(S.ram.keys().next().value);
+  for (let k = 0; k < S.where.length; k++)
+    S.where[k] = S.gpuSet.has(k) ? 3 : S.ram.has(k) ? 2 : S.count[k] > 0 ? 1 : 0;
+  addLog(`${stamp()}  [cache] GPU tier re-pinned (${reason}): ${S.gpuSet.size} busiest experts of ${b.gpuSlots} slots; RAM cache ${S.ram.size}/${b.ramSlots}`, 'cache');
+  drawTiers();
+}
+function serve(routes) {
+  // send one token's picks through the pretend machine; returns where each pick came from
+  const b = budget(); const got = {gpu: 0, ram: 0, ssd: 0}; S.cur = [];
+  routes.forEach((ids, l) => ids.forEach(e => {
+    const k = l * S.E + e; S.count[k]++; S.cur.push([l, e]);
+    if (S.gpuSet.has(k)) { got.gpu++; S.where[k] = 3; return; }
+    if (S.ram.has(k)) { got.ram++; S.ram.delete(k); S.ram.set(k, true); S.where[k] = 2; return; }
+    got.ssd++;
+    if (b.ramSlots > 0) {
+      S.ram.set(k, true); S.where[k] = 2;
+      if (S.ram.size > b.ramSlots) { const old = S.ram.keys().next().value; S.ram.delete(old); if (!S.gpuSet.has(old)) S.where[old] = 1; }
+    } else S.where[k] = 1;
+  }));
+  got.ssdBytes = got.ssd * S.expertBytes; got.ssdMs = got.ssdBytes / b.bw * 1000;
+  return got;
+}
+
+// ------------------------------------------------------------------ drawing
+const cv = $('grid'), cx = cv.getContext('2d');
+function sizeCanvas() {
+  const w = cv.clientWidth, cell = w / S.E, h = Math.max(220, Math.round(cell * 0.62 * S.L));
+  cv.style.height = h + 'px'; cv.width = w * devicePixelRatio; cv.height = h * devicePixelRatio;
+  const yl = $('ylabels'); yl.innerHTML = ''; yl.style.height = h + 'px';
+  INFO.moe_layers.forEach((L, i) => { if (i % 5 === 0 || i === S.L - 1) {
+    const s = document.createElement('span'); s.textContent = 'layer ' + L; s.style.top = ((i + .5) / S.L * h) + 'px'; yl.appendChild(s); }});
+  drawGrid();
+}
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+function drawGrid() {
+  if (!INFO) return;
+  const W = cv.width, H = cv.height, cw = W / S.E, ch = H / S.L, pad = Math.max(1, cw * 0.12);
+  const col = [css('--never'), css('--ssd'), css('--ram'), css('--gpu')];
+  cx.clearRect(0, 0, W, H);
+  const heat = $('heat').checked; let mx = 1; if (heat) for (const v of S.count) mx = Math.max(mx, v);
+  for (let l = 0; l < S.L; l++) for (let e = 0; e < S.E; e++) {
+    const k = l * S.E + e;
+    if (heat) { const v = S.count[k] / mx; cx.fillStyle = S.count[k] ? `rgba(245,185,66,${0.12 + 0.88 * Math.sqrt(v)})` : col[0]; }
+    else cx.fillStyle = col[S.where[k]];
+    cx.fillRect(e * cw + pad, l * ch + pad, cw - 2 * pad, ch - 2 * pad);
+  }
+  cx.strokeStyle = css('--pick'); cx.lineWidth = Math.max(1.5, devicePixelRatio * 1.6);
+  for (const [l, e] of S.cur) cx.strokeRect(e * cw + pad * .3, l * ch + pad * .3, cw - pad * .6, ch - pad * .6);
+}
+function drawTiers() {
+  const b = budget(), all = S.L * S.E * S.expertBytes;
+  $('ssdSeg').textContent = `the whole model: ${fmtB(INFO.params_total * 2)} in bf16 · all ${S.L * S.E} routed experts live here`;
+  $('ssdSide').innerHTML = `reads at <b>${$('ssdBW').value} GB/s</b>`;
+  const ramUsed = S.ram.size * S.expertBytes;
+  $('ramName').textContent = `${$('ramGB').value} GB cache`;
+  $('ramSeg').style.width = (b.ram ? 100 * ramUsed / b.ram : 0) + '%';
+  $('ramSeg').textContent = `expert cache ${fmtB(ramUsed)} (${S.ram.size} experts)`;
+  $('ramFree').style.width = (b.ram ? 100 - 100 * ramUsed / b.ram : 100) + '%';
+  $('ramFree').textContent = b.ram ? 'free' : 'no RAM cache';
+  $('gpuName').textContent = `${$('gpuGB').value} GB`;
+  const tier = S.gpuSet.size * S.expertBytes, fixW = Math.min(100, 100 * b.fixed / b.gpu);
+  $('gpuSeg').style.width = Math.min(100 - fixW, 100 * tier / b.gpu) + '%';
+  $('gpuSeg').textContent = `expert tier ${fmtB(tier)} (${S.gpuSet.size} of ${b.gpuSlots} slots)`;
+  $('fixSeg').style.width = fixW + '%';
+  $('fixSeg').textContent = `always-used weights + working memory · ${fmtB(b.fixed)}`;
+  $('gpuFree').style.width = Math.max(0, 100 - fixW - 100 * tier / b.gpu) + '%';
+  $('gpuFree').textContent = b.gpu < b.fixed ? 'too small for the always-used weights' : '';
+  drawGrid();
+}
+function showToken(tok, got, ms) {
+  const n = S.L * S.K;
+  $('thisHead').textContent = `This token: ${JSON.stringify(tok)}`;
+  $('tBig').innerHTML = `${n} <small>expert picks (${S.L} layers × ${S.K})</small>`;
+  const sp = $('tSplit'); sp.innerHTML = '';
+  [['gpu', 'GPU', 'var(--gpu)', '#111'], ['ram', 'RAM', 'var(--ram)', '#111'], ['ssd', 'SSD', 'var(--ssd)', '#fff']].forEach(([k, lab, bg, fg]) => {
+    if (!got[k]) return; const d = document.createElement('div');
+    d.style.width = (100 * got[k] / n) + '%'; d.style.background = bg; d.style.color = fg; d.textContent = `${got[k]} ${lab}`; sp.appendChild(d); });
+  $('tLine').textContent = `${got.gpu} GPU · ${got.ram} RAM · ${got.ssd} SSD`;
+  $('tLine2').textContent = `${fmtB(got.ssdBytes)} from SSD ≈ ${got.ssdMs.toFixed(0)} ms at ${$('ssdBW').value} GB/s` + (ms != null ? ` · real step on this machine: ${ms.toFixed(0)} ms` : '');
+}
+function showAnswer() {
+  const a = S.ans; if (!a) return; const picks = a.gpu + a.ram + a.ssd || 1;
+  $('aLine').textContent = `${a.tokens} tokens · ${picks.toLocaleString()} expert picks: ${a.gpu.toLocaleString()} GPU · ${a.ram.toLocaleString()} RAM · ${a.ssd.toLocaleString()} SSD`;
+  $('aLine2').innerHTML = `<b>${(100 * a.gpu / picks).toFixed(0)}%</b> from GPU · <b>${fmtB(a.ssdBytes)}</b> read from SSD · <b>${a.tokens ? (1000 * a.tokens / a.realMs).toFixed(1) : '-'}</b> tokens/s real on ${INFO.device}`;
+  const perTok = a.tokens ? a.ssdMs / a.tokens : 0;
+  $('aLine3').textContent = `on the pretend machine, SSD reads alone would add ${perTok.toFixed(0)} ms per token` +
+    (perTok > 0 ? `, a ceiling of ${(1000 / perTok).toFixed(1)} tokens/s from the SSD` : '');
+}
+
+// ------------------------------------------------------------------ inspect a token
+function inspect(i) {
+  const t = S.tokens[i]; if (!t) return;
+  document.querySelectorAll('#answer span.tk.sel').forEach(s => s.classList.remove('sel'));
+  t.el.classList.add('sel');
+  S.cur = []; t.routes.forEach((ids, l) => ids.forEach(e => S.cur.push([l, e])));
+  drawGrid(); showToken(t.text, t.got, t.ms);
+  addLog(`${stamp()}  [inspect] token ${i} ${JSON.stringify(t.text)}: ${t.got.gpu} GPU, ${t.got.ram} RAM, ${t.got.ssd} SSD, step ${t.ms} ms`, 'cache');
+  t.routes.forEach((ids, l) => addLog(`          layer ${String(INFO.moe_layers[l]).padStart(2)}  experts ${ids.map(x => String(x).padStart(2)).join(' ')}   weights ${(t.weights[l] || []).map(w => w.toFixed(3)).join(' ')}`, 'det'));
+}
+
+// ------------------------------------------------------------------ talk to the server
+let ctrl = null;
+async function ask() {
+  const prompt = $('prompt').value.trim(); if (!prompt) return;
+  $('go').disabled = true; $('stop').disabled = false; $('badge').textContent = 'LIVE'; $('badge').classList.add('live');
+  $('answer').innerHTML = ''; S.tokens = []; repinGPU('new answer');
+  S.ans = {tokens: 0, gpu: 0, ram: 0, ssd: 0, ssdBytes: 0, ssdMs: 0, realMs: 0};
+  ctrl = new AbortController();
+  let res;
+  try {
+    res = await fetch('/generate', {method: 'POST', signal: ctrl.signal, headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({prompt, max_new: +$('maxNew').value, temperature: +$('temp').value})});
+  } catch (e) { done('request failed: ' + e); return; }
+  if (res.status !== 200) { done('server said ' + res.status + ': ' + await res.text()); return; }
+  const reader = res.body.getReader(), dec = new TextDecoder(); let buf = '';
+  try {
+    while (true) {
+      const {value, done: end} = await reader.read(); if (end) break;
+      buf += dec.decode(value, {stream: true});
+      let i; while ((i = buf.indexOf('\n\n')) >= 0) {
+        const chunk = buf.slice(0, i); buf = buf.slice(i + 2);
+        const ev = /event: (\w+)/.exec(chunk)[1], data = JSON.parse(chunk.slice(chunk.indexOf('data: ') + 6));
+        onEvent(ev, data);
+      }
+    }
+  } catch (e) { if (e.name !== 'AbortError') addLog('stream error: ' + e, 'err'); }
+  done();
+}
+function onEvent(ev, d) {
+  if (ev === 'log') { addLog(d, 'srv'); return; }
+  if (ev === 'prefill') {
+    const p = document.createElement('div'); p.className = 'prompt';
+    p.textContent = `prompt: ${d.n} tokens, read in one pass (prefill) in ${d.ms.toFixed(0)} ms`; p.style.marginBottom = '10px'; $('answer').appendChild(p); S.lead = true;
+    let agg = {gpu: 0, ram: 0, ssd: 0, ssdBytes: 0, ssdMs: 0};
+    d.routes.forEach(r => { const g = serve(r); for (const k in agg) agg[k] += g[k]; });
+    addLog(`${stamp()}  [cache] prefill: ${d.n} tokens × ${S.L} layers × ${S.K} = ${(d.n * S.L * S.K).toLocaleString()} picks, ` +
+      `${new Set(d.routes.flatMap((r, t) => r.flatMap((ids, l) => ids.map(e => l * S.E + e)))).size} distinct experts; ` +
+      `${agg.gpu} GPU, ${agg.ram} RAM, ${agg.ssd} SSD (${fmtB(agg.ssdBytes)})`, 'cache');
+    $('status').textContent = `prefill done in ${d.ms.toFixed(0)} ms; writing...`;
+    drawTiers(); return;
+  }
+  if (ev === 'token') {
+    const got = serve(d.routes);
+    const a = S.ans; a.tokens++; a.gpu += got.gpu; a.ram += got.ram; a.ssd += got.ssd; a.ssdBytes += got.ssdBytes; a.ssdMs += got.ssdMs; a.realMs += d.ms;
+    const span = document.createElement('span'); span.className = 'tk';
+    span.textContent = S.lead ? d.text.replace(/^\s+/, '') : d.text; if (span.textContent) S.lead = false;   // no blank lines before the answer
+    const idx = S.tokens.length; span.onclick = () => inspect(idx);
+    $('answer').appendChild(span); $('answer').scrollTop = $('answer').scrollHeight;
+    S.tokens.push({text: d.text, routes: d.routes, weights: d.weights, got, ms: d.ms, el: span});
+    addLog(`${stamp()}  [cache] token ${String(d.i).padStart(3)} ${JSON.stringify(d.text).padEnd(14)} ${got.gpu} GPU, ${got.ram} RAM, ${got.ssd} SSD -> ${fmtB(got.ssdBytes)} from SSD (~${got.ssdMs.toFixed(0)} ms)`, 'cache');
+    if ($('lgDet').checked) d.routes.forEach((ids, l) => addLog(`          layer ${String(INFO.moe_layers[l]).padStart(2)}  experts ${ids.map(x => String(x).padStart(2)).join(' ')}   weights ${d.weights[l].map(w => w.toFixed(3)).join(' ')}`, 'det'));
+    if (a.tokens % 32 === 0) repinGPU('every 32 tokens');   // the busiest experts move up, like a real offloading engine
+    showToken(d.text, got, d.ms); showAnswer(); drawTiers();
+    $('status').textContent = `token ${d.i + 1}: ${d.ms.toFixed(0)} ms on ${INFO.device}`;
+    return;
+  }
+  if (ev === 'done') { $('status').textContent = `done: ${d.new_tokens} tokens at ${d.tok_per_s} tokens/s on ${INFO.device} (prefill ${d.prefill_ms} ms). Click any word to see its experts.`; }
+}
+function done(msg) {
+  $('go').disabled = false; $('stop').disabled = true; $('badge').textContent = 'IDLE'; $('badge').classList.remove('live');
+  if (msg) { $('status').textContent = msg; addLog(msg, 'err'); }
+}
+
+// ------------------------------------------------------------------ wiring
+function resetMap() {
+  S.count = new Uint32Array(S.L * S.E); S.where = new Uint8Array(S.L * S.E);
+  S.gpuSet = new Set(); S.ram = new Map(); S.cur = []; drawTiers();
+}
+for (const [id, f] of [['gpuGB', v => v + ' GB'], ['ramGB', v => v + ' GB'], ['ssdBW', v => v + ' GB/s'], ['maxNew', v => v], ['temp', v => v]]) {
+  const o = $(id + 'o'), upd = () => o.textContent = f($(id).value); upd();
+  $(id).addEventListener('input', () => { upd(); if (INFO && ['gpuGB', 'ramGB', 'ssdBW'].includes(id)) repinGPU('size changed'); });
+}
+$('heat').onchange = drawGrid;
+$('go').onclick = ask; $('prompt').onkeydown = e => { if (e.key === 'Enter' && !$('go').disabled) ask(); };
+$('stop').onclick = () => { ctrl && ctrl.abort(); addLog(`${stamp()}  stopped by you`, 'err'); };
+$('clear').onclick = () => { resetMap(); addLog(`${stamp()}  [cache] map cleared: no expert used yet, every cache empty`, 'cache'); };
+$('lgClear').onclick = () => $('log').innerHTML = '';
+window.addEventListener('resize', () => INFO && sizeCanvas());
+cv.addEventListener('mousemove', ev => {
+  if (!INFO) return; const r = cv.getBoundingClientRect();
+  const e = Math.floor((ev.clientX - r.left) / r.width * S.E), l = Math.floor((ev.clientY - r.top) / r.height * S.L);
+  if (e < 0 || e >= S.E || l < 0 || l >= S.L) return;
+  const k = l * S.E + e, tip = $('tip');
+  tip.innerHTML = `layer ${INFO.moe_layers[l]}, expert ${e}<br>picked ${S.count[k]} times<br>now: ${['not used yet', 'only on SSD', 'in RAM cache', 'on GPU'][S.where[k]]}<br>${fmtB(S.expertBytes)}`;
+  tip.style.display = 'block'; tip.style.left = (ev.clientX + 14) + 'px'; tip.style.top = (ev.clientY + 14) + 'px';
+});
+cv.addEventListener('mouseleave', () => $('tip').style.display = 'none');
+
+fetch('/info').then(r => r.json()).then(info => {
+  INFO = info; $('h1').textContent = info.is_deepseek ? 'Inside a DeepSeek MoE' : 'Inside a mixture-of-experts model';
+  S.L = info.moe_layers.length; S.E = info.n_experts; S.K = info.top_k; S.expertBytes = info.expert_bytes;
+  $('sub').textContent = `${info.model} · ${(info.params_total / 1e9).toFixed(1)}B weights, ${(info.params_active_per_token / 1e9).toFixed(1)}B used per token · ` +
+    `${S.L} MoE layers × ${S.E} experts` + (info.n_shared ? ` (+${info.n_shared} shared, always on)` : ' (no shared experts)') + ` · ${S.K} picked per layer · running on ${info.device}`;
+  $('gridTitle').textContent = `${S.E} experts per layer · every token uses ${S.K} per layer`;
+  $('lastCol').textContent = `expert ${S.E - 1}`;
+  $('status').textContent = `model loaded in ${info.load_s} s. Ask something.`;
+  addLog(`${stamp()}  [server] ${info.model} on ${info.device} (${info.dtype}); one expert = ${fmtB(info.expert_bytes)}; ` +
+         `always-used weights = ${fmtB(info.params_always_used * 2)}`, 'srv');
+  resetMap(); sizeCanvas();
+}).catch(e => { $('status').textContent = 'cannot reach the server: ' + e; });
+</script>
+</body>
+</html>

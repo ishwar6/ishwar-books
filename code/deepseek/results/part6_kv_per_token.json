@@ -1,0 +1,53 @@
+{
+ "rows": [
+  {
+   "name": "DeepSeek LLM 67B",
+   "date": "2023-11",
+   "bytes": 389120
+  },
+  {
+   "name": "DeepSeek-V3",
+   "date": "2024-12",
+   "bytes": 70272
+  },
+  {
+   "name": "DeepSeek-V3.2",
+   "date": "2025-12",
+   "bytes": 48068
+  },
+  {
+   "name": "DeepSeek-V4-Flash",
+   "date": "2026-04",
+   "bytes": 3514.25
+  },
+  {
+   "name": "DeepSeek-V4.1-Flash",
+   "date": "2026-09",
+   "bytes": 890.0
+  }
+ ],
+ "v4_pro": 5031.4375,
+ "flash": {
+  "csa": 21,
+  "hca": 20,
+  "swa": 2,
+  "csa_bytes": 3423.0,
+  "hca_bytes": 91.25
+ },
+ "pro": {
+  "csa": 30,
+  "hca": 31,
+  "swa": 0,
+  "csa_bytes": 4890.0,
+  "hca_bytes": 141.4375
+ },
+ "engram_params": 196613849600,
+ "engram_read": 12288,
+ "layouts": {
+  "v32_main": 656,
+  "v32_index": 132,
+  "v4_main": 584,
+  "fp4_index": 68,
+  "v41_main_fp4": 288
+ }
+}

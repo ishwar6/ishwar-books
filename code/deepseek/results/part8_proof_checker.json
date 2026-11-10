@@ -1,0 +1,27 @@
+[
+ {
+  "name": "a correct proof",
+  "verdicts": [
+   "OK",
+   "OK",
+   "OK"
+  ],
+  "reward": 1
+ },
+ {
+  "name": "a proof with one wrong step",
+  "verdicts": [
+   "FAIL"
+  ],
+  "reward": 0
+ },
+ {
+  "name": "a sketch with a hole (sorry)",
+  "verdicts": [
+   "HOLE",
+   "OK",
+   "OK"
+  ],
+  "reward": 0
+ }
+]

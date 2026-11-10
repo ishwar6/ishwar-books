@@ -1,0 +1,47 @@
+[
+ {
+  "image": "small square photo",
+  "W": 384,
+  "H": 384,
+  "cols": 1,
+  "rows": 1,
+  "tiles": 2,
+  "tokens": 421
+ },
+ {
+  "image": "phone photo 3024 x 4032",
+  "W": 3024,
+  "H": 4032,
+  "cols": 3,
+  "rows": 3,
+  "tiles": 10,
+  "tokens": 2017
+ },
+ {
+  "image": "screenshot 1920 x 1080",
+  "W": 1920,
+  "H": 1080,
+  "cols": 4,
+  "rows": 2,
+  "tiles": 9,
+  "tokens": 1807
+ },
+ {
+  "image": "A4 scan at 150 dpi",
+  "W": 1240,
+  "H": 1754,
+  "cols": 3,
+  "rows": 3,
+  "tiles": 10,
+  "tokens": 2017
+ },
+ {
+  "image": "panorama 3000 x 1000",
+  "W": 3000,
+  "H": 1000,
+  "cols": 4,
+  "rows": 2,
+  "tiles": 9,
+  "tokens": 1807
+ }
+]

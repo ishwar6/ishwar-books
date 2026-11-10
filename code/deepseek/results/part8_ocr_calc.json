@@ -1,0 +1,137 @@
+{
+ "modes": {
+  "Tiny": {
+   "side": 512,
+   "patches": 1024,
+   "tokens": 64
+  },
+  "Small": {
+   "side": 640,
+   "patches": 1600,
+   "tokens": 100
+  },
+  "Base": {
+   "side": 1024,
+   "patches": 4096,
+   "tokens": 256
+  },
+  "Large": {
+   "side": 1280,
+   "patches": 6400,
+   "tokens": 400
+  }
+ },
+ "valid_a4": {
+  "Base": 182,
+  "Large": 283
+ },
+ "pages": {
+  "OCR paper, page 5 (text and a figure)": {
+   "chars": 2848,
+   "words": 422,
+   "text_tokens": 761
+  },
+  "OCR paper, page 10 (text and Table 2)": {
+   "chars": 2947,
+   "words": 472,
+   "text_tokens": 995
+  },
+  "OCR paper, page 12 (text and Table 4)": {
+   "chars": 3229,
+   "words": 482,
+   "text_tokens": 1061
+  }
+ },
+ "ratios": {
+  "OCR paper, page 5 (text and a figure)": {
+   "Tiny": 11.890625,
+   "Small": 7.61,
+   "Base": 2.97265625,
+   "Large": 1.9025
+  },
+  "OCR paper, page 10 (text and Table 2)": {
+   "Tiny": 15.546875,
+   "Small": 9.95,
+   "Base": 3.88671875,
+   "Large": 2.4875
+  },
+  "OCR paper, page 12 (text and Table 4)": {
+   "Tiny": 16.578125,
+   "Small": 10.61,
+   "Base": 4.14453125,
+   "Large": 2.6525
+  }
+ },
+ "newspaper": {
+  "4000": {
+   "Tiny": 62.5,
+   "Small": 40.0,
+   "Base": 15.625,
+   "Large": 10.0
+  },
+  "5000": {
+   "Tiny": 78.125,
+   "Small": 50.0,
+   "Base": 19.53125,
+   "Large": 12.5
+  }
+ },
+ "table2": [
+  {
+   "bucket": "600-700",
+   "p64": 96.5,
+   "r64": 10.5,
+   "p100": 98.5,
+   "r100": 6.7,
+   "pages": 7
+  },
+  {
+   "bucket": "700-800",
+   "p64": 93.8,
+   "r64": 11.8,
+   "p100": 97.3,
+   "r100": 7.5,
+   "pages": 28
+  },
+  {
+   "bucket": "800-900",
+   "p64": 83.8,
+   "r64": 13.2,
+   "p100": 96.8,
+   "r100": 8.5,
+   "pages": 28
+  },
+  {
+   "bucket": "900-1000",
+   "p64": 85.9,
+   "r64": 15.1,
+   "p100": 96.8,
+   "r100": 9.7,
+   "pages": 14
+  },
+  {
+   "bucket": "1000-1100",
+   "p64": 79.3,
+   "r64": 16.5,
+   "p100": 91.5,
+   "r100": 10.6,
+   "pages": 11
+  },
+  {
+   "bucket": "1100-1200",
+   "p64": 76.4,
+   "r64": 17.7,
+   "p100": 89.8,
+   "r100": 11.3,
+   "pages": 8
+  },
+  {
+   "bucket": "1200-1300",
+   "p64": 59.1,
+   "r64": 19.7,
+   "p100": 87.1,
+   "r100": 12.6,
+   "pages": 4
+  }
+ ]
+}

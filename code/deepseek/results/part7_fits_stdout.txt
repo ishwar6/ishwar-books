@@ -1,0 +1,80 @@
+== 1. Bytes per weight: the rule ==
+memory = parameters x bits per weight / 8
+  671B in BF16      : 671e9 x 16 / 8 = 1,342.0 GB
+  671B in FP8       : 671e9 x  8 / 8 =   671.0 GB
+  671B in INT4 / FP4: 671e9 x  4 / 8 =   335.5 GB
+
+== Real files: size and effective bits per weight ==
+model                    format                  GB      GiB bits/weight
+V3 / R1 (671B)           BF16 GGUF          1,342.3  1,250.1       16.00
+V3 / R1 (671B)           GGUF Q8_0            713.3    664.3        8.50
+V3 / R1 (671B)           official FP8         688.6    641.3        8.05
+V3 / R1 (671B)           GGUF Q4_K_M          404.4    376.6        4.82
+V3 / R1 (671B)           UD-Q2_K_XL           226.6    211.0        2.70
+V3 / R1 (671B)           UD-IQ1_S             140.2    130.6        1.67
+V3.2 (671B)              official FP8         689.5    642.1        8.06
+V3.2 (671B)              UD-IQ1_S             184.1    171.5        2.19
+V2 (236B)                official BF16        471.5    439.1       16.00
+V2-Lite (16B)            official BF16         31.4     29.2       16.00
+V4-Flash (284B)          official FP4+FP8     159.6    148.6        4.50
+V4-Flash (284B)          UD-Q2_K_XL            96.8     90.2        2.73
+V4-Pro (1.6T)            official FP4+FP8     864.7    805.3        4.32
+V4.1-Flash (552B+196B)   official FP4+FP8     510.3    475.3        5.46
+R1-Distill-Llama-70B     official BF16        141.1    131.4       16.00
+R1-Distill-Llama-70B     GGUF Q4_K_M           42.5     39.6        4.82
+
+== 2. The GB versus GiB trap ==
+R1 UD-IQ1_S ("131 GB" in the blog): 140.2 GB = 140,200,000,000 bytes = 130.6 GiB
+R1 UD-Q2_K_XL ("212 GB" in the blog): 226.6 GB = 226,600,000,000 bytes = 211.0 GiB
+average bits per weight of the "1.58-bit" file: 140.2e9 x 8 / 671e9 = 1.67
+
+== 3. DeepSeek-V3: where the 671B weights live (from config.json) ==
+one expert = 3 x 7168 x 2048 = 44,040,192 parameters
+routed experts: 58 layers x 256 x 44,040,192 = 653.91B (97.4%)
+everything else (attention, dense layers, shared experts, routers, embedding, head) = 17.12B (2.6%)
+total = 671.03B
+per token: 8 of 256 routed experts in each of 58 layers = 20.43B parameters
+at Q4_K_M (4.82 bits): one expert = 26.5 MB; routed experts read per token = 12.3 GB out of 394 GB; the rest = 10.3 GB
+
+== 4. KV cache per token, from each config.json ==
+naive multi-head cache for V3 (for contrast): 128 heads x (128 + 64 + 128) x 61 x 2 B = 4,997,120 B per token
+model                B/token       32K      128K        1M   how
+V2-Lite               31,104     1.02G       n/a       n/a   MLA BF16: (512 + 64) x 27 layers x 2 B
+V2                    69,120     2.26G     9.06G       n/a   MLA BF16: (512 + 64) x 60 layers x 2 B
+V3 / R1 / V3.1        70,272     2.30G     9.21G       n/a   MLA BF16: (512 + 64) x 61 layers x 2 B
+V3.2                  48,068     1.58G     6.30G       n/a   FP8 MLA row 656 B + indexer 132 B, x 61 layers
+V4-Flash               3,514     0.12G     0.46G     3.68G   21 CSA layers x 652 B / 4 + 20 HCA layers x 584 B / 128
+V4-Pro                 5,031     0.16G     0.66G     5.28G   30 CSA layers x 652 B / 4 + 31 HCA layers x 584 B / 128
+V4.1-Flash               890     0.03G     0.12G     0.93G   published: 890 B per token (V4.1 report, abstract)
+Distill-Qwen-1.5B     28,672     0.94G     3.76G       n/a   GQA BF16: 2 x 28 layers x 2 KV heads x 128 x 2 B
+Distill-Qwen-7B       57,344     1.88G     7.52G       n/a   GQA BF16: 2 x 28 layers x 4 KV heads x 128 x 2 B
+Distill-Llama-8B     131,072     4.29G    17.18G       n/a   GQA BF16: 2 x 32 layers x 8 KV heads x 128 x 2 B
+Distill-Qwen-14B     196,608     6.44G    25.77G       n/a   GQA BF16: 2 x 48 layers x 8 KV heads x 128 x 2 B
+Distill-Qwen-32B     262,144     8.59G    34.36G       n/a   GQA BF16: 2 x 64 layers x 8 KV heads x 128 x 2 B
+Distill-Llama-70B    327,680    10.74G    42.95G       n/a   GQA BF16: 2 x 80 layers x 8 KV heads x 128 x 2 B
+checks against published numbers:
+  V3 70,272 B = ISCA 2025 Table 1 "70.272 KB"
+  V3.2 48,068 B, V4-Flash 3,514 B: V4.1 report Figure 1(b) gives 48,068 and 3,514
+  V4-Pro / V3.2 = 10.5% (V4 report: "10% of KV cache"); V4-Flash / V3.2 = 7.3% (report: "7%")
+  V3 MLA versus naive multi-head: 71x smaller; Distill-Llama-8B needs 1.87x more per token than the 671B V3
+
+== 5. What fits where: weights + KV for one 32,768-token sequence <= 90% of memory ==
+(capacities taken as decimal GB; RAM sold as "512 GB" is really 512 GiB, so this errs on the safe side)
+setup                           need GB  16GB lap  24GB GPU  32GB GPU 128GB box 512GB Mac   8x H100   8x H200  2x8 H100 8x MI300X
+V3/R1 FP8 official                690.9         -         -         -         -         -         -       yes       yes       yes
+V3/R1 Q4_K_M                      406.7         -         -         -         -       yes       yes       yes       yes       yes
+R1 UD-Q2_K_XL                     228.9         -         -         -         -       yes       yes       yes       yes       yes
+R1 UD-IQ1_S                       142.5         -         -         -         -       yes       yes       yes       yes       yes
+V3.2 FP8 official                 691.1         -         -         -         -         -         -       yes       yes       yes
+V2 BF16 official                  473.8         -         -         -         -         -       yes       yes       yes       yes
+V2 4-bit (Ollama)                 135.3         -         -         -         -       yes       yes       yes       yes       yes
+V2-Lite 4-bit (Ollama)              9.9       yes       yes       yes       yes       yes       yes       yes       yes       yes
+V4-Pro-0813 official              892.9         -         -         -         -         -         -       yes       yes       yes
+V4-Flash official                 159.7         -         -         -         -       yes       yes       yes       yes       yes
+V4-Flash UD-Q2_K_XL                96.9         -         -         -       yes       yes       yes       yes       yes       yes
+V4.1-Flash-1017 official          510.3         -         -         -         -         -       yes       yes       yes       yes
+V4.1 UD-IQ1_S, Engram on SSD      122.4         -         -         -         -       yes       yes       yes       yes       yes
+Distill-Llama-70B Q4_K_M           53.2         -         -         -       yes       yes       yes       yes       yes       yes
+Distill-Qwen-32B Q4_K_M            28.5         -         -       yes       yes       yes       yes       yes       yes       yes
+Distill-Qwen-14B Q4_K_M            15.4         -       yes       yes       yes       yes       yes       yes       yes       yes
+Distill-Qwen-7B Q4_K_M              6.6       yes       yes       yes       yes       yes       yes       yes       yes       yes

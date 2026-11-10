@@ -1,0 +1,38 @@
+=== 1. Variable-length verification (toy) ===
+  A (code): survival of each prefix = 0.95, 0.88, 0.80, 0.70, 0.59
+  B (chat): survival of each prefix = 0.80, 0.48, 0.24, 0.10, 0.03
+  C (chat): survival of each prefix = 0.70, 0.35, 0.14, 0.04, 0.01
+  D (json): survival of each prefix = 0.97, 0.92, 0.87, 0.80, 0.72
+
+  tokens in pass | expected accepted | ms per step | expected tokens per ms
+               4 |              4.00 |        10.0 |    0.400
+               5 |              4.97 |        10.4 |    0.478
+               6 |              5.92 |        10.4 |    0.569
+               7 |              6.84 |        10.4 |    0.658
+               8 |              7.72 |        10.4 |    0.743
+               9 |              8.59 |        11.0 |    0.781
+              10 |              9.39 |        11.0 |    0.854
+              11 |             10.19 |        11.0 |    0.926
+              12 |             10.98 |        11.0 |    0.998
+              13 |             11.70 |        12.0 |    0.975
+              14 |             12.40 |        12.0 |    1.033
+              15 |             13.10 |        12.0 |    1.092
+              16 |             13.69 |        12.0 |    1.141  <- best
+              17 |             14.17 |        13.6 |    1.042
+              18 |             14.52 |        13.6 |    1.068
+              19 |             14.76 |        13.6 |    1.086
+              20 |             14.90 |        13.6 |    1.096
+              21 |             15.00 |        15.6 |    0.962
+              22 |             15.04 |        15.6 |    0.964
+              23 |             15.07 |        15.6 |    0.966
+              24 |             15.08 |        15.6 |    0.967
+
+  chosen: 16 tokens, draft tokens verified per request = {'A (code)': 5, 'B (chat)': 1, 'C (chat)': 1, 'D (json)': 5}
+  fixed-5 for everyone: 24 tokens, 15.08 expected accepted, 0.967 tokens/ms
+  varlen: 1.141 tokens/ms, +18.1% on this invented curve
+
+=== 2. Expert-parallel load balancing (toy, one layer) ===
+  no replicas, experts in order: per-step GPU loads [[100, 30, 30, 40], [95, 35, 30, 40], [105, 35, 20, 40]], slowest/mean = 2.00
+  replicas per expert after step 1: [4, 1, 1, 1, 1, 1, 2, 1]
+  placement (logical expert ids per GPU): [[0, 3, 7], [0, 6, 4], [0, 6, 1], [0, 5, 2]]
+  per-step GPU loads [[52, 52, 48, 48], [50, 48, 52, 50], [55, 50, 45, 50]], slowest/mean = 1.07

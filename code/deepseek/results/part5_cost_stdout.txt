@@ -1,0 +1,46 @@
+Per (query, key) pair, per layer, multiply-adds:
+  dense MLA, MQA mode (decode):   128 x (512+64 + 512) = 139,264
+  dense MLA, MHA mode (prefill):  128 x (128+64 + 128) = 40,960
+  lightning indexer (FP8):        64 x 128 = 8,192
+  ratio MQA-mode / indexer = 17.0x
+
+DECODE: one new token at position L, whole model (61 layers), attention core only
+       L  dense GFLOP   DSA idx  DSA main   DSA tot dense/DSA  weights attn/weights
+   8,192        139.2       8.2      34.8      43.0      3.2x       74         1.9x
+  16,384        278.4      16.4      34.8      51.2      5.4x       74         3.8x
+  32,768        556.7      32.7      34.8      67.5      8.2x       74         7.5x
+  65,536      1,113.5      65.5      34.8     100.3     11.1x       74        15.0x
+ 131,072      2,226.9     131.0      34.8     165.8     13.4x       74        30.1x
+Dense attention FLOPs equal the 2 x 37B weight FLOPs at L = 4,355 tokens
+
+DECODE: cache bytes read for one new token of one sequence (61 layers)
+       L  dense FP8 MB  dense BF16 MB  DSA idx MB  DSA main MB  DSA tot MB dense/DSA
+   8,192         327.8          575.7        66.0         82.0       147.9      2.2x
+  16,384         655.6        1,151.3       131.9         82.0       213.9      3.1x
+  32,768       1,311.2        2,302.7       263.8         82.0       345.8      3.8x
+  65,536       2,622.5        4,605.3       527.7         82.0       609.6      4.3x
+ 131,072       5,245.0        9,210.7     1,055.4         82.0     1,137.3      4.6x
+At 128K on one H200 (4.8 TB/s): reading the dense FP8 cache takes 1.09 ms per new token, the DSA reads 0.24 ms (one sequence, before any batching)
+
+PREFILL: a whole prompt of L tokens, whole model, attention core only (TFLOP)
+       L  dense MHA  dense MQA   DSA idx  DSA main   DSA tot  MHA/DSA  weights
+   8,192      167.7      570.2      33.5     249.4     283.0     0.6x    606.2
+  16,384      670.7    2,280.5     134.1     534.5     668.6     1.0x  1,212.4
+  32,768    2,682.9    9,121.8     536.6   1,104.6   1,641.2     1.6x  2,424.8
+  65,536   10,731.4   36,486.8   2,146.3   2,244.8   4,391.1     2.4x  4,849.7
+ 131,072   42,925.3  145,945.9   8,585.1   4,525.2  13,110.2     3.3x  9,699.3
+
+Per-query break-even, dense MHA-mode vs DSA: t = 8,704 tokens (7,737 if the FP8 indexer counts half)
+Below that, a dense pass is cheaper: why V3.2 runs short prefills in a masked MHA mode.
+
+KV cache per token (61 layers):
+  V3, BF16 latent:            61 x 576 x 2 B = 70,272 B
+  V3, FlashMLA FP8 row:       61 x 656 B     = 40,016 B
+  V3.2, FP8 row + indexer:    61 x (656 + 132) B = 48,068 B (+20.1%)
+  at 128K tokens: V3 FP8 5.24 GB, V3.2 6.30 GB per sequence
+
+NSA (arXiv 2502.11089) keys read per decoding step: t/d + n*l' + w with l=32, d=16, n=16, l'=64, w=512
+  t =  8,192: 2,048 tokens (exact count 2,047), full attention reads 8,192: 4.0x fewer
+  t = 16,384: 2,560 tokens (exact count 2,559), full attention reads 16,384: 6.4x fewer
+  t = 32,768: 3,584 tokens (exact count 3,583), full attention reads 32,768: 9.1x fewer
+  t = 65,536: 5,632 tokens (exact count 5,631), full attention reads 65,536: 11.6x fewer

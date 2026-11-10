@@ -1,0 +1,63 @@
+== DeepSeek-V3 config.json (the fields that decide the size) ==
+  hidden_size                7168
+  num_hidden_layers          61
+  first_k_dense_replace      3
+  num_attention_heads        128
+  q_lora_rank                1536
+  kv_lora_rank               512
+  qk_nope_head_dim           128
+  qk_rope_head_dim           64
+  v_head_dim                 128
+  intermediate_size          18432
+  moe_intermediate_size      2048
+  n_routed_experts           256
+  n_shared_experts           1
+  num_experts_per_tok        8
+  n_group                    8
+  topk_group                 4
+  vocab_size                 129280
+  num_nextn_predict_layers   1
+
+== Per-piece sizes ==
+  MLA attention, one layer         187,107,328
+  dense SwiGLU FFN, one layer      396,361,728
+  one expert (SwiGLU)               44,040,192
+  router, one MoE layer              1,835,264
+  dense layers: 3, MoE layers: 58
+
+== Method 1: our formula, total parameters ==
+  embedding                         0.927B    0.14%
+  output head                       0.927B    0.14%
+  attention (MLA), all layers      11.414B    1.70%
+  dense FFN, first layers           1.189B    0.18%
+  routed experts                  653.909B   97.45%
+  shared experts                    2.554B    0.38%
+  routers (incl. bias)              0.106B    0.02%
+  RMSNorm weights                   0.001B    0.00%
+  TOTAL main model                671.026B   (671,026,419,200)
+
+== Method 2: transformers DeepseekV3ForCausalLM on the meta device ==
+  parameters + balancing bias    671.026B   (671,026,419,200)
+  equal to Method 1: True
+
+== Active parameters for one token ==
+  embedding                         0.927B
+  output head                       0.927B
+  attention (MLA), all layers      11.414B
+  dense FFN, first layers           1.189B
+  routed experts                   20.435B
+  shared experts                    2.554B
+  routers (incl. bias)              0.106B
+  RMSNorm weights                   0.001B
+  TOTAL active                     37.552B
+  without the input embedding (a table lookup, not a matrix multiply):   36.626B
+  share of all parameters used per token: 5.6%
+
+== The MTP module (one extra layer, num_nextn_predict_layers = 1) ==
+  enorm + hnorm + eh_proj (7168 x 14336) + one full MoE layer + final norm =   11.610B
+  plus its stored copies of the embedding and output head            =    1.853B
+  checkpoint on Hugging Face:  671.026B +   11.610B +    1.853B =  684.490B
+
+== Check on a second real config: DeepSeek-V2-Lite-Chat (published 15.7B total, 2.4B active) ==
+  Method 1 total   15.706B, Method 2 total   15.706B, equal: True
+  Method 1 active    2.661B, without the input embedding    2.451B

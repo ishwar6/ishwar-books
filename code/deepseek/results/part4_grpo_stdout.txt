@@ -1,0 +1,66 @@
+== 1. Rule-based rewards (accuracy + format) ==
+o1: accuracy 1 + format 1 = reward 2   | <think>7 x 8 = 7 x 4 x 2 = 28 x 2 = 56</think> <answer>\boxed{56}</answer>
+o2: accuracy 0 + format 1 = reward 1   | <think>7 x 8 = 54, I think</think> <answer>\boxed{54}</answer>
+o3: accuracy 0 + format 1 = reward 1   | <think>7 x 9 = 63</think> <answer>\boxed{63}</answer>
+o4: accuracy 0 + format 0 = reward 0   | The answer is 56.
+language consistency, mixed CoT: 0.857   clean CoT: 1.000
+
+== 2. Group-relative advantage, A_i = (r_i - mean(r)) / std(r) ==
+Method 1 (from scratch): rewards [2.0, 1.0, 1.0, 0.0]  mean 1.0000  std 0.7071
+  advantages: +1.4142, +0.0000, +0.0000, -1.4142
+Method 2 (torch, batch of 4 groups), first row: +1.4142, +0.0000, +0.0000, -1.4142
+max |Method 1 - Method 2| = 5.08e-08
+
+== 3. Special groups ==
+our group [2,1,1,0]      -> +1.414, +0.000, +0.000, -1.414
+one right [1,0,0,0]      -> +1.732, -0.577, -0.577, -0.577
+three right [1,1,1,0]    -> +0.577, +0.577, +0.577, -1.732
+all right [1,1,1,1]      -> +0.000, +0.000, +0.000, +0.000
+torch's default std divides by G-1 (sample std). Our group then gets: +1.2247, +0.0000, +0.0000, -1.2247
+V3.2 mean-only advantage (no division by std), our group: +1.000, +0.000, +0.000, -1.000
+V3.2 mean-only, one right of four:                         +0.750, -0.250, -0.250, -0.250
+
+== 4. Clipped surrogate for one token: min(ratio*A, clip(ratio, 1-eps, 1+eps)*A), eps = 0.2 ==
+ratio   A=+1.414   A=-1.414
+ 0.50     +0.707     -1.131
+ 0.80     +1.131     -1.131
+ 1.00     +1.414     -1.414
+ 1.10     +1.556     -1.556
+ 1.20     +1.697     -1.697
+ 1.50     +1.697     -2.121
+ 2.00     +1.697     -2.828
+
+== 5. KL estimator k3 = pi_ref/pi - log(pi_ref/pi) - 1 ==
+pi_theta 0.5  pi_ref 0.5  ->  k3 = 0.0000
+pi_theta 0.5  pi_ref 0.4  ->  k3 = 0.0231
+pi_theta 0.5  pi_ref 0.6  ->  k3 = 0.0177
+pi_theta 0.9  pi_ref 0.1  ->  k3 = 1.3083
+pi_theta 0.1  pi_ref 0.9  ->  k3 = 5.8028
+exact KL(pi_theta || pi_ref) = 0.05143; mean of k3 over 200,000 samples = 0.05156
+
+== 6. The GRPO loss on a toy group (G = 4, answers of 5, 3, 4, 2 tokens) ==
+Method 1 (loops) loss = -0.054389
+Method 2 (torch) loss = -0.054389   difference 2.2e-09
+gradient of the loss summed over each answer (negative = that answer is pushed up): -0.199, +0.003, -0.004, +0.171
+
+== 7. A toy RL run: one question, four possible answers, GRPO with G = 8 ==
+step  0: p(o1..o4) = 0.126, 0.229, 0.229, 0.417   expected reward 0.709
+step  5: p(o1..o4) = 0.373, 0.270, 0.270, 0.087   expected reward 1.286
+step 10: p(o1..o4) = 0.757, 0.117, 0.090, 0.036   expected reward 1.721
+step 15: p(o1..o4) = 0.905, 0.044, 0.038, 0.013   expected reward 1.891
+step 20: p(o1..o4) = 0.952, 0.023, 0.017, 0.008   expected reward 1.944
+step 25: p(o1..o4) = 0.962, 0.019, 0.012, 0.007   expected reward 1.955
+step 30: p(o1..o4) = 0.970, 0.014, 0.010, 0.006   expected reward 1.964
+step 35: p(o1..o4) = 0.970, 0.014, 0.010, 0.006   expected reward 1.964
+step 40: p(o1..o4) = 0.970, 0.014, 0.010, 0.006   expected reward 1.964
+
+== 8. Cost arithmetic, R1 paper (Nature version / arXiv v2), Supplementary B.4.4 and Table 7 ==
+R1-Zero: 512 H800 x 198 h = 101,376 GPU hours (table: 101K)
+R1:      512 H800 x  80 h = 40,960 GPU hours (table: 41K)
+SFT data creation: 5,000 GPU hours (table: 5K)
+total as printed: 147,000 GPU hours x $2 = $294,000
+V3 base model (V3 report, Table 1): 2,788,000 GPU hours = $5,576,000
+R1 on top of V3, as a share of the V3 figure: 5.3%  (our arithmetic)
+10% of V3 pre-training alone (2,664K GPU hours) = 266,400 GPU hours (our arithmetic; V3.2 does not say which base)
+
+saved results/part4_grpo.json

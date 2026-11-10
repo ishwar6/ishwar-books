@@ -1,0 +1,39 @@
+{
+ "rows": [
+  {
+   "name": "MHA, V3 head shapes (K 192, V 128 per head)",
+   "bytes": 4997120,
+   "gib_128k": 610.0
+  },
+  {
+   "name": "MHA, textbook (2 x 128 heads x 128)",
+   "bytes": 3997696,
+   "gib_128k": 488.0
+  },
+  {
+   "name": "GQA, 8 KV groups x 128",
+   "bytes": 249856,
+   "gib_128k": 30.5
+  },
+  {
+   "name": "MQA, 1 KV head x 128",
+   "bytes": 31232,
+   "gib_128k": 3.8125
+  },
+  {
+   "name": "MLA, BF16 (512 latent + 64 RoPE key)",
+   "bytes": 70272,
+   "gib_128k": 8.578125
+  },
+  {
+   "name": "MLA, FP8 layout (512 B + 16 B scales + 128 B RoPE)",
+   "bytes": 40016,
+   "gib_128k": 4.884765625
+  }
+ ],
+ "ctx": 131072,
+ "err_scores": 4.884981308350689e-15,
+ "err_out": 1.4821809042966047e-15,
+ "naive_ops": 16818176,
+ "absorb_ops": 139264
+}

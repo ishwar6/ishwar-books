@@ -1,0 +1,31 @@
+== 1. Vision tokens per mode: 16x16 patches, then a 16x squeeze ==
+mode    side  patches  tokens  paper
+Tiny     512     1024      64     64
+Small    640     1600     100    100
+Base    1024     4096     256    256
+Large   1280     6400     400    400
+
+== 2. Valid tokens for an A4-shaped page (210 x 297 mm) padded to a square (paper Eq. 1) ==
+Base   256 tokens, of which 182 cover the page
+Large  400 tokens, of which 283 cover the page
+
+== 3. Text tokens on real pages (DeepSeek-V2-Lite tokenizer, a stand-in for the OCR tokenizer) ==
+OCR paper, page 5 (text and a figure): 2,848 characters, 422 words, 761 text tokens
+OCR paper, page 10 (text and Table 2): 2,947 characters, 472 words, 995 text tokens
+OCR paper, page 12 (text and Table 4): 3,229 characters, 482 words, 1,061 text tokens
+
+== 4. Compression ratio = text tokens / vision tokens, for each page and mode ==
+page                                      Tiny 64  Small 100  Base 256  Large 400
+OCR paper, page 5 (text and a figure)       11.9x       7.6x      3.0x       1.9x
+OCR paper, page 10 (text and Table 2)       15.5x       9.9x      3.9x       2.5x
+OCR paper, page 12 (text and Table 4)       16.6x      10.6x      4.1x       2.7x
+
+== 5. What the paper measured near those ratios (Table 2, Fox English pages, 600-1300 text tokens) ==
+OCR paper, page 5 (text and a figure): bucket 700-800 -> 93.8% with 64 tokens, 97.3% with 100 tokens (28 test pages)
+OCR paper, page 10 (text and Table 2): bucket 900-1000 -> 85.9% with 64 tokens, 96.8% with 100 tokens (14 test pages)
+OCR paper, page 12 (text and Table 4): bucket 1000-1100 -> 79.3% with 64 tokens, 91.5% with 100 tokens (11 test pages)
+
+== 6. A newspaper page: the paper says 4,000 to 5,000 text tokens (p12) ==
+4000 text tokens: Tiny 62.5x, Small 40.0x, Base 15.6x, Large 10.0x
+5000 text tokens: Tiny 78.1x, Small 50.0x, Base 19.5x, Large 12.5x
+Under 10x needs at least 400 to 500 vision tokens, which is why the paper uses Gundam modes for newspapers.

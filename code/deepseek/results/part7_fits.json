@@ -1,0 +1,584 @@
+{
+ "files": [
+  {
+   "model": "V3 / R1 (671B)",
+   "fmt": "BF16 GGUF",
+   "gb": 1342.3,
+   "gib": 1250.1,
+   "bits": 16.0,
+   "source": "unsloth/DeepSeek-R1-GGUF"
+  },
+  {
+   "model": "V3 / R1 (671B)",
+   "fmt": "GGUF Q8_0",
+   "gb": 713.3,
+   "gib": 664.3,
+   "bits": 8.5,
+   "source": "unsloth/DeepSeek-R1-GGUF"
+  },
+  {
+   "model": "V3 / R1 (671B)",
+   "fmt": "official FP8",
+   "gb": 688.6,
+   "gib": 641.3,
+   "bits": 8.05,
+   "source": "deepseek-ai/DeepSeek-V3"
+  },
+  {
+   "model": "V3 / R1 (671B)",
+   "fmt": "GGUF Q4_K_M",
+   "gb": 404.4,
+   "gib": 376.6,
+   "bits": 4.82,
+   "source": "unsloth/DeepSeek-R1-GGUF"
+  },
+  {
+   "model": "V3 / R1 (671B)",
+   "fmt": "UD-Q2_K_XL",
+   "gb": 226.6,
+   "gib": 211.0,
+   "bits": 2.7,
+   "source": "unsloth/DeepSeek-R1-GGUF"
+  },
+  {
+   "model": "V3 / R1 (671B)",
+   "fmt": "UD-IQ1_S",
+   "gb": 140.2,
+   "gib": 130.6,
+   "bits": 1.67,
+   "source": "unsloth/DeepSeek-R1-GGUF"
+  },
+  {
+   "model": "V3.2 (671B)",
+   "fmt": "official FP8",
+   "gb": 689.5,
+   "gib": 642.1,
+   "bits": 8.06,
+   "source": "deepseek-ai/DeepSeek-V3.2"
+  },
+  {
+   "model": "V3.2 (671B)",
+   "fmt": "UD-IQ1_S",
+   "gb": 184.1,
+   "gib": 171.5,
+   "bits": 2.19,
+   "source": "unsloth/DeepSeek-V3.2-GGUF"
+  },
+  {
+   "model": "V2 (236B)",
+   "fmt": "official BF16",
+   "gb": 471.5,
+   "gib": 439.1,
+   "bits": 16.0,
+   "source": "deepseek-ai/DeepSeek-V2"
+  },
+  {
+   "model": "V2-Lite (16B)",
+   "fmt": "official BF16",
+   "gb": 31.4,
+   "gib": 29.2,
+   "bits": 16.0,
+   "source": "deepseek-ai/DeepSeek-V2-Lite"
+  },
+  {
+   "model": "V4-Flash (284B)",
+   "fmt": "official FP4+FP8",
+   "gb": 159.6,
+   "gib": 148.6,
+   "bits": 4.5,
+   "source": "deepseek-ai/DeepSeek-V4-Flash"
+  },
+  {
+   "model": "V4-Flash (284B)",
+   "fmt": "UD-Q2_K_XL",
+   "gb": 96.8,
+   "gib": 90.2,
+   "bits": 2.73,
+   "source": "unsloth/DeepSeek-V4-Flash-GGUF"
+  },
+  {
+   "model": "V4-Pro (1.6T)",
+   "fmt": "official FP4+FP8",
+   "gb": 864.7,
+   "gib": 805.3,
+   "bits": 4.32,
+   "source": "deepseek-ai/DeepSeek-V4-Pro"
+  },
+  {
+   "model": "V4.1-Flash (552B+196B)",
+   "fmt": "official FP4+FP8",
+   "gb": 510.3,
+   "gib": 475.3,
+   "bits": 5.46,
+   "source": "deepseek-ai/DeepSeek-V4.1-Flash-1017"
+  },
+  {
+   "model": "R1-Distill-Llama-70B",
+   "fmt": "official BF16",
+   "gb": 141.1,
+   "gib": 131.4,
+   "bits": 16.0,
+   "source": "deepseek-ai/DeepSeek-R1-Distill-Llama-70B"
+  },
+  {
+   "model": "R1-Distill-Llama-70B",
+   "fmt": "GGUF Q4_K_M",
+   "gb": 42.5,
+   "gib": 39.6,
+   "bits": 4.82,
+   "source": "unsloth/DeepSeek-R1-Distill-Llama-70B-GGUF"
+  }
+ ],
+ "kv": {
+  "V2-Lite": {
+   "bytes_per_token": 31104,
+   "context": 32768,
+   "how": "MLA BF16: (512 + 64) x 27 layers x 2 B",
+   "gb": {
+    "32768": 1.019,
+    "131072": 4.077,
+    "1048576": 32.615
+   }
+  },
+  "V2": {
+   "bytes_per_token": 69120,
+   "context": 131072,
+   "how": "MLA BF16: (512 + 64) x 60 layers x 2 B",
+   "gb": {
+    "32768": 2.265,
+    "131072": 9.06,
+    "1048576": 72.478
+   }
+  },
+  "V3 / R1 / V3.1": {
+   "bytes_per_token": 70272,
+   "context": 131072,
+   "how": "MLA BF16: (512 + 64) x 61 layers x 2 B",
+   "gb": {
+    "32768": 2.303,
+    "131072": 9.211,
+    "1048576": 73.686
+   }
+  },
+  "V3.2": {
+   "bytes_per_token": 48068,
+   "context": 131072,
+   "how": "FP8 MLA row 656 B + indexer 132 B, x 61 layers",
+   "gb": {
+    "32768": 1.575,
+    "131072": 6.3,
+    "1048576": 50.403
+   }
+  },
+  "V4-Flash": {
+   "bytes_per_token": 3514.2,
+   "context": 1048576,
+   "how": "21 CSA layers x 652 B / 4 + 20 HCA layers x 584 B / 128",
+   "gb": {
+    "32768": 0.115,
+    "131072": 0.461,
+    "1048576": 3.685
+   }
+  },
+  "V4-Pro": {
+   "bytes_per_token": 5031.4,
+   "context": 1048576,
+   "how": "30 CSA layers x 652 B / 4 + 31 HCA layers x 584 B / 128",
+   "gb": {
+    "32768": 0.165,
+    "131072": 0.659,
+    "1048576": 5.276
+   }
+  },
+  "V4.1-Flash": {
+   "bytes_per_token": 890,
+   "context": 1048576,
+   "how": "published: 890 B per token (V4.1 report, abstract)",
+   "gb": {
+    "32768": 0.029,
+    "131072": 0.117,
+    "1048576": 0.933
+   }
+  },
+  "Distill-Qwen-1.5B": {
+   "bytes_per_token": 28672,
+   "context": 131072,
+   "how": "GQA BF16: 2 x 28 layers x 2 KV heads x 128 x 2 B",
+   "gb": {
+    "32768": 0.94,
+    "131072": 3.758,
+    "1048576": 30.065
+   }
+  },
+  "Distill-Qwen-7B": {
+   "bytes_per_token": 57344,
+   "context": 131072,
+   "how": "GQA BF16: 2 x 28 layers x 4 KV heads x 128 x 2 B",
+   "gb": {
+    "32768": 1.879,
+    "131072": 7.516,
+    "1048576": 60.13
+   }
+  },
+  "Distill-Llama-8B": {
+   "bytes_per_token": 131072,
+   "context": 131072,
+   "how": "GQA BF16: 2 x 32 layers x 8 KV heads x 128 x 2 B",
+   "gb": {
+    "32768": 4.295,
+    "131072": 17.18,
+    "1048576": 137.439
+   }
+  },
+  "Distill-Qwen-14B": {
+   "bytes_per_token": 196608,
+   "context": 131072,
+   "how": "GQA BF16: 2 x 48 layers x 8 KV heads x 128 x 2 B",
+   "gb": {
+    "32768": 6.442,
+    "131072": 25.77,
+    "1048576": 206.158
+   }
+  },
+  "Distill-Qwen-32B": {
+   "bytes_per_token": 262144,
+   "context": 131072,
+   "how": "GQA BF16: 2 x 64 layers x 8 KV heads x 128 x 2 B",
+   "gb": {
+    "32768": 8.59,
+    "131072": 34.36,
+    "1048576": 274.878
+   }
+  },
+  "Distill-Llama-70B": {
+   "bytes_per_token": 327680,
+   "context": 131072,
+   "how": "GQA BF16: 2 x 80 layers x 8 KV heads x 128 x 2 B",
+   "gb": {
+    "32768": 10.737,
+    "131072": 42.95,
+    "1048576": 343.597
+   }
+  }
+ },
+ "naive_v3": 4997120,
+ "machines": [
+  [
+   "16GB lap",
+   16
+  ],
+  [
+   "24GB GPU",
+   24
+  ],
+  [
+   "32GB GPU",
+   32
+  ],
+  [
+   "128GB box",
+   128
+  ],
+  [
+   "512GB Mac",
+   512
+  ],
+  [
+   "8x H100",
+   640
+  ],
+  [
+   "8x H200",
+   1128
+  ],
+  [
+   "2x8 H100",
+   1280
+  ],
+  [
+   "8x MI300X",
+   1536
+  ]
+ ],
+ "fits": [
+  {
+   "setup": "V3/R1 FP8 official",
+   "weights": 688.6,
+   "need": 690.9,
+   "fits": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    true
+   ]
+  },
+  {
+   "setup": "V3/R1 Q4_K_M",
+   "weights": 404.4,
+   "need": 406.7,
+   "fits": [
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true
+   ]
+  },
+  {
+   "setup": "R1 UD-Q2_K_XL",
+   "weights": 226.6,
+   "need": 228.9,
+   "fits": [
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true
+   ]
+  },
+  {
+   "setup": "R1 UD-IQ1_S",
+   "weights": 140.2,
+   "need": 142.5,
+   "fits": [
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true
+   ]
+  },
+  {
+   "setup": "V3.2 FP8 official",
+   "weights": 689.5,
+   "need": 691.1,
+   "fits": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    true
+   ]
+  },
+  {
+   "setup": "V2 BF16 official",
+   "weights": 471.5,
+   "need": 473.8,
+   "fits": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    true,
+    true
+   ]
+  },
+  {
+   "setup": "V2 4-bit (Ollama)",
+   "weights": 133.0,
+   "need": 135.3,
+   "fits": [
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true
+   ]
+  },
+  {
+   "setup": "V2-Lite 4-bit (Ollama)",
+   "weights": 8.9,
+   "need": 9.9,
+   "fits": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ]
+  },
+  {
+   "setup": "V4-Pro-0813 official",
+   "weights": 892.7,
+   "need": 892.9,
+   "fits": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    true
+   ]
+  },
+  {
+   "setup": "V4-Flash official",
+   "weights": 159.6,
+   "need": 159.7,
+   "fits": [
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true
+   ]
+  },
+  {
+   "setup": "V4-Flash UD-Q2_K_XL",
+   "weights": 96.8,
+   "need": 96.9,
+   "fits": [
+    false,
+    false,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ]
+  },
+  {
+   "setup": "V4.1-Flash-1017 official",
+   "weights": 510.3,
+   "need": 510.3,
+   "fits": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    true,
+    true
+   ]
+  },
+  {
+   "setup": "V4.1 UD-IQ1_S, Engram on SSD",
+   "weights": 122.4,
+   "need": 122.4,
+   "fits": [
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true
+   ]
+  },
+  {
+   "setup": "Distill-Llama-70B Q4_K_M",
+   "weights": 42.5,
+   "need": 53.2,
+   "fits": [
+    false,
+    false,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ]
+  },
+  {
+   "setup": "Distill-Qwen-32B Q4_K_M",
+   "weights": 19.9,
+   "need": 28.5,
+   "fits": [
+    false,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ]
+  },
+  {
+   "setup": "Distill-Qwen-14B Q4_K_M",
+   "weights": 9.0,
+   "need": 15.4,
+   "fits": [
+    false,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ]
+  },
+  {
+   "setup": "Distill-Qwen-7B Q4_K_M",
+   "weights": 4.7,
+   "need": 6.6,
+   "fits": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ]
+  }
+ ],
+ "v3": {
+  "expert": 44040192,
+  "routed": 653908770816,
+  "rest": 17117648384,
+  "total": 671026419200,
+  "per_token_experts": 20434649088
+ }
+}

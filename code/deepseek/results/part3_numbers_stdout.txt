@@ -1,0 +1,55 @@
+1. Learning rate (V3 p.22-23)
+   at     5 T tokens: 2.200e-04
+   at    10 T tokens: 2.200e-04
+   at 12.15 T tokens: 1.210e-04
+   at  14.3 T tokens: 2.200e-05
+   at  14.5 T tokens: 2.200e-05
+   at  14.7 T tokens: 7.300e-06
+   cosine midpoint check: 2.2e-5 + 0.5 x (2.2e-4 - 2.2e-5) x (1 + cos(pi/2)) = 1.210e-04
+   phases add up: 10 + 4.3 + 0.333 + 0.167 = 14.8 T tokens
+
+2. Tokens per optimizer step
+   start: 3,072 x 4,096 = 12,582,912 tokens   full: 15,360 x 4,096 = 62,914,560 tokens
+   steps in the 469B-token ramp (linear ramp assumed): 14,997
+   steps after the ramp: (14.8T - 469B) / 62,914,560 = 227,785
+   total: about 242,782 steps
+
+3. Context extension (V3 p.23): two phases of 1,000 steps
+   phase 1: 1,000 steps x 1,920 sequences x 32,768 tokens  = 62.9B tokens
+   phase 2: 1,000 steps x   480 sequences x 131,072 tokens = 62.9B tokens
+   V3.1 card: 32K phase 630B tokens = 10.0 x;  128K phase 209B tokens = 3.32 x
+   YaRN attention factor sqrt(t) = 0.1 ln(40) + 1 = 1.3689
+
+4. The cost paragraph (V3 p.5), checked
+   180K GPU hours per trillion tokens x 14.8 = 2,664K GPU hours (paper: 2,664K)
+   180K GPU hours / 2,048 GPUs / 24 = 3.66 days per trillion tokens (paper: 3.7)
+   pre-training        2,664K GPU hours =  54.2 days on 2,048 GPUs = $5.328M at $2/hour
+   context extension     119K GPU hours =   2.4 days on 2,048 GPUs = $0.238M at $2/hour
+   post-training           5K GPU hours =   0.1 days on 2,048 GPUs = $0.010M at $2/hour
+   total               2,788K GPU hours =  56.7 days on 2,048 GPUs = $5.576M at $2/hour
+   per trillion tokens: pre-training 180K hours; context extension 946K hours (5.3 x more, longer sequences)
+
+5. Compute estimate (pre-training only)
+   6 x N x D = 6 x 37e9 x 14.8e12 = 3.286e+24 FLOPs
+   ISCA paper, 250 GFLOPs per token x 14.8e12 = 3.700e+24 FLOPs
+   GPU-seconds: 2,664,000 x 3,600 = 9.5904e+09
+   6ND : 343 TFLOPS per GPU on average = 35% of dense BF16 peak (990), 17% of dense FP8 peak (1979)
+   ISCA: 386 TFLOPS per GPU on average = 39% of dense BF16 peak (990), 19% of dense FP8 peak (1979)
+
+6a. Bubble formulas of V3 Table 2 (p.13) with toy times F = 1, B = 2 (of which W = 1), F&B = F + B = 3
+   1F1B      PP = 16: bubble = 45 time units
+   ZB1P      PP = 16: bubble = 15 time units
+   DualPipe  PP = 16: bubble = 14 time units
+
+6b. Toy simulation: 4 pipeline stages, 8 micro-batches, F = 1, B = 2
+   GPipe  total time 33, idle time per device 9 = 27% of the run (formula (S-1)(F+B) = 9)
+   1F1B   total time 33, idle time per device 9 = 27% of the run (formula (S-1)(F+B) = 9)
+   the difference between them is memory: at its peak, stage 0 holds activations of 8 micro-batches in GPipe and 4 in 1F1B
+
+7. Rough memory budget per GPU (DERIVED; our reading of the plan, not a number from the paper)
+   parameters outside the routed experts: 17.5B   routed experts: 665.2B   (main model 671.0B + MTP module)
+   per GPU: 2.18B non-expert + 1.30B routed-expert parameters = 3.48B (4 routed experts per layer per GPU)
+   BF16 weights + FP32 gradients: 20.9 GB
+   FP32 master weights + BF16 Adam moments (8 bytes per parameter): 27.8 GB without sharing, 5.3 GB with ZeRO-1
+   total for the model state: 26.2 GB of 80 GB; the rest is for activations and buffers
+   the whole model state on ONE GPU would be 9.6 TB

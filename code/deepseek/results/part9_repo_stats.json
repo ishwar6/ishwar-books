@@ -1,0 +1,147 @@
+{
+ "commit": "a679bb86ce36e883a98a97733492b686e5b9a08e 2026-11-03T15:31:40+08:00",
+ "files": 313,
+ "total_lines": 53260,
+ "by_language": {
+  "shell": 346,
+  "Python": 47761,
+  "C++": 5153
+ },
+ "by_component": {
+  "deepinfer/.../tilelang_ops (TileLang kernels)": {
+   "Python": 20997
+  },
+  "deepinfer/model_executor/models (V4.1 model)": {
+   "Python": 6148
+  },
+  "deepinfer (other Python)": {
+   "Python": 5045
+  },
+  "csrc/engine (C++ scheduler, block manager, input prep)": {
+   "C++": 4598
+  },
+  "deepinfer/model_executor (other)": {
+   "Python": 3562
+  },
+  "examples": {
+   "Python": 2579,
+   "shell": 91
+  },
+  "tests": {
+   "Python": 2528
+  },
+  "deepinfer/worker (cache, CUDA graphs, runner)": {
+   "Python": 2381
+  },
+  "deepinfer/engine + entrypoints": {
+   "Python": 1831
+  },
+  "eval": {
+   "Python": 1397,
+   "shell": 66
+  },
+  "deepinfer/model_executor/eplb": {
+   "Python": 681
+  },
+  "csrc (other C++)": {
+   "C++": 555
+  },
+  "deep_cluster": {
+   "Python": 537
+  },
+  "scripts": {
+   "shell": 169
+  },
+  "setup.py": {
+   "Python": 75
+  },
+  "build.sh": {
+   "shell": 20
+  }
+ },
+ "derived_from_vllm": [
+  "deepinfer/config.py",
+  "deepinfer/distributed/shm_broadcast.py",
+  "deepinfer/engine/arg_utils.py",
+  "deepinfer/engine/llm_engine.py",
+  "deepinfer/entrypoints/llm.py",
+  "deepinfer/logger.py",
+  "deepinfer/model_executor/layers/layernorm.py",
+  "deepinfer/model_executor/layers/rotary_embedding.py",
+  "deepinfer/model_executor/layers/sampler.py",
+  "deepinfer/model_executor/layers/vocab_parallel_embedding.py",
+  "deepinfer/model_executor/model_loader.py",
+  "deepinfer/model_executor/models/__init__.py",
+  "deepinfer/model_executor/parallel_utils/communication_op.py",
+  "deepinfer/model_executor/utils.py",
+  "deepinfer/sampling_params.py",
+  "deepinfer/sequence.py",
+  "deepinfer/utils.py",
+  "deepinfer/worker/base.py",
+  "deepinfer/worker/cache_engine.py",
+  "deepinfer/worker/model_runner.py",
+  "deepinfer/worker/worker.py",
+  "setup.py",
+  "tests/distributed/test_shm_broadcast.py"
+ ],
+ "env": {
+  "DEEPINFER_ACCELERATOR": "str default=\"nvidia\"",
+  "DEEPINFER_COMPUTE_SUM_SMALLER_PROBS": "bool default=False/0",
+  "DEEPINFER_JIT_CACHE_DIR": "str_or_none (computed)",
+  "DEEPINFER_NCCL_NUM_SMS": "int default=32",
+  "DEEPINFER_USERBUFFER_COMM_SMS": "int default=False/0",
+  "DEEPINFER_GLOO_TIMEOUT": "custom (computed)",
+  "DEEPINFER_REARRANGE_P2P_GROUPS": "int default=1",
+  "DEEPINFER_OVERRIDE_NUM_EXTRA_EXPERTS": "int default=False/0",
+  "DEEPINFER_EXPERT_COUNT_WINDOW_SIZE": "int default=100",
+  "DEEPINFER_EXPERT_REARRANGEMENT_STEP_INTERVAL": "int default=False/0",
+  "DEEPINFER_REARRANGE_AFTER_PREFILL_IN_NORMAL_ENGINE": "bool default=False/0",
+  "DEEPINFER_MOE_LB_STAT_INTERVAL": "int default=128",
+  "DEEPINFER_FORCE_IMBALANCE_RATIO": "float default=False/0",
+  "DEEPINFER_FORCE_LOAD_BALANCE": "bool default=False/0",
+  "DEEPINFER_SHOW_EPLB_DETAIL": "bool default=False/0",
+  "DEEPINFER_PREFILL_MAX_SUM_SEQLEN_K": "int_or_none (computed)",
+  "DEEPINFER_INDEX_ATTN_MEMORY_LIMIT": "int default=10 * 2**30",
+  "DEEPINFER_USE_NEXTN_DECODE": "int default=5",
+  "DEEPINFER_ENABLE_MTP_VARLEN": "bool default=False/0",
+  "DEEPINFER_MAX_BACKTRACKING_TOKENS": "custom (computed)",
+  "DEEPINFER_ENGRAM_PAD_TOKEN": "int default=2",
+  "DEEPINFER_ENGRAM_FORCE_GPU_STORAGE": "custom (computed)",
+  "DEEPINFER_SAMPLER_FORCE_TOPK": "int default=False/0",
+  "DEEPINFER_DECODE_TOKEN_BLACKLIST": "str (computed)",
+  "DEEPINFER_ENFORCE_EAGER": "bool default=False/0",
+  "DEEPINFER_CUDAGRAPH_BATCH_SIZE_INTERVAL": "int default=8",
+  "DEEPINFER_DFLASH_ENFORCE_EAGER": "bool default=False/0",
+  "DEEPINFER_DFLASH_CUDAGRAPH_BATCH_SIZE_INTERVAL": "int default=8",
+  "DEEPINFER_DECODE_PERF_CACHE_DIR": "str_or_none (computed)",
+  "DEEPINFER_DECODE_PERF_CACHE_TTL_SEC": "int default=60 * 60",
+  "DEEPINFER_NUM_STATE_SLOTS_RATIO": "float default=1.2",
+  "DEEPINFER_PREFILL_STORE_EXTRA_STATE": "bool default=False/0",
+  "DEEPINFER_PREFILL_STORE_EXTRA_SIZE": "int default=128",
+  "DEEPINFER_XGRAMMAR_DEBUG": "bool default=False/0",
+  "DEEPINFER_XGRAMMAR_TIMEOUT": "int default=20",
+  "DEEPINFER_XGRAMMAR_DISABLE_CACHE": "bool default=False",
+  "DEEPINFER_XGRAMMAR_CACHE_LIMIT_BYTES": "int default=10 * 1024 * 1024 * 1024",
+  "DEEPINFER_SO_BUILDER_CPUS": "int default=4",
+  "DEEPINFER_PREFILL_ATTEMPT_INTERVAL": "int default=70",
+  "DEEPINFER_PREFILL_ANY_ATTEMPT_INTERVAL": "int default=100",
+  "DEEPINFER_ZERO_OVERHEAD_SCHEDULING": "bool default=False/0",
+  "DEEPINFER_LOGGING_INTERVAL_STEP": "int default=100",
+  "DEEPINFER_NCCL_MEMORY_SAMPLE_INTERVAL_STEPS": "int default=1000",
+  "DEEPINFER_RINGBUFFER_WARNING_INTERVAL": "int default=60",
+  "DEEPINFER_GC_INTERVAL_STEP": "int default=1000",
+  "DEEPINFER_YOCO_PREFILL_TRUNCATION_MODE": "choice default=\"off\", choices=(\"off\", \"mask\", \"compact\"",
+  "DEEPINFER_YOCO_PREFILL_KEEP_TOKENS": "int default=False/0",
+  "DEEPINFER_BATCH_INVARIANT": "bool default=False/0",
+  "DEEPINFER_DISABLE_SYNC_GUARD": "bool default=False/0",
+  "DEEPINFER_PROFILE_TORCH_CUDA_MEMORY": "str_or_none (computed)",
+  "DEEPINFER_ENABLE_MEMORY_TRACING": "bool default=False/0",
+  "DEEPINFER_PROFILE_HTTP_ENABLE": "bool default=False/0",
+  "DEEPINFER_PROFILE_HTTP_PORT_BASE": "int default=6070",
+  "DEEPINFER_TORCH_PROFILER_DIR": "str default=\"/tmp\"",
+  "DEEPINFER_USE_MULTIMODAL_POOL": "bool default=False/0",
+  "DEEPINFER_MULTIMODAL_POOL_SIZE_GB": "int default=8",
+  "DEEPINFER_MULTI_MODAL_BUFFER_SIZE": "int default=512",
+  "DEEPINFER_MULTI_MODAL_WORKER_TIMEOUT": "float default=1800.0"
+ }
+}

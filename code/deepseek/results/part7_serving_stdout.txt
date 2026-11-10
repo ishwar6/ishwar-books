@@ -1,0 +1,27 @@
+== 1. Decode ceiling: tokens/s <= bandwidth / bytes read per token ==
+M3 Ultra, "over 800GB/s"                         V3/R1 Q4_K_M, 37B active                      22.3 GB/token -> at most  35.9 tok/s
+M3 Ultra, "over 800GB/s"                         R1-Distill-Llama-70B Q4_K_M, 70.55B dense     42.5 GB/token -> at most  18.8 tok/s
+2 sockets x 8 ch DDR5-4800 (2 x 8 x 38.4 GB/s)   V3/R1 Q4_K_M, 37B active                      22.3 GB/token -> at most  27.6 tok/s
+2 sockets x 8 ch DDR5-4800 (2 x 8 x 38.4 GB/s)   R1-Distill-Llama-70B Q4_K_M, 70.55B dense     42.5 GB/token -> at most  14.5 tok/s
+measured (third party): R1 4-bit on M3 Ultra 512 GB about 17-18 tok/s (short prompts);
+V3-0324 Q4_K_M: 10.89 tok/s after a 4.8K prompt, 6.67 tok/s after a 12.7K prompt
+share of the ceiling reached at 17.5 tok/s: 49%
+
+== 2. Expert-parallel communication limit (ISCA 2025, section 2.3.2) ==
+CX7 400Gbps InfiniBand, 50 GB/s   : one all-to-all pair  120.96 us, x2 per layer x 61 layers =  14.76 ms ->    67.8 tok/s
+GB200 NVL72, 900 GB/s             : one all-to-all pair    6.72 us, x2 per layer x 61 layers =   0.82 ms ->  1219.8 tok/s
+
+== 3. Where the 256 routed experts go ==
+V3 paper, prefill unit (4 nodes)  : 256 + 32 redundant = 288 = 32 GPUs x 9 routed experts
+Feb 2025, prefill unit (4 nodes)  : 256 + 32 redundant = 288 = 32 GPUs x 9 routed experts
+Feb 2025, decode unit (18 nodes)  : 256 + 32 redundant = 288 = 144 GPUs x 2 routed experts
+V3 paper, decode unit (40 nodes)  : 320 GPUs, one expert each: 256 routed + 64 for redundant and shared experts = 320
+
+== 4. Feb 27-28 2025, 24 hours of V3 + R1 on H800 ==
+cost    = 226.75 nodes x 8 GPUs x 24 h x $2 = $87,072
+revenue = 342B hit x $0.14/M + 266B miss x $0.55/M + 168B out x $2.19/M
+        = $47,880 + $146,300 + $367,920 = $562,100  (reported: $562,027)
+margin  = (562,027 - 87,072) / 87,072 = 545%
+cache-hit share of input: 56.25%
+output share of the theoretical revenue: 65%
+decode: 14.8k output tok/s per node = 1,850 per H800; at 20-22 tok/s per user, 673 to 740 streams per node

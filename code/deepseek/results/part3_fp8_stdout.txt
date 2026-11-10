@@ -1,0 +1,41 @@
+A. FP8 E4M3 (4 exponent bits, 3 mantissa bits)
+   largest number: 448   smallest normal: 0.015625   smallest above zero: 0.00195312
+          1 -> stored as 1
+        1.1 -> stored as 1.125
+        0.3 -> stored as 0.3125
+        300 -> stored as 288
+      0.004 -> stored as 0.00390625
+     0.0001 -> stored as 0
+   between 1 and 2 there are only 8 steps: 1, 1.125, 1.25, 1.375, 1.5, 1.625, 1.75, 1.875, 2
+
+A2. Worked example: scale, round, scale back
+   group [0.5, -1.2, 2.0, 0.01]: scale = 448 / 2 = 224
+      0.01 x scale = 2.24 -> FP8 2.25 -> back 0.010045  (error 0.4%)
+   group [0.5, -1.2, 1000.0, 0.01]: scale = 448 / 1000 = 0.448
+      0.01 x scale = 0.00448 -> FP8 0.0039062 -> back 0.0087193  (error 12.8%)
+
+B. Activation matrix 128 x 1024, random normal (typical |x| about 0.8), one outlier at row 5, column 300
+    outlier |      error of the ordinary numbers       |   ordinary numbers turned into 0  
+            |       tensor    1x128 tile   128x128 blk |     tensor       tile      block
+          0 |       2.65%         2.57%         2.63% |      0.00%      0.00%      0.00%
+        100 |       2.67%         2.57%         2.63% |      0.01%      0.00%      0.00%
+      1,000 |       2.65%         2.57%         2.63% |      0.19%      0.00%      0.03%
+     10,000 |       2.72%         2.57%         2.65% |      1.78%      0.00%      0.24%
+    100,000 |      12.56%         2.60%         5.07% |     17.28%      0.02%      2.14%
+   for comparison: BF16 (7 stored mantissa bits) gives 0.17% on the same numbers
+
+C. Rows (tokens) of very different sizes: row i is multiplied by 10**u, u uniform in [-S, 0]
+   (activation gradients look like this: some tokens carry far larger values than others)
+   error = mean over rows of each row's relative error, so small rows count as much as large ones
+     S |              error of G              |            error of G W^T           
+       |     tensor         tile        block |     tensor         tile        block
+     0 |      2.64%        2.56%        2.66% |      3.74%        3.67%        3.73%
+     2 |      2.64%        2.58%        2.64% |      3.74%        3.70%        3.72%
+     4 |      2.75%        2.57%        2.68% |      3.82%        3.70%        3.78%
+     6 |     17.52%        2.57%       16.31% |     18.30%        3.68%       17.14%
+     8 |     31.53%        2.56%       30.85% |     32.20%        3.69%       31.53%
+
+D. SIMULATION: 4,096 dot products of length K = 4,096 (FP8-rounded random inputs)
+   narrow accumulator for all 4,096 terms   max error 0.4638%   mean error 0.0643%
+   narrow for 128 terms, then FP32          max error 0.0045%   mean error 0.0009%
+   (error = |result - exact sum| / sum of |terms|, so it does not blow up when the sum is near zero)

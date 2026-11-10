@@ -1,0 +1,29 @@
+V4.1-Flash: 40 layers + 3 draft (DSpark) layers; sliding window 128; block = 128 tokens
+compress ratio per layer: [0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+encoder (prefill) layers: 0..19; decoder (YOCO consumer) layers: 20..39
+
+Layers that own a slice of the paged block (all others reuse an earlier layer's cache):
+  layer  2  ratio 2  main  64 entries x 288 B = 18,432 B   indexer  64 x 68 B = 4,352 B
+  layer  8  ratio 2  main  64 entries x 288 B = 18,432 B   indexer  64 x 68 B = 4,352 B
+  layer 14  ratio 2  main  64 entries x 288 B = 18,432 B   indexer  64 x 68 B = 4,352 B
+  layer 20  ratio 1  main 128 entries x 288 B = 36,864 B   indexer 128 x 68 B = 8,704 B
+
+bytes per 128-token block: 113,920 (aligned to 1152: 114,048)
+=> 890.0 bytes per token of context (891.0 after alignment)
+
+For scale: one 528-byte FP8 entry per token in every one of the 40 layers would be 21,120 B/token, 24x more.
+
+Per-sequence state slot: 43 SWA rings x 134 tokens x 528 B = 3,042,336 B, + compression state 96,768 B  => 3,139,488 B (2.99 MiB)
+Part of the slot written to the KV store: 20 layers x 134 x 528 = 1,415,040 B (the Q&A says state_size_to_disk = 1,415,040 B)
+
+Hypothetical 100 GiB left for cache, max_num_seqs=64: state reserve 0.45 GiB (77 slots x2), 937,243 blocks = 120.0 M tokens of context
+  = 1,874,486 tokens per sequence if all 64 slots are full
+
+Hypothetical 100 GiB left for cache, max_num_seqs=256: state reserve 1.80 GiB (308 slots x2), 924,525 blocks = 118.3 M tokens of context
+  = 462,262 tokens per sequence if all 256 slots are full
+
+One sequence, cache in HBM (blocks + its state slot):
+      8,192 tokens: blocks      7.0 MiB + state 2.99 MiB
+     32,768 tokens: blocks     27.8 MiB + state 2.99 MiB
+    131,072 tokens: blocks    111.4 MiB + state 2.99 MiB
+  1,048,576 tokens: blocks    891.0 MiB + state 2.99 MiB
