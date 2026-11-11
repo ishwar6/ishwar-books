@@ -34,6 +34,8 @@ def n0(v): return f'{v:,.0f}'
 def n1(v): return f'{v:,.1f}'
 def n2(v): return f'{v:,.2f}'
 def x(v): return f'{v:.1f} times' if v >= 1.95 else f'{v:.2f} times'
+def about(v): return f'about {v:.0f} times' if v >= 2.95 else f'about {v:.1f} times'   # the way people say it
+def kv_pred(): return R['kv_math']['kv_cache_memory_gib'] * 2**30 / R['kv_math']['bytes_per_token']
 def pct(v): return f'{100 * v:.1f}%' if v < 0.995 or v > 1 else f'{100 * v:.2f}%'
 def ms(v): return f'{v:,.0f} ms' if v < 1000 else f'{v / 1000:,.2f} s'
 def s(v): return f'{v:,.0f} s' if v >= 10 else f'{v:.1f} s'
@@ -49,6 +51,8 @@ def loglines():
         if any(k in line for k in keep):
             line = re.sub(r'^.*?(INFO|WARNING)\s+\S+\s+\S+\s+(\[[^\]]*\]\s*)?', '', line)   # drop prefix and timestamp
             line = re.sub(r' out of potential backends: .*', '', line)
+            if line.startswith('CUDA graph memory profiling'):
+                continue
             out.append(line.strip())
     return '\n'.join(dict.fromkeys(out))
 
@@ -86,9 +90,31 @@ def fail_rows():
         except Exception:
             pass
         return str(t).replace('|', '/').replace('\n', ' ')[:160]
-    names = {'too_long': f"A prompt of about {R['max_model_len'] + 500:,} tokens, over the 4,096 limit",
+    names = {'too_long': f"The word `hello` {R['max_model_len'] + 500:,} times, over the {R['max_model_len']:,}-token limit",
              'wrong_key': 'The wrong API key', 'max_tokens_too_big': f"`max_tokens` of {R['max_model_len'] + 10:,}"}
     return '\n'.join(f"| {names[k]} | {F[k]['status']} | {body(k)} |" for k in names)
+
+def results_rows():
+    st = {x['name']: x for x in R['starts']}; k = R['kv_math']; F = R['failures']
+    rows = [
+        ('Setup', f"{R['gpu']['name']} ({R['gpu']['memory_gib']} GiB), vLLM {R['vllm_version']}, {R['model']}, float16, max_model_len {R['max_model_len']:,}, gpu_memory_utilization {R['gpu_memory_utilization']}"),
+        ('Attention backend', st['default']['attention_backend']),
+        ('Cold start / warm start', f"{st['default']['ready_s']} s / {st['no_prefix_cache']['ready_s']} s"),
+        ('Weights in GPU memory', f"{st['default']['weights_gib_and_load_s'][0]} GiB"),
+        ('KV cache (log)', f"{st['default']['kv_cache_memory_gib']} GiB = {n0(st['default']['kv_cache_tokens'])} tokens = {st['default']['max_concurrency'][1]} requests of {R['max_model_len']:,} tokens"),
+        ('KV cache (by hand)', f"{n0(k['bytes_per_token'])} bytes per token, predicts {n0(kv_pred())} tokens"),
+        ('One user, streaming', f"TTFT about {n0(sum(r['ttft_ms'] for r in R['single_user_stream']) / 3)} ms, {n1(sum(r['tpot_ms'] for r in R['single_user_stream']) / 3)} ms per token"),
+        ('1 to 128 requests in flight', f"{n0(B('conc_1', 'output_throughput'))} to {n0(B('conc_128', 'output_throughput'))} output tok/s ({x(B('conc_128', 'output_throughput') / B('conc_1', 'output_throughput'))}); TPOT p50 {B('conc_1', 'median_tpot_ms'):.1f} to {B('conc_128', 'median_tpot_ms'):.1f} ms"),
+        ('Capacity used for the load test', f"{n2(R['capacity_req_s'])} req/s (best closed-loop rate)"),
+        ('Best goodput (TTFT under 1 s, TPOT under 100 ms)', f"{n2(max(R['bench'][f'rate_{f}']['request_goodput'] or 0 for f in RATES))} req/s, at {max(RATES, key=lambda f: R['bench'][f'rate_{f}']['request_goodput'] or 0):.0%} load"),
+        ('Goodput at 100% and 120% load', f"{n2(R['bench']['rate_1.0']['request_goodput'] or 0)} and {n2(R['bench']['rate_1.2']['request_goodput'] or 0)} req/s"),
+        ('Prefix caching off / on (2,048 shared tokens)', f"TTFT p50 {ms(B('prefix_off', 'median_ttft_ms'))} / {ms(B('prefix_on', 'median_ttft_ms'))} ({x(B('prefix_off', 'median_ttft_ms') / B('prefix_on', 'median_ttft_ms'))}); hit rate {pct(B('prefix_on', 'prefix_cache_hit_rate'))}"),
+        ('Small KV cache vs normal', f"{n0(st['small_kv']['kv_cache_tokens'])} tokens: {n0(B('preempt_small_kv', 'preemptions'))} preemptions, TTFT p50 {ms(B('preempt_small_kv', 'median_ttft_ms'))} vs {ms(B('preempt_baseline', 'median_ttft_ms'))}"),
+        ('Bad requests', f"too long: {F['too_long']['status']}; wrong key: {F['wrong_key']['status']}; max_tokens too big: {F['max_tokens_too_big']['status']}"),
+        ('Server killed', f"{F['killed_mid_run']['completed']} completed, {F['killed_mid_run']['failed']} failed; /health then gave {F['killed_mid_run']['health_after']}"),
+        ('FP8 weights', f"skipped: needs compute capability 8.0 or newer, the T4 is {R['gpu']['compute_capability']}"),
+    ]
+    return '\n'.join(f'| {a} | {b_} |' for a, b_ in rows)
 
 def fp8_section():
     return ''          # T4 runs skip FP8 (compute capability 7.5); the L4/A100 text is written when such a run exists
@@ -155,29 +181,35 @@ def fig_memory():
     x_ = x0
     for lab, v, cls in segs:
         w = v * sc; b += rect(x_, 50, w, 46, cls)
-        if w > 60:
+        if w > 8 * len(lab) + 12:
             b += text(x_ + w / 2, 70, lab, 't-note') + text(x_ + w / 2, 87, f'{v:.2f} GiB', 't-tick')
+        else:                                   # too narrow: label under the bar
+            b += line(x_ + w / 2, 97, x_ + w / 2, 104, 'axis') + text(x_ + w / 2, 117, f'{lab}: {v:.2f} GiB', 't-tick')
         x_ += w
-    b += text(20, 124, f"KV cache: {n0(st['kv_cache_tokens'])} tokens of {n0(R['kv_math']['bytes_per_token'] / 1024)} KiB each, "
+    b += text(20, 146, f"KV cache: {n0(st['kv_cache_tokens'])} tokens of {n0(R['kv_math']['bytes_per_token'] / 1024)} KiB each, "
               f"enough for {st['max_concurrency'][1]:.1f} requests of the full {R['max_model_len']:,} tokens at once.", 't-tick', 'start')
-    b += text(20, 144, 'Working memory: activations for the largest batch, measured by a profile run at startup, plus the CUDA graphs.', 't-tick', 'start')
-    return svg(160, b, f'GPU memory split: weights {w_gib:.2f} GiB, working memory {work + graphs:.2f} GiB, KV cache {kv:.2f} GiB, and {total - budget:.2f} GiB left outside vLLM.')
+    b += text(20, 166, 'Working memory: activations for the largest batch, measured by a profile run at startup, plus the CUDA graphs.', 't-tick', 'start')
+    return svg(180, b, f'GPU memory split: weights {w_gib:.2f} GiB, working memory {work + graphs:.2f} GiB, KV cache {kv:.2f} GiB, and {total - budget:.2f} GiB left outside vLLM.')
 FIG['memory'] = fig_memory()
 
 def fig_batching():
     thr = [B(f'conc_{c}', 'output_throughput') for c in CONC]; tp = [B(f'conc_{c}', 'median_tpot_ms') for c in CONC]
     b = ''
-    a = Axes(70, 40, 270, 190, (1, 128), (0, nice_max(max(thr))), xlog=True)
-    b += text(205, 18, 'Whole server: output tokens per second', 't-title')
+    a = Axes(80, 44, 640, 170, (1, 128), (0, nice_max(max(thr))), xlog=True)
+    b += text(20, 22, 'Whole server: output tokens per second (higher is better)', 't-title', 'start')
     b += a.frame(CONC, ticks(a.yr[1]), str, fmt_k, 'requests in flight', '')
     b += poly([(a.X(c), a.Y(v)) for c, v in zip(CONC, thr)], 'l1')
     b += ''.join(dot(a.X(c), a.Y(v), 's1', 4, f'{c} in flight: {v:,.0f} tok/s') for c, v in zip(CONC, thr))
-    a2 = Axes(460, 40, 270, 190, (1, 128), (0, nice_max(max(tp))), xlog=True)
-    b += text(595, 18, 'Each user: milliseconds per token', 't-title')
+    b += text(a.X(CONC[0]) + 8, a.Y(thr[0]) - 8, f'{thr[0]:,.0f}', 't-tick', 'start')
+    b += text(a.X(CONC[-1]) - 8, a.Y(thr[-1]) - 10, f'{thr[-1]:,.0f}', 't-tick', 'end')
+    a2 = Axes(80, 324, 640, 170, (1, 128), (0, nice_max(max(tp))), xlog=True)
+    b += text(20, 302, 'Each user: milliseconds per token (lower is better)', 't-title', 'start')
     b += a2.frame(CONC, ticks(a2.yr[1]), str, lambda v: f'{v:g}', 'requests in flight', '')
     b += poly([(a2.X(c), a2.Y(v)) for c, v in zip(CONC, tp)], 'l2')
     b += ''.join(dot(a2.X(c), a2.Y(v), 's2', 4, f'{c} in flight: {v:.1f} ms per token') for c, v in zip(CONC, tp))
-    return svg(290, b, f'Output throughput rises from {thr[0]:,.0f} to {thr[-1]:,.0f} tokens per second as requests in flight go from 1 to 128, while time per token per user rises from {tp[0]:.1f} to {tp[-1]:.1f} ms.')
+    b += text(a2.X(CONC[0]) + 8, a2.Y(tp[0]) - 8, f'{tp[0]:.1f} ms', 't-tick', 'start')
+    b += text(a2.X(CONC[-1]) - 8, a2.Y(tp[-1]) + 4, f'{tp[-1]:.1f} ms', 't-tick', 'end')
+    return svg(560, b, f'Output throughput rises from {thr[0]:,.0f} to {thr[-1]:,.0f} tokens per second as requests in flight go from 1 to 128, while time per token per user rises from {tp[0]:.1f} to {tp[-1]:.1f} ms.')
 FIG['batching'] = fig_batching()
 
 def fig_knee():
@@ -189,22 +221,45 @@ def fig_knee():
     b += poly([(a.X(f), a.Y(v)) for f, v in zip(RATES, p50)], 'l1') + poly([(a.X(f), a.Y(v)) for f, v in zip(RATES, p99)], 'l2')
     b += ''.join(dot(a.X(f), a.Y(v), 's1', 4, f'{f:.0%} load: TTFT p50 {ms(v)}') for f, v in zip(RATES, p50))
     b += ''.join(dot(a.X(f), a.Y(v), 's2', 4, f'{f:.0%} load: TTFT p99 {ms(v)}') for f, v in zip(RATES, p99))
-    b += legend([('TTFT p50', 'l1'), ('TTFT p99', 'l2')], 110, 20)
+    b += legend([('TTFT p50', 'l1'), ('TTFT p99', 'l2')], 420, 20)
     return svg(300, b, f'TTFT against offered load: p50 from {ms(p50[0])} at 25% to {ms(p50[-1])} at 120%; p99 from {ms(p99[0])} to {ms(p99[-1])}.')
 FIG['knee'] = fig_knee()
+
+def fig_goodput():
+    rows = [(f, float(R['bench'][f'rate_{f}']['request_rate']), R['bench'][f'rate_{f}']['request_throughput'],
+             R['bench'][f'rate_{f}']['request_goodput'] or 0) for f in RATES]
+    top = nice_max(max(r[1] for r in rows)); x0, W, rowh = 110, 560, 50; b = ''
+    lx = 110
+    for lab, cls in [('arrived', 'box-3'), ('served', 'box-1'), ('met the SLO (goodput)', 'box-2')]:
+        b += rect(lx, 12, 18, 11, cls, 2) + text(lx + 24, 22, lab, 't-tick', 'start'); lx += 46 + 7 * len(lab)
+    for i, (f, arr, srv, good) in enumerate(rows):
+        y = 44 + i * rowh
+        b += text(x0 - 12, y + 24, f'{f:.0%} load', 't-note', 'end')
+        for j, (v, cls) in enumerate([(arr, 'box-3'), (srv, 'box-1'), (good, 'box-2')]):
+            b += rect(x0, y + j * 13, W * v / top, 11, cls, 2)
+        b += text(x0 + W * max(arr, srv) / top + 8, y + 22, f'goodput {good:.2f} req/s', 't-tick', 'start')
+    b += line(x0, 44 + len(rows) * rowh, x0 + W, 44 + len(rows) * rowh, 'axis')
+    for v in ticks(top, 4):
+        b += text(x0 + W * v / top, 44 + len(rows) * rowh + 18, f'{v:g}', 't-tick')
+    b += text(x0 + W / 2, 44 + len(rows) * rowh + 38, 'requests per second', 't-tick')
+    best = max(rows, key=lambda r: r[3])
+    return svg(44 + len(rows) * rowh + 52, b, f'Arrival rate, served rate and goodput at six loads. Goodput peaks at {best[3]:.2f} requests per second at {best[0]:.0%} load and falls to {rows[-1][3]:.2f} at {rows[-1][0]:.0%}.')
+FIG['goodput'] = fig_goodput()
 
 def fig_timeline():
     tl = R['overload_timeline']; T = max(p['t'] for p in tl)
     top = nice_max(max(max(p['running'], p['waiting']) for p in tl) or 1)
     a = Axes(70, 40, 620, 200, (0, T), (0, top))
     b = a.frame(ticks(T, 6), ticks(top), lambda v: f'{v:.0f}', lambda v: f'{v:.0f}', 'seconds since the run started', 'requests')
+    cap = max(p['running'] for p in tl)
+    b += line(70, a.Y(cap), 690, a.Y(cap), 'drop') + text(80, a.Y(cap) - 6, f'most running at once: {cap:.0f}', 't-tick', 'start')
     b += poly([(a.X(p['t']), a.Y(p['running'])) for p in tl], 'l1') + poly([(a.X(p['t']), a.Y(p['waiting'])) for p in tl], 'l2')
     kv = Axes(70, 40, 620, 200, (0, T), (0, 1))
     b += poly([(kv.X(p['t']), kv.Y(p['kv_usage'])) for p in tl], 'l3')
     for v in (0, 0.5, 1):
         b += text(700, kv.Y(v) + 4, f'{v:.0%}', 't-tick', 'start')
     b += text(745, 32, 'KV used', 't-tick', 'end')
-    b += legend([('running', 'l1'), ('waiting', 'l2'), ('KV cache used (right scale)', 'l3')], 90, 20)
+    b += legend([('running', 'l1'), ('waiting', 'l2'), ('KV cache used (right scale)', 'l3')], 170, 20)
     return svg(290, b, f"During the overload, up to {max(p['running'] for p in tl):.0f} requests ran and up to {max(p['waiting'] for p in tl):.0f} waited; KV cache use peaked at {max(p['kv_usage'] for p in tl):.0%}.")
 FIG['timeline'] = fig_timeline()
 

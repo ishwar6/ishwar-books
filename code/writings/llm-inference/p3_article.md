@@ -632,6 +632,9 @@ With `--max-model-len 8192`, the cache is the same size, but each full request n
 
 The real numbers will differ a little. Your driver reports its own total memory, and the test run measures the working memory instead of assuming it. But if your log shows a much smaller cache than this, look for the cause. Another process may be using the GPU, or `--gpu-memory-utilization` may be set low.
 
+> [!TIP] See it on a real GPU
+> [Part 8](llm-inference-8-vllm-on-colab.md) runs these steps on a free Colab T4 with a notebook you can open yourself. There the hand arithmetic predicted 313,824 tokens, and the real log said 313,920. The same page loads the server until latency breaks, turns prefix caching off and on, and forces preemption.
+
 ### Watching the ideas at work: the metrics
 
 A running server shows the ideas of this page as numbers. It publishes them at `http://localhost:8000/metrics`, in the text format of Prometheus, a common monitoring tool. These are the names in vLLM v0.32.0. Prometheus adds `_total` to the names of counters.
