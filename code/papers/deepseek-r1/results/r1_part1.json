@@ -1,0 +1,189 @@
+{
+ "params": 1777088000,
+ "toy": {
+  "names": [
+   "\"18\"",
+   "\"9\"",
+   "\"16\"",
+   "\"2\""
+  ],
+  "logits": [
+   2.0,
+   1.0,
+   0.5,
+   -1.0
+  ],
+  "p1": [
+   0.6094600558280945,
+   0.2242078185081482,
+   0.13598892092704773,
+   0.030343227088451385
+  ],
+  "p06": [
+   0.7826571464538574,
+   0.14782485365867615,
+   0.06424441188573837,
+   0.005273502320051193
+  ],
+  "top_p": [
+   0.7868064045906067,
+   0.14860855042934418,
+   0.06458500772714615,
+   0.0
+  ]
+ },
+ "q1_ours": {
+  "think": 1907,
+  "answer": 140,
+  "total": 2048,
+  "pred": null,
+  "correct": false
+ },
+ "q1_lib": {
+  "think": 732,
+  "answer": 139,
+  "total": 872,
+  "pred": "18",
+  "correct": true
+ },
+ "q1_base": {
+  "total": 377,
+  "stopped": true,
+  "boxes": [
+   "18"
+  ],
+  "correct": true
+ },
+ "shown": 2,
+ "q2_distilled": {
+  "rows": [
+   {
+    "tokens": 6144,
+    "think": null,
+    "pred": null,
+    "correct": false,
+    "waits": 80
+   },
+   {
+    "tokens": 6144,
+    "think": null,
+    "pred": null,
+    "correct": false,
+    "waits": 41
+   },
+   {
+    "tokens": 5197,
+    "think": 4759,
+    "pred": "2220",
+    "correct": true,
+    "waits": 33
+   },
+   {
+    "tokens": 6144,
+    "think": null,
+    "pred": null,
+    "correct": false,
+    "waits": 62
+   },
+   {
+    "tokens": 3465,
+    "think": 3202,
+    "pred": "2220",
+    "correct": true,
+    "waits": 16
+   },
+   {
+    "tokens": 2202,
+    "think": 1969,
+    "pred": "2220",
+    "correct": true,
+    "waits": 5
+   },
+   {
+    "tokens": 6144,
+    "think": null,
+    "pred": null,
+    "correct": false,
+    "waits": 19
+   },
+   {
+    "tokens": 3624,
+    "think": 3287,
+    "pred": "2220",
+    "correct": true,
+    "waits": 17
+   }
+  ],
+  "pass1": 0.5,
+  "votes": {
+   "2220": 4
+  },
+  "majority": "2220"
+ },
+ "q2_base": {
+  "rows": [
+   {
+    "tokens": 410,
+    "think": null,
+    "pred": "2220",
+    "correct": true,
+    "waits": 0
+   },
+   {
+    "tokens": 421,
+    "think": null,
+    "pred": "2220",
+    "correct": true,
+    "waits": 0
+   },
+   {
+    "tokens": 501,
+    "think": null,
+    "pred": "2220",
+    "correct": true,
+    "waits": 0
+   },
+   {
+    "tokens": 486,
+    "think": null,
+    "pred": "210",
+    "correct": false,
+    "waits": 0
+   },
+   {
+    "tokens": 196,
+    "think": null,
+    "pred": "2220",
+    "correct": true,
+    "waits": 0
+   },
+   {
+    "tokens": 461,
+    "think": null,
+    "pred": "2220",
+    "correct": true,
+    "waits": 0
+   },
+   {
+    "tokens": 371,
+    "think": null,
+    "pred": "2220",
+    "correct": true,
+    "waits": 0
+   },
+   {
+    "tokens": 589,
+    "think": null,
+    "pred": "2220",
+    "correct": true,
+    "waits": 0
+   }
+  ],
+  "pass1": 0.875,
+  "votes": {
+   "2220": 7,
+   "210": 1
+  },
+  "majority": "2220"
+ }
+}

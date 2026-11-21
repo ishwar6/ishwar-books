@@ -1,0 +1,72 @@
+{
+ "summary": {
+  "base": {
+   "model": "base",
+   "pass1": 0.375,
+   "mean_tokens": 1263.21875,
+   "mean_tokens_correct": 726.875,
+   "hit_limit": 30,
+   "boxed": 40,
+   "samples": 64,
+   "solved_any": 10,
+   "by_level": {
+    "1": [
+     0.35,
+     5
+    ],
+    "2": [
+     0.2916666666666667,
+     6
+    ],
+    "3": [
+     0.5,
+     5
+    ]
+   }
+  },
+  "distilled": {
+   "model": "distilled",
+   "pass1": 0.59375,
+   "mean_tokens": 1693.390625,
+   "mean_tokens_correct": 1450.7631578947369,
+   "hit_limit": 33,
+   "boxed": 36,
+   "samples": 64,
+   "solved_any": 14,
+   "by_level": {
+    "1": [
+     0.75,
+     5
+    ],
+    "2": [
+     0.5,
+     6
+    ],
+    "3": [
+     0.55,
+     5
+    ]
+   }
+  }
+ },
+ "problems": [
+  "test/intermediate_algebra/1014.json",
+  "test/intermediate_algebra/754.json",
+  "test/prealgebra/996.json",
+  "test/intermediate_algebra/428.json",
+  "test/algebra/1787.json",
+  "test/number_theory/132.json",
+  "test/prealgebra/1733.json",
+  "test/precalculus/1303.json",
+  "test/precalculus/807.json",
+  "test/prealgebra/1747.json",
+  "test/algebra/1547.json",
+  "test/algebra/1842.json",
+  "test/precalculus/441.json",
+  "test/counting_and_probability/761.json",
+  "test/algebra/518.json",
+  "test/prealgebra/1908.json"
+ ],
+ "k": 4,
+ "max_new": 2048
+}

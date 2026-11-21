@@ -1,0 +1,31 @@
+== Qwen/Qwen2.5-Math-1.5B on mps, bfloat16, 8 samples per question, T=1.0, max 1024 new tokens
+GSM8K 0      gold 18           think tags 0/8  answer tags 0/8  strict format 0/8  correct 2/8 (math-verify 2/8)  hit 1024 tokens 0/8  27 s
+   rewards (accuracy + format): [0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+   GRPO advantages (Eq. 3)    : [-0.54, 1.62, 1.62, -0.54, -0.54, -0.54, -0.54, -0.54]
+GSM8K 2      gold 70000        think tags 1/8  answer tags 0/8  strict format 0/8  correct 1/8 (math-verify 1/8)  hit 1024 tokens 1/8  38 s
+   rewards (accuracy + format): [0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0]
+   GRPO advantages (Eq. 3)    : [-0.35, -0.35, -0.35, -0.35, -0.35, 2.47, -0.35, -0.35]
+MATH-500 16  gold -50          think tags 1/8  answer tags 2/8  strict format 1/8  correct 2/8 (math-verify 2/8)  hit 1024 tokens 1/8  38 s
+   rewards (accuracy + format): [0.0, 0.0, 1.0, 0.0, 2.0, 0.0, 0.0, 0.0]
+   GRPO advantages (Eq. 3)    : [-0.5, -0.5, 0.84, -0.5, 2.18, -0.5, -0.5, -0.5]
+MATH-500 48  gold \frac{3}{2}  think tags 0/8  answer tags 0/8  strict format 0/8  correct 3/8 (math-verify 3/8)  hit 1024 tokens 0/8  15 s
+   rewards (accuracy + format): [1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+   GRPO advantages (Eq. 3)    : [1.21, 1.21, 1.21, -0.72, -0.72, -0.72, -0.72, -0.72]
+== Qwen/Qwen2.5-0.5B on mps, bfloat16, 8 samples per question, T=1.0, max 1024 new tokens
+GSM8K 0      gold 18           think tags 0/8  answer tags 1/8  strict format 0/8  correct 0/8 (math-verify 0/8)  hit 1024 tokens 0/8  7 s
+   rewards (accuracy + format): [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+   GRPO advantages (Eq. 3)    : [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+GSM8K 2      gold 70000        think tags 3/8  answer tags 4/8  strict format 1/8  correct 0/8 (math-verify 0/8)  hit 1024 tokens 0/8  6 s
+   rewards (accuracy + format): [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0]
+   GRPO advantages (Eq. 3)    : [-0.35, -0.35, -0.35, -0.35, -0.35, -0.35, 2.47, -0.35]
+MATH-500 16  gold -50          think tags 2/8  answer tags 2/8  strict format 0/8  correct 0/8 (math-verify 0/8)  hit 1024 tokens 0/8  13 s
+   rewards (accuracy + format): [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+   GRPO advantages (Eq. 3)    : [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+MATH-500 48  gold \frac{3}{2}  think tags 1/8  answer tags 1/8  strict format 0/8  correct 0/8 (math-verify 0/8)  hit 1024 tokens 0/8  9 s
+   rewards (accuracy + format): [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+   GRPO advantages (Eq. 3)    : [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+== totals over 4 questions x 8 samples = 32 answers per model
+Qwen/Qwen2.5-Math-1.5B   think  2/32  answer tags  2/32  strict format  1/32  correct  8/32  format and correct  1/32  mean reward 0.281  groups with different rewards 4/4
+Qwen/Qwen2.5-0.5B        think  6/32  answer tags  8/32  strict format  1/32  correct  0/32  format and correct  0/32  mean reward 0.031  groups with different rewards 1/4
+saved results/part3_run.json

@@ -1,0 +1,92 @@
+{
+ "pretrain": {
+  "sentence": "The capital of France is Paris, and the capital of Italy is Rome.",
+  "T": 15,
+  "V": 151936,
+  "rows": [
+   {
+    "token": " capital",
+    "p": 0.0001,
+    "loss": 9.317
+   },
+   {
+    "token": " of",
+    "p": 0.5409,
+    "loss": 0.614
+   },
+   {
+    "token": " France",
+    "p": 0.0416,
+    "loss": 3.179
+   },
+   {
+    "token": " is",
+    "p": 0.721,
+    "loss": 0.327
+   },
+   {
+    "token": " Paris",
+    "p": 0.3156,
+    "loss": 1.153
+   },
+   {
+    "token": ",",
+    "p": 0.221,
+    "loss": 1.509
+   },
+   {
+    "token": " and",
+    "p": 0.1819,
+    "loss": 1.705
+   },
+   {
+    "token": " the",
+    "p": 0.2121,
+    "loss": 1.551
+   },
+   {
+    "token": " capital",
+    "p": 0.1571,
+    "loss": 1.851
+   },
+   {
+    "token": " of",
+    "p": 0.9671,
+    "loss": 0.033
+   },
+   {
+    "token": " Italy",
+    "p": 0.0438,
+    "loss": 3.128
+   },
+   {
+    "token": " is",
+    "p": 0.9876,
+    "loss": 0.013
+   },
+   {
+    "token": " Rome",
+    "p": 0.9232,
+    "loss": 0.08
+   },
+   {
+    "token": ".",
+    "p": 0.6554,
+    "loss": 0.423
+   }
+  ],
+  "ours": 1.7772796154022217,
+  "lib": 1.7772794961929321,
+  "hf": 1.7772794961929321
+ },
+ "sft": {
+  "prompt": "Question: What is 12 times 3?\nAnswer:",
+  "response": " 12 times 3 is 36. The answer is 36.",
+  "n_prompt": 13,
+  "n_resp": 18,
+  "ours": 0.564726710319519,
+  "lib": 0.5647266507148743,
+  "hf": 0.5647266507148743,
+  "all": 1.1736632585525513
+ }
+}

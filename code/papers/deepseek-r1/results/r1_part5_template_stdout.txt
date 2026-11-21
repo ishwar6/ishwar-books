@@ -1,0 +1,19 @@
+two pieces of tokenizer.chat_template (its full length is 2090 characters):
+  ...{% set content = message['content'] %}{% if '</think>' in content %}{% set content = content.split('</think>')[-1] %}{% endif %}{{'<｜Assistant｜>' + co...
+  ...ndif %}{% if add_generation_prompt and not ns.is_tool %}{{'<｜Assistant｜><think>\n'}}{% endif %}
+
+Method 1 (our function):
+'<｜begin▁of▁sentence｜><｜User｜>What is 15% of 80?<｜Assistant｜>\n\nThe answer is **12**.<｜end▁of▁sentence｜><｜User｜>And 15% of 60?<｜Assistant｜><think>\n'
+Method 2 (tokenizer.apply_chat_template):
+'<｜begin▁of▁sentence｜><｜User｜>What is 15% of 80?<｜Assistant｜>\n\nThe answer is **12**.<｜end▁of▁sentence｜><｜User｜>And 15% of 60?<｜Assistant｜><think>\n'
+same string: True
+
+the thinking of the first answer is in the prompt: False
+
+  '<think>'                    -> token ids [151648]
+  '</think>'                   -> token ids [151649]
+  '<｜User｜>'                   -> token ids [151644]
+  '<｜Assistant｜>'              -> token ids [151645]
+  '<｜end▁of▁sentence｜>'        -> token ids [151643]
+
+the prompt is 38 tokens; generation starts right after "<think>\n"

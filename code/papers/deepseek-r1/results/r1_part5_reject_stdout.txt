@@ -1,0 +1,61 @@
+model deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B on mps, bfloat16; 8 samples per problem, temperature 0.6, top-p 0.95, max 2048 new tokens
+  [ 1/10] gsm8k-1275             gold='16'                     03:06:04 53s
+  [ 2/10] gsm8k-523              gold='74'                     03:07:18 74s
+  [ 3/10] gsm8k-734              gold='17'                     03:08:33 74s
+  [ 4/10] gsm8k-1085             gold='26'                     03:09:40 68s
+  [ 5/10] gsm8k-59               gold='187'                    03:10:51 70s
+  [ 6/10] math500-L1-362         gold='\\frac14'               03:12:01 71s
+  [ 7/10] math500-L2-120         gold='\\text{even}'           03:13:12 71s
+  [ 8/10] math500-L3-396         gold='2'                      03:14:27 75s
+  [ 9/10] math500-L4-71          gold='2516_8'                 03:15:37 70s
+  [10/10] math500-L5-166         gold='\\frac{270}7\\text{ de' 03:16:49 72s
+generation took 11.6 minutes
+  methods disagree on math500-L1-362 #0: ours=False math-verify=True pred='\\dfrac{1}{4}' gold='\\frac14'
+  methods disagree on math500-L1-362 #1: ours=False math-verify=True pred='\\dfrac{1}{4}' gold='\\frac14'
+  methods disagree on math500-L1-362 #2: ours=False math-verify=True pred='\\dfrac{1}{4}' gold='\\frac14'
+  methods disagree on math500-L1-362 #3: ours=False math-verify=True pred='\\dfrac{1}{4}' gold='\\frac14'
+  methods disagree on math500-L1-362 #5: ours=False math-verify=True pred='\\dfrac{1}{4}' gold='\\frac14'
+  methods disagree on math500-L1-362 #6: ours=False math-verify=True pred='\\dfrac{1}{4}' gold='\\frac14'
+  methods disagree on math500-L1-362 #7: ours=False math-verify=True pred='\\dfrac{1}{4}' gold='\\frac14'
+
+answer check on 42 finished answers: our checker and math-verify agree on 35
+
+per problem: correct answers out of 8 (math-verify), mean length in tokens
+  gsm8k-1275             correct 8/8   finished 8/8   mean tokens 979
+  gsm8k-523              correct 7/8   finished 8/8   mean tokens 1258
+  gsm8k-734              correct 4/8   finished 4/8   mean tokens 1695
+  gsm8k-1085             correct 8/8   finished 8/8   mean tokens 1429
+  gsm8k-59               correct 7/8   finished 7/8   mean tokens 1099
+  math500-L1-362         correct 7/8   finished 7/8   mean tokens 1313
+  math500-L2-120         correct 0/8   finished 0/8   mean tokens 2048
+  math500-L3-396         correct 0/8   finished 0/8   mean tokens 2048
+  math500-L4-71          correct 0/8   finished 0/8   mean tokens 2048
+  math500-L5-166         correct 0/8   finished 0/8   mean tokens 2048
+groups where all 8 rewards are equal (GRPO advantage 0 for every answer): 6 of 10
+
+the funnel
+   80  sampled   (10 problems)
+   42  finished (</think> and an end token)   (6 problems)
+   41  correct (math-verify)   (6 problems)
+   41  no mixed language (language reward >= 0.99)   (6 problems)
+   40  no long paragraph (<= 120 words)   (6 problems)
+   39  no code block   (6 problems)
+
+among the 41 correct answers: language reward min 1.000; longest paragraph max 122 words; code blocks 1
+paragraphs in their thinking: 923, median 26 words, over 120 words: 1
+
+wrote 39 records to results/r1_part5_sft.jsonl
+the shortest record, with the middle of the thinking cut for space:
+{
+ "id": "gsm8k-59-7",
+ "messages": [
+  {
+   "role": "user",
+   "content": "A raspberry bush has 6 clusters of 20 fruit each and 67 individual fruit scattered across the bush. How many raspberries are there total?\nPlease reason step by step, and put your final answer within \\boxed{}."
+  },
+  {
+   "role": "assistant",
+   "content": "<think>\nOkay, so I have this problem about a raspberry bush, and I need to figure out how many raspberries there are in total. Let me read it again: \"A raspberry bush has 6 clusters of 20 fruit each and 67 individual fruit scattered across the bush. How many r [...]  \\times 20 \\text{ raspberries per cluster} = 120 \\text{ raspberries} \\]\n\nAdditionally, there are 67 individual fruits scattered across the bush, each of which is a raspberry. Therefore, the number of raspberries from the scattered fruits is:\n\n\\[ 67 \\text{ individual fruits} \\]\n\nAdding these together gives the total number of raspberries:\n\n\\[ 120 + 67 = 187 \\]\n\nThus, the total number of raspberries is \\(\\boxed{187}\\)."
+  }
+ ]
+}

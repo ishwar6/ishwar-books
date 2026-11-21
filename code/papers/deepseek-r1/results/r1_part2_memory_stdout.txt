@@ -1,0 +1,18 @@
+bytes per parameter: trained (mixed-precision Adam) 16, frozen (bf16) 2
+
+== 7B policy: 7B parameters per model
+PPO                  policy 112 + reference 14 + reward model 14 + value model 112 = 252 GB
+GRPO, reward model   policy 112 + reference 14 + reward model 14 = 140 GB
+GRPO, rule rewards   policy 112 + reference 14 = 126 GB
+GRPO with rule rewards needs 50% of the memory of PPO; it saves 126 GB
+80 GB GPUs just to hold these (rounded up): PPO 4, GRPO with rule rewards 2
+the value model alone: 112 GB, 2 GPUs of 80 GB (rounded up)
+
+== DeepSeek-V3 size: 671B parameters per model
+PPO                  policy 10,736 + reference 1,342 + reward model 1,342 + value model 10,736 = 24,156 GB
+GRPO, reward model   policy 10,736 + reference 1,342 + reward model 1,342 = 13,420 GB
+GRPO, rule rewards   policy 10,736 + reference 1,342 = 12,078 GB
+GRPO with rule rewards needs 50% of the memory of PPO; it saves 12,078 GB
+80 GB GPUs just to hold these (rounded up): PPO 302, GRPO with rule rewards 151
+the value model alone: 10,736 GB, 135 GPUs of 80 GB (rounded up)
+

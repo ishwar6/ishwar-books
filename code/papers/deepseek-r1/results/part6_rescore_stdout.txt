@@ -1,0 +1,3 @@
+$ python r1_part6_rescore.py
+base      graded on the last answer: 24/64 = 0.375 | graded on the first boxed answer: 29/64 = 0.453
+distilled graded on the last answer: 38/64 = 0.594 | graded on the first boxed answer: 37/64 = 0.578

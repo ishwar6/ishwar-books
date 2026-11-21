@@ -1,0 +1,50 @@
+== 1. Equation 3: advantages inside one group of G = 4 answers
+rewards [1.0, 0.0, 0.0, 1.0]: mean 0.500, std (divide by G) 0.500, std (divide by G-1) 0.577
+   A, std divides by G:   [1.000, -1.000, -1.000, 1.000]   sum 0.000
+   A, std divides by G-1: [0.866, -0.866, -0.866, 0.866]   sum 0.000
+rewards [1.0, 0.0, 0.0, 0.0]: mean 0.250, std (divide by G) 0.433, std (divide by G-1) 0.500
+   A, std divides by G:   [1.732, -0.577, -0.577, -0.577]   sum 0.000
+   A, std divides by G-1: [1.500, -0.500, -0.500, -0.500]   sum 0.000
+rewards [1.0, 1.0, 1.0, 1.0]: std 0.000; no eps: [nan, nan, nan, nan]; eps 1e-4: [0.000, 0.000, 0.000, 0.000]
+rewards [0.0, 0.0, 0.0, 0.0]: std 0.000; no eps: [nan, nan, nan, nan]; eps 1e-4: [0.000, 0.000, 0.000, 0.000]
+
+== 2. One token of Equation 1: min(rho*A, clip(rho, 0.8, 1.2)*A), epsilon = 0.2
+  rho  |  A=+1: term   d/d(rho) |  A=-1: term   d/d(rho)
+  0.5  |  +0.50       +1.0     |  -0.80       +0.0
+  0.7  |  +0.70       +1.0     |  -0.80       +0.0
+  0.9  |  +0.90       +1.0     |  -0.90       -1.0
+  1.0  |  +1.00       +1.0     |  -1.00       -1.0
+  1.1  |  +1.10       +1.0     |  -1.10       -1.0
+  1.3  |  +1.20       +0.0     |  -1.30       -1.0
+  1.5  |  +1.20       +0.0     |  -1.50       -1.0
+
+== 3. Equation 2, the k3 estimator: x - log x - 1 with x = pi_ref / pi_theta
+   x      k1 = -log x    k3 = x - log x - 1
+  0.25     +1.3863         0.6363
+  0.50     +0.6931         0.1931
+  0.90     +0.1054         0.0054
+  1.00     +0.0000         0.0000
+  1.10     -0.0953         0.0047
+  2.00     -0.6931         0.3069
+  4.00     -1.3863         1.6137
+pi_theta = [0.500, 0.200, 0.150, 0.100, 0.050]
+pi_ref   = [0.400, 0.300, 0.100, 0.100, 0.100]
+true KL(pi_theta || pi_ref) = sum pi_theta log(pi_theta/pi_ref) = 0.05664
+exact average of k3 under pi_theta                         = 0.05664
+100,000 tokens sampled from pi_theta: mean k1 0.05613 (std 0.3213, 25.0% of samples below 0)
+                                      mean k3 0.05662 (std 0.0659, smallest 0.0000)
+
+== 4. Method 1 (from scratch) vs Method 2 (TRL GRPOTrainer._compute_loss), same tensors
+advantages, ours: [0.866, -0.866, -0.866, 0.866, -0.500, -0.500, -0.500, 1.500]
+advantages, TRL:  [0.866, -0.866, -0.866, 0.866, -0.500, -0.500, -0.500, 1.500]
+max |difference| of advantages: 0.00e+00
+loss, ours: 0.09479159
+loss, TRL:  0.09479159
+|difference| of the loss: 0.00e+00; max |difference| of the gradients: 0.00e+00
+share of tokens in the flat (clipped) region: ours 0.1429, TRL metric 0.1429
+agree to 1e-6: True
+
+== 5. One ratio for a whole answer, or one per token
+each of 300 tokens has ratio 1.01: ratio of the whole answer = 1.01^300 = 19.79
+each of 300 tokens has ratio 0.99: ratio of the whole answer = 0.99^300 = 0.04904
+each of 1000 tokens has ratio 1.01: ratio of the whole answer = 1.01^1000 = 2.096e+04

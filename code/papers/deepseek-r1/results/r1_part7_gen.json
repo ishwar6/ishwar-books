@@ -1,0 +1,915 @@
+{
+ "greedy": {
+  "answers": 8,
+  "accuracy": 0.625,
+  "hit": 3,
+  "loops": 0,
+  "rep4": 0.27160563366986223,
+  "tail": 0.1832023575638507,
+  "tokens": 1532.75,
+  "ok_finished": 5,
+  "finished": 5,
+  "rows": [
+   {
+    "id": "test/precalculus/807.json",
+    "level": 2,
+    "outs": [
+     {
+      "tokens": 850,
+      "hit": false,
+      "rep4": 0.1298701298701299,
+      "tail": 0.10805500982318272,
+      "loop": null,
+      "ok": true,
+      "pred": "(3, \\frac{\\pi}{2})"
+     }
+    ]
+   },
+   {
+    "id": "test/intermediate_algebra/1994.json",
+    "level": 5,
+    "outs": [
+     {
+      "tokens": 2048,
+      "hit": true,
+      "rep4": 0.4342298288508557,
+      "tail": 0.2770137524557956,
+      "loop": null,
+      "ok": false,
+      "pred": null
+     }
+    ]
+   },
+   {
+    "id": "test/algebra/2584.json",
+    "level": 3,
+    "outs": [
+     {
+      "tokens": 1444,
+      "hit": false,
+      "rep4": 0.32130464954892435,
+      "tail": 0.34577603143418467,
+      "loop": null,
+      "ok": true,
+      "pred": "\\frac{14}{3}"
+     }
+    ]
+   },
+   {
+    "id": "test/number_theory/572.json",
+    "level": 3,
+    "outs": [
+     {
+      "tokens": 1874,
+      "hit": false,
+      "rep4": 0.22928915018706575,
+      "tail": 0.10805500982318272,
+      "loop": null,
+      "ok": true,
+      "pred": "9"
+     }
+    ]
+   },
+   {
+    "id": "test/prealgebra/1622.json",
+    "level": 2,
+    "outs": [
+     {
+      "tokens": 891,
+      "hit": false,
+      "rep4": 0.21959459459459463,
+      "tail": 0.16110019646365425,
+      "loop": null,
+      "ok": true,
+      "pred": "42"
+     }
+    ]
+   },
+   {
+    "id": "test/number_theory/515.json",
+    "level": 3,
+    "outs": [
+     {
+      "tokens": 2048,
+      "hit": true,
+      "rep4": 0.3408312958435208,
+      "tail": 0.17878192534381143,
+      "loop": null,
+      "ok": false,
+      "pred": "8"
+     }
+    ]
+   },
+   {
+    "id": "test/precalculus/927.json",
+    "level": 4,
+    "outs": [
+     {
+      "tokens": 2048,
+      "hit": true,
+      "rep4": 0.34621026894865525,
+      "tail": 0.15127701375245584,
+      "loop": null,
+      "ok": false,
+      "pred": "x = \\frac{k}{2}"
+     }
+    ]
+   },
+   {
+    "id": "test/algebra/2036.json",
+    "level": 3,
+    "outs": [
+     {
+      "tokens": 1059,
+      "hit": false,
+      "rep4": 0.1515151515151515,
+      "tail": 0.13555992141453832,
+      "loop": null,
+      "ok": true,
+      "pred": "3\\sqrt{13}"
+     }
+    ]
+   }
+  ]
+ },
+ "sample": {
+  "answers": 32,
+  "accuracy": 0.65625,
+  "hit": 11,
+  "loops": 0,
+  "rep4": 0.26139489810312483,
+  "tail": 0.19228880157170924,
+  "tokens": 1607.875,
+  "ok_finished": 21,
+  "finished": 21,
+  "rows": [
+   {
+    "id": "test/precalculus/807.json",
+    "level": 2,
+    "outs": [
+     {
+      "tokens": 869,
+      "hit": false,
+      "rep4": 0.11431870669745958,
+      "tail": 0.08251473477406679,
+      "loop": null,
+      "ok": true,
+      "pred": "(3, \\frac{\\pi}{2})"
+     },
+     {
+      "tokens": 1052,
+      "hit": false,
+      "rep4": 0.19447092469018112,
+      "tail": 0.16699410609037324,
+      "loop": null,
+      "ok": true,
+      "pred": "(3, \\frac{\\pi}{2})"
+     },
+     {
+      "tokens": 925,
+      "hit": false,
+      "rep4": 0.12039045553145333,
+      "tail": 0.0982318271119843,
+      "loop": null,
+      "ok": true,
+      "pred": "(3, \\frac{\\pi}{2})"
+     },
+     {
+      "tokens": 906,
+      "hit": false,
+      "rep4": 0.1727574750830565,
+      "tail": 0.13555992141453832,
+      "loop": null,
+      "ok": true,
+      "pred": "(3, \\frac{\\pi}{2})"
+     }
+    ]
+   },
+   {
+    "id": "test/intermediate_algebra/1994.json",
+    "level": 5,
+    "outs": [
+     {
+      "tokens": 2048,
+      "hit": true,
+      "rep4": 0.419559902200489,
+      "tail": 0.40667976424361496,
+      "loop": null,
+      "ok": false,
+      "pred": null
+     },
+     {
+      "tokens": 2048,
+      "hit": true,
+      "rep4": 0.42738386308068455,
+      "tail": 0.25343811394891946,
+      "loop": null,
+      "ok": false,
+      "pred": null
+     },
+     {
+      "tokens": 2048,
+      "hit": true,
+      "rep4": 0.3877750611246944,
+      "tail": 0.2239685658153242,
+      "loop": null,
+      "ok": false,
+      "pred": null
+     },
+     {
+      "tokens": 2048,
+      "hit": true,
+      "rep4": 0.45672371638141807,
+      "tail": 0.4420432220039293,
+      "loop": null,
+      "ok": false,
+      "pred": null
+     }
+    ]
+   },
+   {
+    "id": "test/algebra/2584.json",
+    "level": 3,
+    "outs": [
+     {
+      "tokens": 1635,
+      "hit": false,
+      "rep4": 0.28125,
+      "tail": 0.3045186640471512,
+      "loop": null,
+      "ok": true,
+      "pred": "\\frac{14}{3}"
+     },
+     {
+      "tokens": 1785,
+      "hit": false,
+      "rep4": 0.3406285072951739,
+      "tail": 0.3339882121807466,
+      "loop": null,
+      "ok": true,
+      "pred": "\\frac{14}{3}"
+     },
+     {
+      "tokens": 2048,
+      "hit": true,
+      "rep4": 0.3080684596577017,
+      "tail": 0.12377210216110024,
+      "loop": null,
+      "ok": false,
+      "pred": null
+     },
+     {
+      "tokens": 1773,
+      "hit": false,
+      "rep4": 0.384180790960452,
+      "tail": 0.34184675834970535,
+      "loop": null,
+      "ok": true,
+      "pred": "\\frac{14}{3}"
+     }
+    ]
+   },
+   {
+    "id": "test/number_theory/572.json",
+    "level": 3,
+    "outs": [
+     {
+      "tokens": 1639,
+      "hit": false,
+      "rep4": 0.19743276283618583,
+      "tail": 0.13163064833005889,
+      "loop": null,
+      "ok": true,
+      "pred": "9"
+     },
+     {
+      "tokens": 1338,
+      "hit": false,
+      "rep4": 0.19550561797752808,
+      "tail": 0.14341846758349708,
+      "loop": null,
+      "ok": true,
+      "pred": "9"
+     },
+     {
+      "tokens": 1366,
+      "hit": false,
+      "rep4": 0.22010271460014674,
+      "tail": 0.2298624754420432,
+      "loop": null,
+      "ok": true,
+      "pred": "9"
+     },
+     {
+      "tokens": 1922,
+      "hit": false,
+      "rep4": 0.2417926003126628,
+      "tail": 0.12377210216110024,
+      "loop": null,
+      "ok": true,
+      "pred": "9"
+     }
+    ]
+   },
+   {
+    "id": "test/prealgebra/1622.json",
+    "level": 2,
+    "outs": [
+     {
+      "tokens": 914,
+      "hit": false,
+      "rep4": 0.27442371020856204,
+      "tail": 0.2180746561886051,
+      "loop": null,
+      "ok": true,
+      "pred": "42"
+     },
+     {
+      "tokens": 1267,
+      "hit": false,
+      "rep4": 0.29193037974683544,
+      "tail": 0.2082514734774067,
+      "loop": null,
+      "ok": true,
+      "pred": "42"
+     },
+     {
+      "tokens": 868,
+      "hit": false,
+      "rep4": 0.18150289017341037,
+      "tail": 0.15520628683693516,
+      "loop": null,
+      "ok": true,
+      "pred": "42"
+     },
+     {
+      "tokens": 1109,
+      "hit": false,
+      "rep4": 0.2540687160940326,
+      "tail": 0.18271119842829076,
+      "loop": null,
+      "ok": true,
+      "pred": "42"
+     }
+    ]
+   },
+   {
+    "id": "test/number_theory/515.json",
+    "level": 3,
+    "outs": [
+     {
+      "tokens": 2048,
+      "hit": true,
+      "rep4": 0.3388753056234719,
+      "tail": 0.14538310412573674,
+      "loop": null,
+      "ok": false,
+      "pred": null
+     },
+     {
+      "tokens": 2048,
+      "hit": true,
+      "rep4": 0.33398533007334963,
+      "tail": 0.18860510805500985,
+      "loop": null,
+      "ok": false,
+      "pred": null
+     },
+     {
+      "tokens": 2048,
+      "hit": true,
+      "rep4": 0.3080684596577017,
+      "tail": 0.16699410609037324,
+      "loop": null,
+      "ok": false,
+      "pred": null
+     },
+     {
+      "tokens": 2048,
+      "hit": true,
+      "rep4": 0.20733496332518342,
+      "tail": 0.16110019646365425,
+      "loop": null,
+      "ok": false,
+      "pred": null
+     }
+    ]
+   },
+   {
+    "id": "test/precalculus/927.json",
+    "level": 4,
+    "outs": [
+     {
+      "tokens": 2048,
+      "hit": true,
+      "rep4": 0.2718826405867971,
+      "tail": 0.09037328094302555,
+      "loop": null,
+      "ok": false,
+      "pred": null
+     },
+     {
+      "tokens": 2048,
+      "hit": true,
+      "rep4": 0.23520782396088025,
+      "tail": 0.08251473477406679,
+      "loop": null,
+      "ok": false,
+      "pred": null
+     },
+     {
+      "tokens": 1997,
+      "hit": false,
+      "rep4": 0.2893681043129388,
+      "tail": 0.2554027504911591,
+      "loop": null,
+      "ok": true,
+      "pred": "90"
+     },
+     {
+      "tokens": 1641,
+      "hit": false,
+      "rep4": 0.24542124542124544,
+      "tail": 0.18860510805500985,
+      "loop": null,
+      "ok": true,
+      "pred": "90"
+     }
+    ]
+   },
+   {
+    "id": "test/algebra/2036.json",
+    "level": 3,
+    "outs": [
+     {
+      "tokens": 1841,
+      "hit": false,
+      "rep4": 0.20021762785636565,
+      "tail": 0.14538310412573674,
+      "loop": null,
+      "ok": true,
+      "pred": "3\\sqrt{13}"
+     },
+     {
+      "tokens": 1368,
+      "hit": false,
+      "rep4": 0.15457875457875458,
+      "tail": 0.12770137524557956,
+      "loop": null,
+      "ok": true,
+      "pred": "3\\sqrt{13}"
+     },
+     {
+      "tokens": 1403,
+      "hit": false,
+      "rep4": 0.14428571428571424,
+      "tail": 0.1257367387033399,
+      "loop": null,
+      "ok": true,
+      "pred": "3\\sqrt{13}"
+     },
+     {
+      "tokens": 1306,
+      "hit": false,
+      "rep4": 0.17114351496546432,
+      "tail": 0.168958742632613,
+      "loop": null,
+      "ok": true,
+      "pred": "3\\sqrt{13}"
+     }
+    ]
+   }
+  ],
+  "passk": {
+   "1": 0.65625,
+   "2": 0.7291666666666666,
+   "4": 0.75
+  },
+  "cons4": 0.75
+ },
+ "fewshot": {
+  "answers": 32,
+  "accuracy": 0.46875,
+  "hit": 17,
+  "loops": 0,
+  "rep4": 0.25860555014915143,
+  "tail": 0.18805255402750493,
+  "tokens": 1648.84375,
+  "ok_finished": 15,
+  "finished": 15,
+  "rows": [
+   {
+    "id": "test/precalculus/807.json",
+    "level": 2,
+    "outs": [
+     {
+      "tokens": 884,
+      "hit": false,
+      "rep4": 0.1271282633371169,
+      "tail": 0.11394891944990182,
+      "loop": null,
+      "ok": true,
+      "pred": "(3, \\frac{\\pi}{2})"
+     },
+     {
+      "tokens": 813,
+      "hit": false,
+      "rep4": 0.10617283950617284,
+      "tail": 0.08251473477406679,
+      "loop": null,
+      "ok": true,
+      "pred": "(3, \\frac{\\pi}{2})"
+     },
+     {
+      "tokens": 1008,
+      "hit": false,
+      "rep4": 0.15621890547263684,
+      "tail": 0.15127701375245584,
+      "loop": null,
+      "ok": true,
+      "pred": "(3, \\frac{\\pi}{2})"
+     },
+     {
+      "tokens": 926,
+      "hit": false,
+      "rep4": 0.12242686890574217,
+      "tail": 0.11001964636542239,
+      "loop": null,
+      "ok": true,
+      "pred": "(3, \\frac{\\pi}{2})"
+     }
+    ]
+   },
+   {
+    "id": "test/intermediate_algebra/1994.json",
+    "level": 5,
+    "outs": [
+     {
+      "tokens": 2048,
+      "hit": true,
+      "rep4": 0.34572127139364306,
+      "tail": 0.3889980353634578,
+      "loop": null,
+      "ok": false,
+      "pred": null
+     },
+     {
+      "tokens": 2048,
+      "hit": true,
+      "rep4": 0.42787286063569685,
+      "tail": 0.3555992141453831,
+      "loop": null,
+      "ok": false,
+      "pred": null
+     },
+     {
+      "tokens": 2048,
+      "hit": true,
+      "rep4": 0.4053789731051345,
+      "tail": 0.44007858546168954,
+      "loop": null,
+      "ok": false,
+      "pred": null
+     },
+     {
+      "tokens": 2048,
+      "hit": true,
+      "rep4": 0.31589242053789734,
+      "tail": 0.16699410609037324,
+      "loop": null,
+      "ok": false,
+      "pred": null
+     }
+    ]
+   },
+   {
+    "id": "test/algebra/2584.json",
+    "level": 3,
+    "outs": [
+     {
+      "tokens": 2048,
+      "hit": true,
+      "rep4": 0.2552567237163814,
+      "tail": 0.12966601178781922,
+      "loop": null,
+      "ok": false,
+      "pred": "2"
+     },
+     {
+      "tokens": 1622,
+      "hit": false,
+      "rep4": 0.35453983940704137,
+      "tail": 0.29862475442043224,
+      "loop": null,
+      "ok": true,
+      "pred": "\\frac{14}{3}"
+     },
+     {
+      "tokens": 1853,
+      "hit": false,
+      "rep4": 0.4151351351351351,
+      "tail": 0.38506876227897835,
+      "loop": null,
+      "ok": true,
+      "pred": "\\frac{14}{3}"
+     },
+     {
+      "tokens": 2048,
+      "hit": true,
+      "rep4": 0.3750611246943766,
+      "tail": 0.1905697445972495,
+      "loop": null,
+      "ok": false,
+      "pred": null
+     }
+    ]
+   },
+   {
+    "id": "test/number_theory/572.json",
+    "level": 3,
+    "outs": [
+     {
+      "tokens": 1376,
+      "hit": false,
+      "rep4": 0.2104879825200291,
+      "tail": 0.1905697445972495,
+      "loop": null,
+      "ok": true,
+      "pred": "9"
+     },
+     {
+      "tokens": 2048,
+      "hit": true,
+      "rep4": 0.22053789731051343,
+      "tail": 0.09626719056974464,
+      "loop": null,
+      "ok": false,
+      "pred": "(a+1)(b+1)\\cdots(k+1)"
+     },
+     {
+      "tokens": 1157,
+      "hit": false,
+      "rep4": 0.2305025996533796,
+      "tail": 0.2612966601178782,
+      "loop": null,
+      "ok": true,
+      "pred": "9"
+     },
+     {
+      "tokens": 2048,
+      "hit": true,
+      "rep4": 0.28459657701711494,
+      "tail": 0.2082514734774067,
+      "loop": null,
+      "ok": false,
+      "pred": "196"
+     }
+    ]
+   },
+   {
+    "id": "test/prealgebra/1622.json",
+    "level": 2,
+    "outs": [
+     {
+      "tokens": 946,
+      "hit": false,
+      "rep4": 0.24284199363732772,
+      "tail": 0.2298624754420432,
+      "loop": null,
+      "ok": true,
+      "pred": "42"
+     },
+     {
+      "tokens": 982,
+      "hit": false,
+      "rep4": 0.25434116445352395,
+      "tail": 0.1532416502946955,
+      "loop": null,
+      "ok": true,
+      "pred": "42"
+     },
+     {
+      "tokens": 740,
+      "hit": false,
+      "rep4": 0.19402985074626866,
+      "tail": 0.18860510805500985,
+      "loop": null,
+      "ok": true,
+      "pred": "42"
+     },
+     {
+      "tokens": 2048,
+      "hit": true,
+      "rep4": 0.32713936430317847,
+      "tail": 0.212180746561886,
+      "loop": null,
+      "ok": false,
+      "pred": null
+     }
+    ]
+   },
+   {
+    "id": "test/number_theory/515.json",
+    "level": 3,
+    "outs": [
+     {
+      "tokens": 2048,
+      "hit": true,
+      "rep4": 0.2875305623471882,
+      "tail": 0.11787819253438114,
+      "loop": null,
+      "ok": false,
+      "pred": null
+     },
+     {
+      "tokens": 2048,
+      "hit": true,
+      "rep4": 0.3212713936430318,
+      "tail": 0.18467583497053042,
+      "loop": null,
+      "ok": false,
+      "pred": null
+     },
+     {
+      "tokens": 2048,
+      "hit": true,
+      "rep4": 0.2400977995110024,
+      "tail": 0.13948919449901764,
+      "loop": null,
+      "ok": false,
+      "pred": null
+     },
+     {
+      "tokens": 2048,
+      "hit": true,
+      "rep4": 0.32762836185819066,
+      "tail": 0.19253438113948917,
+      "loop": null,
+      "ok": false,
+      "pred": null
+     }
+    ]
+   },
+   {
+    "id": "test/precalculus/927.json",
+    "level": 4,
+    "outs": [
+     {
+      "tokens": 2048,
+      "hit": true,
+      "rep4": 0.2425427872860636,
+      "tail": 0.18467583497053042,
+      "loop": null,
+      "ok": false,
+      "pred": "y = -s"
+     },
+     {
+      "tokens": 2048,
+      "hit": true,
+      "rep4": 0.2430317848410758,
+      "tail": 0.07465618860510803,
+      "loop": null,
+      "ok": false,
+      "pred": "2x = k"
+     },
+     {
+      "tokens": 2048,
+      "hit": true,
+      "rep4": 0.30024449877750614,
+      "tail": 0.17878192534381143,
+      "loop": null,
+      "ok": false,
+      "pred": null
+     },
+     {
+      "tokens": 2048,
+      "hit": true,
+      "rep4": 0.28166259168704155,
+      "tail": 0.14538310412573674,
+      "loop": null,
+      "ok": false,
+      "pred": null
+     }
+    ]
+   },
+   {
+    "id": "test/algebra/2036.json",
+    "level": 3,
+    "outs": [
+     {
+      "tokens": 1227,
+      "hit": false,
+      "rep4": 0.1576797385620915,
+      "tail": 0.0982318271119843,
+      "loop": null,
+      "ok": true,
+      "pred": "3\\sqrt{13}"
+     },
+     {
+      "tokens": 1635,
+      "hit": false,
+      "rep4": 0.18014705882352944,
+      "tail": 0.08644400785854622,
+      "loop": null,
+      "ok": true,
+      "pred": "3\\sqrt{13}"
+     },
+     {
+      "tokens": 1326,
+      "hit": false,
+      "rep4": 0.1504157218442933,
+      "tail": 0.13555992141453832,
+      "loop": null,
+      "ok": true,
+      "pred": "3\\sqrt{13}"
+     },
+     {
+      "tokens": 1452,
+      "hit": false,
+      "rep4": 0.17184265010351962,
+      "tail": 0.1257367387033399,
+      "loop": null,
+      "ok": true,
+      "pred": "3\\sqrt{13}"
+     }
+    ]
+   }
+  ],
+  "passk": {
+   "1": 0.46875,
+   "2": 0.5833333333333333,
+   "4": 0.625
+  },
+  "cons4": 0.625
+ },
+ "repeat": {
+  "greedy": {
+   "mean": 29.375,
+   "max": 52,
+   "over50": 1,
+   "n": 8
+  },
+  "sample": {
+   "mean": 23.9375,
+   "max": 48,
+   "over50": 0,
+   "n": 32
+  },
+  "fewshot": {
+   "mean": 22.6875,
+   "max": 52,
+   "over50": 1,
+   "n": 32
+  }
+ },
+ "repeat_example": {
+  "id": "test/precalculus/927.json",
+  "L": 52,
+  "first": 811,
+  "second": 912,
+  "text": "- \\(12 \\times \\frac{1}{6} = 2\\)\n- \\(12 \\times (-1) = -12\\)\n- \\(12 \\times (-\\frac{1}{4}) = -3\\)\n"
+ },
+ "tree": {
+  "L": 1997,
+  "m1": 182.08878968123585,
+  "m2": 182.08878968123585,
+  "go": 359.6910013008056,
+  "chess": 123.52544354802205,
+  "vocab": 10346.228082780453,
+  "median": 1.0,
+  "mean": 1.5858858742128585,
+  "p90": 3.0,
+  "p99": 7.0,
+  "max": 22,
+  "one": 0.7193500738552437,
+  "median_t1": 1.0,
+  "mean_t1": 2.6387895514265725,
+  "one_t1": 0.6093446318899168,
+  "hist": [
+   37012,
+   7785,
+   2976,
+   1624,
+   827,
+   477,
+   309,
+   140,
+   107,
+   60,
+   135
+  ],
+  "hist_t1": [
+   31352,
+   7524,
+   3601,
+   2114,
+   1465,
+   1036,
+   766,
+   590,
+   490,
+   373,
+   2141
+  ]
+ }
+}

@@ -1,0 +1,20 @@
+== Chain of thought and majority vote: Qwen/Qwen2.5-0.5B-Instruct, first 30 GSM8K test questions, device mps
+   direct: greedy, reply starts with 'The answer is ', max 16 new tokens; CoT: greedy, max 512; samples: 16 per question, temperature 0.7, max 512
+   question 1: Janet’s ducks lay 16 eggs per day. She eats three for breakfast every morning and bakes mu...  gold answer 18
+   direct reply : "384. Janet makes $384 every day at the farmers'"
+   CoT reply    : "To determine how much Janet makes at the farmers' market each day, we need to follow these steps:\n\n1. Calculate the total number of eggs laid by the d" ... "t makes at the farmers' market each day is:\n\\[\n\\boxed{14}\n\\]"
+
+                              our regex   math-verify   mean new tokens
+  direct answer (greedy)        1/30         1/30            7.9
+  step by step (greedy)        12/30        11/30          314.0
+  one sample (mean of 16)         7.8/30       7.2/30        342.1
+  majority vote of  1 samples    7/30
+  majority vote of  2 samples    7/30
+  majority vote of  4 samples   10/30
+  majority vote of  8 samples   11/30
+  majority vote of 16 samples   14/30
+  at least one of 16 right       21/30
+  vote by hand vs Counter: 0 differences over 5 values of k x 30 questions
+  regex vs math-verify: same verdict on 524 of 540 replies
+  example, question 17: gold 230; greedy CoT said 115; 16 samples said ['2', '2', '320', '294', '230', '460', '230', '230', '450', '240', '170', '185', '230', '150', '230', '80']; vote 230
+  generation time 540 s

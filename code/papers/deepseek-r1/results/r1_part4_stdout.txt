@@ -1,0 +1,52 @@
+AIME decoding noise on 30 fixed questions (each question p(1-p) <= 0.25): 1 sample per question, standard error at most 9.1 points; 16 independent samples per question, at most 2.3 points (an upper bound; it leaves out the noise of which 30 questions were chosen)
+20 MATH-500 problems x 8 samples, temperature 0.6, top-p 0.95, max_new_tokens 2048
+
+== Qwen2.5-Math-1.5B (base, R1-Zero template): 160 answers
+grading: ours and math-verify agree on 153/160; ours says 94 correct, math-verify 101 (we use math-verify)
+   differ: problem 388 gold '\\frac{11}{2}' pred '5.5' ours False math-verify True
+   differ: problem 388 gold '\\frac{11}{2}' pred '5.5' ours False math-verify True
+   differ: problem 388 gold '\\frac{11}{2}' pred '5.5' ours False math-verify True
+   differ: problem 388 gold '\\frac{11}{2}' pred '5.5' ours False math-verify True
+   differ: problem 388 gold '\\frac{11}{2}' pred '5.5' ours False math-verify True
+   differ: problem 456 gold '-2,1' pred '1, -2' ours False math-verify True
+   differ: problem 456 gold '-2,1' pred '1, -2' ours False math-verify True
+truncated at 2048 tokens: 12/160 (scored as wrong); finished but no final answer found: 11/160
+answers that finished inside 2048 tokens: 148/160, of which correct: 101/148 = 0.682
+pass@1 (mean of 8 samples per problem): Method 1 0.6312, Method 2 numpy 0.6312, agree: True
+cons@8 (majority vote): Method 1 0.7000 (14/20), Method 2 0.7500 (15/20)
+pass@8 (at least one of 8 correct): 0.8000 (16/20)
+correct answers out of 8, per problem: 8 6 8 6 6 7 6 7 1 8 6 6 0 7 0 8 5 0 0 6
+length (new tokens): mean 687, median 518; correct answers mean 502 (n=101), wrong answers mean 1005 (n=59), wrong and finished mean 739 (n=47)
+length histogram, bins of 256 tokens: correct [23, 38, 18, 14, 7, 1, 0, 0], wrong [8, 11, 7, 9, 5, 4, 0, 15]; numpy agrees: True
+reflection words, total over 160 answers: Method 1 {'wait': 0, 'let me check': 0, 'alternatively': 0, 're-evaluate': 0}
+                                              Method 2 {'wait': 0, 'let me check': 0, 'alternatively': 0, 're-evaluate': 0}, agree: True
+per answer: wait 0.00, let me check 0.00, alternatively 0.00, re-evaluate 0.00
+per 1,000 tokens: wait 0.00, let me check 0.00, alternatively 0.00, re-evaluate 0.00
+answers with at least one "wait": 0/160
+"wait" per answer: correct answers 0.00, wrong answers 0.00
+answers with any Chinese, Japanese or Korean character: 0/160
+GRPO view, groups with mixed results: positive-advantage answers mean length 609 (n=69), negative-advantage answers 785 (n=27)
+
+== DeepSeek-R1-Distill-Qwen-1.5B: 160 answers
+grading: ours and math-verify agree on 160/160; ours says 61 correct, math-verify 61 (we use math-verify)
+truncated at 2048 tokens: 96/160 (scored as wrong); finished but no final answer found: 0/160
+answers that finished inside 2048 tokens: 64/160, of which correct: 61/64 = 0.953
+pass@1 (mean of 8 samples per problem): Method 1 0.3812, Method 2 numpy 0.3812, agree: True
+cons@8 (majority vote): Method 1 0.6000 (12/20), Method 2 0.6000 (12/20)
+pass@8 (at least one of 8 correct): 0.6000 (12/20)
+correct answers out of 8, per problem: 5 7 3 0 0 8 3 2 0 8 2 6 0 8 0 5 0 0 0 4
+length (new tokens): mean 1834, median 2048; correct answers mean 1497 (n=61), wrong answers mean 2042 (n=99), wrong and finished mean 1865 (n=3)
+length histogram, bins of 256 tokens: correct [0, 0, 0, 3, 13, 20, 10, 15], wrong [0, 0, 0, 0, 0, 0, 1, 98]; numpy agrees: True
+reflection words, total over 160 answers: Method 1 {'wait': 719, 'let me check': 77, 'alternatively': 208, 're-evaluate': 0}
+                                              Method 2 {'wait': 719, 'let me check': 77, 'alternatively': 208, 're-evaluate': 0}, agree: True
+per answer: wait 4.49, let me check 0.48, alternatively 1.30, re-evaluate 0.00
+per 1,000 tokens: wait 2.45, let me check 0.26, alternatively 0.71, re-evaluate 0.00
+answers with at least one "wait": 159/160
+"wait" per answer: correct answers 3.00, wrong answers 5.41
+answers with any Chinese, Japanese or Korean character: 0/160
+GRPO view, groups with mixed results: positive-advantage answers mean length 1605 (n=37), negative-advantage answers 2048 (n=35)
+
+== a real "Wait" (distill, problem 20: 'Evaluate $(1+2i)6-3i$.', sample 2, 1579 tokens, final answer '6 + 9i', correct True)
+Another thought: if I were to write this out in terms of real and imaginary parts, the expression is (1*6 - 2i*6) - 3i, which is (6 - 12i) - 3i. Wait, hold on, that's a different approach. Is that correct?
+
+Wait, no, that's not right. Because when you have (1 + 2i)*6, it's 6*(1) + 6*(2i) = 6 + 12i. Then subtracting 3i, so 6 + 12i - 3i. So, that's 6 + (12i - 3i) = 6 + 9i. But if I distribute the multiplication first, maybe I can see another way. Let's think about it: 1*6 is 6, 2i*6 is 12i, so that's 6 + 12i. Then subtract 3i, so 6 + 12i - 3i is 6 + 9i.

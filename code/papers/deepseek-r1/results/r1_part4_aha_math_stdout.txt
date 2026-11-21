@@ -1,0 +1,16 @@
+equation: sqrt(a - sqrt(a + x)) = x, with a > 1
+after squaring twice (sympy): Eq(a**2 - 2*a*x**2 - a + x**4 - x, 0)
+factored (sympy):             Eq((-a + x**2 - x)*(-a + x**2 + x + 1), 0)
+sum of the 4 quartic roots (Vieta, minus the x^3 coefficient): 0  <- the tempting wrong answer
+a = 3: Method 1 candidates [1.0, -2.0, 2.3028, -1.3028], kept [1.0]
+        numpy.roots [2.3028, 1.0, -1.3028, -2.0], sum +0.0000; formula (sqrt(4a-3)-1)/2 = 1.0000
+a = 7: Method 1 candidates [2.0, -3.0, 3.1926, -2.1926], kept [2.0]
+        numpy.roots [3.1926, 2.0, -2.1926, -3.0], sum -0.0000; formula (sqrt(4a-3)-1)/2 = 2.0000
+a = 13: Method 1 candidates [3.0, -4.0, 4.1401, -3.1401], kept [3.0]
+        numpy.roots [4.1401, 3.0, -3.1401, -4.0], sum +0.0000; formula (sqrt(4a-3)-1)/2 = 3.0000
+a = 2.5: Method 1 candidates [0.8229, -1.8229, 2.1583, -1.1583], kept [0.8229]
+        numpy.roots [2.1583, 0.8229, -1.1583, -1.8229], sum -0.0000; formula (sqrt(4a-3)-1)/2 = 0.8229
+sympy solve for a = 3: [1]
+sympy: a + X = (u + 2)**2/4  so sqrt(a + X) = u/2 + 1 ; a - sqrt(a + X) = u**2/4  so the left side = u/2  and X = u/2
+sympy check: left side - X = 0  for every a > 1
+answer: the only real solution is x = (sqrt(4a - 3) - 1)/2, so the sum is (sqrt(4a - 3) - 1)/2

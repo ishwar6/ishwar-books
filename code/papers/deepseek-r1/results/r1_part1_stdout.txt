@@ -1,0 +1,292 @@
+== 1. The two models (float32 on mps)
+  deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B  params 1,777,088,000  layers 28  d_model 1536  heads 12  vocab 151,936
+  Qwen/Qwen2.5-Math-1.5B                     params 1,543,714,304  layers 28  d_model 1536  heads 12  vocab 151,936
+  same shapes: True; mean |difference| of one weight matrix (layer 0 up_proj): 0.00406
+
+== 2. Temperature and top-p on four toy logits
+  token   logit   p (T=1)   p (T=0.6)   after top-p 0.95   library
+  "18"     2.00     0.609       0.783              0.787     0.787
+  "9"      1.00     0.224       0.148              0.149     0.149
+  "16"     0.50     0.136       0.064              0.065     0.065
+  "2"     -1.00     0.030       0.005              0.000     0.000
+  top-p keeps 3 of 4 tokens; max |ours - library| = 6.0e-08
+
+  real logits: the first token the distilled model writes after the GSM8K prompt (vocabulary 151,936)
+    'Okay'         p (T=0.6) = 0.7923
+    'Alright'      p (T=0.6) = 0.2069
+    'First'        p (T=0.6) = 0.0006
+    'Hmm'          p (T=0.6) = 0.0001
+    'To'           p (T=0.6) = 0.0000
+  top-p 0.95 keeps 2 tokens of 151,936; max |ours - library| = 0.0e+00
+
+== 3. Greedy decoding, 128 new tokens: our loop (KV cache) against model.generate
+  our loop 128 tokens, generate 128 tokens, equal at 128 of 128 positions: True
+  first 12 tokens: ['Okay', ',', 'Ġso', 'ĠI', 'Ġneed', 'Ġto', 'Ġfigure', 'Ġout', 'Ġhow', 'Ġmuch', 'Ġmoney', 'ĠJanet']
+
+== 4. GSM8K test question 0, distilled model, our own sampling loop (T 0.6, top-p 0.95, seed 0, max 2,048 new tokens)
+  prompt (85 tokens): "<｜begin▁of▁sentence｜><｜User｜>Janet’s ducks lay 16 eggs per day. She eats three for breakfast every morning and bakes muffins for her friends every day with four. She sells the remainder at the farmers' market daily for $2 per fresh duck egg. How much in dollars does she make every day at the farmers' market?\nPlease reason step by step, and put your final answer within \\boxed{}.<｜Assistant｜><think>\n"
+  ---- output ----
+  | Okay, so Janet has ducks that lay 16 eggs every day. She eats three eggs for breakfast each morning and bakes muffins for her friends with four eggs each day. Then, she sells the remaining eggs at the farmers' market for $2 each. I need to figure out how much money she makes every day from selling these eggs.
+  | 
+  | First, let me break down the problem step by step. She has 16 eggs per day. That seems straightforward. Then, she uses some eggs for breakfast and some for muffins. The rest are sold at the market.
+  | 
+  | So, she eats 3 eggs every morning. There are 24 hours in a day, but since she eats breakfast every morning, which is 12 times a day, right? Because a day has 24 hours, so 24 divided by 2 is 12. So, she eats 3 eggs 12 times a day. Let me calculate how many eggs she eats for breakfast in a day.
+  | 
+  | That would be 3 eggs/morning * 12 mornings/day = 36 eggs.
+  | 
+  | Wait, hold on. That can't be right because she only has 16 eggs a day. If she eats 36 eggs for breakfast, that's way more than she has. That must be a mistake in my reasoning.
+  | 
+  | Let me rethink that. She eats 3 eggs for breakfast every morning. Since a day has 24 hours, but she only eats breakfast once a day. So, she eats 3 eggs once a day. So, that's 3 eggs.
+  | 
+  | Then, she bakes muffins with 4 eggs each day. So, 4 eggs for the muffins.
+  | 
+  | So, total eggs used for breakfast and muffins are 3 + 4 = 7 eggs per day.
+  | 
+  | Wait, but her ducks lay 16 eggs each day. So, 16 total eggs, minus 7 used for breakfast and muffins, would be 16 - 7 = 9 eggs left.
+  | 
+  | Then, she sells these 9 eggs at the farmers' market for $2 each. So, she makes 9 * $2 = $18 per day.
+  | 
+  | Wait, that seems like a lot. Let me confirm each step again.
+  | 
+  | Total eggs per day: 16.
+  | 
+  | Breakfast: 3 eggs.
+  | 
+  | Muffins: 4 eggs.
+  | 
+  | Total used: 3 + 4 = 7.
+  | 
+  | Remaining eggs: 16 - 7 = 9.
+  | 
+  | Selling each for $2: 9 * 2 = 18.
+  | 
+  | Hmm, so that's $18 per day. That seems correct.
+  | 
+  | Alternatively, maybe I should check if I considered breakfast correctly. If she has 16 eggs a day, and she uses 3 for breakfast each day, that's 3 eggs. Then, she uses 4 eggs for muffins. So, 3 + 4 = 7 eggs used. So, 16 - 7 = 9 eggs left. Then, 9 * 2 = 18.
+  | 
+  | Alternatively, is there a chance I miscounted the number of breakfasts? If she has 16 eggs, and eats 3 each morning, how many days does she eat breakfast? But since she's only eating breakfast once a day, regardless of how many eggs she has, she uses 3 eggs each day for breakfast.
+  | 
+  | Wait, but hold on, if she has 16 eggs, and she uses 3 for breakfast, then 16 - 3 = 13 eggs left. Then, she bakes muffins with 4 eggs. So, 13 - 4 = 9 eggs left. So, she sells 9 eggs for $2 each, making 18 dollars.
+  | 
+  | Wait, that's the same result.
+  | 
+  | Alternatively, maybe she uses 3 eggs for breakfast and 4 eggs for muffins, totaling 7 eggs, so 16 - 7 = 9, which is sold at $2 per egg, so 18.
+  | 
+  | So, I think that's correct.
+  | 
+  | But let me think another way: sometimes in word problems, it's easy to misinterpret. So, is it 3 eggs per day for breakfast, and 4 eggs per day for muffins? Yes, that's what the problem says. So, 3 + 4 = 7 per day, 16 - 7 = 9, 9 * 2 = 18.
+  | 
+  | Alternatively, is there a way that she could have more eggs? Or fewer?
+  | 
+  | Wait, the problem says she lays 16 eggs per day. So, that's fixed.
+  | 
+  | So, the total eggs used are 3 + 4 = 7, so 9 eggs left. 9 * 2 = 18.
+  | 
+  | So, I think that's the correct answer.
+  | 
+  | But let me just check if she can't have more eggs. Wait, 16 is the total, so 3 + 4 is 7, so 9 are left.
+  | 
+  | Alternatively, if she had more eggs, say, 20 eggs, then 3 for breakfast, 4 for muffins, 20 - 7 = 13, but in this case, it's 16, so 9.
+  | 
+  | So, I think 9 * 2 is 18.
+  | 
+  | Wait, but let me think about it again. If she's using 3 eggs for breakfast each morning, that's 3 eggs per day. And for the muffins, 4 eggs each day. So, 3 + 4 is 7 per day.
+  | 
+  | So, 16 - 7 is 9. So, 9 eggs per day left.
+  | 
+  | Then, she sells them for $2 each. So, 9 * 2 is 18.
+  | 
+  | Alternatively, if she sells all the eggs she can, but she can only sell the leftovers after breakfast and muffins. So, 16 - 7 = 9.
+  | 
+  | So, 9 * 2 = 18.
+  | 
+  | Therefore, the answer is 18 dollars.
+  | 
+  | But wait, hold on, the problem says she eats three for breakfast every morning and bakes muffins for her friends every day with four. So, is the four per day? So, 4 eggs per day for the muffins, not per breakfast.
+  | 
+  | So, that is, breakfast is 3 eggs per day, and muffins are 4 eggs per day.
+  | 
+  | So, total used is 7 per day, so 9 left, which is sold for $2 each.
+  | 
+  | So, 9 * 2 is 18.
+  | 
+  | Alternatively, perhaps I need to calculate how much she makes each day.
+  | 
+  | Wait, is the 4 eggs per day for the muffins, or is it 4 eggs per day in total, regardless of the breakfast?
+  | 
+  | Wait, the problem says: "she eats three for breakfast every morning and bakes muffins for her friends every day with four."
+  | 
+  | So, four eggs for the muffins each day.
+  | 
+  | So, yes, that's 4 per day.
+  | 
+  | So, 3 for breakfast, 4 for muffins, so 7 per day.
+  | 
+  | Therefore, 16 - 7 = 9, which is sold for $2 each, so 18.
+  | 
+  | So, I think that's correct.
+  | 
+  | Alternatively, is there another way to interpret it? Maybe she eats 3 eggs per day for breakfast, and then bakes 4 eggs for her friends each day, so 3 + 4 = 7 per day.
+  | 
+  | So, same as before.
+  | 
+  | Alternatively, maybe she uses 3 eggs for breakfast each morning, and 4 eggs for muffins each day. So, 3 + 4 = 7.
+  | 
+  | So, same result.
+  | 
+  | Therefore, 16 - 7 = 9, 9 * 2 = 18.
+  | 
+  | Therefore, I think the answer is 18 dollars.
+  | 
+  | Wait, but let me make sure that I didn't misinterpret the number of eggs.
+  | 
+  | The problem says: "she lays 16 eggs per day. She eats three for breakfast every morning. Bakes muffins for her friends every day with four. She sells the remainder at the farmers' market daily for $2 per fresh duck egg."
+  | 
+  | So, 16 eggs, 3 for breakfast, 4 for muffins, and sells the rest.
+  | 
+  | So, 16 - 3 - 4 = 9.
+  | 
+  | So, 9 * 2 = 18.
+  | 
+  | Alternatively, if she only uses 3 for breakfast and 4 for muffins, that's 7, so 16 - 7 = 9.
+  | 
+  | Therefore, 9 * 2 is 18.
+  | 
+  | I think that's correct.
+  | 
+  | Alternatively, maybe she uses 3 eggs per day for breakfast, and 4 eggs per day for muffins, so 7 per day, 16 - 7 = 9.
+  | 
+  | Therefore, 9 * 2 = 18.
+  | 
+  | Yes, so I think 18 is the correct amount.
+  | 
+  | Therefore, the answer is 18 dollars.
+  | 
+  | **Final Answer**
+  | \boxed{18}
+  | </think>
+  | 
+  | Janet’s ducks lay 16 eggs per day. She eats 3 eggs for breakfast every morning and 4 eggs for muffins every day. The remaining eggs are sold at the farmers' market for $2 each. 
+  | 
+  | First, we calculate the total number of eggs used for breakfast and muffins:
+  | - Breakfast: 3 eggs
+  | - Muffins: 4 eggs
+  | 
+  | Total eggs used per day:
+  | \[ 3 + 4 = 7 \text{ eggs} \]
+  | 
+  | Next, we determine the number of eggs left for sale:
+  | \[ 16 - 7 = 9 \text{ eggs} \]
+  | 
+  | These 9 eggs are sold at the farmers
+  ---- end ----
+  new tokens 2048 in 134.3 s (15.2 tokens/s); thinking tokens 1907; answer tokens 140; closed </think>: True
+  boxed answer None, gold '18'; correct (our checker) False; correct (math-verify) False
+
+== 5. The same question with model.generate (do_sample, T 0.6, top-p 0.95, seed 0, max 2,048 new tokens)
+  new tokens 872; thinking tokens 732; answer tokens 139; closed </think>: True
+  answer part: "Janet's ducks lay 16 eggs per day. She eats 3 eggs for breakfast every morning and bakes muffins for her friends using 4 eggs each day. \n\nTo find out how many eggs she has left for selling, we subtract the eggs used for breakfast and muffins from the total eggs:\n\n\\[\n16 - 3 - 4 = 9\n\\]\n\nEach of these 9 eggs sells for $2. Therefore, the total money she makes per day is:\n\n\\[\n9 \\times 2 = 18\n\\]\n\nThus, "
+  boxed answer '18'; correct (our checker) True; correct (math-verify) True
+
+== 6. The same question, the same words, base model Qwen2.5-Math-1.5B (no chat format; T 0.6, top-p 0.95, seed 0, max 1,024)
+  prompt (81 tokens): "Janet’s ducks lay 16 eggs per day. She eats three for breakfast every morning and bakes muffins for her friends every day with four. She sells the remainder at the farmers' market daily for $2 per fresh duck egg. How much in dollars does she make every day at the farmers' market?\nPlease reason step by step, and put your final answer within \\boxed{}.\n"
+  ---- output ----
+  | To determine how much Janet makes every day at the farmers' market, we need to follow these steps:
+  | 
+  | 1. Calculate the total number of eggs laid per day.
+  | 2. Subtract the number of eggs Janet eats for breakfast and the number of eggs she bakes for her friends.
+  | 3. Determine the number of remaining eggs that she sells at the farmers' market.
+  | 4. Calculate the total revenue from selling the remaining eggs.
+  | 
+  | Let's break it down step-by-step and implement it in Python:
+  | 
+  | 1. Janet's ducks lay 16 eggs per day.
+  | 2. Janet eats 3 eggs for breakfast every morning, so she eats 3 eggs per day.
+  | 3. Janet bakes 4 eggs for her friends every day, so she bakes 4 eggs per day.
+  | 4. The number of eggs remaining to be sold is \(16 - 3 - 4 = 9\) eggs per day.
+  | 5. Each egg is sold for $2, so the revenue per day is \(9 \times 2 = 18\) dollars.
+  | 
+  | Now let's implement this in Python to verify the result.
+  | ```python
+  | # Given data
+  | total_eggs_per_day = 16
+  | eggs_eaten_for_breakfast = 3
+  | eggs_baked_for_friends = 4
+  | price_per_egg = 2
+  | 
+  | # Calculate the remaining eggs after accounting for breakfast and baking
+  | remaining_eggs_per_day = total_eggs_per_day - eggs_eaten_for_breakfast - eggs_baked_for_friends
+  | 
+  | # Calculate the revenue from selling the remaining eggs
+  | revenue_per_day = remaining_eggs_per_day * price_per_egg
+  | 
+  | print(revenue_per_day)
+  | ```
+  | ```output
+  | 18
+  | ```
+  | The final answer is \(\boxed{18}\). Janet makes $18 every day at the farmers' market.<|endoftext|>
+  ---- end ----
+  new tokens 377; stopped by end-of-text: True; contains <think>: False; boxed answers found: ['18']
+  first boxed answer '18'; correct (our checker) True; correct (math-verify) True
+
+== 7. MATH-500 problem 10, 8 samples per model (T 0.6, top-p 0.95, seed 0): pass@1 and majority voting
+  problem: 'What is the least positive integer multiple of 30 that can be written with only the digits 0 and 2?'   gold answer: 2220
+  brute-force check of the gold answer: smallest multiple of 30 written with digits 0 and 2 only = 2220
+  -- distilled model, max 6,144 new tokens, 701 s for the batch of 8
+  sample 0:  6144 tokens, thinking     -, "Wait" x80  answer None         correct False (math-verify False)
+  sample 1:  6144 tokens, thinking     -, "Wait" x41  answer None         correct False (math-verify False)
+  sample 2:  5197 tokens, thinking  4759, "Wait" x33  answer '2220'       correct True (math-verify True)
+    ---- the end of its thinking, then its answer ----
+    | , so it's divisible by 30.
+    | 
+    | And it's the smallest such number because all smaller numbers made up of 0s and 2s either don't meet the divisibility rules or are not multiples of 30.
+    | 
+    | So, I think that's it. 2220 is the least positive integer multiple of 30 that can be written with only the digits 0 and 2.
+    | 
+    | **Final Answer**
+    | The least positive integer multiple of 30 that can be written with only the digits 0 and 2 is \boxed{2220}.
+    | </think>
+    | 
+    | To find the smallest positive integer multiple of 30 that can be written with only the digits 0 and 2, we need to ensure the number satisfies the divisibility rules for 2, 3, and 5.
+    | 
+    | 1. **Divisibility by 2 and 5**: The number must end in 0.
+    | 2. **Divisibility by 3**: The sum of the digits must be divisible by 3.
+    | 
+    | We start by checking the smallest numbers composed only of the digits 0 and 2:
+    | 
+    | - 20: Sum of digits is 2, not divisible by 3.
+    | - 200: Sum of digits is 2, not divisible by 3.
+    | - 202: Sum of digits is 4, not divisible by 3.
+    | - 220: Sum of digits is 4, not divisible by 3.
+    | - 222: Sum of digits is 6, which is divisible by 3, but 222 is not a multiple of 30.
+    | 
+    | Next, we consider four-digit numbers:
+    | 
+    | - 2020: Sum of digits is 4, not divisible by 3.
+    | - 2002: Sum of digits is 4, not divisible by 3.
+    | - 2022: Sum of digits is 6, which is divisible by 3, but 2022 is not a multiple of 30.
+    | - 2200: Sum of digits is 4, not divisible by 3.
+    | - 2202: Sum of digits is 6, which is divisible by 3, but 2202 is not a multiple of 30.
+    | - 2220: Sum of digits is 6, which is divisible by 3, and it ends in 0. Therefore, 2220 is a multiple of 30.
+    | 
+    | Thus, the smallest positive integer multiple of 30 that can be written with only the digits 0 and 2 is \(\boxed{2220}\).
+    ---- end ----
+  sample 3:  6144 tokens, thinking     -, "Wait" x62  answer None         correct False (math-verify False)
+  sample 4:  3465 tokens, thinking  3202, "Wait" x16  answer '2220'       correct True (math-verify True)
+  sample 5:  2202 tokens, thinking  1969, "Wait" x5   answer '2220'       correct True (math-verify True)
+  sample 6:  6144 tokens, thinking     -, "Wait" x19  answer None         correct False (math-verify False)
+  sample 7:  3624 tokens, thinking  3287, "Wait" x17  answer '2220'       correct True (math-verify True)
+  pass@1 = 4/8 = 0.500; votes {'2220': 4}; majority answer '2220'; majority correct: True
+  -- base model, max 1,024 new tokens, 48 s for the batch of 8
+  sample 0:   410 tokens, thinking     -, "Wait" x0   answer '2220'       correct True (math-verify True)
+  sample 1:   421 tokens, thinking     -, "Wait" x0   answer '2220'       correct True (math-verify True)
+  sample 2:   501 tokens, thinking     -, "Wait" x0   answer '2220'       correct True (math-verify True)
+  sample 3:   486 tokens, thinking     -, "Wait" x0   answer '210'        correct False (math-verify False)
+  sample 4:   196 tokens, thinking     -, "Wait" x0   answer '2220'       correct True (math-verify True)
+  sample 5:   461 tokens, thinking     -, "Wait" x0   answer '2220'       correct True (math-verify True)
+  sample 6:   371 tokens, thinking     -, "Wait" x0   answer '2220'       correct True (math-verify True)
+  sample 7:   589 tokens, thinking     -, "Wait" x0   answer '2220'       correct True (math-verify True)
+  pass@1 = 7/8 = 0.875; votes {'2220': 7, '210': 1}; majority answer '2220'; majority correct: True
+
+saved results/r1_part1.json

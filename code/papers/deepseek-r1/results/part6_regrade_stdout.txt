@@ -1,0 +1,11 @@
+$ python r1_part6_regrade.py
+== 128 saved answers (16 problems x 4 samples x 2 models), max 2048 new tokens
+== policy: cut off at the limit = wrong; distilled: grade only the text after </think>, no </think> = wrong
+base      pass@1 0.328 (21/64) | problems solved at least once 10/16 | level 1: 0.25, level 2: 0.29, level 3: 0.45
+          finished inside the limit 34/64 | closed </think> 0/64 | mean tokens 1263 (correct answers only: 538)
+          old grading (whole text, cut-off answers included): 24/64 = 0.375
+          kinder: finished answers graded at their first box: 21/64 = 0.328
+distilled pass@1 0.484 (31/64) | problems solved at least once 11/16 | level 1: 0.70, level 2: 0.38, level 3: 0.40
+          finished inside the limit 31/64 | closed </think> 36/64 | mean tokens 1693 (correct answers only: 1316)
+          old grading (whole text, cut-off answers included): 38/64 = 0.594
+distilled answers that finished: 31, of which correct: 31/31

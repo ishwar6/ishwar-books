@@ -1,0 +1,30 @@
+== 1. Next-token loss of Qwen2.5-0.5B (base model) on one sentence
+  sentence: 'The capital of France is Paris, and the capital of Italy is Rome.'
+  tokens T = 15, vocabulary V = 151,936, logits shape (15, 151936)
+  next token        p(next)   -log p
+  ' capital'         0.0001    9.317
+  ' of'              0.5409    0.614
+  ' France'          0.0416    3.179
+  ' is'              0.7210    0.327
+  ' Paris'           0.3156    1.153
+  ','                0.2210    1.509
+  ' and'             0.1819    1.705
+  ' the'             0.2121    1.551
+  ' capital'         0.1571    1.851
+  ' of'              0.9671    0.033
+  ' Italy'           0.0438    3.128
+  ' is'              0.9876    0.013
+  ' Rome'            0.9232    0.080
+  '.'                0.6554    0.423
+  mean loss, ours (Method 1)              : 1.7773
+  mean loss, F.cross_entropy (Method 2)    : 1.7773
+  mean loss, model(ids, labels=ids).loss   : 1.7773
+  max |ours - library| per token: 9.5e-07
+  perplexity exp(loss) = 5.91;  a uniform guess would give loss ln(V) = 11.93
+
+== 2. SFT loss: the same loss, only on the response tokens
+  prompt 13 tokens (label -100), response 18 tokens
+  SFT loss, ours (Method 1)                       : 0.5647
+  SFT loss, F.cross_entropy(ignore_index=-100)     : 0.5647
+  SFT loss, model(ids, labels=labels).loss         : 0.5647
+  loss on every token (prompt too), for comparison  : 1.1737

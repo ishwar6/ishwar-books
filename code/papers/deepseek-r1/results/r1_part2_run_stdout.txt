@@ -1,0 +1,69 @@
+model Qwen/Qwen2.5-0.5B-Instruct on mps, float32; G = 8, temperature 1.0, max_new_tokens 512
+checkpoint defaults: repetition_penalty 1.1, temperature 0.7, top_p 0.8, top_k 20
+sampling with: temperature 1.0, top_p 1.0, top_k 0, repetition_penalty 1.0 (plain softmax, the same distribution the log-probs use)
+
+== 1. Sample a group of 8 answers per question, reward 1 if the final answer is right
+question 0: gold 18; rewards [0, 0, 0, 0, 1, 1, 0, 0]; advantages [-0.54, -0.54, -0.54, -0.54, +1.62, +1.62, -0.54, -0.54]
+
+== 2. The group we train on: GSM8K test question 0
+question: Janet’s ducks lay 16 eggs per day. She eats three for breakfast every morning and bakes muffins for her friends every day with four. She sells the remainder at the farmers' market daily for $2 per fresh duck egg. How much in dollars does she make every day at the farmers' market?
+reference answer: 18
+answer 0: 177 tokens, final answer       26, reward 0, A -0.540
+answer 1: 316 tokens, final answer       14, reward 0, A -0.540
+answer 2: 336 tokens, final answer       41, reward 0, A -0.540
+answer 3: 296 tokens, final answer       34, reward 0, A -0.540
+answer 4: 347 tokens, final answer       18, reward 1, A +1.620
+answer 5: 280 tokens, final answer       18, reward 1, A +1.620
+answer 6: 371 tokens, final answer       14, reward 0, A -0.540
+answer 7: 430 tokens, final answer       16, reward 0, A -0.540
+
+answer 4 (right), last 220 characters: ..."er egg, the total revenue is:\n\\[ 9 \\text{ eggs} \\times 2 \\text{ dollars/egg} = 18 \\text{ dollars} \\]\n\nTherefore, the amount Janet makes every day from selling the leftover eggs at the farmers' market is:\n\\[\n\\boxed{18}\n\\]"
+answer 0 (wrong), last 220 characters: ..."\n\\[16 - 3 = 13\\]\n\nSince she sells these 13 eggs for $2 each, the total amount of money she makes every day is:\n\\[13 \\times 2 = 26\\]\n\nSo, the amount of money Janet makes every day at the farmers' market is:\n\\[\\boxed{26}\\]"
+
+== 3. Per-token log-probs, ratios and KL at the first step
+shapes: ids (8, 523), per-token log-probs (8, 430), mask (8, 430)
+answer 4, first 10 tokens and log pi_theta:
+  To:-0.10  _determine:-0.09  _how:-0.00  _much:-0.01  _Janet:-0.64  _makes:-0.03  _in:-2.26  _dollars:-0.04  _every:-0.09  _day:-0.00
+log pi_theta(o_i | q) of each whole answer (sum over its tokens): [-50.2, -96.9, -190.4, -162.6, -80.3, -80.3, -72.7, -137.9]
+ratios pi_theta / pi_theta_old on real tokens: min 1.0000, max 1.0000
+max |log pi_theta - log pi_ref| 7.58e-05; k3 KL mean over real tokens -4.79e-09 (0 up to float rounding)
+loss, ours +0.00000004; TRL +0.00000003; |difference| 7.5e-09
+mean of the advantages +3.0e-08: at ratio 1 the loss is -(1/G) sum A_i = 0, but its gradient is not 0
+
+agree to 1e-6: True
+
+== 4. One gradient step (AdamW) and its effect on the log-probability of each answer
+gradient norm 5.020
+-- learning rate 3e-06
+answer  reward      A     log pi before   log pi after   change
+    0       0   -0.540         -50.23         -96.30   -46.073
+    1       0   -0.540         -96.85        -130.27   -33.416
+    2       0   -0.540        -190.40        -260.61   -70.212
+    3       0   -0.540        -162.58        -208.30   -45.717
+    4       1   +1.620         -80.34         -54.61   +25.734
+    5       1   +1.620         -80.29         -49.25   +31.042
+    6       0   -0.540         -72.73         -99.04   -26.316
+    7       0   -0.540        -137.88        -168.37   -30.482
+right answers: mean change +28.388; wrong answers: mean change -42.036
+answer 4 (right): probability of the whole answer x1.5e+11
+-- learning rate 1e-07
+answer  reward      A     log pi before   log pi after   change
+    0       0   -0.540         -50.23         -51.66   -1.436
+    1       0   -0.540         -96.85         -97.39   -0.536
+    2       0   -0.540        -190.40        -192.30   -1.894
+    3       0   -0.540        -162.58        -163.85   -1.271
+    4       1   +1.620         -80.34         -78.57   +1.768
+    5       1   +1.620         -80.29         -78.32   +1.976
+    6       0   -0.540         -72.73         -73.09   -0.367
+    7       0   -0.540        -137.88        -138.45   -0.567
+right answers: mean change +1.872; wrong answers: mean change -1.012
+answer 4 (right): probability of the whole answer x5.861
+
+== 5. The same batch after the step with learning rate 1e-07: ratios move away from 1
+per-token ratios: min 0.6318, max 1.2368, outside [0.8, 1.2]: 0.12% of 2553 tokens
+answer 4: whole-answer ratio exp(sum of log ratios) = 5.861
+k3 KL to the reference, mean over real tokens: 2.10e-04
+loss at the second step, ours -0.00387105; TRL -0.00387105; |difference| 0.0e+00
+share of tokens in the flat (clipped) region, TRL metric: 0.12%
+(the loss went from +0.000000 to -0.003871)
+time 28 s

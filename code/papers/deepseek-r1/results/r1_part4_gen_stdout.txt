@@ -1,0 +1,8 @@
+MATH-500: 20 problems (seed 0), K = 8 samples each, temperature 0.6, top-p 0.95, max_new_tokens 2048, device mps
+levels: 3 3 4 4 5 2 4 5 4 3 4 5 5 5 5 2 1 5 5 4
+distill: batch 1/2: 80 answers, longest 2048 tokens, 362 s
+distill: batch 2/2: 80 answers, longest 2048 tokens, 359 s
+distill: 160 answers in 12.0 min -> r1_part4_gen_distill.jsonl
+base: batch 1/2: 80 answers, longest 2048 tokens, 350 s
+base: batch 2/2: 80 answers, longest 2048 tokens, 398 s
+base: 160 answers in 12.5 min -> r1_part4_gen_base.jsonl

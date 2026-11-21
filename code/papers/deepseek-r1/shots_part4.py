@@ -1,0 +1,77 @@
+"""Highlighted excerpts for Part 4: section 2.2.4 (performance, self-evolution, aha moment, drawback), Table 2,
+Figure 2, Figure 3, Table 3 of the v1 paper; the evaluation setup (page 12); two passages of the later long
+version (arXiv 2501.12948, later revision); and two passages of Liu et al. (2025), arXiv 2503.20783."""
+from paper_shots import run
+
+LONG = '2501.12948'      # the later long version of the same paper (86 pages)
+LIU = '2503.20783'       # Liu et al. (2025), Understanding R1-Zero-Like Training: A Critical Perspective
+
+JOBS = [
+    dict(name='p4-performance', page=5, anchor='Performance of DeepSeek-R1-Zero',
+         highlight=['steady and consistent enhancement', 'from an initial 15.6% to an impressive 71.0%',
+                    'comparable to OpenAI-o1-0912'],
+         above=4, end='performance over time.', column='full'),
+    dict(name='p4-eval-setup', page=11, anchor='Evaluation Setup',
+         highlight=['greedy decoding', 'higher repetition rates', 'sampling temperature of 0.6',
+                    'correctness of the', 'cons@64'],
+         above=4, end='denoted as cons@64.', column='full'),
+    dict(name='p4-table2', page=6, anchor='Table 2 | Comparison of DeepSeek-R1-Zero', figure=True,
+         highlight=['DeepSeek-R1-Zero 71.0 86.7 95.9 73.3 50.0 1444'], column='full', below=14),
+    dict(name='p4-majority', page=6, anchor='DeepSeek-R1-Zero to attain robust reasoning',
+         highlight=['without the need for any supervised', 'majority voting', 'from 71.0% to 86.7%'],
+         above=4, end='advancements in reasoning tasks.', column='full'),
+    dict(name='p4-figure2', page=6, anchor='Figure 2 | AIME accuracy of DeepSeek-R1-Zero during training', figure=True,
+         highlight=['we sample', '16 responses and calculate the overall average accuracy'], column='full', below=14, fig_top=236),
+    dict(name='p4-self-evolution', page=6, anchor='Self-evolution Process of DeepSeek-R1-Zero',
+         highlight=['initiating RL directly from the base model', 'without the influence of the supervised fine-tuning stage'],
+         above=4, end='shows consistent improve-', column='full'),
+    dict(name='p4-figure3', page=7, anchor='Figure 3 | The average response length of DeepSeek-R1-Zero', figure=True,
+         highlight=['naturally learns to solve reasoning tasks with more thinking time'], column='full', below=0),
+    dict(name='p4-thinking-time', page=7, anchor='ment throughout the training process',
+         highlight=['not the result of external adjustments', 'hundreds to thousands of reasoning tokens'],
+         above=4, end='in greater depth.', column='full'),
+    dict(name='p4-reflection', page=7, anchor='One of the most remarkable aspects',
+         highlight=['revisits and reevaluates its previous steps', 'exploration of alternative approaches',
+                    'not explicitly programmed'],
+         above=4, end='greater efficiency and accuracy.', column='full'),
+    dict(name='p4-aha', page=7, anchor='Aha Moment of DeepSeek-R1-Zero',
+         highlight=['intermediate version of the model', 'allocate more thinking time to a problem by reevaluating its initial',
+                    'approach'],
+         hl_nth={'approach': 0}, above=4, end='sophisticated outcomes.', column='full'),
+    dict(name='p4-aha-incentives', page=7, anchor='This moment is not only an',
+         highlight=['we simply provide it with the', 'right incentives'],
+         above=4, end='models in the future.', column='full'),
+    dict(name='p4-table3', page=8, anchor='Table 3 | An interesting', figure=True,
+         highlight=['That’s an aha moment I can flag here', 'reevaluate this step-by-step'], column='full', below=28, fig_top=240),
+    dict(name='p4-drawback', page=8, anchor='Drawback of DeepSeek-R1-Zero',
+         highlight=['poor readability', 'language mixing'],
+         above=4, end='cold-start data.', column='full'),
+    dict(name='p4-readability', page=9, anchor='Readability: A key limitation',
+         highlight=['often not suitable', 'mix multiple languages', 'lack markdown formatting'],
+         above=4, end='not reader-friendly.', column='full'),
+    # the later long version of the paper
+    dict(name='p4-later-limits', arxiv_id=LONG, page=2, anchor='To train DeepSeek-R1-Zero,',
+         highlight=['sample 16 outputs with a maximum length of 32,768 tokens', 'before the 8.2k step and 65,536 tokens afterward',
+                    'exhibit a significant jump at the 8.2k step', '10,400 steps'],
+         above=4, end='single inner epoch.', column='full'),
+    dict(name='p4-later-fig1', arxiv_id=LONG, page=3, anchor='Figure 1 | (a) AIME accuracy of DeepSeek-R1-Zero', figure=True,
+         highlight=['human participants in the AIME competition', 'more thinking time'], column='full', below=84),
+    dict(name='p4-later-779', arxiv_id=LONG, page=3, anchor='Figure 1(a) depicts the performance trajectory',
+         highlight=['from an initial 15.6% to 77.9%'], above=4, end='performance can be', column='full'),
+    dict(name='p4-later-reflection', arxiv_id=LONG, page=37, anchor='First, as shown in Figure 9(a)',
+         highlight=['rises 5- to 7-fold', 'nearly', 'absent during early training', 'significant spikes after step 8000'],
+         above=4, end='stages of development.', column='full'),
+    dict(name='p4-later-fig9', arxiv_id=LONG, page=38, anchor='Figure 9 | Evolution of reasoning behaviors', figure=True,
+         highlight=['Specific occurrence patterns of the word'], column='full', below=30),
+    # Liu et al. (2025)
+    dict(name='p4-liu-aha', arxiv_id=LIU, page=3, anchor='Aha Moment Already Appears in Base Models',
+         highlight=['already exhibit self-reflection keywords', 'DeepSeek-V3-Base also generates a decent amount',
+                    'of self-reflections', 'not positively correlated with higher accuracy'],
+         above=4, end='Sec. F.', column='full'),
+    dict(name='p4-liu-length', arxiv_id=LIU, page=5, anchor='Response-level length bias',
+         highlight=['longer responses are', 'penalized less due to their larger', 'lengthier responses'],
+         above=4, end='among incorrect ones.', column='full'),
+]
+
+if __name__ == '__main__':
+    run(JOBS)

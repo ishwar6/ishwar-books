@@ -1,0 +1,12 @@
+{
+ "7B policy": {
+  "PPO": 252.0,
+  "GRPO, reward model": 140.0,
+  "GRPO, rule rewards": 126.0
+ },
+ "DeepSeek-V3 size": {
+  "PPO": 24156.0,
+  "GRPO, reward model": 13420.0,
+  "GRPO, rule rewards": 12078.0
+ }
+}

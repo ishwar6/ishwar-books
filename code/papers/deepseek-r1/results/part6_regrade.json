@@ -1,0 +1,55 @@
+{
+ "summary": {
+  "base": {
+   "model": "base",
+   "pass1": 0.328125,
+   "correct": 21,
+   "samples": 64,
+   "solved_any": 10,
+   "mean_tokens": 1263.21875,
+   "mean_tokens_correct": 538.1428571428571,
+   "hit_limit": 30,
+   "by_level": {
+    "1": [
+     0.25,
+     5
+    ],
+    "2": [
+     0.2916666666666667,
+     6
+    ],
+    "3": [
+     0.45,
+     5
+    ]
+   },
+   "first_box_correct": 21
+  },
+  "distilled": {
+   "model": "distilled",
+   "pass1": 0.484375,
+   "correct": 31,
+   "samples": 64,
+   "solved_any": 11,
+   "mean_tokens": 1693.390625,
+   "mean_tokens_correct": 1315.9032258064517,
+   "hit_limit": 33,
+   "by_level": {
+    "1": [
+     0.7,
+     5
+    ],
+    "2": [
+     0.375,
+     6
+    ],
+    "3": [
+     0.4,
+     5
+    ]
+   }
+  }
+ },
+ "k": 4,
+ "max_new": 2048
+}

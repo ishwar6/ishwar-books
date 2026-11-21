@@ -1,0 +1,11 @@
+{
+ "same": true,
+ "prompt": "<\uff5cbegin\u2581of\u2581sentence\uff5c><\uff5cUser\uff5c>What is 15% of 80?<\uff5cAssistant\uff5c>\n\nThe answer is **12**.<\uff5cend\u2581of\u2581sentence\uff5c><\uff5cUser\uff5c>And 15% of 60?<\uff5cAssistant\uff5c><think>\n",
+ "n_tokens": 38,
+ "think_ids": [
+  151648
+ ],
+ "end_think_ids": [
+  151649
+ ]
+}

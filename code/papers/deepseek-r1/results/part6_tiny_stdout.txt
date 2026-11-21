@@ -1,0 +1,13 @@
+$ python r1_part6_tiny.py
+== 1. teacher deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B writes one trace per problem (128 GSM8K train problems, max 1024 tokens)
+== 0. teacher distribution at response position 444 (after " $18 every day at the farmers' market.\n\n"):
+   'Wait' 0.900, 'Let' 0.074, 'Hmm' 0.011, 'But' 0.005, 'Hold' 0.005; the trace has 'Wait' (p = 0.900)
+traces written 128, finished and correct (kept) 35, mean length of kept 835 tokens, 391 s
+== 3a. student Qwen/Qwen2.5-0.5B-Instruct before distillation (30 held-out GSM8K test problems x 2 samples)
+before  accuracy 0.450 (27/60) | mean tokens 328 | with </think> 0/60 | with "Wait" 0/60 | hit the limit 0/60
+== 2. SFT on the kept traces: 3 epochs, batch 1, AdamW, lr 1e-05 cosine to 1.0000000000000002e-06
+  step    1/105  loss 0.8382  (mean of last 1)  3 s
+  step   25/105  loss 0.7023  (mean of last 25)  52 s
+  step   50/105  loss 0.4550  (mean of last 25)  162 s
+  step   75/105  loss 0.3267  (mean of last 25)  476 s
+  step  100/105  loss 0.1719  (mean of last 25)  712 s

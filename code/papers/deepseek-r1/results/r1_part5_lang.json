@@ -1,0 +1,109 @@
+{
+ "cases": [
+  {
+   "case": "A: English question, English thinking",
+   "target": "en",
+   "n_target": 13,
+   "n_words": 13,
+   "reward": 1.0
+  },
+  {
+   "case": "B: English question, thinking drifts into Chinese",
+   "target": "en",
+   "n_target": 6,
+   "n_words": 11,
+   "reward": 0.5455
+  },
+  {
+   "case": "C: Chinese question, Chinese thinking with two English terms",
+   "target": "zh",
+   "n_target": 12,
+   "n_words": 14,
+   "reward": 0.8571
+  },
+  {
+   "case": "D: Chinese question, thinking all in English",
+   "target": "zh",
+   "n_target": 0,
+   "n_words": 9,
+   "reward": 0.0
+  }
+ ],
+ "group": [
+  {
+   "name": "right, English",
+   "accuracy": 1,
+   "language": 1.0,
+   "reward": 2.0,
+   "advantage": 1.0973
+  },
+  {
+   "name": "right, mixed",
+   "accuracy": 1,
+   "language": 0.5455,
+   "reward": 1.5455,
+   "advantage": 0.4495
+  },
+  {
+   "name": "wrong, English",
+   "accuracy": 0,
+   "language": 1.0,
+   "reward": 1.0,
+   "advantage": -0.328
+  },
+  {
+   "name": "wrong, mixed",
+   "accuracy": 0,
+   "language": 0.375,
+   "reward": 0.375,
+   "advantage": -1.2188
+  }
+ ],
+ "agree": true,
+ "split_B": [
+  [
+   "First",
+   "en"
+  ],
+  [
+   "of",
+   "en"
+  ],
+  [
+   "is",
+   "en"
+  ],
+  [
+   "\u7136",
+   "zh"
+  ],
+  [
+   "\u540e",
+   "zh"
+  ],
+  [
+   "\u662f",
+   "zh"
+  ],
+  [
+   "\u6240",
+   "zh"
+  ],
+  [
+   "\u4ee5",
+   "zh"
+  ],
+  [
+   "Let",
+   "en"
+  ],
+  [
+   "me",
+   "en"
+  ],
+  [
+   "check",
+   "en"
+  ]
+ ]
+}

@@ -1,0 +1,27 @@
+Method 1 (our scanner + unicodedata) and Method 2 (regex + Unicode scripts)
+
+tiny example: how Method 1 splits case B
+  words: First/en of/en is/en 然/zh 后/zh 是/zh 所/zh 以/zh Let/en me/en check/en
+
+A: English question, English thinking
+  target=en  method 1: 13/13 = 1.000   method 2: 13/13 = 1.000   agree: True
+B: English question, thinking drifts into Chinese
+  target=en  method 1: 6/11 = 0.545   method 2: 6/11 = 0.545   agree: True
+C: Chinese question, Chinese thinking with two English terms
+  target=zh  method 1: 12/14 = 0.857   method 2: 12/14 = 0.857   agree: True
+D: Chinese question, thinking all in English
+  target=zh  method 1: 0/9 = 0.000   method 2: 0/9 = 0.000   agree: True
+
+both methods agree on all 4 strings: True
+
+  unicodedata.name('a') = 'LATIN SMALL LETTER A'  -> en
+  unicodedata.name('然') = 'CJK UNIFIED IDEOGRAPH-7136'  -> zh
+  unicodedata.name('%') = 'PERCENT SIGN'  -> None
+
+final reward of §2.3.2 for a group of 4 answers to the English question (accuracy 1 or 0, plus language)
+  right, English  accuracy=1  language=1.000  reward=2.000  advantage=+1.097
+  right, mixed    accuracy=1  language=0.545  reward=1.545  advantage=+0.449
+  wrong, English  accuracy=0  language=1.000  reward=1.000  advantage=-0.328
+  wrong, mixed    accuracy=0  language=0.375  reward=0.375  advantage=-1.219
+  accuracy alone gives advantages +0.866, +0.866, -0.866, -0.866 : the two right answers look the same
+  (advantages from group_advantages() of r1_part2_grpo.py: std over G - 1, eps 1e-4)

@@ -1,0 +1,65 @@
+== 0. reward model loss for one human comparison (Bradley-Terry)
+r(chosen)=+1.2  r(rejected)=+0.4  P(chosen preferred)=0.690  loss ours=0.371  torch=0.371
+r(chosen)=+0.4  r(rejected)=+1.2  P(chosen preferred)=0.310  loss ours=1.171  torch=1.171
+r(chosen)=+3.0  r(rejected)=-3.0  P(chosen preferred)=0.998  loss ours=0.002  torch=0.002
+
+== 1a. extract the last box: a naive regex vs our brace counter
+'so the answer is \\boxed{18}.'                  naive regex: '18'                   ours: '18'
+'Thus $\\boxed{\\frac{\\sqrt{3}}{2}}$.'          naive regex: '\\frac{\\sqrt{3'      ours: '\\frac{\\sqrt{3}}{2}'
+'First \\boxed{4}, no wait: \\boxed{\\dfrac{3}{4}}' naive regex: '\\dfrac{3'            ours: '\\dfrac{3}{4}'
+'The answer is \\boxed{\\frac{1}{2}'             naive regex: '\\frac{1'             ours: None
+
+== 1b. accuracy reward on tricky pairs (the model output is "The answer is \boxed{<pred>}.")
+gold                 model answer            ours   lib  note
+\frac{1}{2}          0.5                        1     1  
+\dfrac{3}{4}         3/4                        1     1  
+-\frac{1}{2}         -0.5                       1     1  
+1000                 1,000                      1     1  
+18                   18 \text{ dollars}         1     1  
+18                   18 dollars                 1     0  DISAGREE
+3                    x = 3                      1     1  
+5                    \frac{10}{2}               1     1  
+1000                 10^{3}                     0     1  DISAGREE
+\frac{\sqrt{2}}{2}   \sqrt{2}/2                 0     1  DISAGREE
+50\%                 0.5                        0     1  DISAGREE
+\{1,2\}              \{2,1\}                    0     1  DISAGREE
+\frac{1}{3}          0.333                      0     0  
+2\pi                 6.28                       0     0  
+(1,2)                (2,1)                      0     0  
+the two methods agree on 10 of 15 pairs
+
+== 2. code reward: digit_sum(n), 5 hidden tests, 2 s limit
+correct            Method 1 (harness): reward 1  (all tests pass)
+drops a digit      Method 1 (harness): reward 0  (wrong: digit_sum(7) == 7)
+endless loop       Method 1 (harness): reward 0  (timeout)
+syntax error       Method 1 (harness): reward 0  (SyntaxError: expected ':')
+learned the tests  Method 1 (harness): reward 0  (wrong: digit_sum(99999) == 45)
+fakes the marker   Method 1 (harness): reward 0  (SystemExit: 0)
+correct            Method 2 (judge)  : reward 1  (5/5 cases)
+drops a digit      Method 2 (judge)  : reward 0  (1/5 cases)
+endless loop       Method 2 (judge)  : reward 0  (0/5 cases)
+syntax error       Method 2 (judge)  : reward 0  (0/5 cases)
+learned the tests  Method 2 (judge)  : reward 0  (3/5 cases)
+fakes the marker   Method 2 (judge)  : reward 0  (0/5 cases)
+the two code rewards agree on all 6 programs
+a grader that trusts a printed "ALL PASS": fakes the marker gets reward 1
+
+== 3. format reward: regex (Method 1) vs parser (Method 2)
+good                 regex 1  parser 1  (ok)
+no tags              regex 0  parser 0  (no tags)
+no answer tags       regex 0  parser 0  (tags: <think> </think>)
+text before          regex 0  parser 0  (text before <think>)
+text after           regex 0  parser 0  (text after </answer>)
+empty think          regex 1  parser 0  (empty think)   DISAGREE
+two think blocks     regex 1  parser 0  (tags: <think> </think> <think> </think> <answer> </answer>)   DISAGREE
+answer inside think  regex 1  parser 0  (tags: <think> <answer> </answer> </think> <answer> </answer>)   DISAGREE
+
+== 4. reward hacking on the duck-egg question (gold 18)
+honest answer          naive reward 1   strict reward 1   (75 characters)
+number spray 0..1000   naive reward 1   strict reward 0   (3947 characters)
+30 boxes 0..29         naive reward 1   strict reward 0   (331 characters)
+empty think            regex format 1   strict reward 0   (the strict reward runs the parser first)
+two think blocks       regex format 1   strict reward 0   (the strict reward runs the parser first)
+answer inside think    regex format 1   strict reward 0   (the strict reward runs the parser first)
+number spray on all 1319 GSM8K test questions: naive reward 1 on 1190 (90.2%), strict reward 1 on 0
+saved results/part3.json

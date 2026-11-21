@@ -1,0 +1,19 @@
+$ python r1_part6_eval.py
+== 16 MATH-500 problems (levels 1-3: 5 / 6 / 5), 4 samples each, T=0.6, top-p 0.95, max 2048 new tokens, bf16 on mps
+== Qwen/Qwen2.5-Math-1.5B
+  base      problems  1- 4: correct  5/16, mean tokens   1485
+  base      problems  5- 8: correct  3/16, mean tokens   1194
+  base      problems  9-12: correct 10/16, mean tokens   1321
+  base      problems 13-16: correct  6/16, mean tokens   1052
+  base      generation time 484 s on mps
+== deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B
+  distilled problems  1- 4: correct  7/16, mean tokens   1846
+  distilled problems  5- 8: correct  4/16, mean tokens   1961
+  distilled problems  9-12: correct 13/16, mean tokens   1550
+  distilled problems 13-16: correct 14/16, mean tokens   1417
+  distilled generation time 466 s on mps
+== summary (pass@1 = mean correctness over all samples)
+base      pass@1 0.375 (24/64) | problems solved at least once 10/16 | level 1: 0.35, level 2: 0.29, level 3: 0.50
+          mean tokens 1263 (correct answers only: 727) | hit the 2048-token limit 30/64 | has \boxed{} 40/64
+distilled pass@1 0.594 (38/64) | problems solved at least once 14/16 | level 1: 0.75, level 2: 0.50, level 3: 0.55
+          mean tokens 1693 (correct answers only: 1451) | hit the 2048-token limit 33/64 | has \boxed{} 36/64

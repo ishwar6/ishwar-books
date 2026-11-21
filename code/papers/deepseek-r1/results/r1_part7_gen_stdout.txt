@@ -1,0 +1,74 @@
+model deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B, device mps, bfloat16
+8 MATH-500 problems (the first 8 without a drawing), max_new_tokens 2048
+greedy: 1 answer each; sampling: 4 answers each at T=0.6, top-p=0.95
+
+== greedy
+  problem              lvl  gold            tokens  hit-limit  rep4   tail-rep4  loop  correct
+  test/precalculus/807   2  \left( 3, \f...   850    0/1      0.13   0.11       0/1   1/1
+  test/intermediate_al   5  p - q            2048    1/1      0.43   0.28       0/1   0/1
+  test/algebra/2584.js   3  \frac{14}{3}     1444    0/1      0.32   0.35       0/1   1/1
+  test/number_theory/5   3  9                1874    0/1      0.23   0.11       0/1   1/1
+  test/prealgebra/1622   2  42                891    0/1      0.22   0.16       0/1   1/1
+  test/number_theory/5   3  27               2048    1/1      0.34   0.18       0/1   0/1
+  test/precalculus/927   4  90^\circ         2048    1/1      0.35   0.15       0/1   0/1
+  test/algebra/2036.js   3  3\sqrt{13}       1059    0/1      0.15   0.14       0/1   1/1
+  total: 8 answers, correct 5/8 = 0.625, hit the 2048-token limit 3/8, loop at the end 0/8, mean tokens 1533
+  mean repeated 4-gram rate 0.272, in the last 512 tokens 0.183; correct among finished answers 5/5
+
+== sample
+  problem              lvl  gold            tokens  hit-limit  rep4   tail-rep4  loop  correct
+  test/precalculus/807   2  \left( 3, \f...   869    0/4      0.15   0.12       0/4   4/4
+  test/intermediate_al   5  p - q            2048    4/4      0.42   0.33       0/4   0/4
+  test/algebra/2584.js   3  \frac{14}{3}     1635    1/4      0.33   0.28       0/4   3/4
+  test/number_theory/5   3  9                1639    0/4      0.21   0.16       0/4   4/4
+  test/prealgebra/1622   2  42                914    0/4      0.25   0.19       0/4   4/4
+  test/number_theory/5   3  27               2048    4/4      0.30   0.17       0/4   0/4
+  test/precalculus/927   4  90^\circ         2048    2/4      0.26   0.15       0/4   2/4
+  test/algebra/2036.js   3  3\sqrt{13}       1841    0/4      0.17   0.14       0/4   4/4
+  total: 32 answers, correct 21/32 = 0.656, hit the 2048-token limit 11/32, loop at the end 0/32, mean tokens 1608
+  mean repeated 4-gram rate 0.261, in the last 512 tokens 0.192; correct among finished answers 21/21
+
+== fewshot
+  problem              lvl  gold            tokens  hit-limit  rep4   tail-rep4  loop  correct
+  test/precalculus/807   2  \left( 3, \f...   884    0/4      0.13   0.11       0/4   4/4
+  test/intermediate_al   5  p - q            2048    4/4      0.37   0.34       0/4   0/4
+  test/algebra/2584.js   3  \frac{14}{3}     2048    2/4      0.35   0.25       0/4   2/4
+  test/number_theory/5   3  9                1376    2/4      0.24   0.19       0/4   2/4
+  test/prealgebra/1622   2  42                946    1/4      0.25   0.20       0/4   3/4
+  test/number_theory/5   3  27               2048    4/4      0.29   0.16       0/4   0/4
+  test/precalculus/927   4  90^\circ         2048    4/4      0.27   0.15       0/4   0/4
+  test/algebra/2036.js   3  3\sqrt{13}       1227    0/4      0.17   0.11       0/4   4/4
+  total: 32 answers, correct 15/32 = 0.469, hit the 2048-token limit 17/32, loop at the end 0/32, mean tokens 1649
+  mean repeated 4-gram rate 0.259, in the last 512 tokens 0.188; correct among finished answers 15/15
+
+== sampled answers: pass@1, pass@k (unbiased, n = 4) and cons@4 (fraction credit on ties)
+  sample   pass@1 0.656  pass@2 0.729  pass@4 0.750  cons@4 0.750
+  fewshot  pass@1 0.469  pass@2 0.583  pass@4 0.625  cons@4 0.625
+  greedy   accuracy 0.625 (one answer per problem)
+
+== no greedy answer ended in a loop under this definition
+
+== longest block of tokens written twice in one answer
+  greedy   mean   29.4 tokens, max   52, answers with a block of 50+ tokens repeated: 1/8
+  sample   mean   23.9 tokens, max   48, answers with a block of 50+ tokens repeated: 0/32
+  fewshot  mean   22.7 tokens, max   52, answers with a block of 50+ tokens repeated: 1/32
+  greedy, problem test/precalculus/927.json: a block of 52 tokens at token 811 comes again at token 912:
+  | - \(12 \times \frac{1}{6} = 2\)
+  | - \(12 \times (-1) = -12\)
+  | - \(12 \times (-\frac{1}{4}) = -3\)
+
+== branching factor of a search over tokens (51,452 steps of 32 sampled answers)
+  vocabulary: 151,665 tokens in the tokenizer (151,936 rows in the output layer)
+  top-p 0.95 nucleus at T=0.6: median 1, mean 1.59, 90th pct 3, 99th pct 7, max 22, size 1 at 71.9% of steps
+  top-p 0.95 nucleus at T=1.0: median 1, mean 2.64, 90th pct 6, 99th pct 21, max 78, size 1 at 60.9% of steps
+  mean entropy at T=0.6: 0.233 nats
+
+== how many different answers could top-p sampling write? one answer (test/precalculus/927.json), 1997 tokens
+  Method 1 (sum of log10 of nucleus sizes):  10^182.1
+  Method 2 (exact product, count the digits): 183 digits = 10^182.1
+  Go, b = 250, d = 150:   250^150 = 10^359.7  (exact: 360 digits)
+  chess, b = 35, d = 80:  35^80 = 10^123.5  (exact: 124 digits)
+  whole vocabulary, 1997 tokens: 151,665^1997 = 10^10346
+  a tree of depth 150 with our median nucleus at T=0.6: 1^150 = 10^0.0
+
+saved results/r1_part7_gen.json

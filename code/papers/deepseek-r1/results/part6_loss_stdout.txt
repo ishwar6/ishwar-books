@@ -1,0 +1,50 @@
+$ python r1_part6.py
+== 1. one trace from DeepSeek-R1-Distill-Qwen-1.5B (GSM8K test #0, T=0.6, top-p 0.95, max 1024 new tokens)
+question: Janet’s ducks lay 16 eggs per day. She eats three for breakfast every morning and bakes muffins for her friends every day with four. She sells the remainder at the farmers' market daily for $2 per fresh duck egg. How much in dollars does she make every day at the farmers' market?
+gold answer: 18
+generated tokens: 872, finished with end token: True
+trace starts: "Okay, so I have this problem about Janet and her ducks. Let me try to break it down step by step. I need to figure out how much money Janet makes every day at the farmers' market. Hmm, let's see.\n\nFirst, the problem says"
+trace ends:   "ells for $2. Therefore, the total money she makes per day is:\n\n\\[\n9 \\times 2 = 18\n\\]\n\nThus, Janet makes \\(\\boxed{18}\\) dollars every day at the farmers' market."
+== 2. SFT loss of this example for the student Qwen2.5-Math-1.5B (fp32)
+tokens: 957 in total, 85 prompt tokens (label -100), 872 response tokens
+  position  82  token '<｜Assistant｜>'        label -100
+  position  83  token '<think>'              label -100
+  position  84  token '\n'                   label -100
+  position  85  token 'Okay'                 label 32313
+  position  86  token ','                    label 11
+  position  87  token ' so'                  label 773
+logits shape: (957, 151936)
+Method 1 (from scratch)        loss = 0.927018  over 872 tokens
+Method 2a (model(labels=...))  loss = 0.927019
+Method 2b (F.cross_entropy)    loss = 0.927019
+TRL tokenised example: same input ids as ours: True, same labels (prompt masked): True
+Method 2c (TRL SFTTrainer.compute_loss) loss = 0.927019
+largest difference between methods: 1.25e-06  (agree to 1e-5: True)
+first 12 response tokens and their loss under the student (nats):
+  'Okay':12.07  ',':0.17  ' so':3.67  ' I':4.01  ' have':2.57  ' this':3.09  ' problem':0.67  ' about':3.20  ' Janet':0.93  ' and':1.18  ' her':0.08  ' ducks':0.14
+== 3. per-token loss of R1 text under the base model and the distilled model (fp32)
+base model answer to the same question starts: "Janet's ducks lay 16 eggs per day. She eats 3 eggs for breakfast every morning and bakes 4 eggs for her friends. So the number of eggs she sells at the farmers'"
+our trace (R1-Distill-1.5B)      732 tokens | base: loss 0.973, perplexity   2.64 | distilled: loss 0.361, perplexity   1.43
+real R1 trace 1 (s1K-1.1)       1024 tokens | base: loss 0.480, perplexity   1.62 | distilled: loss 0.259, perplexity   1.30
+real R1 trace 2 (s1K-1.1)       1024 tokens | base: loss 1.476, perplexity   4.38 | distilled: loss 0.998, perplexity   2.71
+real R1 trace 3 (s1K-1.1)       1024 tokens | base: loss 0.701, perplexity   2.02 | distilled: loss 0.458, perplexity   1.58
+control: base model answer       107 tokens | base: loss 0.250, perplexity   1.28 | distilled: loss 0.809, perplexity   2.25
+same response token ids under both tokenizers: True (checked for every text)
+tokens of the real R1 traces with the largest gap (seen at least 5 times; mean loss base -> distilled):
+  'Okay'         x  5    6.36 ->  0.90
+  'First'        x  5    4.04 ->  0.34
+  ' have'        x  6    3.82 ->  0.97
+  ' right'       x  6    3.47 ->  1.13
+  ' Let'         x 10    3.39 ->  1.09
+  ' me'          x  8    2.74 ->  0.50
+  ' susceptible' x  6    2.22 ->  0.45
+  ' here'        x  5    3.70 ->  2.35
+  ' so'          x 10    1.90 ->  0.59
+  ' *'           x 11    1.38 ->  0.08
+  ' \n\n'        x  5    2.30 ->  1.00
+  ' that'        x 15    1.85 ->  0.61
+  word 'Wait': x2, base 13.71, distilled 4.03 nats
+  word ' wait': x1, base 4.02, distilled 0.79 nats
+  word ' Hmm': x3, base 11.75, distilled 1.00 nats
+  word 'Okay': x5, base 6.36, distilled 0.90 nats
+  word ' Let': x10, base 3.39, distilled 1.09 nats

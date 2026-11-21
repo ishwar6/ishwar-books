@@ -1,0 +1,46 @@
+{
+ "funnel": [
+  [
+   "sampled",
+   80
+  ],
+  [
+   "finished (</think> and an end token)",
+   42
+  ],
+  [
+   "correct (math-verify)",
+   41
+  ],
+  [
+   "no mixed language (language reward >= 0.99)",
+   41
+  ],
+  [
+   "no long paragraph (<= 120 words)",
+   40
+  ],
+  [
+   "no code block",
+   39
+  ]
+ ],
+ "disagree": 7,
+ "n_finished": 42,
+ "per_problem": {
+  "gsm8k-1275": 8,
+  "gsm8k-523": 7,
+  "gsm8k-734": 4,
+  "gsm8k-1085": 8,
+  "gsm8k-59": 7,
+  "math500-L1-362": 7,
+  "math500-L2-120": 0,
+  "math500-L3-396": 0,
+  "math500-L4-71": 0,
+  "math500-L5-166": 0
+ },
+ "thresholds": {
+  "long_para": 120,
+  "min_lang": 0.99
+ }
+}

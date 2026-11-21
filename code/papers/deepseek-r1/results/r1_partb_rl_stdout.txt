@@ -1,0 +1,48 @@
+== 1. REINFORCE: a policy picks one of 4 answers; only answer 2 is right (reward 1, else 0)
+  pi = [0.3875, 0.235, 0.1425, 0.235]   expected reward J = 0.1425
+  exact gradient dJ/dtheta = pi * (r - J) = [-0.0552, -0.0335, 0.1222, -0.0335]
+  grad log pi(a=2): ours [-0.3875, -0.235, 0.8575, -0.235]   autograd [-0.3875, -0.235, 0.8575, -0.235]
+  exact gradient by autograd           [-0.0552, -0.0335, 0.1222, -0.0335]
+  rewards +0, no baseline    : mean of 200,000 estimates [-0.0554, -0.0336, 0.1227, -0.0336]  variance 0.1221
+  rewards +0, baseline b = J : mean of 200,000 estimates [-0.0554, -0.0338, 0.1226, -0.0334]  variance 0.0961
+  rewards +5, no baseline    : mean of 200,000 estimates [-0.0554, -0.0272, 0.1254, -0.0428]  variance 19.5260
+  rewards +5, baseline b = J : mean of 200,000 estimates [-0.0554, -0.0338, 0.1226, -0.0334]  variance 0.0961
+  training: 300 steps, one sample per step, learning rate 0.1, 200 seeds; P(right answer) after the step
+  rewards +0, no baseline     : step 50 mean 0.332, step 300 mean 0.960, worst seed 0.950, seeds below 0.5 at the end 0/200
+  rewards +0, baseline        : step 50 mean 0.332, step 300 mean 0.959, worst seed 0.927, seeds below 0.5 at the end 0/200
+  rewards +5, no baseline     : step 50 mean 0.270, step 300 mean 0.428, worst seed 0.001, seeds below 0.5 at the end 112/200
+  rewards +5, baseline        : step 50 mean 0.333, step 300 mean 0.953, worst seed 0.872, seeds below 0.5 at the end 0/200
+
+== 2. Reward model (Bradley-Terry): loss = -log sigmoid(r(x, y_w) - r(x, y_l))
+  r_w = 1.2, r_l = 0.4: P(w beats l) = 0.690, loss ours 0.3711  logsigmoid 0.3711  BCE-with-logits 0.3711
+  r_w = 0.4, r_l = 1.2: P(w beats l) = 0.310, loss ours 1.1711  logsigmoid 1.1711  BCE-with-logits 1.1711
+  r_w = 3.0, r_l = 0.0: P(w beats l) = 0.953, loss ours 0.0486  logsigmoid 0.0486  BCE-with-logits 0.0486
+  ranking D > B > A > C -> 6 pairs: [('D', 'B'), ('D', 'A'), ('D', 'C'), ('B', 'A'), ('B', 'C'), ('A', 'C')]
+  learned scores {'A': -1.35, 'B': 1.35, 'C': -4.33, 'D': 4.33}, final loss 0.029
+  add 10 to every score: loss 0.029 (only differences count)
+
+== 3. RLHF reward with a per-token KL penalty: r_t = -beta * log(pi(t) / pi_ref(t)), plus r_RM at the end
+  beta = 0.02 (InstructGPT, App. C.4), reward model score 1.5 on the last token
+  token 1: pi 0.60  pi_ref 0.30  penalty ours -0.0139  torch -0.0139
+  token 2: pi 0.90  pi_ref 0.90  penalty ours -0.0000  torch -0.0000
+  token 3: pi 0.30  pi_ref 0.40  penalty ours +0.0058  torch +0.0058
+  total reward = 1.5 + (-0.0139 + -0.0000 + +0.0058) = 1.4919
+
+== 4. PPO clipped objective, epsilon = 0.2: min(ratio * A, clip(ratio, 0.8, 1.2) * A)
+  A = +1, ratio 0.5: unclipped +0.50  ours +0.50  torch +0.50  gradient +1
+  A = +1, ratio 0.9: unclipped +0.90  ours +0.90  torch +0.90  gradient +1
+  A = +1, ratio 1.0: unclipped +1.00  ours +1.00  torch +1.00  gradient +1
+  A = +1, ratio 1.1: unclipped +1.10  ours +1.10  torch +1.10  gradient +1
+  A = +1, ratio 1.5: unclipped +1.50  ours +1.20  torch +1.20  gradient +0
+  A = -1, ratio 0.5: unclipped -0.50  ours -0.80  torch -0.80  gradient +0
+  A = -1, ratio 0.9: unclipped -0.90  ours -0.90  torch -0.90  gradient -1
+  A = -1, ratio 1.0: unclipped -1.00  ours -1.00  torch -1.00  gradient -1
+  A = -1, ratio 1.1: unclipped -1.10  ours -1.10  torch -1.10  gradient -1
+  A = -1, ratio 1.5: unclipped -1.50  ours -1.50  torch -1.50  gradient -1
+
+== 5. Memory estimate for RLHF with PPO on a 7B policy (rule of thumb, not a measurement)
+  policy    :   112 GB  (trained)
+  critic    :   112 GB  (trained)
+  reference :    14 GB  (frozen)
+  reward    :    14 GB  (frozen)
+  total 252 GB; without the critic 140 GB (44% less), before activations and the KV cache of generation
