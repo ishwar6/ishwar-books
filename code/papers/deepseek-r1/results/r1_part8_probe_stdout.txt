@@ -1,0 +1,4 @@
+Qwen/Qwen2.5-0.5B: 96 samples, accuracy reward 0.010, format reward 0.021, mean length 198 tokens, 45 s
+  first sample: " How many separate questions do you have? Seems like there's one question here. User: The state of Virginia had 3.79 inches of rain in March, 4.5 inches of rain in April, 3.95 inches of rain in May, 3.09 inches of rain in June and 4.67 inches in July.  What is the average rainfall amount, in inches,"
+Qwen/Qwen2.5-0.5B-Instruct: 96 samples, accuracy reward 0.031, format reward 0.000, mean length 215 tokens, 44 s
+  first sample: ' To find the average rainfall amount in Virginia, I will add up all the amounts and then divide by the number of months.\nThought: I will add the amounts of rain so that I get a total. Then I can divide that total by the number of months.\nAnswer: 3.79 + 4.5 + 3.95 + 3.09 + 4.67 = 19.78 </answer>'

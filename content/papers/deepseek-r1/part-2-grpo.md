@@ -599,7 +599,7 @@ If we trained a second time on the same batch, as R1 does with its 16 mini-batch
 
 [![Terminal output of r1_part2_run.py: the sampled groups, rewards, advantages, log-probabilities, ratios, the loss and the effect of one step](/img/papers/deepseek-r1/r1_part2_run-run.png)](/img/papers/deepseek-r1/r1_part2_run-run.png)
 
-This is one step on one question. Part 8 (coming soon) runs the loop for many steps and trains a small model to reason. First, [Part 3](part-3-rewards-and-the-template.md) looks at where the rewards come from.
+This is one step on one question. [Part 8](part-8-train-a-reasoner-from-scratch.md) runs the loop for many steps and trains a small model to reason. First, [Part 3](part-3-rewards-and-the-template.md) looks at where the rewards come from.
 
 > [!TAKEAWAYS] Key takeaways
 > - The paper's three results (R1-Zero, R1 and the distilled models) all rest on one learning rule, GRPO.

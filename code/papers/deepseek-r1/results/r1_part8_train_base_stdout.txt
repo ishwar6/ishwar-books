@@ -1,0 +1,45 @@
+config: {"model": "Qwen/Qwen2.5-0.5B", "steps": 400, "minutes": 20.0, "questions": 4, "G": 8, "max_new_tokens": 300, "temperature": 1.0, "lr": 3e-06, "eps": 0.2, "beta": 0.04, "minibatches": 2, "micro": 8, "seed": 0}
+GSM8K: 7473 training questions, 200 held-out test questions; device mps
+BEFORE training: accuracy 0.100  format 0.355  mean length 98.9 tokens  (102 s)
+before: our accuracy rule and math_verify agree on 200 of 200 answers (both read the text inside the last answer tags)
+before: our format parser and an independent regular expression agree on 200 of 200 answers
+memory at the start: 1.6 GB
+step    1  reward 0.156  acc 0.000  format 0.156  length  139.9  kl 24.25661  clipped 0.0313  memory 1.5 GB  45 s
+step    2  reward 0.719  acc 0.156  format 0.562  length   46.5  kl 0.14335  clipped 0.0188  memory 1.1 GB  95 s
+step    3  reward 0.656  acc 0.000  format 0.656  length   47.3  kl 0.20922  clipped 0.0119  memory 1.2 GB  148 s
+step    4  reward 0.781  acc 0.031  format 0.750  length   22.1  kl 0.44341  clipped 0.0198  memory 1.2 GB  174 s
+step    5  reward 0.844  acc 0.000  format 0.844  length   26.6  kl 0.30624  clipped 0.0047  memory 1.2 GB  222 s
+step    6  reward 1.000  acc 0.062  format 0.938  length   18.5  kl 0.49940  clipped 0.0051  memory 1.2 GB  238 s
+step    7  reward 1.000  acc 0.000  format 1.000  length   19.6  kl 0.29634  clipped 0.0000  memory 1.2 GB  254 s
+step    8  reward 1.000  acc 0.000  format 1.000  length   26.6  kl 0.15158  clipped 0.0000  memory 1.2 GB  272 s
+step    9  reward 1.000  acc 0.156  format 0.844  length   48.8  kl 0.14999  clipped 0.0109  memory 1.2 GB  302 s
+step   10  reward 0.906  acc 0.031  format 0.875  length   79.1  kl 0.08293  clipped 0.0016  memory 1.2 GB  343 s
+step   11  reward 0.969  acc 0.062  format 0.906  length   66.1  kl 0.08693  clipped 0.0000  memory 1.2 GB  371 s
+step   12  reward 0.875  acc 0.000  format 0.875  length   64.7  kl 0.14322  clipped 0.0019  memory 1.2 GB  413 s
+step   13  reward 0.969  acc 0.094  format 0.875  length   60.6  kl 0.11781  clipped 0.0015  memory 1.2 GB  457 s
+step   14  reward 1.031  acc 0.062  format 0.969  length   50.9  kl 0.09942  clipped 0.0000  memory 1.2 GB  486 s
+step   15  reward 1.031  acc 0.094  format 0.938  length   42.9  kl 0.12095  clipped 0.0015  memory 1.2 GB  509 s
+step   16  reward 0.812  acc 0.031  format 0.781  length   44.8  kl 0.21039  clipped 0.0035  memory 1.2 GB  537 s
+step   17  reward 0.938  acc 0.000  format 0.938  length   49.7  kl 0.12700  clipped 0.0013  memory 1.3 GB  582 s
+step   18  reward 1.062  acc 0.094  format 0.969  length   44.9  kl 0.87025  clipped 0.0014  memory 1.3 GB  625 s
+step   19  reward 0.844  acc 0.000  format 0.844  length   67.4  kl 0.15157  clipped 0.0023  memory 1.3 GB  671 s
+step   20  reward 0.906  acc 0.062  format 0.844  length   49.9  kl 0.16265  clipped 0.0006  memory 1.3 GB  712 s
+step   21  reward 0.750  acc 0.062  format 0.688  length   73.8  kl 0.12645  clipped 0.0017  memory 1.2 GB  754 s
+step   22  reward 0.781  acc 0.062  format 0.719  length   53.8  kl 0.14275  clipped 0.0000  memory 1.2 GB  795 s
+step   23  reward 0.906  acc 0.031  format 0.875  length   43.6  kl 0.29467  clipped 0.0000  memory 1.2 GB  837 s
+step   24  reward 0.906  acc 0.031  format 0.875  length   52.2  kl 0.15646  clipped 0.0000  memory 1.2 GB  879 s
+step   25  reward 1.000  acc 0.062  format 0.938  length   35.6  kl 0.21327  clipped 0.0000  memory 1.2 GB  905 s
+step   26  reward 0.938  acc 0.000  format 0.938  length   30.7  kl 0.24392  clipped 0.0000  memory 1.2 GB  934 s
+step   27  reward 0.906  acc 0.000  format 0.906  length   37.4  kl 0.23229  clipped 0.0008  memory 1.2 GB  967 s
+step   28  reward 0.938  acc 0.031  format 0.906  length   41.4  kl 0.20466  clipped 0.0008  memory 1.3 GB  1005 s
+step   29  reward 0.969  acc 0.031  format 0.938  length   33.5  kl 0.20155  clipped 0.0019  memory 1.3 GB  1056 s
+step   30  reward 1.031  acc 0.094  format 0.938  length   34.5  kl 0.42559  clipped 0.0009  memory 1.3 GB  1086 s
+step   31  reward 0.906  acc 0.000  format 0.906  length   28.0  kl 0.28300  clipped 0.0011  memory 1.3 GB  1110 s
+step   32  reward 1.000  acc 0.031  format 0.969  length   23.8  kl 0.29326  clipped 0.0000  memory 1.3 GB  1126 s
+step   33  reward 1.031  acc 0.062  format 0.969  length   29.6  kl 0.25926  clipped 0.0042  memory 1.3 GB  1141 s
+step   34  reward 1.031  acc 0.062  format 0.969  length   44.8  kl 0.20420  clipped 0.0021  memory 1.3 GB  1184 s
+step   35  reward 0.906  acc 0.000  format 0.906  length   44.2  kl 0.16397  clipped 0.0007  memory 1.3 GB  1225 s
+time budget of 20.0 minutes reached after step 35
+AFTER training: accuracy 0.040  format 0.985  mean length 37.3 tokens  (51 s)
+after: our accuracy rule and math_verify agree on 200 of 200 answers (both read the text inside the last answer tags)
+after: our format parser and an independent regular expression agree on 200 of 200 answers

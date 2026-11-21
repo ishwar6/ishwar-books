@@ -1,0 +1,4 @@
+Qwen/Qwen2.5-0.5B: 96 samples, accuracy reward 0.021, format reward 0.115, mean length 137 tokens, 45 s
+  first sample: '<think> Average rainfall is calculated as the arithmetic mean of the amounts of rain received in the 5 months </think> <answer> 4.09 </answer>\n\n'
+Qwen/Qwen2.5-0.5B-Instruct: 96 samples, accuracy reward 0.052, format reward 0.427, mean length 141 tokens, 43 s
+  first sample: '<think> To find the average rainfall amount in Virginia, I first need to identify the total rainfall for all the months and then divide by the number of months. This can be done with the formula: (total rainfall) / (number of months) </think> <answer> 3.8 </answer>'

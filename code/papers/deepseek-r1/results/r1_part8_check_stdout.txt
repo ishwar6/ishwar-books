@@ -1,0 +1,67 @@
+== (a) the three equations on small numbers
+Eq. 3, rewards of one group: [2.0, 0.0, 1.0, 0.0]
+  mean 0.75  std (n - 1) 0.9574
+  advantages (ours)      : [1.3054, -0.7833, 0.2611, -0.7833]
+  advantages (statistics): [1.3054, -0.7833, 0.2611, -0.7833]
+  all four the same reward: [0.0, 0.0, 0.0, 0.0]
+Eq. 1 term, A = +1, ratio 1.5: min(+1.50, +1.20) = +1.20
+Eq. 1 term, A = +1, ratio 0.7: min(+0.70, +0.80) = +0.70
+Eq. 1 term, A = -1, ratio 0.5: min(-0.50, -0.80) = -0.80
+Eq. 1 term, A = -1, ratio 1.3: min(-1.30, -1.20) = -1.30
+  clipped? A = +1, ratio 1.5: yes
+  clipped? A = +1, ratio 0.7: no
+  clipped? A = -1, ratio 0.5: yes
+  clipped? A = -1, ratio 1.3: no
+Eq. 2, pi_ref 0.5, pi_theta 0.5: 1.0000 - ln 1.0000 - 1 = 0.00000
+Eq. 2, pi_ref 0.5, pi_theta 0.6: 0.8333 - ln 0.8333 - 1 = 0.01565
+Eq. 2, pi_ref 0.5, pi_theta 0.4: 1.2500 - ln 1.2500 - 1 = 0.02686
+Eq. 2, pi_ref 0.5, pi_theta 0.9: 0.5556 - ln 0.5556 - 1 = 0.14334
+A = 0, pi_theta 0.6, pi_ref 0.5, beta 0.04: gradient of the loss on log pi_theta = 0.006667
+
+== (c) the reward rules and the completion mask on hand-made cases
+accuracy, answer             '18' gold   18: value    18  reward 1
+accuracy, answer      '$1,250.00' gold 1250: value  1250  reward 1
+accuracy, answer      '3 + 4 = 7' gold    7: value     7  reward 1
+accuracy, answer            '1/2' gold    2: value   1/2  reward 0
+accuracy, answer            '1e3' gold    3: value  1000  reward 0
+accuracy, answer  '\\boxed{36/2}' gold   18: value    18  reward 1
+accuracy, answer         '10 - 2' gold    8: value  None  reward 0
+accuracy, answer            '2^3' gold    8: value  None  reward 0
+format 1: '<think> 2 + 3 = 5 </think> <answer> 5 </answer>'
+format 0: '<think> </think><answer> </answer>'
+format 0: '<think> a </think><think> b </think><answer> 5 </answer>'
+format 0: '<think> a </think><answer> 5 </answer> more'
+format 0: '<think> a <answer> 5 </answer>'
+mask, stopped on </answer>, then 2 padding tokens: tokens [' ', '5', ' </', 'answer', '>', '<|endoftext|>', '<|endoftext|>'] -> [1, 1, 1, 1, 1, 0, 0]
+mask, stopped on a sampled <|im_end|>, then 1 padding token: tokens [' ', '5', '<|im_end|>', '<|endoftext|>'] -> [1, 1, 1, 0]
+mask, hit the length limit: tokens [' ', '5', ' is', ' the', ' answer'] -> [1, 1, 1, 1, 1]
+
+== (b) our loss against TRL on one fixed batch
+rewards our rules give these 8 answers: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+batch: 2 questions x 4 completions, completion tensor (8, 96), 694 real completion tokens
+fixed rewards used for the check: [2.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 2.0]
+advantages: [1.3054, -0.7833, 0.2611, -0.7833, 0.0, 0.0, -1.2246, 1.2246]
+epsilon 0.2, beta 0.04, TRL use_bias_correction_kl=False:
+  tokens clipped, ours 0.0202, TRL clip_ratio/region_mean 0.0202
+  mean KL per token, ours 0.273503, TRL kl 0.273503
+  loss, ours: +64.69831085
+  loss, TRL 1.18.2 GRPOTrainer._compute_loss: +64.69834900
+  |difference|: loss 3.81e-05, per-token log-probs 1.30e-06, gradient of lm_head 1.29e-02
+  relative difference of the two losses: 5.9e-07
+  our loss on the log-probs TRL computed: +64.69834900, |difference| from TRL 0.00e+00
+epsilon 0.02, beta 0.04, TRL use_bias_correction_kl=False:
+  tokens clipped, ours 0.1254, TRL clip_ratio/region_mean 0.1254
+  mean KL per token, ours 0.273503, TRL kl 0.273503
+  loss, ours: +64.70719147
+  loss, TRL 1.18.2 GRPOTrainer._compute_loss: +64.70722961
+  |difference|: loss 3.81e-05, per-token log-probs 1.30e-06, gradient of lm_head 8.20e-03
+  relative difference of the two losses: 5.9e-07
+  our loss on the log-probs TRL computed: +64.70722961, |difference| from TRL 0.00e+00
+epsilon 0.2, beta 0.04, TRL use_bias_correction_kl=True:
+  tokens clipped, ours 0.0202, TRL clip_ratio/region_mean 0.0202
+  mean KL per token, ours 0.273503, TRL kl 9.148457
+  loss, ours: +64.69831085
+  loss, TRL 1.18.2 GRPOTrainer._compute_loss: +65.01915741
+  |difference|: loss 3.21e-01, per-token log-probs 1.30e-06, gradient of lm_head 1.50e+02
+  relative difference of the two losses: 4.9e-03
+  our loss on the log-probs TRL computed: +64.69834900, |difference| from TRL 3.21e-01

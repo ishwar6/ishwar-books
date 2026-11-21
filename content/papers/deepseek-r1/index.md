@@ -44,7 +44,7 @@ Each part follows the paper's own sections:
 5. **[The R1 Pipeline](part-5-the-r1-pipeline.md)**: §2.3. Cold-start data, reasoning RL with a language reward, rejection sampling, and the last RL stage for all tasks.
 6. **[Distillation](part-6-distillation.md)**: §2.4, §3.2, §4.1, Tables 5 and 6. Teaching small models with R1's answers, and why this beat RL on the small model.
 7. **[Results, Failures and Limits](part-7-results-failures-and-limits.md)**: §3, §3.1, §4.2, §5 and Table 4. How the models are scored, what the results show, what did not work, and what is still open.
-8. **Train a Reasoner from Scratch** (coming soon): the whole method in one short Python package. We write GRPO and the rewards ourselves and train a small model to reason on a laptop.
+8. **[Train a Reasoner from Scratch](part-8-train-a-reasoner-from-scratch.md)**: the whole method in one short Python package. We write GRPO and the rewards ourselves and train a small model to reason on a laptop.
 
 ## How to read the boxes
 

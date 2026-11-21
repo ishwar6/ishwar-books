@@ -1,0 +1,24 @@
+minute   0.0  after step    0  footprint   5.1 GB
+minute   1.0  after step    0  footprint   4.7 GB
+minute   2.0  after step    0  footprint  27.0 GB
+minute   3.0  after step    1  footprint  33.0 GB
+minute   4.0  after step    3  footprint  23.0 GB
+minute   5.0  after step    4  footprint  30.0 GB
+minute   6.0  after step    8  footprint  21.0 GB
+minute   7.0  after step    9  footprint  29.0 GB
+minute   8.0  after step   11  footprint  24.0 GB
+minute   9.0  after step   12  footprint  32.0 GB
+minute  10.0  after step   15  footprint  24.0 GB
+minute  11.0  after step   16  footprint  30.0 GB
+minute  12.0  after step   18  footprint  24.0 GB
+minute  13.0  after step   19  footprint  32.0 GB
+minute  14.0  after step   21  footprint  23.0 GB
+minute  15.0  after step   22  footprint  27.0 GB
+minute  16.0  after step   23  footprint  32.0 GB
+minute  17.0  after step   26  footprint  23.0 GB
+minute  18.0  after step   27  footprint  26.0 GB
+minute  19.0  after step   29  footprint  24.0 GB
+minute  20.0  after step   31  footprint  24.0 GB
+minute  21.0  after step   33  footprint  31.0 GB
+minute  22.0  after step   35  footprint  24.0 GB
+training process ended
