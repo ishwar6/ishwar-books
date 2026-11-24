@@ -56,7 +56,6 @@ export default function Layout() {
             <NavLink to="/demos">Demos</NavLink>
             <NavLink to="/videos">Videos</NavLink>
             <NavLink to="/map">Map</NavLink>
-            <NavLink to="/projects">Projects</NavLink>
             <NavLink to="/about">About</NavLink>
           </nav>
           <div className="header-actions">
@@ -95,7 +94,6 @@ export default function Layout() {
               <Link to="/demos">Interactive demos</Link>
               <Link to="/videos">Videos ({videos.length})</Link>
               <Link to="/map">Topic map</Link>
-              <Link to="/projects">Projects</Link>
             </div>
             <div>
               <h4>Connect</h4>

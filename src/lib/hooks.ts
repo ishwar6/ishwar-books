@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom'
 import { books, papers, videos, writings } from './content'
 import { applyHead, loadHead, type HeadNode } from './seo-head'
 
-const routes = new Set(['', 'writings', 'books', 'papers', 'videos', 'demos', 'map', 'projects', 'about',
+const routes = new Set(['', 'writings', 'books', 'papers', 'videos', 'demos', 'map', 'about',
   ...writings.map((p) => p.route), ...videos.map((p) => p.route),
   ...books.flatMap((b) => [`books/${b.slug}`, ...b.chapters.map((c) => c.route)]),
   ...papers.flatMap((p) => [p.route, ...p.parts.map((x) => x.route), ...(p.demo ? [`${p.route}/demo`] : []), ...(p.reader ? [`${p.route}/read`] : [])]),

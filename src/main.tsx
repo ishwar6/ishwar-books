@@ -13,7 +13,6 @@ import Post from './pages/Post'
 import Books from './pages/Books'
 import Book from './pages/Book'
 import Chapter from './pages/Chapter'
-import Projects from './pages/Projects'
 import TopicMap from './pages/Map'
 import About from './pages/About'
 import Videos from './pages/Videos'
@@ -46,7 +45,6 @@ createRoot(document.getElementById('root')!).render(
           <Route path="papers/:paper/:part" element={<PaperPart />} />
           <Route path="videos" element={<Videos />} />
           <Route path="videos/:slug" element={<Video />} />
-          <Route path="projects" element={<Projects />} />
           <Route path="map" element={<TopicMap />} />
           <Route path="about" element={<About />} />
           <Route path="*" element={<NotFound />} />

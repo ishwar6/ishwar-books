@@ -58,7 +58,7 @@ const crumbs = (items) => ({
 // ---------------------------------------------------------------- page definitions
 const pages = []
 const papers = manifest.papers ?? []
-const nav = `<nav><a href="${BASE}">Home</a> · <a href="${BASE}writings/">Writings</a> · <a href="${BASE}books/">Books</a> · <a href="${BASE}papers/">Research papers</a> · <a href="${BASE}demos/">Demos</a> · <a href="${BASE}videos/">Videos</a> · <a href="${BASE}map/">Topic map</a> · <a href="${BASE}projects/">Projects</a> · <a href="${BASE}about/">About</a></nav>`
+const nav = `<nav><a href="${BASE}">Home</a> · <a href="${BASE}writings/">Writings</a> · <a href="${BASE}books/">Books</a> · <a href="${BASE}papers/">Research papers</a> · <a href="${BASE}demos/">Demos</a> · <a href="${BASE}videos/">Videos</a> · <a href="${BASE}map/">Topic map</a> · <a href="${BASE}about/">About</a></nav>`
 const list = (items) => `<ul>${items.map(([href, title, desc]) => `<li><a href="${href}">${esc(title)}</a>${desc ? `<p>${esc(desc)}</p>` : ''}</li>`).join('')}</ul>`
 
 pages.push({
@@ -68,8 +68,7 @@ pages.push({
     <h2>Writings</h2>${list(manifest.writings.map((w) => [`${BASE}${w.route}/`, w.title, w.description]))}
     <h2>Videos</h2>${list((manifest.videos ?? []).map((v) => [`${BASE}${v.route}/`, v.title, v.description]))}
     <h2>Research papers</h2>${list(papers.map((p) => [`${BASE}${p.route}/`, `${p.short}, explained`, p.description]))}
-    <h2>Books</h2>${list(manifest.books.map((b) => [`${BASE}books/${b.slug}/`, b.title, b.description]))}
-    <h2>Projects</h2>${list(projects.map((p) => [`${BASE}projects/`, p.name, p.tagline]))}`,
+    <h2>Books</h2>${list(manifest.books.map((b) => [`${BASE}books/${b.slug}/`, b.title, b.description]))}`,
 })
 pages.push({
   route: 'writings', title: `Writings · ${site.name}`,
@@ -84,15 +83,6 @@ pages.push({
   image: ogImage('site'), type: 'website',
   ld: [{ '@type': 'CollectionPage', name: 'Books', url: url('books') }, crumbs([['Home', ''], ['Books', 'books']])],
   body: `<h1>Books</h1>${list(manifest.books.map((b) => [`${BASE}books/${b.slug}/`, b.title, b.description]))}`,
-})
-pages.push({
-  route: 'projects', title: `Projects · ${site.name}`, description: projects.map((p) => `${p.name}: ${p.tagline}.`).join(' '),
-  image: ogImage('site'), type: 'website',
-  ld: [{
-    '@type': 'CollectionPage', name: 'Projects', url: url('projects'),
-    hasPart: projects.map((p) => ({ '@type': 'SoftwareSourceCode', name: p.name, description: p.description, programmingLanguage: p.tech, author: { '@id': person['@id'] } })),
-  }, crumbs([['Home', ''], ['Projects', 'projects']])],
-  body: `<h1>Projects</h1>${projects.map((p) => `<article><h2>${esc(p.name)}</h2><p><strong>${esc(p.tagline)}</strong></p><p>${esc(p.description)}</p><ul>${p.highlights.map((h) => `<li>${esc(h)}</li>`).join('')}</ul><p>${esc(p.tech.join(', '))}</p></article>`).join('')}`,
 })
 const topicGraph = JSON.parse(fs.readFileSync(path.join(ROOT, 'src/data/graph.json'), 'utf8'))
 pages.push({
@@ -371,7 +361,7 @@ console.log(`postbuild: ${pages.length} pages with SEO metadata + prerendered co
 // Optional text discovery index. This supplements HTML/sitemaps; it is not a ranking directive.
 const mdLink = (p) => `- [${p.title.replace(/[\[\]\n]/g, ' ')}](${url(p.route)}): ${(p.description ?? '').replace(/\s+/g, ' ')}${p.markdown ? ` [Markdown](${p.markdown})` : ''}`
 const sections = [
-  ['Start here', pages.filter((p) => ['', 'about', 'map', 'books', 'papers', 'demos', 'videos', 'writings', 'projects'].includes(p.route))],
+  ['Start here', pages.filter((p) => ['', 'about', 'map', 'books', 'papers', 'demos', 'videos', 'writings'].includes(p.route))],
   ['Writings', pages.filter((p) => p.route.startsWith('writings/'))],
   ...manifest.books.map((b) => [b.title, pages.filter((p) => p.route === `books/${b.slug}` || p.route.startsWith(`books/${b.slug}/`))]),
   ['Research paper explanations and demos', pages.filter((p) => p.route.startsWith('papers/'))],
