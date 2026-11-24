@@ -419,3 +419,8 @@
 .article-credit a { color: var(--link); text-underline-offset: .2em; }
 .article-credit summary { cursor: pointer; color: var(--text); }
 .article-credit details[open] summary { margin-bottom: .75rem; }
+
+/* photographs inside a writing (licensed photos with a credit line) */
+.prose .fig.photo img { display: block; max-width: 100%; height: auto; margin: 0 auto; border: 1px solid var(--border); border-radius: var(--radius); }
+.prose .fig.photo.tall img { max-height: 560px; width: auto; }
+.prose .fig.photo .credit { display: block; margin-top: 0.3em; font-size: 0.9em; color: var(--faint); }

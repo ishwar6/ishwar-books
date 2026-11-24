@@ -1,0 +1,83 @@
+{
+ "rtx5060ti": {
+  "alt": "A GeForce RTX 5060 Ti with 16 GB, made by PNY: two fans, a metal bracket with the video ports, and the gold edge connector that goes into the motherboard.",
+  "caption": "A home card: the GeForce RTX 5060 Ti with 16 GB. NVIDIA makes the chip, and board makers such as PNY build the card around it.",
+  "author": "FreeMediaKid!",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Nvidia_GeForce_RTX_5060_Ti_16GB,_PNY_Overclocked_Dual_Fan,_front.jpg",
+  "w": 1280,
+  "h": 853
+ },
+ "rtx3090v4090": {
+  "alt": "Two large graphics cards with three fans each, an RTX 3090 above and a wider RTX 4090 below.",
+  "caption": "An RTX 3090 (top, Ampere) and an RTX 4090 (bottom, Ada Lovelace). Both have 24 GB. The top tier grew with each generation.",
+  "author": "Benlisquare",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Size_comparison_between_RTX_3090_and_RTX_4090.jpg",
+  "w": 960,
+  "h": 797
+ },
+ "pcb5090": {
+  "alt": "The bare circuit boards of the RTX 5080 and RTX 5090 Founders Edition cards. Each has a large square chip in the middle with small black memory chips around it.",
+  "caption": "The boards of the RTX 5080 and RTX 5090 without their coolers. The large square is the GPU chip. The small black rectangles around it are the GDDR7 memory chips: that is the VRAM.",
+  "author": "Geekerwan",
+  "license": "CC BY 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Nvidia_RTX_5080_5090_FE_PCB.png",
+  "w": 1280,
+  "h": 538
+ },
+ "ada6000": {
+  "alt": "Four slim RTX 6000 Ada workstation cards side by side in one open computer.",
+  "caption": "Four RTX 6000 Ada workstation cards in one machine. Each has 48 GB and a slim shape with one fan at the end, so they fit side by side.",
+  "author": "Geekerwan",
+  "license": "CC BY 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:4%C3%97_NVIDIA_RTX%E2%84%A2_6000_der_Ada-Generation_(%E6%9E%81%E5%AE%A2%E6%B9%BEGeekerwan)_01.png",
+  "w": 1280,
+  "h": 720
+ },
+ "spark": {
+  "alt": "A small gold-coloured metal box on a wooden desk: the NVIDIA DGX Spark.",
+  "caption": "The DGX Spark: a whole AI computer in a box that fits in one hand.",
+  "author": "Daniel Lu (dllu)",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Nvidia_DGX_Spark_oblique_view_dllu.jpg",
+  "w": 1280,
+  "h": 790
+ },
+ "h100": {
+  "alt": "Four gold-coloured H100 cards standing in a row. They have no fans.",
+  "caption": "H100 cards. They have no fans: the server pushes air through them.",
+  "author": "Geekerwan",
+  "license": "CC BY 3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:NVIDIA_H100_(%E6%9E%81%E5%AE%A2%E6%B9%BEGeekerwan)_011.png",
+  "w": 1280,
+  "h": 720
+ },
+ "dgxb200": {
+  "alt": "A large server board with eight tall black GPU modules, labelled HGX B200.",
+  "caption": "Eight B200 GPUs on one board, the inside of a B200 server.",
+  "author": "Pokiiri",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Nvidia_DGX-B200-HGX.jpg",
+  "w": 960,
+  "h": 974
+ },
+ "gb200": {
+  "alt": "A tall black server rack filled with flat trays: an NVIDIA GB200 rack.",
+  "caption": "A GB200 rack with 72 Blackwell GPUs and 36 Grace processors, cooled by liquid. It is sold as one machine.",
+  "author": "Pokiiri",
+  "license": "CC BY-SA 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Nvidia_DGX_GB200.jpg",
+  "w": 640,
+  "h": 1100
+ },
+ "jetson": {
+  "alt": "A small grey box with cooling fins next to its retail carton: the Jetson AGX Orin developer kit.",
+  "caption": "The Jetson AGX Orin developer kit, a complete computer for a robot.",
+  "author": "Auledas",
+  "license": "CC BY 4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:NVidia_Jetson_Orin_AGX.png",
+  "w": 1280,
+  "h": 968
+ }
+}
