@@ -95,7 +95,7 @@ assert.ok(rss.querySelectorAll('item').length >= markdownCount - 15, 'Feed omits
 for (const date of rss.querySelectorAll('pubDate')) assert.ok(Number.isFinite(Date.parse(date.textContent)))
 assert.ok(read('robots.txt').includes(`Sitemap: ${origin}${base}sitemap.xml`))
 assert.match(read('robots.txt'), /User-agent: OAI-SearchBot\nAllow: \//)
-for (const url of urls.filter((url) => routeOf(url) !== 'projects')) assert.ok(read('llms.txt').includes(url), `Missing discovery index entry: ${url}`)
+for (const url of urls) assert.ok(read('llms.txt').includes(url), `Missing discovery index entry: ${url}`)
 
 // Exercise actual client head replacement with a DOM: article → video → 404 → article.
 const server = await createServer({ root, configFile: false, server: { middlewareMode: true, hmr: false, watch: null }, logLevel: 'error' })

@@ -492,13 +492,18 @@ for (const p of pages) {
     const start = node.position.start.offset, end = node.position.end.offset
     const original = p.body.slice(start, end)
     // Edit URL tokens only; fenced code and inline examples are untouched.
-    const at = node.type === 'definition' ? original.indexOf(':') + 1 : original.indexOf('](') + 2
+    const at = node.type === 'definition' ? original.indexOf(':') + 1 : original.lastIndexOf('](') + 2
     if (at < 1) return
     const token = original.indexOf(href, at)
     if (token !== -1) edits.push({ start: start + token, end: start + token + href.length, value: resolved })
   })
   let markdown = p.body
   for (const edit of edits.sort((a, b) => b.start - a.start)) markdown = markdown.slice(0, edit.start) + edit.value + markdown.slice(edit.end)
+  // Inline SVG geometry is unreadable as text and can be most of a file: keep its description, drop the drawing.
+  markdown = markdown.split(/(```[\s\S]*?```)/).map((chunk, i) => i % 2 ? chunk : chunk.replace(/<svg\b[^>]*>[\s\S]*?<\/svg>/g, (svg) => {
+    const label = svg.match(/^<svg\b[^>]*\baria-label="([^"]*)"/)?.[1] ?? svg.match(/<title>([^<]*)<\/title>/)?.[1]
+    return `<p>[Figure${label ? ': ' + label : ''}. See it at ${canonical}]</p>`
+  })).join('')
   fs.writeFileSync(dest.replace(/\.json$/, '.md'), `# ${p.meta.title}\n\nAuthor: ${site.name}\nCanonical URL: ${canonical}\n${p.meta.updated ? `Updated: ${p.meta.updated}\n` : ''}Source: ${sourceUrl}\n\n${markdown}\n`)
   for (const sec of sections) {
     const text = sec.text.join(' ').replace(/\s+/g, ' ').trim()

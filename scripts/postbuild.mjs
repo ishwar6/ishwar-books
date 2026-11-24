@@ -144,7 +144,7 @@ for (const p of papers) {
     '@type': 'ScholarlyArticle', name: p.title, headline: p.title, datePublished: p.year ? String(p.year) : undefined,
     author: p.authors.map((name) => ({ '@type': 'Person', name })), ...(p.arxiv ? { url: `https://arxiv.org/abs/${p.arxiv}`, sameAs: `https://arxiv.org/abs/${p.arxiv}` } : {}),
   }
-  const cite = `<p>${esc(p.title)}. ${esc(p.authors.join(', '))}. ${esc([p.venue, p.year].filter(Boolean).join(', '))}.${p.arxiv ? ` <a href="https://arxiv.org/abs/${p.arxiv}">arXiv:${p.arxiv}</a>` : ''}</p>`
+  const cite = `<p>${esc(p.title)}. ${esc(p.authors.join(', '))}. ${esc([p.venue, p.year].filter(Boolean).join(', '))}.${p.arxiv ? ` <a href="https://arxiv.org/abs/${p.arxiv}">arXiv:${p.arxiv}</a>` : ''}${p.url ? ` <a href="${esc(p.url)}">Original paper</a>` : ''}${p.code ? ` · <a href="${esc(p.code)}">Code</a>` : ''}${p.reader ? ` · <a href="${BASE}${p.route}/read/">Read beside the paper</a>` : ''}${p.demo ? ` · <a href="${BASE}${p.route}/demo/">Interactive demo</a>` : ''}</p>`
   pages.push({
     route: p.route, title: `${p.short}, explained: ${p.title} · ${site.name}`, description: p.description, image: ogImage(`paper-${p.slug}`), type: 'article',
     published: iso(p.date), modified: iso(p.updated ?? p.date), tags: p.tags,
@@ -176,7 +176,7 @@ for (const p of papers) {
     route: `${p.route}/demo`, title: `${p.demo.title} · ${p.short} · ${site.name}`, image: ogImage(`paper-${p.slug}`), type: 'website',
     description: p.demo.description,
     ld: [crumbs([['Home', ''], ['Research papers', 'papers'], [p.short, p.route], [p.demo.title, `${p.route}/demo`]])],
-    body: `<h1>${esc(p.demo.title)}</h1><p>${esc(p.demo.description)}</p><p><a href="${BASE}${p.route}/">${esc(p.short)}, explained</a></p>`,
+    body: `<h1>${esc(p.demo.title)}</h1><p>${esc(p.demo.description)}</p><p><a href="${BASE}${p.route}/">${esc(p.short)}, explained</a></p><h2>The explanation, part by part</h2>${list(p.parts.map((x) => [`${BASE}${x.route}/`, `${x.partLabel}: ${x.title}`, x.description]))}`,
   })
   if (p.reader) pages.push({
     route: `${p.route}/read`, title: `${p.short}, read beside the paper · ${site.name}`, image: ogImage(`paper-${p.slug}`), type: 'website',
@@ -269,7 +269,7 @@ for (const pg of pages) {
     const children = [...sourceMeta.values()].filter((x) => !pg.route || x.route.startsWith(pg.route + '/'))
     const pageFile = { '': 'Home', writings: 'Writings', books: 'Books', papers: 'Papers', demos: 'Demos', videos: 'Videos', map: 'Map', about: 'About', projects: 'Projects' }[pg.route]
     const paper = papers.find((p) => pg.route.startsWith(p.route + '/'))
-    pg.modified = iso(latestDate(children.map((x) => x.updated), pageFile && sourceDates.get(`src/pages/${pageFile}.tsx`), ['','about','projects'].includes(pg.route) && sourceDates.get('src/data/site.json'), pg.route === 'map' && sourceDates.get('src/data/graph.json'), paper?.updated, paper && [...sourceDates].filter(([file]) => file.startsWith(`src/demos/${paper.slug}/`)).map(([, date]) => date)))
+    pg.modified = iso(latestDate(children.map((x) => x.updated), pageFile && sourceDates.get(`src/pages/${pageFile}.tsx`), ['','about','projects'].includes(pg.route) && sourceDates.get('src/data/site.json'), pg.route === 'map' && sourceDates.get('src/data/graph.json'), pg.route === 'demos' && [sourceDates.get('src/demos/catalog.ts'), ...[...sourceDates].filter(([file]) => file.startsWith('src/demos/')).map(([, date]) => date)], paper?.updated, paper && [...sourceDates].filter(([file]) => file.startsWith(`src/demos/${paper.slug}/`)).map(([, date]) => date)))
   }
   const main = pg.ld.find((node) => ['BlogPosting', 'TechArticle', 'Book', 'VideoObject'].includes(node['@type']))
   if (main) {
@@ -334,8 +334,8 @@ function render(pg, options = {}) {
     .replace(/\s*<meta name="description"[^>]*>/, '')
     .replace(/\s*<meta property="og:[^>]*>/g, '')
     .replace(/\s*<link rel="canonical"[^>]*>/, '')
-    .replace('</head>', `    ${head}\n  </head>`)
-    .replace('<div id="root"></div>', `<div id="root"><div class="container prerender">${nav}<main class="prose">${pg.body}</main><footer><a href="${BASE}rss.xml">RSS feed</a> · <a href="${BASE}llms.txt">Content index for AI tools</a></footer></div></div>`)
+    .replace('</head>', () => `    ${head}\n  </head>`)
+    .replace('<div id="root"></div>', () => `<div id="root"><div class="container prerender">${nav}<main class="prose">${pg.body}</main><footer><a href="${BASE}rss.xml">RSS feed</a> · <a href="${BASE}llms.txt">Content index for AI tools</a></footer></div></div>`)
 }
 
 for (const pg of pages) {
@@ -356,7 +356,7 @@ fs.writeFileSync(path.join(DIST, 'sitemap.xml'), `<?xml version="1.0" encoding="
 ${pages.map((pg) => `  <url><loc>${url(pg.route)}</loc>${pg.modified ? `<lastmod>${pg.modified.slice(0, 10)}</lastmod>` : ''}</url>`).join('\n')}
 </urlset>
 `)
-fs.writeFileSync(path.join(DIST, 'robots.txt'), `# Public content is available to search engines and AI search crawlers.\n# OAI-SearchBot serves ChatGPT search; training crawler policy remains unchanged.\nUser-agent: *\nAllow: /\n\nUser-agent: OAI-SearchBot\nAllow: /\n\nSitemap: ${ORIGIN}${BASE}sitemap.xml\n`)
+fs.writeFileSync(path.join(DIST, 'robots.txt'), `# Public content is available to search engines and AI search crawlers.\n# OAI-SearchBot serves ChatGPT search; training crawler policy remains unchanged.\nUser-agent: *\nAllow: /\n\nUser-agent: OAI-SearchBot\nAllow: /\n\n# AI assistants that fetch a page when a person asks about it, and AI search indexes.\nUser-agent: ChatGPT-User\nUser-agent: Claude-User\nUser-agent: Claude-SearchBot\nUser-agent: PerplexityBot\nUser-agent: Perplexity-User\nAllow: /\n\nSitemap: ${ORIGIN}${BASE}sitemap.xml\n`)
 fs.writeFileSync(path.join(DIST, 'rss.xml'), `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel>
 <title>${esc(site.name)}: writings, books, papers and videos</title><link>${ORIGIN}${BASE}</link><description>${esc(site.description)}</description><language>en</language>
@@ -371,7 +371,7 @@ console.log(`postbuild: ${pages.length} pages with SEO metadata + prerendered co
 // Optional text discovery index. This supplements HTML/sitemaps; it is not a ranking directive.
 const mdLink = (p) => `- [${p.title.replace(/[\[\]\n]/g, ' ')}](${url(p.route)}): ${(p.description ?? '').replace(/\s+/g, ' ')}${p.markdown ? ` [Markdown](${p.markdown})` : ''}`
 const sections = [
-  ['Start here', pages.filter((p) => ['', 'about', 'map', 'books', 'papers', 'demos', 'videos', 'writings'].includes(p.route))],
+  ['Start here', pages.filter((p) => ['', 'about', 'map', 'books', 'papers', 'demos', 'videos', 'writings', 'projects'].includes(p.route))],
   ['Writings', pages.filter((p) => p.route.startsWith('writings/'))],
   ...manifest.books.map((b) => [b.title, pages.filter((p) => p.route === `books/${b.slug}` || p.route.startsWith(`books/${b.slug}/`))]),
   ['Research paper explanations and demos', pages.filter((p) => p.route.startsWith('papers/'))],
